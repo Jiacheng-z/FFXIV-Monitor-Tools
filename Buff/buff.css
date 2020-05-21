@@ -1,0 +1,73 @@
+#jobs {
+  position: relative;
+}
+
+#bars {
+  position: relative;
+  top: 20px; /* Space for pull counter */
+  left: 100px; /* Space for some left buffs */
+}
+
+.big-buff {
+  border: 1px solid black;
+  width: 44px;
+  height: 32px;
+}
+
+/* Relative to #bars */
+#left-side-icons {
+  position: absolute;
+  left: -2px;
+}
+
+/* Relative to #bars */
+#right-side-icons {
+  position: absolute;
+  left: 242px;
+}
+
+/* Relative to #bars */
+#pull-bar,
+#hp-bar,
+#mp-bar,
+#mp-tick,
+#cp-bar,
+#gp-bar {
+  width: 202px;
+  height: 7px;
+  margin-top: 1px;
+}
+
+#pull-bar {
+  position: absolute;
+  left: 100px;
+  top: 0;
+  height: 18px;
+  font-size: 10px;
+}
+
+.justbuffs #right-side-icons {
+  position: fixed;
+  left: 0;
+}
+
+.justbuffs #pull-bar {
+  display: none;
+}
+
+.justbuffs #bars {
+  display: none;
+}
+
+#jobs-buffs-total {
+  color : white;
+  text-shadow: -1px 0 3px black, 0 1px 3px black, 1px 0 3px black, 0 -1px 3px black;
+}
+
+#jobs-buffs-total .num {
+  position: absolute;
+  left: 50px;
+  top: 0;
+  color : white;
+  text-shadow: -1px 0 3px black, 0 1px 3px black, 1px 0 3px black, 0 -1px 3px black;
+}
