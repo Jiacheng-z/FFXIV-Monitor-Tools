@@ -8,42 +8,10 @@ let Options = {
     BigBuffBarHeight: 20, // 团副监控计时条高度（像素）
     BigBuffTextHeight: 0,//团副监控文字高度（像素）
     BigBuffBorderSize: 0,// 团副监控边框尺寸（像素）
+    TTS: true, // 是否使用tts播报
     // BigBuffShowCooldownSeconds: 20, // 显示团辅冷却倒计时最小时间
 
     PerBuffOptions: {
-        // This is noisy since it's more or less permanently on you.
-        // Players are unlikely to make different decisions based on this.
-        standardFinish: {
-            hide: true,
-        },
-
-        // The name of the buff to override.  These available buffs are:
-        // trick, litany, embolden, balance, chain, hyper, sight, brotherhood,
-        // devotion, requiem
-        trick: {
-            // By default everything is on the right.  This puts the icon on the
-            // left for better visibility.
-            side: 'left',
-
-            // The border color.  See: https://www.google.com/search?q=color+picker
-            // This example sets trick to use a white border.
-            borderColor: '#FFFFFF',
-
-            // The icon to use.  This is a url or a data url like this.  This
-            // example sets trick to use a bright red icon instead.
-            icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAySURBVEhL7c0xEQAgDAAxhHSsf2d4QMJPbLnLnnNnvxIkQRIkQRIkQRIkQRIkQfoczD4cGLQ9QOmZGwAAAABJRU5ErkJggg==',
-
-            // If true (instead of false here), this will hide the buff and
-            // prevent it from being shown.
-            hide: false,
-
-            // sortKey controls the order of the buffs when multiple buffs are shown.
-            // Smaller numbers are higher priority and will be shown closer to
-            // the middle.  The existing buffs are ordered 0-10, but you can use any
-            // numerical value you want here, including negatives.
-            // This example sets trick to be a very high priority.
-            sortKey: 1000,
-        },
     },
 };
 
@@ -212,7 +180,7 @@ function makeAuraTimerIcon(name, seconds, opacity, iconWidth, iconHeight, iconTe
     div.appendChild(barDiv);
 
     if (seconds >= 0) {
-        let c = 250 / 60
+        let c = 200 / 30
         let width = seconds * c // 动态长度
         let bar = document.createElement('timer-bar');
         bar.width = width;// 进度条宽度
@@ -463,6 +431,12 @@ class Buff {
             aura.addTimeout = null;
             this.buffsCalculation(list)
 
+            // 语音播报
+            if (Options.TTS === true && this.info.tts != null && this.info.tts != '') {
+                let cmd = { 'call': 'cactbotSay', 'text': this.info.tts };
+                window.callOverlayHandler(cmd);
+            }
+
             if (seconds > 0) {
                 aura.removeTimeout = window.setTimeout(() => {
                     aura.removeCallback();
@@ -501,12 +475,6 @@ class Buff {
         let cooldown = this.cooldown[source];
         if (cooldown)
             cooldown.removeCallback();
-    }
-
-    onOwnGain(seconds, source) {
-        this.onLose();
-        this.clearCooldown(source);
-        this.active = this.makeOwnAura(this.name, this.ownactiveList, seconds, 0, 0, 'white', '', 1);
     }
 
     onGain(seconds, source) {
@@ -559,6 +527,7 @@ class BuffTracker {
                 sortKey: 1,
                 cooldown: 60,
                 increases: 5,
+                tts: '背刺',
             },
             litany: { //战斗连祷
                 gainEffect: gLang.kEffect.BattleLitany,
@@ -570,6 +539,7 @@ class BuffTracker {
                 sortKey: 1,
                 cooldown: 180,
                 increases: 5,
+                tts: '连祷',
             },
             embolden: { // 鼓励
                 // Embolden is special and has some extra text at the end, depending on embolden stage:
@@ -587,6 +557,7 @@ class BuffTracker {
                 cooldown: 120,
                 increases: 4,
                 increasesDim: {5: 10, 4: 8, 3: 6, 2: 4, 1: 2}, // 递减
+                tts: '鼓励',
             },
             arrow: { // 放浪神之箭
                 gainEffect: gLang.kEffect.Arrow,
@@ -597,6 +568,7 @@ class BuffTracker {
                 borderColor: '#37ccee',
                 sortKey: 1,
                 increasesJob: {melee: 6, ranged: 3},
+                tts: '近卡',
             },
             balance: { // 太阳神之衡
                 gainEffect: gLang.kEffect.Balance,
@@ -607,6 +579,7 @@ class BuffTracker {
                 borderColor: '#ff9900',
                 sortKey: 1,
                 increasesJob: {melee: 6, ranged: 3},
+                tts: '近卡',
             },
             bole: { // 世界树之干
                 gainEffect: gLang.kEffect.Bole,
@@ -617,6 +590,7 @@ class BuffTracker {
                 borderColor: '#22dd77',
                 sortKey: 1,
                 increasesJob: {melee: 3, ranged: 6},
+                tts: '远卡',
             },
             ewer: { // 河流神之瓶
                 gainEffect: gLang.kEffect.Ewer,
@@ -627,6 +601,7 @@ class BuffTracker {
                 borderColor: '#66ccdd',
                 sortKey: 1,
                 increasesJob: {melee: 3, ranged: 6},
+                tts: '远卡',
             },
             spear: { // 战争神之枪
                 gainEffect: gLang.kEffect.Spear,
@@ -637,6 +612,7 @@ class BuffTracker {
                 borderColor: '#4477dd',
                 sortKey: 1,
                 increasesJob: {melee: 6, ranged: 3},
+                tts: '近卡',
             },
             spire: { // 建筑神之塔
                 gainEffect: gLang.kEffect.Spire,
@@ -647,6 +623,7 @@ class BuffTracker {
                 borderColor: '#ddd044',
                 sortKey: 1,
                 increasesJob: {melee: 3, ranged: 6},
+                tts: '远卡',
             },
             ladyOfCrowns: { // 王冠之贵妇
                 gainEffect: gLang.kEffect.LadyOfCrowns,
@@ -657,6 +634,7 @@ class BuffTracker {
                 borderColor: '#9e5599',
                 sortKey: 1,
                 increasesJob: {melee: 4, ranged: 8},
+                tts: '远卡',
             },
             lordOfCrowns: { // 王冠之领主
                 gainEffect: gLang.kEffect.LordOfCrowns,
@@ -667,6 +645,7 @@ class BuffTracker {
                 borderColor: '#9a2222',
                 sortKey: 1,
                 increasesJob: {melee: 8, ranged: 4},
+                tts: '近卡',
             },
             devilment: { // 进攻之探戈
                 gainEffect: gLang.kEffect.Devilment,
@@ -678,6 +657,7 @@ class BuffTracker {
                 sortKey: 1,
                 cooldown: 120,
                 increases: 10,
+                tts: '探戈',
             },
             technicalFinish: { // 技巧舞步结束
                 gainEffect: gLang.kEffect.TechnicalFinish,
@@ -689,6 +669,7 @@ class BuffTracker {
                 sortKey: 1,
                 cooldown: 120,
                 increases: 5,
+                tts: '技巧',
             },
             battlevoice: { // 战斗之声
                 gainEffect: gLang.kEffect.BattleVoice,
@@ -700,6 +681,7 @@ class BuffTracker {
                 sortKey: 1,
                 cooldown: 180,
                 increases: 4,
+                tts: '战斗之声',
             },
             chain: { // 连环计
                 gainAbility: gLang.kAbility.ChainStratagem,
@@ -710,6 +692,7 @@ class BuffTracker {
                 sortKey: 1,
                 cooldown: 120,
                 increases: 5,
+                tts: '连环计',
             },
             lefteye: { // 巨龙左眼
                 gainEffect: gLang.kEffect.LeftEye,
@@ -721,6 +704,7 @@ class BuffTracker {
                 sortKey: 1,
                 cooldown: 120,
                 increases: 5,
+                tts: '左眼',
             },
             righteye: { // 巨龙右眼
                 gainEffect: gLang.kEffect.RightEye,
@@ -732,6 +716,7 @@ class BuffTracker {
                 sortKey: 1,
                 cooldown: 120,
                 increases: 10,
+                tts: '右眼',
             },
             brotherhood: { // 义结金兰：斗气/攻击
                 gainEffect: gLang.kEffect.Brotherhood,
@@ -743,6 +728,7 @@ class BuffTracker {
                 sortKey: 1,
                 cooldown: 90,
                 increases: 5,
+                tts: '桃园',
             },
             devotion: { // 灵护
                 gainEffect: gLang.kEffect.Devotion,
@@ -754,6 +740,7 @@ class BuffTracker {
                 sortKey: 1,
                 cooldown: 180,
                 increases: 5,
+                tts: '灵护',
             },
             divination: { // 占卜
                 gainEffect: gLang.kEffect.Divination,
@@ -765,6 +752,7 @@ class BuffTracker {
                 sortKey: 1,
                 cooldown: 120,
                 increases: 6,
+                tts: '占卜',
             },
             raging: { // 猛者
                 gainEffect: gLang.kEffect.RagingStrikes,
@@ -777,6 +765,7 @@ class BuffTracker {
                 sortKey: 1,
                 cooldown: 80,
                 increases: 10,
+                tts: '猛者',
             },
             stormbite: {
                 mobGainsOwnEffect: gLang.kEffect.Stormbite,
@@ -1267,7 +1256,7 @@ class Brds {
     }
 
     Test() {
-        this.TestChangeJob();
+        // this.TestChangeJob();
 
         let logs = [];
         let t = '[10:10:10.000] ';
@@ -1285,32 +1274,38 @@ class Brds {
         // logs.push(t + '1A:10000000:' + this.me + ' gains the effect of Devotion from That Guy for 15.0 Seconds.');
         // logs.push(t + '1A:10000000:' + this.me + ' gains the effect of Brotherhood from That Guy for 15.0 Seconds.');
         // logs.push(t + '1A:10000000:' + this.me + ' gains the effect of Brotherhood from Other Guy for 15.0 Seconds.');
-        let e = {detail: {logs: logs}};
+        // let e = {detail: {logs: logs}};
         // this.OnLogEvent(e);
 
         setTimeout(() => {
-            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 强化药 from ' + this.me + ' for 30.00 Seconds.'];
+            let logs = ['[01:05:59.585] 15:1039A1D9:' + this.me + ':8D2:攻其不备:4000031E:木人:1E710003:384B0000:5050F:27E0000:0:0:0:0:0:0:0:0:0:0:0:0:7400000:7400000:0:0:0:1000:-603.1267:-762.9036:25.02:2.283125:82278:82278:10000:10000:0:1000:-604.8576:-761.8551:25:2.115644:00003E39'];
+            let e = {detail: {logs: logs}};
+            this.OnLogEvent(e);
+        }, 1)
+
+        setTimeout(() => {
+            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 强化药 from ' + this.me + ' for 18.00 Seconds.'];
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
         }, 1)
         setTimeout(() => {
-            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 猛者强击 from ' + this.me + ' for 20.00 Seconds.'];
+            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 猛者强击 from ' + this.me + ' for 10.00 Seconds.'];
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
         }, 1000)
         setTimeout(() => {
-            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 放浪神之箭 from Okonomi Yaki for 15.00 Seconds.'];
+            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 放浪神之箭 from Okonomi Yaki for 5.00 Seconds.'];
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
         }, 2000)
         setTimeout(() => {
-            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 太阳神之衡 from Okonomi Yaki for 15.00 Seconds.'];
+            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 太阳神之衡 from Okonomi Yaki for 5.00 Seconds.'];
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
         }, 3000)
 
         setTimeout(() => {
-            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 义结金兰：攻击 from Okonomi Yaki for 15.00 Seconds.'];
+            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 义结金兰：攻击 from Okonomi Yaki for 10.00 Seconds.'];
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
         }, 4000)
@@ -1326,7 +1321,7 @@ class Brds {
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
         }, 3000)
-        //
+
         // setTimeout(() => {
         //     let logs = ['[22:26:37.632] 1E:4000031E:木人 loses the effect of 狂风蚀箭 from ' + this.me + '.'];
         //     let e = {detail: {logs: logs}};
@@ -1337,7 +1332,6 @@ class Brds {
         //     let e = {detail: {logs: logs}};
         //     this.OnLogEvent(e);
         // }, 9000)
-
     }
 
     TestChangeJob() {
