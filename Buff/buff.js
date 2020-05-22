@@ -54,6 +54,8 @@ let kYouUseAbilityRegex = null;
 let kAnybodyAbilityRegex = null;
 let kMobGainsEffectRegex = null;
 let kMobLosesEffectRegex = null;
+let kMobGainsOwnEffectRegex = null; // 自己给boss上的buff
+let kMobLosesOwnEffectRegex = null; // 自己在boss身上丢失的buff
 
 let kStatsRegex = Regexes.statChange();
 
@@ -175,6 +177,8 @@ function setupRegexes(playerName) {
     kAnybodyAbilityRegex = Regexes.ability();
     kMobGainsEffectRegex = Regexes.gainsEffect({targetId: '4.......'});
     kMobLosesEffectRegex = Regexes.losesEffect({targetId: '4.......'});
+    kMobGainsOwnEffectRegex = Regexes.gainsEffect({targetId: '4.......', source: playerName})
+    kMobLosesOwnEffectRegex = Regexes.losesEffect({targetId: '4.......', source: playerName})
 }
 
 function computeBackgroundColorFrom(element, classList) {
@@ -188,10 +192,11 @@ function computeBackgroundColorFrom(element, classList) {
     return color;
 }
 
-function makeAuraTimerIcon(name, seconds, opacity, iconWidth, iconHeight, iconText,
-                           barHeight, textHeight, textColor, borderSize, borderColor, barColor, auraIcon) {
+function makeAuraTimerIcon(name, seconds, opacity, iconWidth, iconHeight, iconText, barHeight, textHeight, textColor, borderSize, borderColor, barColor, auraIcon, increases) {
     let div = document.createElement('div');
     div.style.opacity = opacity;
+    div.className = 'buffs'
+    div.setAttribute('buffs-value', increases)
 
     let icon = document.createElement('timer-icon');
     icon.width = iconWidth;
@@ -249,14 +254,54 @@ function makeAuraTimerIcon(name, seconds, opacity, iconWidth, iconHeight, iconTe
     return div;
 }
 
+function makeOwnAuraTimerIcon(name, seconds, opacity, iconWidth, iconHeight, iconText,
+                              barHeight, textHeight, textColor, borderSize, borderColor, barColor, auraIcon) {
+    let div = document.createElement('div');
+    div.style.opacity = opacity;
+
+    let icon = document.createElement('timer-icon');
+    icon.width = iconWidth;
+    icon.height = iconHeight;
+    icon.bordersize = borderSize;
+    icon.textcolor = textColor;
+    div.appendChild(icon);
+
+    let barDiv = document.createElement('div');
+    barDiv.style.position = 'relative';
+    barDiv.style.top = iconHeight;
+    div.appendChild(barDiv);
+
+    if (seconds >= 0) {
+        let bar = document.createElement('timer-bar');
+        bar.width = iconWidth;
+        bar.height = barHeight;
+        bar.fg = barColor;
+        bar.duration = seconds;
+        barDiv.appendChild(bar);
+    }
+
+    // 获取当前buff值
+    let statTotal = document.getElementById('jobs-buffs-total');
+    let v = statTotal.getAttribute('value')
+    if (v !== undefined && Number(v) > 0) {
+        icon.text = v;
+    }
+    icon.bordercolor = borderColor;
+    icon.icon = auraIcon;
+
+    return div;
+}
+
 class Buff {
-    constructor(name, info, list, options) {
+    constructor(job, name, info, list, options, ownBuff) {
+        this.job = job;
         this.name = name;
         this.info = info;
         this.options = options;
 
         // TODO: these should be different ui elements.
         // TODO: or maybe add some buffer between sections?
+        this.ownBuff = ownBuff;
         this.activeList = list;
         this.cooldownList = list;
         this.readyList = list;
@@ -313,42 +358,37 @@ class Buff {
     //         this.readySortKeyBase, color, txt, 0.6);
     // }
 
-    //添加数据
-    totalAdd() {
-        let statTotal = document.getElementById('jobs-buffs-total')
-        let value = statTotal.getAttribute('value')
-        console.log('add', statTotal, value)
-        if (value == undefined || Number(value) == 0) {
-            value = this.info.increases
-        } else {
-            value = Number(value) + this.info.increases
-        }
-        statTotal.setAttribute('value', value)
-        statTotal.innerText = 'Total: ' + value + '%'
-    }
-
-    // 删除数据
-    totalRemove() {
-        let statTotal = document.getElementById('jobs-buffs-total')
-        let value = statTotal.getAttribute('value')
-        console.log('remove', statTotal, value)
-        if (value != undefined) {
-            value = Number(value) - this.info.increases
-            if (value <= 0) {
-                value = 0
+    // 计算buff, 展示剩余多少时间刷buff是值得
+    buffsCalculation(list) {
+        let tgs = list.rootElement.getElementsByClassName('buffs');
+        let total = 0;
+        for (let i = 0; i < tgs.length; i++) {
+            let iv = tgs[i].getAttribute('buffs-value');
+            if (iv !== undefined && Number(iv) > 0) {
+                total = Number(total) + Number(iv);
             }
         }
 
-        statTotal.setAttribute('value', value)
-        if (Number(value) <= 0) {
-            statTotal.innerText = ''
+        let statTotal = document.getElementById('jobs-buffs-total');
+        statTotal.setAttribute('value', total)
+        if (Number(total) <= 0) {
+            statTotal.innerText = '';
         } else {
-            statTotal.innerText = 'Total: ' + value + '%'
+            statTotal.innerText = 'Total: ' + total + '%';
+        }
+
+        // 诗人计算秒数
+        if (this.job === 'BRD') {
+            let statSec = document.getElementById('jobs-buffs-sec');
+            if (Number(total) > 0) {
+                statSec.innerText = Math.floor((30 * 900 * (Number(total) / 100)) / ((1 + (Number(total) / 100)) * (230 - 100))) + 's';
+            } else {
+                statSec.innerText = '';
+            }
         }
     }
 
-    makeAura(key, list, seconds, secondsUntilShow,
-             adjustSort, textColor, txt, opacity, expireCallback) {
+    makeOwnAura(key, list, seconds, secondsUntilShow, adjustSort, textColor, txt, opacity, expireCallback) {
         let aura = {};
 
         aura.removeCallback = () => {
@@ -361,7 +401,53 @@ class Buff {
                 window.clearTimeout(aura.removeTimeout);
                 aura.removeTimeout = null;
             }
-            this.totalRemove()
+        };
+        aura.addCallback = () => {
+            let elem = makeOwnAuraTimerIcon(
+                key, seconds, opacity,
+                this.options.BigBuffIconWidth, this.options.BigBuffIconHeight,
+                txt,
+                5, 0,
+                textColor,
+                1,
+                this.info.borderColor, this.info.borderColor,
+                this.info.icon);
+            list.addElement(key, elem, Math.floor(seconds) + adjustSort);
+            aura.addTimeout = null;
+
+            if (seconds > 0) {
+                aura.removeTimeout = window.setTimeout(() => {
+                    aura.removeCallback();
+                    if (expireCallback)
+                        expireCallback();
+                }, seconds * 1000);
+            }
+        };
+        aura.removeTimeout = null;
+
+        if (secondsUntilShow > 0)
+            aura.addTimeout = window.setTimeout(aura.addCallback, secondsUntilShow * 1000);
+        else
+            aura.addCallback();
+
+
+        return aura;
+    }
+
+    makeAura(key, list, seconds, secondsUntilShow, adjustSort, textColor, txt, opacity, expireCallback) {
+        let aura = {};
+
+        aura.removeCallback = () => {
+            list.removeElement(key);
+            if (aura.addTimeout) {
+                window.clearTimeout(aura.addTimeout);
+                aura.addTimeout = null;
+            }
+            if (aura.removeTimeout) {
+                window.clearTimeout(aura.removeTimeout);
+                aura.removeTimeout = null;
+            }
+            this.buffsCalculation(list)
         };
         aura.addCallback = () => {
             let elem = makeAuraTimerIcon(
@@ -372,10 +458,10 @@ class Buff {
                 textColor,
                 this.options.BigBuffBorderSize,
                 this.info.borderColor, this.info.borderColor,
-                this.info.icon);
+                this.info.icon, this.info.increases);
             list.addElement(key, elem, Math.floor(seconds) + adjustSort);
             aura.addTimeout = null;
-            this.totalAdd()
+            this.buffsCalculation(list)
 
             if (seconds > 0) {
                 aura.removeTimeout = window.setTimeout(() => {
@@ -417,12 +503,21 @@ class Buff {
             cooldown.removeCallback();
     }
 
-    onGain(seconds, source) {
-        // seconds = 999
+    onOwnGain(seconds, source) {
         this.onLose();
         this.clearCooldown(source);
-        this.active = this.makeAura(this.name, this.activeList, seconds, 0, 0, 'white', '', 1);
-        // this.addCooldown(source, seconds);
+        this.active = this.makeOwnAura(this.name, this.ownactiveList, seconds, 0, 0, 'white', '', 1);
+    }
+
+    onGain(seconds, source) {
+        this.onLose();
+        this.clearCooldown(source);
+        if (this.ownBuff === true) {
+            this.active = this.makeOwnAura(this.name, this.activeList, seconds, 0, 0, 'white', '', 1);
+        } else {
+            this.active = this.makeAura(this.name, this.activeList, seconds, 0, 0, 'white', '', 1);
+            // this.addCooldown(source, seconds);
+        }
     }
 
     onLose() {
@@ -434,10 +529,11 @@ class Buff {
 }
 
 class BuffTracker {
-    constructor(options, playerName, job, leftBuffDiv, rightBuffDiv) {
+    constructor(options, playerName, job, leftBuffDiv, rightBuffDiv, ownBuffDiv) {
         this.options = options;
         this.playerName = playerName;
         this.job = job;
+        this.ownBuffDiv = ownBuffDiv;
         this.leftBuffDiv = leftBuffDiv;
         this.rightBuffDiv = rightBuffDiv;
         this.buffs = {};
@@ -680,8 +776,24 @@ class BuffTracker {
                 borderColor: '#db6509',
                 sortKey: 1,
                 cooldown: 80,
-                increases: 20,
+                increases: 10,
             },
+            stormbite: {
+                mobGainsOwnEffect: gLang.kEffect.Stormbite,
+                mobLosesOwnEffect: gLang.kEffect.Stormbite,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/002000/002614.png',
+                borderColor: '#3df6fd',
+                sortKey: 1,
+            },
+            causticBite: {
+                mobGainsOwnEffect: gLang.kEffect.CausticBite,
+                mobLosesOwnEffect: gLang.kEffect.CausticBite,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/002000/002613.png',
+                borderColor: '#e053bb',
+                sortKey: 1,
+            }
         };
 
         let keys = Object.keys(this.buffInfo);
@@ -690,6 +802,8 @@ class BuffTracker {
         this.gainAbilityMap = {};
         this.mobGainsEffectMap = {};
         this.mobLosesEffectMap = {};
+        this.mobGainsOwnEffectMap = {};
+        this.mobLosesOwnEffectMap = {};
 
         let propToMapMap = {
             gainEffect: this.gainEffectMap,
@@ -697,6 +811,8 @@ class BuffTracker {
             gainAbility: this.gainAbilityMap,
             mobGainsEffect: this.mobGainsEffectMap,
             mobLosesEffect: this.mobLosesEffectMap,
+            mobGainsOwnEffect: this.mobGainsOwnEffectMap,
+            mobLosesOwnEffect: this.mobLosesOwnEffectMap,
         };
 
         for (let i = 0; i < keys.length; ++i) {
@@ -751,7 +867,7 @@ class BuffTracker {
 
             let seconds = b.durationSeconds;
             let source = abilitySourceFromLog(log);
-            this.onBigBuff(b.name, seconds, b, source);
+            this.onBigBuff(b.name, seconds, b, source, false);
         }
     }
 
@@ -766,11 +882,33 @@ class BuffTracker {
                 seconds = b.durationSeconds;
 
             let source = gainSourceFromLog(log);
-            this.onBigBuff(b.name, seconds, b, source);
+            this.onBigBuff(b.name, seconds, b, source, false);
+        }
+    }
+
+    onGainOwnEffect(buffs, log) {
+        if (!buffs)
+            return;
+        for (let b of buffs) {
+            let seconds = -1;
+            if (b.useEffectDuration)
+                seconds = gainSecondsFromLog(log);
+            else if ('durationSeconds' in b)
+                seconds = b.durationSeconds;
+
+            let source = gainSourceFromLog(log);
+            this.onBigBuff(b.name, seconds, b, source, true);
         }
     }
 
     onLoseEffect(buffs, log) {
+        if (!buffs)
+            return;
+        for (let b of buffs)
+            this.onLoseBigBuff(b.name, b);
+    }
+
+    onLoseOwnEffect(buffs, log) {
         if (!buffs)
             return;
         for (let b of buffs)
@@ -793,7 +931,15 @@ class BuffTracker {
         this.onLoseEffect(this.mobLosesEffectMap[name], log);
     }
 
-    onBigBuff(name, seconds, info, source) {
+    onMobGainsOwnEffect(name, log) {
+        this.onGainOwnEffect(this.mobGainsOwnEffectMap[name], log);
+    }
+
+    onMobLosesOwnEffect(name, log) {
+        this.onLoseOwnEffect(this.mobLosesOwnEffectMap[name], log);
+    }
+
+    onBigBuff(name, seconds, info, source, ownBuff) {
         if (seconds <= 0)
             return;
 
@@ -812,7 +958,11 @@ class BuffTracker {
 
         let buff = this.buffs[name];
         if (!buff) {
-            this.buffs[name] = new Buff(name, info, list, this.options);
+            if (ownBuff === true) {
+                this.buffs[name] = new Buff(this.job, name, info, this.ownBuffDiv, this.options, true);
+            } else {
+                this.buffs[name] = new Buff(this.job, name, info, list, this.options, false);
+            }
             buff = this.buffs[name];
         }
 
@@ -899,15 +1049,17 @@ class Brds {
             stat.removeChild(stat.childNodes[0]);
 
         let statLayoutTotal = document.createElement('div');
-        // statLayoutTotal.attachShadow({mode: 'open'});
         statLayoutTotal.id = 'jobs-buffs-total';
+        let statLayoutSec = document.createElement('div');
+        statLayoutSec.id = 'jobs-buffs-sec';
         let statLayoutNow = document.createElement('div');
-        // statLayoutNow.attachShadow({mode: 'open'});
         statLayoutNow.id = 'jobs-buffs-now';
-        // statLayoutNow.style.color = 'white';
-        // statLayoutNow.style.textShadow = '-1px 0 3px black, 0 1px 3px black, 1px 0 3px black, 0 -1px 3px black';
+        let ownDotLayoutNow = document.createElement('div');
+        ownDotLayoutNow.id = 'jobs-own-dot';
         stat.appendChild(statLayoutTotal);
+        stat.appendChild(statLayoutSec);
         stat.appendChild(statLayoutNow);
+        stat.appendChild(ownDotLayoutNow);
 
         let container = document.getElementById('jobs-container'); // 查找对应ID的元素
         if (container == null) {
@@ -963,6 +1115,13 @@ class Brds {
 
         this.o.rightBuffsList = document.createElement('widget-list');
         this.o.rightBuffsContainer.appendChild(this.o.rightBuffsList);
+
+        this.o.ownDotList = document.createElement('widget-list');
+        this.o.ownDotList.rowcolsize = 2;
+        this.o.ownDotList.maxnumber = 2;
+        this.o.ownDotList.toward = 'left down';
+        this.o.ownDotList.elementwidth = this.options.BigBuffIconWidth + 2;
+        ownDotLayoutNow.appendChild(this.o.ownDotList);
 
         this.o.rightBuffsList.rowcolsize = 7;
         this.o.rightBuffsList.maxnumber = 7;
@@ -1020,7 +1179,7 @@ class Brds {
             // On reload, we need to set the opacity after setting up the job bars.
             this.UpdateOpacity();
             // Set up the buff tracker after the job bars are created.
-            this.buffTracker = new BuffTracker(this.options, this.me, this.job, this.o.leftBuffsList, this.o.rightBuffsList);
+            this.buffTracker = new BuffTracker(this.options, this.me, this.job, this.o.leftBuffsList, this.o.rightBuffsList, this.o.ownDotList);
         }
     }
 
@@ -1044,7 +1203,7 @@ class Brds {
                     continue;
                 }
             } else if (log[15] == '1') {
-                if (log[16] == 'A') { // 自己给自己的buff
+                if (log[16] == 'A') {
                     let m = log.match(kYouGainEffectRegex);
                     if (m) {
                         let name = m.groups.effect;
@@ -1056,6 +1215,11 @@ class Brds {
                     m = log.match(kMobGainsEffectRegex);
                     if (m)
                         this.buffTracker.onMobGainsEffect(m.groups.effect, log);
+
+                    m = log.match(kMobGainsOwnEffectRegex);
+                    if (m)
+                        this.buffTracker.onMobGainsOwnEffect(m.groups.effect, log);
+
                 } else if (log[16] == 'E') {
                     let m = log.match(kYouLoseEffectRegex);
                     if (m) {
@@ -1068,6 +1232,10 @@ class Brds {
                     m = log.match(kMobLosesEffectRegex);
                     if (m)
                         this.buffTracker.onMobLosesEffect(m.groups.effect, log);
+
+                    m = log.match(kMobLosesOwnEffectRegex);
+                    if (m)
+                        this.buffTracker.onMobLosesOwnEffect(m.groups.effect, log);
                 }
                 // TODO: consider flags for missing.
                 // flags:damage is 1:0 in most misses.
@@ -1099,6 +1267,8 @@ class Brds {
     }
 
     Test() {
+        this.TestChangeJob();
+
         let logs = [];
         let t = '[10:10:10.000] ';
         // logs.push(t + '1A:10000000:' + this.me + ' gains the effect of 强化药 from ' + this.me + ' for 30.00 Seconds.');
@@ -1124,7 +1294,7 @@ class Brds {
             this.OnLogEvent(e);
         }, 1)
         setTimeout(() => {
-            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 猛者强击 from ' + this.me + ' for 10.00 Seconds.'];
+            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 猛者强击 from ' + this.me + ' for 20.00 Seconds.'];
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
         }, 1000)
@@ -1143,7 +1313,31 @@ class Brds {
             let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 义结金兰：攻击 from Okonomi Yaki for 15.00 Seconds.'];
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
-        }, 1000)
+        }, 4000)
+
+        setTimeout(() => {
+            let logs = ['[22:26:37.632] 1A:4000031E:木人 gains the effect of 狂风蚀箭 from ' + this.me + ' for 30.00 Seconds.'];
+            let e = {detail: {logs: logs}};
+            this.OnLogEvent(e);
+        }, 2000)
+
+        setTimeout(() => {
+            let logs = ['[22:26:37.632] 1A:4000031E:木人 gains the effect of 烈毒咬箭 from ' + this.me + ' for 30.00 Seconds.'];
+            let e = {detail: {logs: logs}};
+            this.OnLogEvent(e);
+        }, 3000)
+        //
+        // setTimeout(() => {
+        //     let logs = ['[22:26:37.632] 1E:4000031E:木人 loses the effect of 狂风蚀箭 from ' + this.me + '.'];
+        //     let e = {detail: {logs: logs}};
+        //     this.OnLogEvent(e);
+        // }, 8000)
+        // setTimeout(() => {
+        //     let logs = ['[22:26:37.632] 1E:4000031E:木人 loses the effect of 烈毒咬箭 from ' + this.me + '.'];
+        //     let e = {detail: {logs: logs}};
+        //     this.OnLogEvent(e);
+        // }, 9000)
+
     }
 
     TestChangeJob() {

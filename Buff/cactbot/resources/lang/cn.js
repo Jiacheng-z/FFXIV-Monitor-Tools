@@ -80,6 +80,10 @@ class CactbotLanguageCn extends CactbotLanguage {
 
       // OWN
       RagingStrikes: '猛者强击',
+
+      // BRD-DOT
+      Stormbite: '狂风蚀箭',
+      CausticBite: '烈毒咬箭',
   });
 
     this.kUIStrings = Object.freeze({
