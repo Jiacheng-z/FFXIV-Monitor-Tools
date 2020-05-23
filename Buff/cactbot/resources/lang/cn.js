@@ -92,6 +92,20 @@ class CactbotLanguageCn extends CactbotLanguage {
       CircleOfScorn: '厄运流转',
       Requiescat: '安魂祈祷',
 
+      // 枪刃
+      NoMercy: '无情',
+      SonicBreak: '音速破',
+      BowShock: '弓形冲波',
+
+      // 白魔
+      Dia: '天辉',
+
+      // 学者
+      Biolysis: '蛊毒法',
+
+      // 占星
+      CombustIII: '焚灼',
+
     });
 
     this.kUIStrings = Object.freeze({

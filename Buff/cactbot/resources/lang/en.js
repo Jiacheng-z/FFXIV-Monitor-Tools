@@ -90,6 +90,20 @@ class CactbotLanguageEn extends CactbotLanguage {
       GoringBlade: 'Goring Blade',
       CircleOfScorn: 'Circle of Scorn',
       Requiescat: 'Requiescat',
+
+      // 枪刃
+      NoMercy: 'No Mercy',
+      SonicBreak: 'Sonic Break',
+      BowShock: 'Bow Shock',
+
+      // 白魔
+      Dia: 'Dia',
+
+      // 学者
+      Biolysis: 'Biolysis',
+
+      // 占星
+      CombustIII: 'Combust III',
     });
 
     this.kUIStrings = Object.freeze({

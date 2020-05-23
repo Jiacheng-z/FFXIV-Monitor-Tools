@@ -662,6 +662,273 @@ class BuffTracker {
                 increasesDim: {5: 10, 4: 8, 3: 6, 2: 4, 1: 2}, // 递减
                 tts: '鼓励',
             },
+            devilment: { // 进攻之探戈
+                gainEffect: gLang.kEffect.Devilment,
+                loseEffect: gLang.kEffect.Devilment,
+                durationSeconds: 20,
+                icon: 'cactbot/resources/icon/status/devilment.png',
+                // Dark Green.
+                borderColor: '#006400',
+                sortKey: 1,
+                cooldown: 120,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 10, // 物理增伤
+                incrMagic: 10, // 魔法增伤
+                increases: 10,
+                tts: '探戈',
+            },
+            technicalFinish: { // 技巧舞步结束
+                gainEffect: gLang.kEffect.TechnicalFinish,
+                loseEffect: gLang.kEffect.TechnicalFinish,
+                durationSeconds: 20,
+                icon: 'cactbot/resources/icon/status/technical-finish.png',
+                // Dark Peach.
+                borderColor: '#E0757C',
+                sortKey: 1,
+                cooldown: 120,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 5, // 物理增伤
+                incrMagic: 5, // 魔法增伤
+                increases: 5,
+                tts: '技巧',
+            },
+            battlevoice: { // 战斗之声
+                gainEffect: gLang.kEffect.BattleVoice,
+                loseEffect: gLang.kEffect.BattleVoice,
+                useEffectDuration: true,
+                icon: 'cactbot/resources/icon/status/battlevoice.png',
+                // Red.
+                borderColor: '#D6371E',
+                sortKey: 1,
+                cooldown: 180,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 4, // 物理增伤
+                incrMagic: 4, // 魔法增伤
+                increases: 4,
+                tts: '战斗之声',
+            },
+            lefteye: { // 巨龙左眼
+                gainEffect: gLang.kEffect.LeftEye,
+                loseEffect: gLang.kEffect.LeftEye,
+                useEffectDuration: true,
+                icon: 'cactbot/resources/icon/status/dragon-sight.png',
+                borderColor: '#FA8737',
+                sortKey: 1,
+                cooldown: 120,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 5, // 物理增伤
+                incrMagic: 5, // 魔法增伤
+                increases: 5,
+                tts: '左眼',
+            },
+            righteye: { // 巨龙右眼
+                gainEffect: gLang.kEffect.RightEye,
+                loseEffect: gLang.kEffect.RightEye,
+                useEffectDuration: true,
+                icon: 'cactbot/resources/icon/status/dragon-sight.png',
+                borderColor: '#FA8737',
+                sortKey: 1,
+                cooldown: 120,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 10, // 物理增伤
+                incrMagic: 10, // 魔法增伤
+                increases: 10,
+                tts: '右眼',
+            },
+            brotherhood: { // 义结金兰：斗气/攻击
+                gainEffect: gLang.kEffect.Brotherhood,
+                loseEffect: gLang.kEffect.Brotherhood,
+                useEffectDuration: true,
+                icon: 'cactbot/resources/icon/status/brotherhood.png',
+                borderColor: '#994200',
+                sortKey: 1,
+                cooldown: 90,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 5, // 物理增伤
+                incrMagic: 0, // 魔法增伤
+                increases: 5,
+                tts: '桃园',
+            },
+            devotion: { // 灵护
+                gainEffect: gLang.kEffect.Devotion,
+                loseEffect: gLang.kEffect.Devotion,
+                useEffectDuration: true,
+                icon: 'cactbot/resources/icon/status/devotion.png',
+                borderColor: '#ffbf00',
+                sortKey: 1,
+                cooldown: 180,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 5, // 物理增伤
+                incrMagic: 5, // 魔法增伤
+                increases: 5,
+                tts: '灵护',
+            },
+
+            raging: { // 猛者
+                gainEffect: gLang.kEffect.RagingStrikes,
+                loseEffect: gLang.kEffect.RagingStrikes,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/000000/000352.png',
+                borderColor: '#db6509',
+                sortKey: 1,
+                cooldown: 80,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 10, // 物理增伤
+                incrMagic: 10, // 魔法增伤
+                increases: 10,
+                tts: '猛者',
+            },
+            stormbite: { // 风
+                mobGainsOwnEffect: gLang.kEffect.Stormbite,
+                mobLosesOwnEffect: gLang.kEffect.Stormbite,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/002000/002614.png',
+                borderColor: '#3df6fd',
+                sortKey: 1,
+                buffType: 'physical', // physical, magic
+            },
+            causticBite: { // 毒
+                mobGainsOwnEffect: gLang.kEffect.CausticBite,
+                mobLosesOwnEffect: gLang.kEffect.CausticBite,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/002000/002613.png',
+                borderColor: '#e053bb',
+                sortKey: 1,
+                buffType: 'physical', // physical
+            },
+            //骑士
+            fightOrFlight: { // [22:22:27.085] 1A:1039A1D9:水貂桑 gains the effect of 战逃反应 from xxx for 25.00 Seconds.
+                gainEffect: gLang.kEffect.FightOrFlight,
+                loseEffect: gLang.kEffect.FightOrFlight,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/000000/000166.png',
+                borderColor: '#cc392a',
+                sortKey: 1,
+                cooldown: 60,
+                incrOwn: true,
+                incrPhysical: 25, // 物理增伤
+                incrMagic: 0, // 魔法增伤
+                // tts: '战逃',
+            },
+            requiescat: { // [22:45:16.801] 1A:1039A1D9:水貂桑 gains the effect of 安魂祈祷 from xxx for 12.00 Seconds.
+                gainEffect: gLang.kEffect.Requiescat,
+                loseEffect: gLang.kEffect.Requiescat,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/002000/002513.png',
+                borderColor: '#2e70f5',
+                sortKey: 1,
+                cooldown: 60,
+                incrOwn: true,
+                incrPhysical: 0, // 物理增伤
+                incrMagic: 50, // 魔法增伤
+                // tts: '安魂',
+            },
+            goringBlade: { // [22:22:30.877] 1A:400001B8:木人 gains the effect of 沥血剑 from xxx for 21.00 Seconds.
+                mobGainsOwnEffect: gLang.kEffect.GoringBlade,
+                mobLosesOwnEffect: gLang.kEffect.GoringBlade,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/002000/002506.png',
+                borderColor: '#d23e29',
+                sortKey: 1,
+                buffType: 'physical', // physical
+            },
+            circleOfScorn: { // [22:39:30.463] 1A:400001B9:木人 gains the effect of 厄运流转 from xxx for 15.00 Seconds.
+                mobGainsOwnEffect: gLang.kEffect.CircleOfScorn,
+                mobLosesOwnEffect: gLang.kEffect.CircleOfScorn,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/000000/000161.png',
+                borderColor: '#e77d70',
+                sortKey: 1,
+                buffType: 'physical', // physical
+            },
+            // 枪刃
+            noMercy: { // [22:54:08.026] 1A:1039A1D9:水貂桑 gains the effect of 无情 from xxx for 20.00 Seconds.
+                gainEffect: gLang.kEffect.NoMercy,
+                loseEffect: gLang.kEffect.NoMercy,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/003000/003402.png',
+                borderColor: '#345ec4',
+                sortKey: 1,
+                cooldown: 60,
+                incrOwn: true,
+                incrPhysical: 20, // 物理增伤
+                incrMagic: 20, // 魔法增伤
+                // tts: '战逃',
+            },
+            sonicBreak: { //[22:54:09.441] 1A:400001B8:木人 gains the effect of 音速破 from xxx for 30.00 Seconds.
+                mobGainsOwnEffect: gLang.kEffect.SonicBreak,
+                mobLosesOwnEffect: gLang.kEffect.SonicBreak,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/003000/003417.png',
+                borderColor: '#755cbb',
+                sortKey: 1,
+                buffType: 'physical', // physical
+            },
+            bowShock: { //[22:54:10.770] 1A:400001B8:木人 gains the effect of 弓形冲波 from xxx for 15.00 Seconds.
+                mobGainsOwnEffect: gLang.kEffect.BowShock,
+                mobLosesOwnEffect: gLang.kEffect.BowShock,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/003000/003423.png',
+                borderColor: '#d5d557',
+                sortKey: 1,
+                buffType: 'physical', // physical
+            },
+            // 白魔
+            dia: { //[23:07:47.882] 1A:400001B8:木人 gains the effect of 天辉 from xxx for 30.00 Seconds.
+                mobGainsOwnEffect: gLang.kEffect.Dia,
+                mobLosesOwnEffect: gLang.kEffect.Dia,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/002000/002641.png',
+                borderColor: '#3eb9fa',
+                sortKey: 1,
+                buffType: 'magic', // physical
+            },
+            // 学者
+            chain: { // 连环计
+                gainAbility: gLang.kAbility.ChainStratagem,
+                durationSeconds: 15,
+                icon: 'cactbot/resources/icon/status/chain-stratagem.png',
+                // Blue.
+                borderColor: '#4674E5',
+                sortKey: 1,
+                cooldown: 120,
+                incrOwn: false, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 5, // 物理增伤
+                incrMagic: 5, // 魔法增伤
+                tts: '连环计',
+            },
+            biolysis: { //[23:15:37.240] 1A:400001B8:木人 gains the effect of 蛊毒法 from xxx for 30.00 Seconds.
+                mobGainsOwnEffect: gLang.kEffect.Biolysis,
+                mobLosesOwnEffect: gLang.kEffect.Biolysis,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/002000/002820.png',
+                borderColor: '#2e1fc4',
+                sortKey: 1,
+                buffType: 'magic', // physical
+            },
+            // 占星
+            combustIII: { //[23:24:52.095] 1A:400001B8:木人 gains the effect of 焚灼 from xxx for 30.00 Seconds.
+                mobGainsOwnEffect: gLang.kEffect.CombustIII,
+                mobLosesOwnEffect: gLang.kEffect.CombustIII,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/003000/003554.png',
+                borderColor: '#62daf8',
+                sortKey: 1,
+                buffType: 'magic', // physical
+            },
+            divination: { // 占卜
+                gainEffect: gLang.kEffect.Divination,
+                loseEffect: gLang.kEffect.Divination,
+                useEffectDuration: true,
+                icon: 'cactbot/resources/icon/status/divination.png',
+                borderColor: '#5C1F58',
+                sortKey: 1,
+                cooldown: 120,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 6, // 物理增伤
+                incrMagic: 6, // 魔法增伤
+                tts: '占卜',
+            },
             arrow: { // 放浪神之箭
                 gainEffect: gLang.kEffect.Arrow,
                 loseEffect: gLang.kEffect.Arrow,
@@ -758,212 +1025,6 @@ class BuffTracker {
                 increasesJob: {melee: 8, ranged: 4},
                 tts: '近卡',
             },
-            devilment: { // 进攻之探戈
-                gainEffect: gLang.kEffect.Devilment,
-                loseEffect: gLang.kEffect.Devilment,
-                durationSeconds: 20,
-                icon: 'cactbot/resources/icon/status/devilment.png',
-                // Dark Green.
-                borderColor: '#006400',
-                sortKey: 1,
-                cooldown: 120,
-                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 10, // 物理增伤
-                incrMagic: 10, // 魔法增伤
-                increases: 10,
-                tts: '探戈',
-            },
-            technicalFinish: { // 技巧舞步结束
-                gainEffect: gLang.kEffect.TechnicalFinish,
-                loseEffect: gLang.kEffect.TechnicalFinish,
-                durationSeconds: 20,
-                icon: 'cactbot/resources/icon/status/technical-finish.png',
-                // Dark Peach.
-                borderColor: '#E0757C',
-                sortKey: 1,
-                cooldown: 120,
-                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 5, // 物理增伤
-                incrMagic: 5, // 魔法增伤
-                increases: 5,
-                tts: '技巧',
-            },
-            battlevoice: { // 战斗之声
-                gainEffect: gLang.kEffect.BattleVoice,
-                loseEffect: gLang.kEffect.BattleVoice,
-                useEffectDuration: true,
-                icon: 'cactbot/resources/icon/status/battlevoice.png',
-                // Red.
-                borderColor: '#D6371E',
-                sortKey: 1,
-                cooldown: 180,
-                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 4, // 物理增伤
-                incrMagic: 4, // 魔法增伤
-                increases: 4,
-                tts: '战斗之声',
-            },
-            chain: { // 连环计
-                gainAbility: gLang.kAbility.ChainStratagem,
-                durationSeconds: 15,
-                icon: 'cactbot/resources/icon/status/chain-stratagem.png',
-                // Blue.
-                borderColor: '#4674E5',
-                sortKey: 1,
-                cooldown: 120,
-                incrOwn: false, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 5, // 物理增伤
-                incrMagic: 5, // 魔法增伤
-                increases: 5,
-                tts: '连环计',
-            },
-            lefteye: { // 巨龙左眼
-                gainEffect: gLang.kEffect.LeftEye,
-                loseEffect: gLang.kEffect.LeftEye,
-                useEffectDuration: true,
-                icon: 'cactbot/resources/icon/status/dragon-sight.png',
-                borderColor: '#FA8737',
-                sortKey: 1,
-                cooldown: 120,
-                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 5, // 物理增伤
-                incrMagic: 5, // 魔法增伤
-                increases: 5,
-                tts: '左眼',
-            },
-            righteye: { // 巨龙右眼
-                gainEffect: gLang.kEffect.RightEye,
-                loseEffect: gLang.kEffect.RightEye,
-                useEffectDuration: true,
-                icon: 'cactbot/resources/icon/status/dragon-sight.png',
-                borderColor: '#FA8737',
-                sortKey: 1,
-                cooldown: 120,
-                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 10, // 物理增伤
-                incrMagic: 10, // 魔法增伤
-                increases: 10,
-                tts: '右眼',
-            },
-            brotherhood: { // 义结金兰：斗气/攻击
-                gainEffect: gLang.kEffect.Brotherhood,
-                loseEffect: gLang.kEffect.Brotherhood,
-                useEffectDuration: true,
-                icon: 'cactbot/resources/icon/status/brotherhood.png',
-                borderColor: '#994200',
-                sortKey: 1,
-                cooldown: 90,
-                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 5, // 物理增伤
-                incrMagic: 0, // 魔法增伤
-                increases: 5,
-                tts: '桃园',
-            },
-            devotion: { // 灵护
-                gainEffect: gLang.kEffect.Devotion,
-                loseEffect: gLang.kEffect.Devotion,
-                useEffectDuration: true,
-                icon: 'cactbot/resources/icon/status/devotion.png',
-                borderColor: '#ffbf00',
-                sortKey: 1,
-                cooldown: 180,
-                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 5, // 物理增伤
-                incrMagic: 5, // 魔法增伤
-                increases: 5,
-                tts: '灵护',
-            },
-            divination: { // 占卜
-                gainEffect: gLang.kEffect.Divination,
-                loseEffect: gLang.kEffect.Divination,
-                useEffectDuration: true,
-                icon: 'cactbot/resources/icon/status/divination.png',
-                borderColor: '#5C1F58',
-                sortKey: 1,
-                cooldown: 120,
-                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 6, // 物理增伤
-                incrMagic: 6, // 魔法增伤
-                increases: 6,
-                tts: '占卜',
-            },
-            raging: { // 猛者
-                gainEffect: gLang.kEffect.RagingStrikes,
-                loseEffect: gLang.kEffect.RagingStrikes,
-                useEffectDuration: true,
-                icon: 'https://xivapi.com/i/000000/000352.png',
-                borderColor: '#db6509',
-                sortKey: 1,
-                cooldown: 80,
-                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 10, // 物理增伤
-                incrMagic: 10, // 魔法增伤
-                increases: 10,
-                tts: '猛者',
-            },
-            stormbite: { // 风
-                mobGainsOwnEffect: gLang.kEffect.Stormbite,
-                mobLosesOwnEffect: gLang.kEffect.Stormbite,
-                useEffectDuration: true,
-                icon: 'https://xivapi.com/i/002000/002614.png',
-                borderColor: '#3df6fd',
-                sortKey: 1,
-                buffType: 'physical', // physical, magic
-            },
-            causticBite: { // 毒
-                mobGainsOwnEffect: gLang.kEffect.CausticBite,
-                mobLosesOwnEffect: gLang.kEffect.CausticBite,
-                useEffectDuration: true,
-                icon: 'https://xivapi.com/i/002000/002613.png',
-                borderColor: '#e053bb',
-                sortKey: 1,
-                buffType: 'physical', // physical
-            },
-            //骑士
-            fightOrFlight: { // [22:22:27.085] 1A:1039A1D9:水貂桑 gains the effect of 战逃反应 from xxx for 25.00 Seconds.
-                gainEffect: gLang.kEffect.FightOrFlight,
-                loseEffect: gLang.kEffect.FightOrFlight,
-                useEffectDuration: true,
-                icon: 'https://xivapi.com/i/000000/000166.png',
-                borderColor: '#cc392a',
-                sortKey: 1,
-                cooldown: 60,
-                incrOwn: true,
-                incrPhysical: 25, // 物理增伤
-                incrMagic: 0, // 魔法增伤
-                // tts: '战逃',
-            },
-            requiescat: { // [22:45:16.801] 1A:1039A1D9:水貂桑 gains the effect of 安魂祈祷 from xxx for 12.00 Seconds.
-                gainEffect: gLang.kEffect.Requiescat,
-                loseEffect: gLang.kEffect.Requiescat,
-                useEffectDuration: true,
-                icon: 'https://xivapi.com/i/002000/002513.png',
-                borderColor: '#2e70f5',
-                sortKey: 1,
-                cooldown: 60,
-                incrOwn: true,
-                incrPhysical: 0, // 物理增伤
-                incrMagic: 50, // 魔法增伤
-                // tts: '安魂',
-            },
-            goringBlade: { // [22:22:30.877] 1A:400001B8:木人 gains the effect of 沥血剑 from xxx for 21.00 Seconds.
-                mobGainsOwnEffect: gLang.kEffect.GoringBlade,
-                mobLosesOwnEffect: gLang.kEffect.GoringBlade,
-                useEffectDuration: true,
-                icon: 'https://xivapi.com/i/002000/002506.png',
-                borderColor: '#d23e29',
-                sortKey: 1,
-                buffType: 'physical', // physical
-            },
-            circleOfScorn: { // [22:39:30.463] 1A:400001B9:木人 gains the effect of 厄运流转 from xxx for 15.00 Seconds.
-                mobGainsOwnEffect: gLang.kEffect.CircleOfScorn,
-                mobLosesOwnEffect: gLang.kEffect.CircleOfScorn,
-                useEffectDuration: true,
-                icon: 'https://xivapi.com/i/000000/000161.png',
-                borderColor: '#e77d70',
-                sortKey: 1,
-                buffType: 'physical', // physical
-            }
         };
 
         let keys = Object.keys(this.buffInfo);
