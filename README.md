@@ -1,4 +1,4 @@
-# FFXIV--Monitor-Tools
+# FFXIV-Monitor-Tools
 FFXIV监控工具
 
 ## 团辅Buff计算监控
