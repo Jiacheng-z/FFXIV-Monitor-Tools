@@ -16,8 +16,6 @@ let kMobLosesOwnEffectRegex = null; // 自己在boss身上丢失的buff
 let kStatsRegex = Regexes.statChange();
 
 function gainTargetFromLog(log) {
-    // [21:00:46.695] 1A:400001B9:木人 gains the effect of 狂风蚀箭 from 水貂桑 for 30.00 Seconds.
-    // [21:01:11.825] 1E:400001B8:木人 loses the effect of 狂风蚀箭 from 水貂桑.
     let m = log.match(Regexes.parse('] 1A:(\\y{ObjectId}):([^:]*?) gains'));
     if (m)
         return m[1] + ':' + m[2];
@@ -25,8 +23,6 @@ function gainTargetFromLog(log) {
 }
 
 function loseTargetFromLog(log) {
-    // [21:00:46.695] 1A:400001B9:木人 gains the effect of 狂风蚀箭 from 水貂桑 for 30.00 Seconds.
-    // [21:01:11.825] 1E:400001B8:木人 loses the effect of 狂风蚀箭 from 水貂桑.
     let m = log.match(Regexes.parse('] 1E:(\\y{ObjectId}):([^:]*?) loses'));
     if (m)
         return m[1] + ':' + m[2];
@@ -337,7 +333,7 @@ function buffsCalculation(job, options, list) {
 
         bip = Number(bip)
         bim = Number(bim)
-        if (Boolean(bio) === true) { // 作用自己, 乘法公式
+        if (bio === 'true') { // 作用自己, 乘法公式
             if (bip > 0) {
                 if (toip <= 0) {
                     toip = bip;
@@ -745,7 +741,7 @@ class BuffTracker {
                 buffType: 'physical', // physical
             },
             //骑士
-            fightOrFlight: { // [22:22:27.085] 1A:1039A1D9:水貂桑 gains the effect of 战逃反应 from xxx for 25.00 Seconds.
+            fightOrFlight: { // [22:22:27.085] 1A:1039A1D9:xxx gains the effect of 战逃反应 from xxx for 25.00 Seconds.
                 gainEffect: gLang.kEffect.FightOrFlight,
                 loseEffect: gLang.kEffect.FightOrFlight,
                 useEffectDuration: true,
@@ -758,7 +754,7 @@ class BuffTracker {
                 incrMagic: 0, // 魔法增伤
                 // tts: '战逃',
             },
-            requiescat: { // [22:45:16.801] 1A:1039A1D9:水貂桑 gains the effect of 安魂祈祷 from xxx for 12.00 Seconds.
+            requiescat: { // [22:45:16.801] 1A:1039A1D9:xxx gains the effect of 安魂祈祷 from xxx for 12.00 Seconds.
                 gainEffect: gLang.kEffect.Requiescat,
                 loseEffect: gLang.kEffect.Requiescat,
                 useEffectDuration: true,
@@ -790,7 +786,7 @@ class BuffTracker {
                 buffType: 'physical', // physical
             },
             // 枪刃
-            noMercy: { // [22:54:08.026] 1A:1039A1D9:水貂桑 gains the effect of 无情 from xxx for 20.00 Seconds.
+            noMercy: { // [22:54:08.026] 1A:1039A1D9:xxx gains the effect of 无情 from xxx for 20.00 Seconds.
                 gainEffect: gLang.kEffect.NoMercy,
                 loseEffect: gLang.kEffect.NoMercy,
                 useEffectDuration: true,
@@ -973,7 +969,7 @@ class BuffTracker {
                 increasesJob: {melee: 8, ranged: 4},
                 tts: '近卡',
             },
-            // 武僧  [23:31:06.105] 1A:1039A1D9:水貂桑 gains the effect of 义结金兰：攻击 from xxx for 15.00 Seconds.
+            // 武僧  [23:31:06.105] 1A:1039A1D9:xxx gains the effect of 义结金兰：攻击 from xxx for 15.00 Seconds.
             Demolish: { //[23:31:10.291] 1A:400001B8:木人 gains the effect of 破碎拳 from xxx for 18.00 Seconds.
                 mobGainsOwnEffect: gLang.kEffect.Demolish,
                 mobLosesOwnEffect: gLang.kEffect.Demolish,
@@ -983,7 +979,7 @@ class BuffTracker {
                 sortKey: 1,
                 buffType: 'physical', // physical
             },
-            riddleOfFire: { // [23:31:04.573] 1A:1039A1D9:水貂桑 gains the effect of 红莲极意 from xxx for 20.00 Seconds.
+            riddleOfFire: { // [23:31:04.573] 1A:1039A1D9:xxx gains the effect of 红莲极意 from xxx for 20.00 Seconds.
                 gainEffect: gLang.kEffect.RiddleOfFire,
                 loseEffect: gLang.kEffect.RiddleOfFire,
                 useEffectDuration: true,
@@ -1009,8 +1005,8 @@ class BuffTracker {
                 tts: '桃园',
             },
             // 龙骑
-            // [23:47:39.159] 1A:1039A1D9:水貂桑 gains the effect of 巨龙右眼 from xxx for 20.00 Seconds.
-            lanceCharge: { // [23:47:03.086] 1A:1039A1D9:水貂桑 gains the effect of 猛枪 from xxx for 20.00 Seconds.
+            // [23:47:39.159] 1A:1039A1D9:xxx gains the effect of 巨龙右眼 from xxx for 20.00 Seconds.
+            lanceCharge: { // [23:47:03.086] 1A:1039A1D9:xxx gains the effect of 猛枪 from xxx for 20.00 Seconds.
                 gainEffect: gLang.kEffect.LanceCharge,
                 loseEffect: gLang.kEffect.LanceCharge,
                 useEffectDuration: true,
@@ -1031,7 +1027,7 @@ class BuffTracker {
                 sortKey: 1,
                 buffType: 'physical', // physical
             },
-            litany: { //战斗连祷 [23:47:29.214] 1A:1039A1D9:水貂桑 gains the effect of 战斗连祷 from xxx for 20.00 Seconds.
+            litany: { //战斗连祷 [23:47:29.214] 1A:1039A1D9:xxx gains the effect of 战斗连祷 from xxx for 20.00 Seconds.
                 gainEffect: gLang.kEffect.BattleLitany,
                 loseEffect: gLang.kEffect.BattleLitany,
                 useEffectDuration: true,
@@ -1081,9 +1077,8 @@ class BuffTracker {
                 sortKey: 1,
                 cooldown: 60,
                 incrOwn: false, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 10, // 物理增伤
-                incrMagic: 10, // 魔法增伤
-                increases: 5,
+                incrPhysical: 5, // 物理增伤
+                incrMagic: 5, // 魔法增伤
                 tts: '背刺',
             },
             shadowFang: { //[00:03:38.355] 1A:400001B8:木人 gains the effect of 影牙 from xxx for 30.00 Seconds.
@@ -1096,7 +1091,7 @@ class BuffTracker {
                 buffType: 'physical', // physical
             },
             // 武士
-            higanbana: { // [00:12:10.091] 1A:400001B8:木人 gains the effect of 彼岸花 from 水貂桑 for 60.00 Seconds.
+            higanbana: { // [00:12:10.091] 1A:400001B8:木人 gains the effect of 彼岸花 from xxx for 60.00 Seconds.
                 mobGainsOwnEffect: gLang.kEffect.Higanbana,
                 mobLosesOwnEffect: gLang.kEffect.Higanbana,
                 useEffectDuration: true,
@@ -1107,7 +1102,7 @@ class BuffTracker {
             },
             // 诗人
             // 机工
-            bioblaster: { // [00:20:02.402] 1A:400001B9:木人 gains the effect of 毒菌冲击 from 水貂桑 for 15.00 Seconds.
+            bioblaster: { // [00:20:02.402] 1A:400001B9:木人 gains the effect of 毒菌冲击 from xxx for 15.00 Seconds.
                 mobGainsOwnEffect: gLang.kEffect.Bioblaster,
                 mobLosesOwnEffect: gLang.kEffect.Bioblaster,
                 useEffectDuration: true,
@@ -1752,32 +1747,41 @@ class Brds {
         // this.OnLogEvent(e);
 
         setTimeout(() => {
-            let logs = ['[01:05:59.585] 15:1039A1D9:' + this.me + ':8D2:攻其不备:4000031E:木人:1E710003:384B0000:5050F:27E0000:0:0:0:0:0:0:0:0:0:0:0:0:7400000:7400000:0:0:0:1000:-603.1267:-762.9036:25.02:2.283125:82278:82278:10000:10000:0:1000:-604.8576:-761.8551:25:2.115644:00003E39'];
+            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 强化药 from ' + this.me + ' for 30.00 Seconds.'];
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
         }, 1)
 
         setTimeout(() => {
-            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 强化药 from ' + this.me + ' for 30.00 Seconds.'];
+            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 猛者强击 from ' + this.me + ' for 20.00 Seconds.'];
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
-        }, 1)
+        }, 100)
+
         setTimeout(() => {
-            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 猛者强击 from ' + this.me + ' for 15.00 Seconds.'];
+            let logs = ['[22:26:37.632] 1A:4000031E:木人 gains the effect of 狂风蚀箭 from ' + this.me + ' for 30.00 Seconds.'];
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
         }, 1000)
+
         setTimeout(() => {
-            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 放浪神之箭 from Okonomi Yaki for 10.00 Seconds.'];
+            let logs = ['[22:26:37.632] 1A:4000031E:木人 gains the effect of 烈毒咬箭 from ' + this.me + ' for 30.00 Seconds.'];
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
         }, 2000)
-        // setTimeout(() => {
-        //     let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 太阳神之衡 from Okonomi Yaki for 5.00 Seconds.'];
-        //     let e = {detail: {logs: logs}};
-        //     this.OnLogEvent(e);
-        // }, 3000)
-        //
+
+        setTimeout(() => {
+            let logs = ['[22:26:37.632] 1A:4000032E:木人 gains the effect of 狂风蚀箭 from ' + this.me + ' for 30.00 Seconds.'];
+            let e = {detail: {logs: logs}};
+            this.OnLogEvent(e);
+        }, 3000)
+
+        setTimeout(() => {
+            let logs = ['[01:05:59.585] 15:1039A1D9:' + this.me + ':8D2:攻其不备:4000031E:木人:1E710003:384B0000:5050F:27E0000:0:0:0:0:0:0:0:0:0:0:0:0:7400000:7400000:0:0:0:1000:-603.1267:-762.9036:25.02:2.283125:82278:82278:10000:10000:0:1000:-604.8576:-761.8551:25:2.115644:00003E39'];
+            let e = {detail: {logs: logs}};
+            this.OnLogEvent(e);
+        }, 4000)
+
         setTimeout(() => {
             let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 义结金兰：攻击 from Okonomi Yaki for 25.00 Seconds.'];
             let e = {detail: {logs: logs}};
@@ -1785,81 +1789,88 @@ class Brds {
         }, 4000)
 
         setTimeout(() => {
-            let logs = ['[22:26:37.632] 1A:4000031E:木人 gains the effect of 狂风蚀箭 from ' + this.me + ' for 30.00 Seconds.'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
-        }, 2000)
-
-        setTimeout(() => {
-            let logs = ['[22:26:37.632] 1A:4000031E:木人 gains the effect of 烈毒咬箭 from ' + this.me + ' for 30.00 Seconds.'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
-        }, 3000)
-
-        setTimeout(() => {
-            let logs = ['[22:26:37.632] 1A:4000032E:木人 gains the effect of 狂风蚀箭 from ' + this.me + ' for 30.00 Seconds.'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
-        }, 4000)
-        //
-        // setTimeout(() => {
-        //     let logs = ['[22:26:37.632] 1A:4000032E:木人 gains the effect of 烈毒咬箭 from ' + this.me + ' for 30.00 Seconds.'];
-        //     let e = {detail: {logs: logs}};
-        //     this.OnLogEvent(e);
-        // }, 5000)
-
-        setTimeout(() => {
-            let logs = ['[00:53:40.317] 15:10000000:Tako Yaki:1D60:Embolden:10000000:' + this.me + ':500020F:4D70000:0:0:0:0:0:0:0:0:0:0:0:0:0:0:42194:42194:10000:10000:0:1000:-655.3301:-838.5481:29.80905:0.523459:42194:42194:10000:10000:0:1000:-655.3301:-838.5481:29.80905:0.523459:00001DE7'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
-        }, 3000)
-
-        setTimeout(() => {
-            let logs = ['[00:53:41.096] 1A:1039A1D9:' + this.me + ' gains the effect of 鼓励 from xxx for 20.00 Seconds. (5)'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
-        }, 3000)
-
-        setTimeout(() => {
-            let logs = ['[00:53:41.096] 1A:1039A1D9:' + this.me + ' gains the effect of 鼓励 from xxx for 20.00 Seconds. (4)'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
-        }, 4000)
-
-        setTimeout(() => {
-            let logs = ['[00:53:41.096] 1A:1039A1D9:' + this.me + ' gains the effect of 鼓励 from xxx for 20.00 Seconds. (3)'];
+            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 放浪神之箭 from Okonomi Yaki for 15.00 Seconds.'];
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
         }, 5000)
 
         setTimeout(() => {
-            let logs = ['[00:53:41.096] 1A:1039A1D9:' + this.me + ' gains the effect of 鼓励 from xxx for 20.00 Seconds. (2)'];
+            let logs = ['[22:26:37.632] 1A:4000031E:木人 gains the effect of 狂风蚀箭 from ' + this.me + ' for 30.00 Seconds.'];
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
         }, 6000)
 
         setTimeout(() => {
-            let logs = ['[00:53:41.096] 1A:1039A1D9:' + this.me + ' gains the effect of 鼓励 from xxx for 20.00 Seconds. (1)'];
+            let logs = ['[22:26:37.632] 1A:4000031E:木人 gains the effect of 烈毒咬箭 from ' + this.me + ' for 30.00 Seconds.'];
+            let e = {detail: {logs: logs}};
+            this.OnLogEvent(e);
+        }, 6000)
+
+        setTimeout(() => {
+            let logs = ['[10:10:10.000] 1E:10000000:' + this.me + ' loses the effect of 放浪神之箭 from Okonomi Yaki.'];
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
         }, 7000)
 
         setTimeout(() => {
-            let logs = ['[00:53:41.096] 1E:1039A1D9:' + this.me + ' loses the effect of 鼓励 from xxx. (1)'];
+            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 河流神之瓶 from Okonomi Yaki for 15.00 Seconds.'];
+            let e = {detail: {logs: logs}};
+            this.OnLogEvent(e);
+        }, 7000)
+
+
+        setTimeout(() => {
+            let logs = ['[00:53:40.317] 15:10000000:Tako Yaki:1D60:Embolden:10000000:' + this.me + ':500020F:4D70000:0:0:0:0:0:0:0:0:0:0:0:0:0:0:42194:42194:10000:10000:0:1000:-655.3301:-838.5481:29.80905:0.523459:42194:42194:10000:10000:0:1000:-655.3301:-838.5481:29.80905:0.523459:00001DE7'];
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
         }, 8000)
 
         setTimeout(() => {
-            let logs = ['[22:26:37.632] 1E:4000031E:木人 loses the effect of 狂风蚀箭 from ' + this.me + '.'];
+            let logs = ['[00:53:41.096] 1A:1039A1D9:' + this.me + ' gains the effect of 鼓励 from xxx for 20.00 Seconds. (5)'];
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
         }, 8000)
+
         setTimeout(() => {
-            let logs = ['[22:26:37.632] 1E:4000031E:木人 loses the effect of 烈毒咬箭 from ' + this.me + '.'];
+            let logs = ['[00:53:41.096] 1A:1039A1D9:' + this.me + ' gains the effect of 鼓励 from xxx for 20.00 Seconds. (4)'];
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
-        }, 9000)
+        }, 12000)
+
+        setTimeout(() => {
+            let logs = ['[00:53:41.096] 1A:1039A1D9:' + this.me + ' gains the effect of 鼓励 from xxx for 20.00 Seconds. (3)'];
+            let e = {detail: {logs: logs}};
+            this.OnLogEvent(e);
+        }, 16000)
+
+        setTimeout(() => {
+            let logs = ['[00:53:41.096] 1A:1039A1D9:' + this.me + ' gains the effect of 鼓励 from xxx for 20.00 Seconds. (2)'];
+            let e = {detail: {logs: logs}};
+            this.OnLogEvent(e);
+        }, 20000)
+
+        setTimeout(() => {
+            let logs = ['[00:53:41.096] 1A:1039A1D9:' + this.me + ' gains the effect of 鼓励 from xxx for 20.00 Seconds. (1)'];
+            let e = {detail: {logs: logs}};
+            this.OnLogEvent(e);
+        }, 24000)
+
+        setTimeout(() => {
+            let logs = ['[00:53:41.096] 1E:1039A1D9:' + this.me + ' loses the effect of 鼓励 from xxx. (1)'];
+            let e = {detail: {logs: logs}};
+            this.OnLogEvent(e);
+        }, 28000)
+
+        // setTimeout(() => {
+        //     let logs = ['[22:26:37.632] 1E:4000031E:木人 loses the effect of 狂风蚀箭 from ' + this.me + '.'];
+        //     let e = {detail: {logs: logs}};
+        //     this.OnLogEvent(e);
+        // }, 8000)
+        // setTimeout(() => {
+        //     let logs = ['[22:26:37.632] 1E:4000031E:木人 loses the effect of 烈毒咬箭 from ' + this.me + '.'];
+        //     let e = {detail: {logs: logs}};
+        //     this.OnLogEvent(e);
+        // }, 9000)
     }
 
     TestChangeJob() {
