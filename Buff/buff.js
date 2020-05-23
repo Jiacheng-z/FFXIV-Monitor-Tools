@@ -1730,7 +1730,7 @@ class Brds {
     }
 
     Test() {
-        this.TestChangeJob();
+        // this.TestChangeJob();
 
         let logs = [];
         let t = '[10:10:10.000] ';
