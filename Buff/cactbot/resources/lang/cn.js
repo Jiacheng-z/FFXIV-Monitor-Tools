@@ -81,10 +81,18 @@ class CactbotLanguageCn extends CactbotLanguage {
       // OWN
       RagingStrikes: '猛者强击',
 
+
       // BRD-DOT
       Stormbite: '狂风蚀箭',
       CausticBite: '烈毒咬箭',
-  });
+
+      // PLD
+      FightOrFlight: '战逃反应',
+      GoringBlade: '沥血剑',
+      CircleOfScorn: '厄运流转',
+      Requiescat: '安魂祈祷',
+
+    });
 
     this.kUIStrings = Object.freeze({
       // jobs: text on the pull countdown.

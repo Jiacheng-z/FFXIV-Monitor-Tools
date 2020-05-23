@@ -822,7 +822,6 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.LeftEye,
                 useEffectDuration: true,
                 icon: 'cactbot/resources/icon/status/dragon-sight.png',
-                // Orange.
                 borderColor: '#FA8737',
                 sortKey: 1,
                 cooldown: 120,
@@ -837,7 +836,6 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.RightEye,
                 useEffectDuration: true,
                 icon: 'cactbot/resources/icon/status/dragon-sight.png',
-                // Orange.
                 borderColor: '#FA8737',
                 sortKey: 1,
                 cooldown: 120,
@@ -852,7 +850,6 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.Brotherhood,
                 useEffectDuration: true,
                 icon: 'cactbot/resources/icon/status/brotherhood.png',
-                // Dark Orange.
                 borderColor: '#994200',
                 sortKey: 1,
                 cooldown: 90,
@@ -867,7 +864,6 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.Devotion,
                 useEffectDuration: true,
                 icon: 'cactbot/resources/icon/status/devotion.png',
-                // Yellow.
                 borderColor: '#ffbf00',
                 sortKey: 1,
                 cooldown: 180,
@@ -882,7 +878,6 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.Divination,
                 useEffectDuration: true,
                 icon: 'cactbot/resources/icon/status/divination.png',
-                // Dark purple.
                 borderColor: '#5C1F58',
                 sortKey: 1,
                 cooldown: 120,
@@ -896,9 +891,7 @@ class BuffTracker {
                 gainEffect: gLang.kEffect.RagingStrikes,
                 loseEffect: gLang.kEffect.RagingStrikes,
                 useEffectDuration: true,
-                // icon: 'cactbot/resources/icon/status/raging-strikes.png',
                 icon: 'https://xivapi.com/i/000000/000352.png',
-                // Dark purple.
                 borderColor: '#db6509',
                 sortKey: 1,
                 cooldown: 80,
@@ -923,6 +916,51 @@ class BuffTracker {
                 useEffectDuration: true,
                 icon: 'https://xivapi.com/i/002000/002613.png',
                 borderColor: '#e053bb',
+                sortKey: 1,
+                buffType: 'physical', // physical
+            },
+            //骑士
+            fightOrFlight: { // [22:22:27.085] 1A:1039A1D9:水貂桑 gains the effect of 战逃反应 from xxx for 25.00 Seconds.
+                gainEffect: gLang.kEffect.FightOrFlight,
+                loseEffect: gLang.kEffect.FightOrFlight,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/000000/000166.png',
+                borderColor: '#cc392a',
+                sortKey: 1,
+                cooldown: 60,
+                incrOwn: true,
+                incrPhysical: 25, // 物理增伤
+                incrMagic: 0, // 魔法增伤
+                // tts: '战逃',
+            },
+            requiescat: { // [22:45:16.801] 1A:1039A1D9:水貂桑 gains the effect of 安魂祈祷 from xxx for 12.00 Seconds.
+                gainEffect: gLang.kEffect.Requiescat,
+                loseEffect: gLang.kEffect.Requiescat,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/002000/002513.png',
+                borderColor: '#2e70f5',
+                sortKey: 1,
+                cooldown: 60,
+                incrOwn: true,
+                incrPhysical: 0, // 物理增伤
+                incrMagic: 50, // 魔法增伤
+                // tts: '安魂',
+            },
+            goringBlade: { // [22:22:30.877] 1A:400001B8:木人 gains the effect of 沥血剑 from xxx for 21.00 Seconds.
+                mobGainsOwnEffect: gLang.kEffect.GoringBlade,
+                mobLosesOwnEffect: gLang.kEffect.GoringBlade,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/002000/002506.png',
+                borderColor: '#d23e29',
+                sortKey: 1,
+                buffType: 'physical', // physical
+            },
+            circleOfScorn: { // [22:39:30.463] 1A:400001B9:木人 gains the effect of 厄运流转 from xxx for 15.00 Seconds.
+                mobGainsOwnEffect: gLang.kEffect.CircleOfScorn,
+                mobLosesOwnEffect: gLang.kEffect.CircleOfScorn,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/000000/000161.png',
+                borderColor: '#e77d70',
                 sortKey: 1,
                 buffType: 'physical', // physical
             }

@@ -84,6 +84,12 @@ class CactbotLanguageEn extends CactbotLanguage {
       // BRD-DOT
       Stormbite: 'Stormbite',
       CausticBite: 'Caustic Bite',
+
+      //PLD
+      FightOrFlight: 'Fight or Flight',
+      GoringBlade: 'Goring Blade',
+      CircleOfScorn: 'Circle of Scorn',
+      Requiescat: 'Requiescat',
     });
 
     this.kUIStrings = Object.freeze({
