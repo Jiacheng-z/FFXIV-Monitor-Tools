@@ -735,20 +735,6 @@ class BuffTracker {
                 increases: 10,
                 tts: '右眼',
             },
-            brotherhood: { // 义结金兰：斗气/攻击
-                gainEffect: gLang.kEffect.Brotherhood,
-                loseEffect: gLang.kEffect.Brotherhood,
-                useEffectDuration: true,
-                icon: 'cactbot/resources/icon/status/brotherhood.png',
-                borderColor: '#994200',
-                sortKey: 1,
-                cooldown: 90,
-                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 5, // 物理增伤
-                incrMagic: 0, // 魔法增伤
-                increases: 5,
-                tts: '桃园',
-            },
             devotion: { // 灵护
                 gainEffect: gLang.kEffect.Devotion,
                 loseEffect: gLang.kEffect.Devotion,
@@ -763,7 +749,6 @@ class BuffTracker {
                 increases: 5,
                 tts: '灵护',
             },
-
             raging: { // 猛者
                 gainEffect: gLang.kEffect.RagingStrikes,
                 loseEffect: gLang.kEffect.RagingStrikes,
@@ -1025,6 +1010,41 @@ class BuffTracker {
                 increasesJob: {melee: 8, ranged: 4},
                 tts: '近卡',
             },
+            // 武僧  [23:31:06.105] 1A:1039A1D9:水貂桑 gains the effect of 义结金兰：攻击 from xxx for 15.00 Seconds.
+            Demolish: { //[23:31:10.291] 1A:400001B8:木人 gains the effect of 破碎拳 from xxx for 18.00 Seconds.
+                mobGainsOwnEffect: gLang.kEffect.Demolish,
+                mobLosesOwnEffect: gLang.kEffect.Demolish,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/000000/000204.png',
+                borderColor: '#dc4919',
+                sortKey: 1,
+                buffType: 'physical', // physical
+            },
+            riddleOfFire: { // [23:31:04.573] 1A:1039A1D9:水貂桑 gains the effect of 红莲极意 from xxx for 20.00 Seconds.
+                gainEffect: gLang.kEffect.RiddleOfFire,
+                loseEffect: gLang.kEffect.RiddleOfFire,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/002000/002541.png',
+                borderColor: '#e07453',
+                sortKey: 1,
+                cooldown: 90,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 25, // 物理增伤
+                incrMagic: 25, // 魔法增伤
+            },
+            brotherhood: { // 义结金兰：斗气/攻击
+                gainEffect: gLang.kEffect.Brotherhood,
+                loseEffect: gLang.kEffect.Brotherhood,
+                useEffectDuration: true,
+                icon: 'cactbot/resources/icon/status/brotherhood.png',
+                borderColor: '#994200',
+                sortKey: 1,
+                cooldown: 90,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 5, // 物理增伤
+                incrMagic: 0, // 魔法增伤
+                tts: '桃园',
+            },
         };
 
         let keys = Object.keys(this.buffInfo);
@@ -1242,8 +1262,8 @@ class Brds {
         this.abilityFuncMap = {};
 
         let secb = getQueryVariable('brdsec');
-        if (secb !== false && secb == 0) { // 关闭sec展示
-            this.options.TextBrdSec = false;
+        if (secb !== false && secb == 1) { // 开启sec展示
+            this.options.TextBrdSec = true;
         }
     }
 

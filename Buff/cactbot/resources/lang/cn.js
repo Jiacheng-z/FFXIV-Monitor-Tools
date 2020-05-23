@@ -106,6 +106,9 @@ class CactbotLanguageCn extends CactbotLanguage {
       // 占星
       CombustIII: '焚灼',
 
+      // 武僧
+      Demolish: '破碎拳',
+      RiddleOfFire: '红莲极意',
     });
 
     this.kUIStrings = Object.freeze({

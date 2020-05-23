@@ -9,7 +9,7 @@ let Options = {
     TextMagicTextColor: '#07d5ee', // 魔法文字颜色
     TextMagicFontSize: 20, // 魔法文字大小px
 
-    TextBrdSec: true, // 诗人展示dot刷新秒数
+    TextBrdSec: false, // 诗人展示dot刷新秒数
 
     // DOT相关配置
     DotIconWidth: 32, // DOT图标宽度

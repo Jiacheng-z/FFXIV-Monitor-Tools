@@ -104,6 +104,10 @@ class CactbotLanguageEn extends CactbotLanguage {
 
       // 占星
       CombustIII: 'Combust III',
+
+      // 武僧
+      Demolish: 'Demolish',
+      RiddleOfFire: 'Riddle of Fire',
     });
 
     this.kUIStrings = Object.freeze({
