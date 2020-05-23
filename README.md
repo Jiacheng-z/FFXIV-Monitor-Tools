@@ -10,5 +10,6 @@ FFXIV监控工具
 - 依赖ACT插件: cacbot + ngld
 - 添加新的自定悬浮窗
 - 在悬浮窗路径中填写：https://jiacheng-z.github.io/FFXIV-Monitor-Tools/Buff/buff.html
+- 开启诗人buff计时参考: https://jiacheng-z.github.io/FFXIV-Monitor-Tools/Buff/buff.html?brdsec=1
 
 **PS: 当前为预览版本, BUG请在issues中提出.**
