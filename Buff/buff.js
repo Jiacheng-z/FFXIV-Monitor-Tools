@@ -437,7 +437,7 @@ class Buff {
         }
 
         // 诗人计算秒数
-        if (this.job === 'BRD') {
+        if (this.job === 'BRD' && this.options.TextBrdSec === true) {
             let statSec = document.getElementById('jobs-stat-buff-sec');
             if (Number(showip) > 0) {
                 statSec.innerText = Math.floor((30 * 900 * (Number(showip) / 100)) / ((1 + (Number(showip) / 100)) * (230 - 100))) + 's';
@@ -631,51 +631,6 @@ class BuffTracker {
                 increases: 4,
                 increasesDim: {5: 10, 4: 8, 3: 6, 2: 4, 1: 2}, // 递减
                 tts: '鼓励',
-            },
-            devilment: { // 进攻之探戈
-                gainEffect: gLang.kEffect.Devilment,
-                loseEffect: gLang.kEffect.Devilment,
-                durationSeconds: 20,
-                icon: 'cactbot/resources/icon/status/devilment.png',
-                // Dark Green.
-                borderColor: '#006400',
-                sortKey: 1,
-                cooldown: 120,
-                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 10, // 物理增伤
-                incrMagic: 10, // 魔法增伤
-                increases: 10,
-                tts: '探戈',
-            },
-            technicalFinish: { // 技巧舞步结束
-                gainEffect: gLang.kEffect.TechnicalFinish,
-                loseEffect: gLang.kEffect.TechnicalFinish,
-                durationSeconds: 20,
-                icon: 'cactbot/resources/icon/status/technical-finish.png',
-                // Dark Peach.
-                borderColor: '#E0757C',
-                sortKey: 1,
-                cooldown: 120,
-                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 5, // 物理增伤
-                incrMagic: 5, // 魔法增伤
-                increases: 5,
-                tts: '技巧',
-            },
-            battlevoice: { // 战斗之声
-                gainEffect: gLang.kEffect.BattleVoice,
-                loseEffect: gLang.kEffect.BattleVoice,
-                useEffectDuration: true,
-                icon: 'cactbot/resources/icon/status/battlevoice.png',
-                // Red.
-                borderColor: '#D6371E',
-                sortKey: 1,
-                cooldown: 180,
-                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 4, // 物理增伤
-                incrMagic: 4, // 魔法增伤
-                increases: 4,
-                tts: '战斗之声',
             },
             devotion: { // 灵护
                 gainEffect: gLang.kEffect.Devotion,
@@ -1073,6 +1028,92 @@ class BuffTracker {
                 borderColor: '#08bcfe',
                 sortKey: 1,
                 buffType: 'physical', // physical
+            },
+            // 武士
+            higanbana: { // [00:12:10.091] 1A:400001B8:木人 gains the effect of 彼岸花 from 水貂桑 for 60.00 Seconds.
+                mobGainsOwnEffect: gLang.kEffect.Higanbana,
+                mobLosesOwnEffect: gLang.kEffect.Higanbana,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/003000/003160.png',
+                borderColor: '#d9542a',
+                sortKey: 1,
+                buffType: 'physical', // physical
+            },
+            // 诗人
+            // 机工
+            bioblaster: { // [00:20:02.402] 1A:400001B9:木人 gains the effect of 毒菌冲击 from 水貂桑 for 15.00 Seconds.
+                mobGainsOwnEffect: gLang.kEffect.Bioblaster,
+                mobLosesOwnEffect: gLang.kEffect.Bioblaster,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/003000/003044.png',
+                borderColor: '#acfd19',
+                sortKey: 1,
+                buffType: 'physical', // physical
+            },
+            // 舞娘
+            devilment: { // 进攻之探戈
+                gainEffect: gLang.kEffect.Devilment,
+                loseEffect: gLang.kEffect.Devilment,
+                durationSeconds: 20,
+                icon: 'cactbot/resources/icon/status/devilment.png',
+                // Dark Green.
+                borderColor: '#006400',
+                sortKey: 1,
+                cooldown: 120,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 10, // 物理增伤
+                incrMagic: 10, // 魔法增伤
+                increases: 10,
+                tts: '贪个',
+            },
+            technicalFinish: { // 技巧舞步结束
+                gainEffect: gLang.kEffect.TechnicalFinish,
+                loseEffect: gLang.kEffect.TechnicalFinish,
+                durationSeconds: 20,
+                icon: 'cactbot/resources/icon/status/technical-finish.png',
+                // Dark Peach.
+                borderColor: '#E0757C',
+                sortKey: 1,
+                cooldown: 120,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 5, // 物理增伤
+                incrMagic: 5, // 魔法增伤
+                increases: 5,
+                tts: '技巧',
+            },
+            battlevoice: { // 战斗之声
+                gainEffect: gLang.kEffect.BattleVoice,
+                loseEffect: gLang.kEffect.BattleVoice,
+                useEffectDuration: true,
+                icon: 'cactbot/resources/icon/status/battlevoice.png',
+                // Red.
+                borderColor: '#D6371E',
+                sortKey: 1,
+                cooldown: 180,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 4, // 物理增伤
+                incrMagic: 4, // 魔法增伤
+                increases: 4,
+                tts: '战斗之声',
+            },
+            // 黑魔
+            thunderIII: { // [00:32:47.727] 1A:400001B8:木人 gains the effect of 暴雷 from xxx for 24.00 Seconds.
+                mobGainsOwnEffect: gLang.kEffect.ThunderIII,
+                mobLosesOwnEffect: gLang.kEffect.ThunderIII,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/000000/000459.png',
+                borderColor: '#93d5fd',
+                sortKey: 1,
+                buffType: 'magic', // physical
+            },
+            thunderIV: { // [00:32:47.727] 1A:400001B8:木人 gains the effect of 霹雷 from xxx for 18.00 Seconds.
+                mobGainsOwnEffect: gLang.kEffect.ThunderIV,
+                mobLosesOwnEffect: gLang.kEffect.ThunderIV,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/002000/002662.png',
+                borderColor: '#ac6af6',
+                sortKey: 1,
+                buffType: 'magic', // physical
             },
         };
 

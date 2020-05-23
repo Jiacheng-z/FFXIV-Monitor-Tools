@@ -115,6 +115,16 @@ class CactbotLanguageEn extends CactbotLanguage {
 
             // 忍着
             ShadowFang: 'Shadow Fang',
+
+            // 武士
+            Higanbana: 'Higanbana',
+
+            // 机工
+            Bioblaster: 'Bioblaster',
+
+            // 黑魔
+            ThunderIII: 'Thunder III',
+            ThunderIV: 'Thunder IV',
         });
 
         this.kUIStrings = Object.freeze({

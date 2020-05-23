@@ -4,7 +4,7 @@ let Options = {
     Language: 'cn',
 
     // 文字相关
-    TextPhysicalTextColor: '#ff6600', // 物理文字颜色
+    TextPhysicalTextColor: '#ff8129', // 物理文字颜色
     TextPhysicalFontSize: 20, // 物理文字大小px
     TextMagicTextColor: '#07d5ee', // 魔法文字颜色
     TextMagicFontSize: 20, // 魔法文字大小px
