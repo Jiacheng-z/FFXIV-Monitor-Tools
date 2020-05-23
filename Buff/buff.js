@@ -626,21 +626,6 @@ class BuffTracker {
                 increases: 5,
                 tts: '背刺',
             },
-            litany: { //战斗连祷
-                gainEffect: gLang.kEffect.BattleLitany,
-                loseEffect: gLang.kEffect.BattleLitany,
-                useEffectDuration: true,
-                icon: 'cactbot/resources/icon/status/battle-litany.png',
-                // Cyan.
-                borderColor: '#099',
-                sortKey: 1,
-                cooldown: 180,
-                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 5, // 物理增伤
-                incrMagic: 5, // 魔法增伤
-                increases: 5,
-                tts: '连祷',
-            },
             embolden: { // 鼓励
                 // Embolden is special and has some extra text at the end, depending on embolden stage:
                 // Potato Chippy gains the effect of Embolden from Tater Tot for 20.00 Seconds. (5)
@@ -706,34 +691,6 @@ class BuffTracker {
                 incrMagic: 4, // 魔法增伤
                 increases: 4,
                 tts: '战斗之声',
-            },
-            lefteye: { // 巨龙左眼
-                gainEffect: gLang.kEffect.LeftEye,
-                loseEffect: gLang.kEffect.LeftEye,
-                useEffectDuration: true,
-                icon: 'cactbot/resources/icon/status/dragon-sight.png',
-                borderColor: '#FA8737',
-                sortKey: 1,
-                cooldown: 120,
-                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 5, // 物理增伤
-                incrMagic: 5, // 魔法增伤
-                increases: 5,
-                tts: '左眼',
-            },
-            righteye: { // 巨龙右眼
-                gainEffect: gLang.kEffect.RightEye,
-                loseEffect: gLang.kEffect.RightEye,
-                useEffectDuration: true,
-                icon: 'cactbot/resources/icon/status/dragon-sight.png',
-                borderColor: '#FA8737',
-                sortKey: 1,
-                cooldown: 120,
-                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 10, // 物理增伤
-                incrMagic: 10, // 魔法增伤
-                increases: 10,
-                tts: '右眼',
             },
             devotion: { // 灵护
                 gainEffect: gLang.kEffect.Devotion,
@@ -1016,7 +973,7 @@ class BuffTracker {
                 mobLosesOwnEffect: gLang.kEffect.Demolish,
                 useEffectDuration: true,
                 icon: 'https://xivapi.com/i/000000/000204.png',
-                borderColor: '#dc4919',
+                borderColor: '#f5cc19',
                 sortKey: 1,
                 buffType: 'physical', // physical
             },
@@ -1025,7 +982,7 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.RiddleOfFire,
                 useEffectDuration: true,
                 icon: 'https://xivapi.com/i/002000/002541.png',
-                borderColor: '#e07453',
+                borderColor: '#dc625a',
                 sortKey: 1,
                 cooldown: 90,
                 incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
@@ -1044,6 +1001,70 @@ class BuffTracker {
                 incrPhysical: 5, // 物理增伤
                 incrMagic: 0, // 魔法增伤
                 tts: '桃园',
+            },
+            // 龙骑
+            //
+            //
+            // [23:47:39.159] 1A:1039A1D9:水貂桑 gains the effect of 巨龙右眼 from 水貂桑 for 20.00 Seconds.
+            lanceCharge: { // [23:47:03.086] 1A:1039A1D9:水貂桑 gains the effect of 猛枪 from xxx for 20.00 Seconds.
+                gainEffect: gLang.kEffect.LanceCharge,
+                loseEffect: gLang.kEffect.LanceCharge,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/000000/000309.png',
+                borderColor: '#831819',
+                sortKey: 1,
+                cooldown: 90,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 15, // 物理增伤
+                incrMagic: 15, // 魔法增伤
+            },
+            chaosThrust: { //[23:47:07.481] 1A:400001B8:木人 gains the effect of 樱花怒放 from xxx for 24.00 Seconds.
+                mobGainsOwnEffect: gLang.kEffect.ChaosThrust,
+                mobLosesOwnEffect: gLang.kEffect.ChaosThrust,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/000000/000308.png',
+                borderColor: '#83598c',
+                sortKey: 1,
+                buffType: 'physical', // physical
+            },
+            litany: { //战斗连祷 [23:47:29.214] 1A:1039A1D9:水貂桑 gains the effect of 战斗连祷 from xxx for 20.00 Seconds.
+                gainEffect: gLang.kEffect.BattleLitany,
+                loseEffect: gLang.kEffect.BattleLitany,
+                useEffectDuration: true,
+                icon: 'cactbot/resources/icon/status/battle-litany.png',
+                // Cyan.
+                borderColor: '#099',
+                sortKey: 1,
+                cooldown: 180,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 5, // 物理增伤
+                incrMagic: 5, // 魔法增伤
+                tts: '连祷',
+            },
+            lefteye: { // 巨龙左眼
+                gainEffect: gLang.kEffect.LeftEye,
+                loseEffect: gLang.kEffect.LeftEye,
+                useEffectDuration: true,
+                icon: 'cactbot/resources/icon/status/dragon-sight.png',
+                borderColor: '#fd693a',
+                sortKey: 1,
+                cooldown: 120,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 5, // 物理增伤
+                incrMagic: 5, // 魔法增伤
+                tts: '左眼',
+            },
+            righteye: { // 巨龙右眼
+                gainEffect: gLang.kEffect.RightEye,
+                loseEffect: gLang.kEffect.RightEye,
+                useEffectDuration: true,
+                icon: 'cactbot/resources/icon/status/dragon-sight.png',
+                borderColor: '#FA8737',
+                sortKey: 1,
+                cooldown: 120,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 10, // 物理增伤
+                incrMagic: 10, // 魔法增伤
             },
         };
 
