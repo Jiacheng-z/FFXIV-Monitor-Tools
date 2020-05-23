@@ -125,6 +125,10 @@ class CactbotLanguageEn extends CactbotLanguage {
             // 黑魔
             ThunderIII: 'Thunder III',
             ThunderIV: 'Thunder IV',
+
+            // 召唤
+            BioIII: 'Bio III',
+            MiasmaIII: 'Miasma III',
         });
 
         this.kUIStrings = Object.freeze({

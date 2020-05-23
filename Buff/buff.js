@@ -189,7 +189,8 @@ function makeAuraTimerIcon(name, seconds, opacity, iconWidth, iconHeight, iconTe
     div.style.opacity = opacity;
     div.className = 'buffs'
     // 设置buff详细信息
-    div.setAttribute('buffs-value', buffInfo.increases)
+    div.setAttribute('buffs-name', name)
+    // div.setAttribute('buffs-value', buffInfo.increases)
     div.setAttribute('buffs-incr-own', buffInfo.incrOwn) // 作用自己
     div.setAttribute('buffs-incr-physical', buffInfo.incrPhysical) // 作用物理
     div.setAttribute('buffs-incr-magic', buffInfo.incrMagic) // 作用魔法
@@ -296,6 +297,107 @@ function makeOwnAuraTimerIcon(name, seconds, opacity, iconWidth, iconHeight, ico
     icon.icon = auraIcon;
 
     return div;
+}
+
+function changeEmbolden(isMe, num, list) {
+    let listDim = {5: 10, 4: 8, 3: 6, 2: 4, 1: 2};
+    let tgs = list.rootElement.getElementsByClassName('buffs');
+    for (let i = 0; i < tgs.length; i++) {
+        let bname = tgs[i].getAttribute('buffs-name')
+        if (bname === '=>embolden') {
+            if (isMe === true) {
+                tgs[i].setAttribute('buffs-incr-physical', 0) // 作用物理
+                tgs[i].setAttribute('buffs-incr-magic', listDim[num]) // 作用魔法
+            } else {
+                tgs[i].setAttribute('buffs-incr-physical', listDim[num]) // 作用物理
+                tgs[i].setAttribute('buffs-incr-magic', 0) // 作用魔法
+            }
+            break;
+        }
+    }
+}
+
+// 计算buff, 展示剩余多少时间刷buff是值得
+function buffsCalculation(job, options, list) {
+    let tgs = list.rootElement.getElementsByClassName('buffs');
+    let toip = 0; // 自己的物理增伤 (换算成攻击) (1 + a)(1 + b) = 1 + a + b + ab
+    let toim = 0; // 自己的魔法增伤 (换算成攻击)
+    let tbip = 0; // 对boss的物理增伤
+    let tbim = 0; // 对boss的魔法增伤
+
+    for (let i = 0; i < tgs.length; i++) {
+
+        let bio = tgs[i].getAttribute('buffs-incr-own') // 作用自己
+        let bip = tgs[i].getAttribute('buffs-incr-physical') // 作用物理
+        let bim = tgs[i].getAttribute('buffs-incr-magic') // 作用魔法
+
+        if (bio === undefined || bip === undefined || bim === undefined) {
+            continue;
+        }
+
+        bip = Number(bip)
+        bim = Number(bim)
+        if (Boolean(bio) === true) { // 作用自己, 乘法公式
+            if (bip > 0) {
+                if (toip <= 0) {
+                    toip = bip;
+                } else {
+                    toip = toip + bip + ((toip * bip) / 100)
+                }
+            }
+
+            if (bim > 0) {
+                if (toim <= 0) {
+                    toim = bim;
+                } else {
+                    toim = toim + bim + ((toim * bim) / 100)
+                }
+            }
+        } else { // 对boss增伤
+            if (bip > 0) {
+                tbip += bip
+            }
+            if (bim > 0) {
+                tbim += bim
+            }
+        }
+    }
+
+    let showip = Math.floor((toip + tbip) * 10) / 10
+    let showim = Math.floor((toim + tbim) * 10) / 10
+
+    // jobs-stat-physical
+    // jobs-stat-magic
+
+    let statp = document.getElementById('jobs-stat-physical');
+    if (statp != null) {
+        statp.setAttribute('value', showip)
+        if (showip <= 0) {
+            statp.innerText = '';
+        } else {
+            statp.innerText = '物: ' + showip + '%';
+        }
+    }
+
+    let statm = document.getElementById('jobs-stat-magic');
+    if (statm != null) {
+        statm.setAttribute('value', showim)
+        if (showim <= 0) {
+            statm.innerText = '';
+        } else {
+            statm.innerText = '魔: ' + showim + '%';
+        }
+    }
+
+    // 诗人计算秒数
+    if (job === 'BRD' && options.TextBrdSec === true) {
+        let statSec = document.getElementById('jobs-stat-buff-sec');
+        if (Number(showip) > 0) {
+            statSec.innerText = Math.floor((30 * 900 * (Number(showip) / 100)) / ((1 + (Number(showip) / 100)) * (230 - 100))) + 's';
+        } else {
+            statSec.innerText = '';
+        }
+    }
 }
 
 class Buff {
@@ -506,7 +608,7 @@ class Buff {
                 window.clearTimeout(aura.removeTimeout);
                 aura.removeTimeout = null;
             }
-            this.buffsCalculation(list)
+            buffsCalculation(this.job, this.options, list)
         };
         aura.addCallback = () => {
             let elem = makeAuraTimerIcon(
@@ -520,7 +622,7 @@ class Buff {
                 this.info.icon, this.info);
             list.addElement(key, elem, Math.floor(seconds) + adjustSort);
             aura.addTimeout = null;
-            this.buffsCalculation(list)
+            buffsCalculation(this.job, this.options, list)
 
             // 语音播报
             if (Options.TTS === true && this.info.tts != null && this.info.tts != '') {
@@ -611,41 +713,6 @@ class BuffTracker {
                 incrMagic: 10, // 魔法增伤
                 increases: 10,
             },
-            embolden: { // 鼓励
-                // Embolden is special and has some extra text at the end, depending on embolden stage:
-                // Potato Chippy gains the effect of Embolden from Tater Tot for 20.00 Seconds. (5)
-                // Instead, use somebody using the effect on you:
-                //   16:106C22EF:Tater Tot:1D60:Embolden:106C22EF:Potato Chippy:500020F:4D7: etc etc
-                gainAbility: gLang.kAbility.Embolden,
-                gainRegex: Regexes.abilityFull({id: gLang.kAbility.Embolden, target: this.playerName}),
-                loseEffect: gLang.kEffect.Embolden,
-                durationSeconds: 20,
-                icon: 'cactbot/resources/icon/status/embolden.png',
-                // Lime.
-                borderColor: '#57FC4A',
-                sortKey: 1,
-                cooldown: 120,
-                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 4, // 物理增伤
-                incrMagic: 4, // 魔法增伤
-                increases: 4,
-                increasesDim: {5: 10, 4: 8, 3: 6, 2: 4, 1: 2}, // 递减
-                tts: '鼓励',
-            },
-            devotion: { // 灵护
-                gainEffect: gLang.kEffect.Devotion,
-                loseEffect: gLang.kEffect.Devotion,
-                useEffectDuration: true,
-                icon: 'cactbot/resources/icon/status/devotion.png',
-                borderColor: '#ffbf00',
-                sortKey: 1,
-                cooldown: 180,
-                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 5, // 物理增伤
-                incrMagic: 5, // 魔法增伤
-                increases: 5,
-                tts: '灵护',
-            },
             raging: { // 猛者
                 gainEffect: gLang.kEffect.RagingStrikes,
                 loseEffect: gLang.kEffect.RagingStrikes,
@@ -657,7 +724,6 @@ class BuffTracker {
                 incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
                 incrPhysical: 10, // 物理增伤
                 incrMagic: 10, // 魔法增伤
-                increases: 10,
                 tts: '猛者',
             },
             stormbite: { // 风
@@ -1115,6 +1181,58 @@ class BuffTracker {
                 sortKey: 1,
                 buffType: 'magic', // physical
             },
+            // 召唤
+            bioIII: { // [00:40:15.962] 1A:400001B8:木人 gains the effect of 剧毒菌 from xxx for 30.00 Seconds.
+                mobGainsOwnEffect: gLang.kEffect.BioIII,
+                mobLosesOwnEffect: gLang.kEffect.BioIII,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/002000/002689.png',
+                borderColor: '#e3e02d',
+                sortKey: 1,
+                buffType: 'magic', // physical
+            },
+            miasmaIII: { // [00:40:20.731] 1A:400001B8:木人 gains the effect of 瘴暍 from xxx for 30.00 Seconds.
+                mobGainsOwnEffect: gLang.kEffect.MiasmaIII,
+                mobLosesOwnEffect: gLang.kEffect.MiasmaIII,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/002000/002690.png',
+                borderColor: '#97abe0',
+                sortKey: 1,
+                buffType: 'magic', // physical
+            },
+            devotion: { // 灵护
+                gainEffect: gLang.kEffect.Devotion,
+                loseEffect: gLang.kEffect.Devotion,
+                useEffectDuration: true,
+                icon: 'cactbot/resources/icon/status/devotion.png',
+                borderColor: '#ffbf00',
+                sortKey: 1,
+                cooldown: 180,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 5, // 物理增伤
+                incrMagic: 5, // 魔法增伤
+                tts: '灵护',
+            },
+            // 赤魔
+            embolden: { // 鼓励
+                // Embolden is special and has some extra text at the end, depending on embolden stage:
+                // Potato Chippy gains the effect of Embolden from Tater Tot for 20.00 Seconds. (5)
+                // Instead, use somebody using the effect on you:
+                //   16:106C22EF:Tater Tot:1D60:Embolden:106C22EF:Potato Chippy:500020F:4D7: etc etc
+                gainAbility: gLang.kAbility.Embolden,
+                gainRegex: Regexes.abilityFull({id: gLang.kAbility.Embolden, target: this.playerName}),
+                loseEffect: gLang.kEffect.Embolden,
+                durationSeconds: 20,
+                icon: 'cactbot/resources/icon/status/embolden.png',
+                // Lime.
+                borderColor: '#bcbce3',
+                sortKey: 1,
+                cooldown: 120,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 0, // 物理增伤
+                incrMagic: 0, // 魔法增伤
+                tts: '鼓励',
+            },
         };
 
         let keys = Object.keys(this.buffInfo);
@@ -1188,7 +1306,7 @@ class BuffTracker {
 
             let seconds = b.durationSeconds;
             let source = abilitySourceFromLog(log);
-            this.onBigBuff('', name, seconds, b, source, false);
+            this.onBigBuff('', b.name, seconds, b, source, false);
         }
     }
 
@@ -1549,6 +1667,18 @@ class Brds {
                     if (m)
                         this.buffTracker.onMobGainsEffect(m.groups.effect, log);
 
+                    //鼓励匹配
+                    m = log.match(Regexes.parse('] 1A:\\y{ObjectId}:' + this.me + ' gains the effect of 鼓励 from (\\y{Name}) for \\y{Float} Seconds. \\(([0-9]+)\\)'));
+                    if (m) {
+                        let isMe = false;
+                        if (this.me == m[1]) {
+                            isMe = true;
+                        }
+                        // 鼓励变更
+                        changeEmbolden(isMe, m[2], this.o.rightBuffsList)
+                        buffsCalculation(this.job, this.options, this.o.rightBuffsList)
+                    }
+
                     m = log.match(kMobGainsOwnEffectRegex);
                     if (m)
                         this.buffTracker.onMobGainsOwnEffect(m.groups.effect, log);
@@ -1637,22 +1767,22 @@ class Brds {
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
         }, 1000)
-        // setTimeout(() => {
-        //     let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 放浪神之箭 from Okonomi Yaki for 10.00 Seconds.'];
-        //     let e = {detail: {logs: logs}};
-        //     this.OnLogEvent(e);
-        // }, 2000)
+        setTimeout(() => {
+            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 放浪神之箭 from Okonomi Yaki for 10.00 Seconds.'];
+            let e = {detail: {logs: logs}};
+            this.OnLogEvent(e);
+        }, 2000)
         // setTimeout(() => {
         //     let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 太阳神之衡 from Okonomi Yaki for 5.00 Seconds.'];
         //     let e = {detail: {logs: logs}};
         //     this.OnLogEvent(e);
         // }, 3000)
         //
-        // setTimeout(() => {
-        //     let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 义结金兰：攻击 from Okonomi Yaki for 25.00 Seconds.'];
-        //     let e = {detail: {logs: logs}};
-        //     this.OnLogEvent(e);
-        // }, 4000)
+        setTimeout(() => {
+            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 义结金兰：攻击 from Okonomi Yaki for 25.00 Seconds.'];
+            let e = {detail: {logs: logs}};
+            this.OnLogEvent(e);
+        }, 4000)
 
         setTimeout(() => {
             let logs = ['[22:26:37.632] 1A:4000031E:木人 gains the effect of 狂风蚀箭 from ' + this.me + ' for 30.00 Seconds.'];
@@ -1671,28 +1801,71 @@ class Brds {
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
         }, 4000)
+        //
+        // setTimeout(() => {
+        //     let logs = ['[22:26:37.632] 1A:4000032E:木人 gains the effect of 烈毒咬箭 from ' + this.me + ' for 30.00 Seconds.'];
+        //     let e = {detail: {logs: logs}};
+        //     this.OnLogEvent(e);
+        // }, 5000)
 
         setTimeout(() => {
-            let logs = ['[22:26:37.632] 1A:4000032E:木人 gains the effect of 烈毒咬箭 from ' + this.me + ' for 30.00 Seconds.'];
+            let logs = ['[00:53:40.317] 15:10000000:Tako Yaki:1D60:Embolden:10000000:' + this.me + ':500020F:4D70000:0:0:0:0:0:0:0:0:0:0:0:0:0:0:42194:42194:10000:10000:0:1000:-655.3301:-838.5481:29.80905:0.523459:42194:42194:10000:10000:0:1000:-655.3301:-838.5481:29.80905:0.523459:00001DE7'];
+            let e = {detail: {logs: logs}};
+            this.OnLogEvent(e);
+        }, 3000)
+
+        setTimeout(() => {
+            let logs = ['[00:53:41.096] 1A:1039A1D9:' + this.me + ' gains the effect of 鼓励 from xxx for 20.00 Seconds. (5)'];
+            let e = {detail: {logs: logs}};
+            this.OnLogEvent(e);
+        }, 3000)
+
+        setTimeout(() => {
+            let logs = ['[00:53:41.096] 1A:1039A1D9:' + this.me + ' gains the effect of 鼓励 from xxx for 20.00 Seconds. (4)'];
+            let e = {detail: {logs: logs}};
+            this.OnLogEvent(e);
+        }, 4000)
+
+        setTimeout(() => {
+            let logs = ['[00:53:41.096] 1A:1039A1D9:' + this.me + ' gains the effect of 鼓励 from xxx for 20.00 Seconds. (3)'];
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
         }, 5000)
 
-        // setTimeout(() => {
-        //     let logs = ['[22:26:37.632] 1E:4000031E:木人 loses the effect of 狂风蚀箭 from ' + this.me + '.'];
-        //     let e = {detail: {logs: logs}};
-        //     this.OnLogEvent(e);
-        // }, 8000)
-        // setTimeout(() => {
-        //     let logs = ['[22:26:37.632] 1E:4000031E:木人 loses the effect of 烈毒咬箭 from ' + this.me + '.'];
-        //     let e = {detail: {logs: logs}};
-        //     this.OnLogEvent(e);
-        // }, 9000)
+        setTimeout(() => {
+            let logs = ['[00:53:41.096] 1A:1039A1D9:' + this.me + ' gains the effect of 鼓励 from xxx for 20.00 Seconds. (2)'];
+            let e = {detail: {logs: logs}};
+            this.OnLogEvent(e);
+        }, 6000)
+
+        setTimeout(() => {
+            let logs = ['[00:53:41.096] 1A:1039A1D9:' + this.me + ' gains the effect of 鼓励 from xxx for 20.00 Seconds. (1)'];
+            let e = {detail: {logs: logs}};
+            this.OnLogEvent(e);
+        }, 7000)
+
+        setTimeout(() => {
+            let logs = ['[00:53:41.096] 1E:1039A1D9:' + this.me + ' loses the effect of 鼓励 from xxx. (1)'];
+            let e = {detail: {logs: logs}};
+            this.OnLogEvent(e);
+        }, 8000)
+
+        setTimeout(() => {
+            let logs = ['[22:26:37.632] 1E:4000031E:木人 loses the effect of 狂风蚀箭 from ' + this.me + '.'];
+            let e = {detail: {logs: logs}};
+            this.OnLogEvent(e);
+        }, 8000)
+        setTimeout(() => {
+            let logs = ['[22:26:37.632] 1E:4000031E:木人 loses the effect of 烈毒咬箭 from ' + this.me + '.'];
+            let e = {detail: {logs: logs}};
+            this.OnLogEvent(e);
+        }, 9000)
     }
 
     TestChangeJob() {
         // let e = {detail: {job: "MNK", name: "TestName"}}
         let e = {detail: {job: "BRD", name: "TestName"}}
+        // let e = {detail: {job: "BRD", name: "xxx"}}
         this.OnPlayerChanged(e)
     }
 }
