@@ -251,7 +251,7 @@ function makeAuraTimerIcon(name, seconds, opacity, iconWidth, iconHeight, iconTe
 }
 
 function makeOwnAuraTimerIcon(name, seconds, opacity, iconWidth, iconHeight, iconText,
-                              barHeight, textHeight, textColor, borderSize, borderColor, barColor, auraIcon) {
+                              barHeight, textHeight, textColor, borderSize, borderColor, barColor, auraIcon, info) {
     let div = document.createElement('div');
     div.style.opacity = opacity;
 
@@ -276,13 +276,22 @@ function makeOwnAuraTimerIcon(name, seconds, opacity, iconWidth, iconHeight, ico
         barDiv.appendChild(bar);
     }
 
-    // TODO::根据物理计算还是魔法计算
-    // 获取当前buff值
-    let statTotal = document.getElementById('jobs-stat-physical');
-    let v = statTotal.getAttribute('value')
-    if (v !== undefined && Number(v) > 0) {
-        icon.text = v;
+    // 根据物理计算还是魔法计算
+    if (info.buffType !== undefined && info.buffType === 'physical') {
+        let jsp = document.getElementById('jobs-stat-physical');
+        let v = jsp.getAttribute('value')
+        if (v !== undefined && Number(v) > 0) {
+            icon.text = v;
+        }
     }
+    if (info.buffType !== undefined && info.buffType === 'magic') {
+        let jsm = document.getElementById('jobs-stat-magic');
+        let v = jsm.getAttribute('value')
+        if (v !== undefined && Number(v) > 0) {
+            icon.text = v;
+        }
+    }
+
     icon.bordercolor = borderColor;
     icon.icon = auraIcon;
 
@@ -358,8 +367,6 @@ class Buff {
     // 计算buff, 展示剩余多少时间刷buff是值得
     buffsCalculation(list) {
         let tgs = list.rootElement.getElementsByClassName('buffs');
-        let total = 0;
-
         let toip = 0; // 自己的物理增伤 (换算成攻击) (1 + a)(1 + b) = 1 + a + b + ab
         let toim = 0; // 自己的魔法增伤 (换算成攻击)
         let tbip = 0; // 对boss的物理增伤
@@ -463,7 +470,7 @@ class Buff {
                 textColor,
                 1,
                 this.info.borderColor, this.info.borderColor,
-                this.info.icon);
+                this.info.icon, this.info);
             list.addElement(key, elem, Math.floor(seconds) + adjustSort);
             aura.addTimeout = null;
 
@@ -628,6 +635,9 @@ class BuffTracker {
                 borderColor: '#099',
                 sortKey: 1,
                 cooldown: 180,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 5, // 物理增伤
+                incrMagic: 5, // 魔法增伤
                 increases: 5,
                 tts: '连祷',
             },
@@ -645,6 +655,9 @@ class BuffTracker {
                 borderColor: '#57FC4A',
                 sortKey: 1,
                 cooldown: 120,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 4, // 物理增伤
+                incrMagic: 4, // 魔法增伤
                 increases: 4,
                 increasesDim: {5: 10, 4: 8, 3: 6, 2: 4, 1: 2}, // 递减
                 tts: '鼓励',
@@ -657,6 +670,7 @@ class BuffTracker {
                 // Light Blue.
                 borderColor: '#37ccee',
                 sortKey: 1,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
                 increasesJob: {melee: 6, ranged: 3},
                 tts: '近卡',
             },
@@ -668,6 +682,7 @@ class BuffTracker {
                 // Orange.
                 borderColor: '#ff9900',
                 sortKey: 1,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
                 increasesJob: {melee: 6, ranged: 3},
                 tts: '近卡',
             },
@@ -679,6 +694,7 @@ class BuffTracker {
                 // Green.
                 borderColor: '#22dd77',
                 sortKey: 1,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
                 increasesJob: {melee: 3, ranged: 6},
                 tts: '远卡',
             },
@@ -690,6 +706,7 @@ class BuffTracker {
                 // Light Blue.
                 borderColor: '#66ccdd',
                 sortKey: 1,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
                 increasesJob: {melee: 3, ranged: 6},
                 tts: '远卡',
             },
@@ -701,6 +718,7 @@ class BuffTracker {
                 // Dark Blue.
                 borderColor: '#4477dd',
                 sortKey: 1,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
                 increasesJob: {melee: 6, ranged: 3},
                 tts: '近卡',
             },
@@ -712,6 +730,7 @@ class BuffTracker {
                 // Yellow.
                 borderColor: '#ddd044',
                 sortKey: 1,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
                 increasesJob: {melee: 3, ranged: 6},
                 tts: '远卡',
             },
@@ -723,6 +742,7 @@ class BuffTracker {
                 // Purple.
                 borderColor: '#9e5599',
                 sortKey: 1,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
                 increasesJob: {melee: 4, ranged: 8},
                 tts: '远卡',
             },
@@ -734,6 +754,7 @@ class BuffTracker {
                 // Dark Red.
                 borderColor: '#9a2222',
                 sortKey: 1,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
                 increasesJob: {melee: 8, ranged: 4},
                 tts: '近卡',
             },
@@ -746,6 +767,9 @@ class BuffTracker {
                 borderColor: '#006400',
                 sortKey: 1,
                 cooldown: 120,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 10, // 物理增伤
+                incrMagic: 10, // 魔法增伤
                 increases: 10,
                 tts: '探戈',
             },
@@ -758,6 +782,9 @@ class BuffTracker {
                 borderColor: '#E0757C',
                 sortKey: 1,
                 cooldown: 120,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 5, // 物理增伤
+                incrMagic: 5, // 魔法增伤
                 increases: 5,
                 tts: '技巧',
             },
@@ -770,6 +797,9 @@ class BuffTracker {
                 borderColor: '#D6371E',
                 sortKey: 1,
                 cooldown: 180,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 4, // 物理增伤
+                incrMagic: 4, // 魔法增伤
                 increases: 4,
                 tts: '战斗之声',
             },
@@ -781,6 +811,9 @@ class BuffTracker {
                 borderColor: '#4674E5',
                 sortKey: 1,
                 cooldown: 120,
+                incrOwn: false, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 5, // 物理增伤
+                incrMagic: 5, // 魔法增伤
                 increases: 5,
                 tts: '连环计',
             },
@@ -793,6 +826,9 @@ class BuffTracker {
                 borderColor: '#FA8737',
                 sortKey: 1,
                 cooldown: 120,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 5, // 物理增伤
+                incrMagic: 5, // 魔法增伤
                 increases: 5,
                 tts: '左眼',
             },
@@ -805,6 +841,9 @@ class BuffTracker {
                 borderColor: '#FA8737',
                 sortKey: 1,
                 cooldown: 120,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 10, // 物理增伤
+                incrMagic: 10, // 魔法增伤
                 increases: 10,
                 tts: '右眼',
             },
@@ -817,6 +856,9 @@ class BuffTracker {
                 borderColor: '#994200',
                 sortKey: 1,
                 cooldown: 90,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 5, // 物理增伤
+                incrMagic: 0, // 魔法增伤
                 increases: 5,
                 tts: '桃园',
             },
@@ -829,6 +871,9 @@ class BuffTracker {
                 borderColor: '#ffbf00',
                 sortKey: 1,
                 cooldown: 180,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 5, // 物理增伤
+                incrMagic: 5, // 魔法增伤
                 increases: 5,
                 tts: '灵护',
             },
@@ -841,6 +886,9 @@ class BuffTracker {
                 borderColor: '#5C1F58',
                 sortKey: 1,
                 cooldown: 120,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 6, // 物理增伤
+                incrMagic: 6, // 魔法增伤
                 increases: 6,
                 tts: '占卜',
             },
@@ -856,25 +904,27 @@ class BuffTracker {
                 cooldown: 80,
                 incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
                 incrPhysical: 10, // 物理增伤
-                incrMagic: 5, // 魔法增伤
+                incrMagic: 10, // 魔法增伤
                 increases: 10,
                 tts: '猛者',
             },
-            stormbite: {
+            stormbite: { // 风
                 mobGainsOwnEffect: gLang.kEffect.Stormbite,
                 mobLosesOwnEffect: gLang.kEffect.Stormbite,
                 useEffectDuration: true,
                 icon: 'https://xivapi.com/i/002000/002614.png',
                 borderColor: '#3df6fd',
                 sortKey: 1,
+                buffType: 'physical', // physical, magic
             },
-            causticBite: {
+            causticBite: { // 毒
                 mobGainsOwnEffect: gLang.kEffect.CausticBite,
                 mobLosesOwnEffect: gLang.kEffect.CausticBite,
                 useEffectDuration: true,
                 icon: 'https://xivapi.com/i/002000/002613.png',
                 borderColor: '#e053bb',
                 sortKey: 1,
+                buffType: 'physical', // physical
             }
         };
 
@@ -1034,9 +1084,12 @@ class BuffTracker {
 
         if (info.increasesJob != null) { // 根据远近判断
             if (isMeleeJob(this.job)) {
-                info.increases = info.increasesJob.melee
+                info.incrPhysical = info.increasesJob.melee; // 物理增伤
+                info.incrMagic = info.increasesJob.melee; // 魔法增伤
             } else {
                 info.increases = info.increasesJob.ranged
+                info.incrPhysical = info.increasesJob.ranged; // 物理增伤
+                info.incrMagic = info.increasesJob.ranged; // 魔法增伤
             }
         }
 
@@ -1044,7 +1097,6 @@ class BuffTracker {
         let buff = this.buffs[tname];
         if (!buff) {
             if (ownBuff === true) {
-                console.log(tname)
                 this.buffs[tname] = new Buff(this.job, tname, info, this.ownBuffDiv, this.options, true);
             } else {
                 this.buffs[tname] = new Buff(this.job, tname, info, list, this.options, false);
@@ -1141,13 +1193,13 @@ class Brds {
         // 设置DOT位置
         this.o.StatDot = document.createElement('div');
         this.o.StatDot.id = 'jobs-stat-dot';
-        this.o.StatDot.style.left = sWidth + 10;
+        // this.o.StatDot.style.left = sWidth + 10;
         this.o.Stat.appendChild(this.o.StatDot)
 
         this.o.StatDotList = document.createElement('widget-list');
-        this.o.StatDotList.rowcolsize = 2;
+        this.o.StatDotList.rowcolsize = 1;
         this.o.StatDotList.maxnumber = 20;
-        this.o.StatDotList.toward = 'right down';
+        this.o.StatDotList.toward = 'left down';
         this.o.StatDotList.elementwidth = this.options.DotIconWidth + 2;
         this.o.StatDotList.elementheight = this.options.DotIconHeight + this.options.DotBarHeight;
         this.o.StatDot.appendChild(this.o.StatDotList);
@@ -1155,8 +1207,8 @@ class Brds {
         // 设置秒数位置
         this.o.StatBuffSec = document.createElement('div');
         this.o.StatBuffSec.id = 'jobs-stat-buff-sec';
-        this.o.StatBuffSec.style.left = (sWidth + 10) + (this.options.DotIconWidth + 2) * 2 + 10;
-        // this.o.StatBuffSec.innerText = '10s'
+        // this.o.StatBuffSec.style.left = (sWidth + 10) + (this.options.DotIconWidth + 2) * 2 + 10;
+        this.o.StatBuffSec.style.left = sWidth + 10;
         this.o.Stat.appendChild(this.o.StatBuffSec);
     }
 

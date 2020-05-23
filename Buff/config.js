@@ -21,7 +21,7 @@ let Options = {
     BigBuffIconHeight: 20, // 团副监控图标高度（像素）
     BigBuffBorderSize: 0,// 团副监控边框尺寸（像素）
     BigBuffBar30sWidth: function () { // 团辅进度条30s团辅长度 (自动获取当前页面宽度)
-        return document.getElementsByTagName('body')[0].clientWidth - this.BigBuffIconWidth - 5
+        return document.getElementsByTagName('body')[0].clientWidth - this.BigBuffIconWidth - (this.DotIconWidth+1) - 5
     },
     TTS: true, // 是否使用tts播报
 
