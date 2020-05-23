@@ -1,20 +1,5 @@
 'use strict';
 
-// See user/jobs-example.js for documentation.
-let Options = {
-    Language: 'cn',
-    BigBuffIconWidth: 32,//团辅监控图标宽度（像素）
-    BigBuffIconHeight: 20, // 团副监控图标高度（像素）
-    BigBuffBarHeight: 20, // 团副监控计时条高度（像素）
-    BigBuffTextHeight: 0,//团副监控文字高度（像素）
-    BigBuffBorderSize: 0,// 团副监控边框尺寸（像素）
-    TTS: true, // 是否使用tts播报
-    // BigBuffShowCooldownSeconds: 20, // 显示团辅冷却倒计时最小时间
-
-    PerBuffOptions: {
-    },
-};
-
 // Regexes to be filled out once we know the player's name.
 let kYouGainEffectRegex = null;
 let kYouLoseEffectRegex = null;
@@ -180,7 +165,7 @@ function makeAuraTimerIcon(name, seconds, opacity, iconWidth, iconHeight, iconTe
     div.appendChild(barDiv);
 
     if (seconds >= 0) {
-        let c = 200 / 30
+        let c = Options.BigBuffBar30sWidth() / 30
         let width = seconds * c // 动态长度
         let bar = document.createElement('timer-bar');
         bar.width = width;// 进度条宽度
@@ -422,7 +407,7 @@ class Buff {
                 key, seconds, opacity,
                 this.options.BigBuffIconWidth, this.options.BigBuffIconHeight,
                 txt,
-                this.options.BigBuffBarHeight, this.options.BigBuffTextHeight,
+                this.options.BigBuffIconHeight, 0,
                 textColor,
                 this.options.BigBuffBorderSize,
                 this.info.borderColor, this.info.borderColor,
@@ -1256,7 +1241,7 @@ class Brds {
     }
 
     Test() {
-        // this.TestChangeJob();
+        this.TestChangeJob();
 
         let logs = [];
         let t = '[10:10:10.000] ';
@@ -1284,17 +1269,17 @@ class Brds {
         }, 1)
 
         setTimeout(() => {
-            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 强化药 from ' + this.me + ' for 18.00 Seconds.'];
+            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 强化药 from ' + this.me + ' for 30.00 Seconds.'];
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
         }, 1)
         setTimeout(() => {
-            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 猛者强击 from ' + this.me + ' for 10.00 Seconds.'];
+            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 猛者强击 from ' + this.me + ' for 15.00 Seconds.'];
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
         }, 1000)
         setTimeout(() => {
-            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 放浪神之箭 from Okonomi Yaki for 5.00 Seconds.'];
+            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 放浪神之箭 from Okonomi Yaki for 10.00 Seconds.'];
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
         }, 2000)
@@ -1305,7 +1290,7 @@ class Brds {
         }, 3000)
 
         setTimeout(() => {
-            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 义结金兰：攻击 from Okonomi Yaki for 10.00 Seconds.'];
+            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 义结金兰：攻击 from Okonomi Yaki for 25.00 Seconds.'];
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
         }, 4000)
@@ -1340,7 +1325,6 @@ class Brds {
         this.OnPlayerChanged(e)
     }
 }
-
 
 // 结束 从这里开始
 let gBrds;
