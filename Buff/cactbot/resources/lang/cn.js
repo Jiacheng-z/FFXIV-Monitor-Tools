@@ -19,12 +19,8 @@ class CactbotLanguageCn extends CactbotLanguage {
       CoeurlForm: '猛豹形', // 0x6d
       PerfectBalance: '震脚', // 0x6e
       Medicated: '强化药', // tbc
-
       Embolden: '鼓励', // 0x4d7
-
       Hypercharge: '超荷', // 0x2b0
-
-
       Devotion: '灵护', // 0x4bd
       FoeRequiem: '魔人的安魂曲', // up 0x8b, down 0x8c
       LeadenFist: '连击效果提高',
@@ -117,6 +113,9 @@ class CactbotLanguageCn extends CactbotLanguage {
       ChaosThrust: '樱花怒放',
       LeftEye: '巨龙左眼', // 0x4a0
       RightEye: '巨龙右眼', // 0x49f
+
+      // 忍着
+      ShadowFang: '影牙',
     });
 
     this.kUIStrings = Object.freeze({

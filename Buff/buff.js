@@ -611,21 +611,6 @@ class BuffTracker {
                 incrMagic: 10, // 魔法增伤
                 increases: 10,
             },
-            trick: { // 背刺
-                gainAbility: gLang.kAbility.TrickAttack,
-                gainRegex: Regexes.ability({id: gLang.kAbility.TrickAttack}),
-                durationSeconds: 15,
-                icon: 'cactbot/resources/icon/status/trick-attack.png',
-                // Magenta.
-                borderColor: '#FC4AE6',
-                sortKey: 1,
-                cooldown: 60,
-                incrOwn: false, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 10, // 物理增伤
-                incrMagic: 10, // 魔法增伤
-                increases: 5,
-                tts: '背刺',
-            },
             embolden: { // 鼓励
                 // Embolden is special and has some extra text at the end, depending on embolden stage:
                 // Potato Chippy gains the effect of Embolden from Tater Tot for 20.00 Seconds. (5)
@@ -1003,9 +988,7 @@ class BuffTracker {
                 tts: '桃园',
             },
             // 龙骑
-            //
-            //
-            // [23:47:39.159] 1A:1039A1D9:水貂桑 gains the effect of 巨龙右眼 from 水貂桑 for 20.00 Seconds.
+            // [23:47:39.159] 1A:1039A1D9:水貂桑 gains the effect of 巨龙右眼 from xxx for 20.00 Seconds.
             lanceCharge: { // [23:47:03.086] 1A:1039A1D9:水貂桑 gains the effect of 猛枪 from xxx for 20.00 Seconds.
                 gainEffect: gLang.kEffect.LanceCharge,
                 loseEffect: gLang.kEffect.LanceCharge,
@@ -1065,6 +1048,31 @@ class BuffTracker {
                 incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
                 incrPhysical: 10, // 物理增伤
                 incrMagic: 10, // 魔法增伤
+            },
+            // 忍着
+            trick: { // 背刺
+                gainAbility: gLang.kAbility.TrickAttack,
+                gainRegex: Regexes.ability({id: gLang.kAbility.TrickAttack}),
+                durationSeconds: 15,
+                icon: 'cactbot/resources/icon/status/trick-attack.png',
+                // Magenta.
+                borderColor: '#FC4AE6',
+                sortKey: 1,
+                cooldown: 60,
+                incrOwn: false, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 10, // 物理增伤
+                incrMagic: 10, // 魔法增伤
+                increases: 5,
+                tts: '背刺',
+            },
+            shadowFang: { //[00:03:38.355] 1A:400001B8:木人 gains the effect of 影牙 from xxx for 30.00 Seconds.
+                mobGainsOwnEffect: gLang.kEffect.ShadowFang,
+                mobLosesOwnEffect: gLang.kEffect.ShadowFang,
+                useEffectDuration: true,
+                icon: 'https://xivapi.com/i/000000/000606.png',
+                borderColor: '#08bcfe',
+                sortKey: 1,
+                buffType: 'physical', // physical
             },
         };
 

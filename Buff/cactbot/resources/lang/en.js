@@ -112,6 +112,9 @@ class CactbotLanguageEn extends CactbotLanguage {
             // 龙骑
             LanceCharge: 'Lance Charge',
             ChaosThrust: 'Chaos Thrust',
+
+            // 忍着
+            ShadowFang: 'Shadow Fang',
         });
 
         this.kUIStrings = Object.freeze({
