@@ -1,5 +1,8 @@
 'use strict';
 
+// 近战职业列表
+let meleeJobs = ['PLD', 'WAR', 'DRK', 'GNB', 'MNK', 'DRG', 'NIN', 'SAM'];
+
 // Regexes to be filled out once we know the player's name.
 let kYouGainEffectRegex = null;
 let kYouLoseEffectRegex = null;
@@ -11,6 +14,24 @@ let kMobGainsOwnEffectRegex = null; // 自己给boss上的buff
 let kMobLosesOwnEffectRegex = null; // 自己在boss身上丢失的buff
 
 let kStatsRegex = Regexes.statChange();
+
+function gainTargetFromLog(log) {
+    // [21:00:46.695] 1A:400001B9:木人 gains the effect of 狂风蚀箭 from 水貂桑 for 30.00 Seconds.
+    // [21:01:11.825] 1E:400001B8:木人 loses the effect of 狂风蚀箭 from 水貂桑.
+    let m = log.match(Regexes.parse('] 1A:(\\y{ObjectId}):([^:]*?) gains'));
+    if (m)
+        return m[1] + ':' + m[2];
+    return 0;
+}
+
+function loseTargetFromLog(log) {
+    // [21:00:46.695] 1A:400001B9:木人 gains the effect of 狂风蚀箭 from 水貂桑 for 30.00 Seconds.
+    // [21:01:11.825] 1E:400001B8:木人 loses the effect of 狂风蚀箭 from 水貂桑.
+    let m = log.match(Regexes.parse('] 1E:(\\y{ObjectId}):([^:]*?) loses'));
+    if (m)
+        return m[1] + ':' + m[2];
+    return 0;
+}
 
 let kGainSecondsRegex = Regexes.parse('for (\\y{Float}) Seconds\\.');
 
@@ -37,6 +58,24 @@ function abilitySourceFromLog(log) {
     if (m)
         return m[1];
     return null;
+}
+
+// 是否为近战职业
+function isMeleeJob(job) {
+    return meleeJobs.indexOf(job) >= 0;
+}
+
+// 获取url参数
+function getQueryVariable(variable) {
+    let query = window.location.search.substring(1);
+    let vars = query.split("&");
+    for (let i = 0; i < vars.length; i++) {
+        let pair = vars[i].split("=");
+        if (pair[0] == variable) {
+            return pair[1];
+        }
+    }
+    return (false);
 }
 
 class ComboTracker {
@@ -145,11 +184,15 @@ function computeBackgroundColorFrom(element, classList) {
     return color;
 }
 
-function makeAuraTimerIcon(name, seconds, opacity, iconWidth, iconHeight, iconText, barHeight, textHeight, textColor, borderSize, borderColor, barColor, auraIcon, increases) {
+function makeAuraTimerIcon(name, seconds, opacity, iconWidth, iconHeight, iconText, barHeight, textHeight, textColor, borderSize, borderColor, barColor, auraIcon, buffInfo) {
     let div = document.createElement('div');
     div.style.opacity = opacity;
     div.className = 'buffs'
-    div.setAttribute('buffs-value', increases)
+    // 设置buff详细信息
+    div.setAttribute('buffs-value', buffInfo.increases)
+    div.setAttribute('buffs-incr-own', buffInfo.incrOwn) // 作用自己
+    div.setAttribute('buffs-incr-physical', buffInfo.incrPhysical) // 作用物理
+    div.setAttribute('buffs-incr-magic', buffInfo.incrMagic) // 作用魔法
 
     let icon = document.createElement('timer-icon');
     icon.width = iconWidth;
@@ -233,8 +276,9 @@ function makeOwnAuraTimerIcon(name, seconds, opacity, iconWidth, iconHeight, ico
         barDiv.appendChild(bar);
     }
 
+    // TODO::根据物理计算还是魔法计算
     // 获取当前buff值
-    let statTotal = document.getElementById('jobs-buffs-total');
+    let statTotal = document.getElementById('jobs-stat-physical');
     let v = statTotal.getAttribute('value')
     if (v !== undefined && Number(v) > 0) {
         icon.text = v;
@@ -315,26 +359,81 @@ class Buff {
     buffsCalculation(list) {
         let tgs = list.rootElement.getElementsByClassName('buffs');
         let total = 0;
+
+        let toip = 0; // 自己的物理增伤 (换算成攻击) (1 + a)(1 + b) = 1 + a + b + ab
+        let toim = 0; // 自己的魔法增伤 (换算成攻击)
+        let tbip = 0; // 对boss的物理增伤
+        let tbim = 0; // 对boss的魔法增伤
+
         for (let i = 0; i < tgs.length; i++) {
-            let iv = tgs[i].getAttribute('buffs-value');
-            if (iv !== undefined && Number(iv) > 0) {
-                total = Number(total) + Number(iv);
+
+            let bio = tgs[i].getAttribute('buffs-incr-own') // 作用自己
+            let bip = tgs[i].getAttribute('buffs-incr-physical') // 作用物理
+            let bim = tgs[i].getAttribute('buffs-incr-magic') // 作用魔法
+
+            if (bio === undefined || bip === undefined || bim === undefined) {
+                continue;
+            }
+
+            bip = Number(bip)
+            bim = Number(bim)
+            if (Boolean(bio) === true) { // 作用自己, 乘法公式
+                if (bip > 0) {
+                    if (toip <= 0) {
+                        toip = bip;
+                    } else {
+                        toip = toip + bip + ((toip * bip) / 100)
+                    }
+                }
+
+                if (bim > 0) {
+                    if (toim <= 0) {
+                        toim = bim;
+                    } else {
+                        toim = toim + bim + ((toim * bim) / 100)
+                    }
+                }
+            } else { // 对boss增伤
+                if (bip > 0) {
+                    tbip += bip
+                }
+                if (bim > 0) {
+                    tbim += bim
+                }
             }
         }
 
-        let statTotal = document.getElementById('jobs-buffs-total');
-        statTotal.setAttribute('value', total)
-        if (Number(total) <= 0) {
-            statTotal.innerText = '';
-        } else {
-            statTotal.innerText = 'Total: ' + total + '%';
+        let showip = Math.floor((toip + tbip) * 10) / 10
+        let showim = Math.floor((toim + tbim) * 10) / 10
+
+        // jobs-stat-physical
+        // jobs-stat-magic
+
+        let statp = document.getElementById('jobs-stat-physical');
+        if (statp != null) {
+            statp.setAttribute('value', showip)
+            if (showip <= 0) {
+                statp.innerText = '';
+            } else {
+                statp.innerText = '物: ' + showip + '%';
+            }
+        }
+
+        let statm = document.getElementById('jobs-stat-magic');
+        if (statm != null) {
+            statm.setAttribute('value', showim)
+            if (showim <= 0) {
+                statm.innerText = '';
+            } else {
+                statm.innerText = '魔: ' + showim + '%';
+            }
         }
 
         // 诗人计算秒数
         if (this.job === 'BRD') {
-            let statSec = document.getElementById('jobs-buffs-sec');
-            if (Number(total) > 0) {
-                statSec.innerText = Math.floor((30 * 900 * (Number(total) / 100)) / ((1 + (Number(total) / 100)) * (230 - 100))) + 's';
+            let statSec = document.getElementById('jobs-stat-buff-sec');
+            if (Number(showip) > 0) {
+                statSec.innerText = Math.floor((30 * 900 * (Number(showip) / 100)) / ((1 + (Number(showip) / 100)) * (230 - 100))) + 's';
             } else {
                 statSec.innerText = '';
             }
@@ -358,9 +457,9 @@ class Buff {
         aura.addCallback = () => {
             let elem = makeOwnAuraTimerIcon(
                 key, seconds, opacity,
-                this.options.BigBuffIconWidth, this.options.BigBuffIconHeight,
+                this.options.DotIconWidth, this.options.DotIconHeight,
                 txt,
-                5, 0,
+                this.options.DotBarHeight, 0,
                 textColor,
                 1,
                 this.info.borderColor, this.info.borderColor,
@@ -411,14 +510,14 @@ class Buff {
                 textColor,
                 this.options.BigBuffBorderSize,
                 this.info.borderColor, this.info.borderColor,
-                this.info.icon, this.info.increases);
+                this.info.icon, this.info);
             list.addElement(key, elem, Math.floor(seconds) + adjustSort);
             aura.addTimeout = null;
             this.buffsCalculation(list)
 
             // 语音播报
             if (Options.TTS === true && this.info.tts != null && this.info.tts != '') {
-                let cmd = { 'call': 'cactbotSay', 'text': this.info.tts };
+                let cmd = {'call': 'cactbotSay', 'text': this.info.tts};
                 window.callOverlayHandler(cmd);
             }
 
@@ -500,6 +599,9 @@ class BuffTracker {
                 borderColor: '#AA41B2',
                 sortKey: 0,
                 cooldown: 270, //CD
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 10, // 物理增伤
+                incrMagic: 10, // 魔法增伤
                 increases: 10,
             },
             trick: { // 背刺
@@ -511,6 +613,9 @@ class BuffTracker {
                 borderColor: '#FC4AE6',
                 sortKey: 1,
                 cooldown: 60,
+                incrOwn: false, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 10, // 物理增伤
+                incrMagic: 10, // 魔法增伤
                 increases: 5,
                 tts: '背刺',
             },
@@ -749,6 +854,9 @@ class BuffTracker {
                 borderColor: '#db6509',
                 sortKey: 1,
                 cooldown: 80,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 10, // 物理增伤
+                incrMagic: 5, // 魔法增伤
                 increases: 10,
                 tts: '猛者',
             },
@@ -841,7 +949,7 @@ class BuffTracker {
 
             let seconds = b.durationSeconds;
             let source = abilitySourceFromLog(log);
-            this.onBigBuff(b.name, seconds, b, source, false);
+            this.onBigBuff('', name, seconds, b, source, false);
         }
     }
 
@@ -856,7 +964,7 @@ class BuffTracker {
                 seconds = b.durationSeconds;
 
             let source = gainSourceFromLog(log);
-            this.onBigBuff(b.name, seconds, b, source, false);
+            this.onBigBuff('', b.name, seconds, b, source, false);
         }
     }
 
@@ -871,7 +979,8 @@ class BuffTracker {
                 seconds = b.durationSeconds;
 
             let source = gainSourceFromLog(log);
-            this.onBigBuff(b.name, seconds, b, source, true);
+            let target = gainTargetFromLog(log);
+            this.onBigBuff(target, b.name, seconds, b, source, true);
         }
     }
 
@@ -879,14 +988,16 @@ class BuffTracker {
         if (!buffs)
             return;
         for (let b of buffs)
-            this.onLoseBigBuff(b.name, b);
+            this.onLoseBigBuff('', b.name, b);
     }
 
     onLoseOwnEffect(buffs, log) {
         if (!buffs)
             return;
-        for (let b of buffs)
-            this.onLoseBigBuff(b.name, b);
+        for (let b of buffs) {
+            let target = loseTargetFromLog(log);
+            this.onLoseBigBuff(target, b.name, b);
+        }
     }
 
     onYouGainEffect(name, log) {
@@ -913,7 +1024,7 @@ class BuffTracker {
         this.onLoseOwnEffect(this.mobLosesOwnEffectMap[name], log);
     }
 
-    onBigBuff(name, seconds, info, source, ownBuff) {
+    onBigBuff(target, name, seconds, info, source, ownBuff) {
         if (seconds <= 0)
             return;
 
@@ -921,23 +1032,24 @@ class BuffTracker {
         if (info.side == 'left' && this.leftBuffDiv)
             list = this.leftBuffDiv;
 
-        let melee = this.job.match('(PLD|WAR|DRK|GNB|MNK|DRG|NIN|SAM)');
         if (info.increasesJob != null) { // 根据远近判断
-            if (melee != null) {
+            if (isMeleeJob(this.job)) {
                 info.increases = info.increasesJob.melee
             } else {
                 info.increases = info.increasesJob.ranged
             }
         }
 
-        let buff = this.buffs[name];
+        let tname = target + "=>" + name
+        let buff = this.buffs[tname];
         if (!buff) {
             if (ownBuff === true) {
-                this.buffs[name] = new Buff(this.job, name, info, this.ownBuffDiv, this.options, true);
+                console.log(tname)
+                this.buffs[tname] = new Buff(this.job, tname, info, this.ownBuffDiv, this.options, true);
             } else {
-                this.buffs[name] = new Buff(this.job, name, info, list, this.options, false);
+                this.buffs[tname] = new Buff(this.job, tname, info, list, this.options, false);
             }
-            buff = this.buffs[name];
+            buff = this.buffs[tname];
         }
 
         let shareList = info.sharesCooldownWith || [];
@@ -949,8 +1061,9 @@ class BuffTracker {
         buff.onGain(seconds, source);
     }
 
-    onLoseBigBuff(name) {
-        let buff = this.buffs[name];
+    onLoseBigBuff(target, name) {
+        let tname = target + "=>" + name
+        let buff = this.buffs[tname];
         if (!buff)
             return;
         buff.onLose();
@@ -968,72 +1081,97 @@ class Brds {
         this.options = options;
         this.init = false;
         this.me = null;
-        this.o = {};
-        this.casting = {};
         this.job = '';
-        this.hp = 0;
-        this.maxHP = 0;
-        this.currentShield = 0;
-        this.mp = 0;
-        this.prevMP = 0;
-        this.maxMP = 0;
-        this.level = 0;
-        this.distance = -1;
-        this.whiteMana = -1;
-        this.blackMana = -1;
-        this.oath = -1;
-        this.umbralStacks = 0;
-        this.inCombat = false;
+        this.o = {};
         this.combo = 0;
-        this.comboTimer = null;
-
-        this.presenceOfMind = 0;
-        this.shifu = 0;
-        this.huton = 0;
-        this.lightningStacks = 0;
-        this.paeonStacks = 0;
-        this.museStacks = 0;
-        this.circleOfPower = 0;
 
         this.comboFuncs = [];
         this.gainEffectFuncMap = {};
         this.loseEffectFuncMap = {};
-        this.statChangeFuncMap = {};
         this.abilityFuncMap = {};
+
+        let secb = getQueryVariable('brdsec');
+        if (secb !== false && secb == 0) { // 关闭sec展示
+            this.options.TextBrdSec = false;
+        }
+    }
+
+    // 统计信息布局
+    SetStatLayout() {
+        this.o.Stat = document.getElementById('jobs-stat');
+        if (this.o.Stat == null) {
+            let root = document.getElementById('container');
+            this.o.Stat = document.createElement('div');
+            this.o.Stat.id = 'jobs-stat';
+            this.o.Stat.style.height = Number(this.options.DotIconHeight) + Number(this.options.DotBarHeight)
+            root.appendChild(this.o.Stat);
+        }
+        while (this.o.Stat.childNodes.length)
+            this.o.Stat.removeChild(this.o.Stat.childNodes[0]);
+
+        // 物理增伤
+        this.o.StatPhysical = document.createElement('div');
+        this.o.StatPhysical.id = 'jobs-stat-physical';
+        this.o.StatPhysical.style.color = this.options.TextPhysicalTextColor;
+        this.o.StatPhysical.style.fontSize = this.options.TextPhysicalFontSize;
+        this.o.StatPhysical.setAttribute('value', 0)
+        this.o.Stat.appendChild(this.o.StatPhysical)
+        // this.o.StatPhysical.innerText = '物: 10%';
+
+        // 魔法增伤
+        this.o.StatMagic = document.createElement('div');
+        this.o.StatMagic.id = 'jobs-stat-magic';
+        this.o.StatMagic.style.color = this.options.TextMagicTextColor;
+        this.o.StatMagic.style.fontSize = this.options.TextMagicFontSize;
+        this.o.StatMagic.style.top = this.options.TextPhysicalFontSize;
+        this.o.StatMagic.setAttribute('value', 0)
+        this.o.Stat.appendChild(this.o.StatMagic)
+        // this.o.StatMagic.innerText = '魔: 10%';
+
+        // 设置统计div高度
+        let sWidth = Number(this.options.TextPhysicalFontSize) * 5
+        let dotHeight = Number(this.options.DotIconHeight) + Number(this.options.DotBarHeight)
+        let fontHeight = Number(this.options.TextPhysicalFontSize) + Number(this.options.TextPhysicalFontSize) + 5
+        if (dotHeight > fontHeight) {
+            this.o.Stat.style.height = dotHeight
+        } else {
+            this.o.Stat.style.height = fontHeight
+        }
+
+        // 设置DOT位置
+        this.o.StatDot = document.createElement('div');
+        this.o.StatDot.id = 'jobs-stat-dot';
+        this.o.StatDot.style.left = sWidth + 10;
+        this.o.Stat.appendChild(this.o.StatDot)
+
+        this.o.StatDotList = document.createElement('widget-list');
+        this.o.StatDotList.rowcolsize = 2;
+        this.o.StatDotList.maxnumber = 20;
+        this.o.StatDotList.toward = 'right down';
+        this.o.StatDotList.elementwidth = this.options.DotIconWidth + 2;
+        this.o.StatDotList.elementheight = this.options.DotIconHeight + this.options.DotBarHeight;
+        this.o.StatDot.appendChild(this.o.StatDotList);
+
+        // 设置秒数位置
+        this.o.StatBuffSec = document.createElement('div');
+        this.o.StatBuffSec.id = 'jobs-stat-buff-sec';
+        this.o.StatBuffSec.style.left = (sWidth + 10) + (this.options.DotIconWidth + 2) * 2 + 10;
+        // this.o.StatBuffSec.innerText = '10s'
+        this.o.Stat.appendChild(this.o.StatBuffSec);
     }
 
     // 更新职业(布局)
     UpdateJob() {
         this.comboFuncs = [];
-        this.jobFuncs = [];
         this.gainEffectFuncMap = {};
         this.loseEffectFuncMap = {};
-        this.statChangeFuncMap = {};
         this.abilityFuncMap = {};
 
-        // 统计信息布局
-        let stat = document.getElementById('jobs-stat'); // 统计
-        if (stat == null) {
-            let root = document.getElementById('container');
-            stat = document.createElement('div');
-            stat.id = 'jobs-stat';
-            root.appendChild(stat);
-        }
-        while (stat.childNodes.length)
-            stat.removeChild(stat.childNodes[0]);
+        // 初始化
+        this.o = {};
 
-        let statLayoutTotal = document.createElement('div');
-        statLayoutTotal.id = 'jobs-buffs-total';
-        let statLayoutSec = document.createElement('div');
-        statLayoutSec.id = 'jobs-buffs-sec';
-        let statLayoutNow = document.createElement('div');
-        statLayoutNow.id = 'jobs-buffs-now';
-        let ownDotLayoutNow = document.createElement('div');
-        ownDotLayoutNow.id = 'jobs-own-dot';
-        stat.appendChild(statLayoutTotal);
-        stat.appendChild(statLayoutSec);
-        stat.appendChild(statLayoutNow);
-        stat.appendChild(ownDotLayoutNow);
+        // 统计信息布局
+        this.SetStatLayout()
 
         let container = document.getElementById('jobs-container'); // 查找对应ID的元素
         if (container == null) {
@@ -1044,8 +1182,6 @@ class Brds {
         }
         while (container.childNodes.length)
             container.removeChild(container.childNodes[0]);
-
-        this.o = {};
 
         let barsLayoutContainer = document.createElement('div');
         barsLayoutContainer.id = 'jobs';
@@ -1090,13 +1226,6 @@ class Brds {
         this.o.rightBuffsList = document.createElement('widget-list');
         this.o.rightBuffsContainer.appendChild(this.o.rightBuffsList);
 
-        this.o.ownDotList = document.createElement('widget-list');
-        this.o.ownDotList.rowcolsize = 2;
-        this.o.ownDotList.maxnumber = 2;
-        this.o.ownDotList.toward = 'left down';
-        this.o.ownDotList.elementwidth = this.options.BigBuffIconWidth + 2;
-        ownDotLayoutNow.appendChild(this.o.ownDotList);
-
         this.o.rightBuffsList.rowcolsize = 7;
         this.o.rightBuffsList.maxnumber = 7;
         this.o.rightBuffsList.toward = 'down right';
@@ -1113,21 +1242,12 @@ class Brds {
         barsLayoutContainer.classList.add('justbuffs');
     }
 
-    UpdateOpacity() {
-        let opacityContainer = document.getElementById('opacity-container');
-        if (!opacityContainer)
-            return;
-        if (this.inCombat || !this.options.LowerOpacityOutOfCombat)
-            opacityContainer.style.opacity = 1.0;
-        else
-            opacityContainer.style.opacity = this.options.OpacityOutOfCombat;
-    }
-
     OnComboChange(skill) {
         for (let i = 0; i < this.comboFuncs.length; ++i)
             this.comboFuncs[i](skill);
     }
 
+    // 切换职业
     OnPlayerChanged(e) {
         if (this.me !== e.detail.name) {
             this.me = e.detail.name;
@@ -1150,10 +1270,8 @@ class Brds {
 
         if (updateJob) {
             this.UpdateJob();
-            // On reload, we need to set the opacity after setting up the job bars.
-            this.UpdateOpacity();
             // Set up the buff tracker after the job bars are created.
-            this.buffTracker = new BuffTracker(this.options, this.me, this.job, this.o.leftBuffsList, this.o.rightBuffsList, this.o.ownDotList);
+            this.buffTracker = new BuffTracker(this.options, this.me, this.job, this.o.leftBuffsList, this.o.rightBuffsList, this.o.StatDotList);
         }
     }
 
@@ -1278,22 +1396,22 @@ class Brds {
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
         }, 1000)
-        setTimeout(() => {
-            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 放浪神之箭 from Okonomi Yaki for 10.00 Seconds.'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
-        }, 2000)
-        setTimeout(() => {
-            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 太阳神之衡 from Okonomi Yaki for 5.00 Seconds.'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
-        }, 3000)
-
-        setTimeout(() => {
-            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 义结金兰：攻击 from Okonomi Yaki for 25.00 Seconds.'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
-        }, 4000)
+        // setTimeout(() => {
+        //     let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 放浪神之箭 from Okonomi Yaki for 10.00 Seconds.'];
+        //     let e = {detail: {logs: logs}};
+        //     this.OnLogEvent(e);
+        // }, 2000)
+        // setTimeout(() => {
+        //     let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 太阳神之衡 from Okonomi Yaki for 5.00 Seconds.'];
+        //     let e = {detail: {logs: logs}};
+        //     this.OnLogEvent(e);
+        // }, 3000)
+        //
+        // setTimeout(() => {
+        //     let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 义结金兰：攻击 from Okonomi Yaki for 25.00 Seconds.'];
+        //     let e = {detail: {logs: logs}};
+        //     this.OnLogEvent(e);
+        // }, 4000)
 
         setTimeout(() => {
             let logs = ['[22:26:37.632] 1A:4000031E:木人 gains the effect of 狂风蚀箭 from ' + this.me + ' for 30.00 Seconds.'];
@@ -1306,6 +1424,18 @@ class Brds {
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
         }, 3000)
+
+        setTimeout(() => {
+            let logs = ['[22:26:37.632] 1A:4000032E:木人 gains the effect of 狂风蚀箭 from ' + this.me + ' for 30.00 Seconds.'];
+            let e = {detail: {logs: logs}};
+            this.OnLogEvent(e);
+        }, 4000)
+
+        setTimeout(() => {
+            let logs = ['[22:26:37.632] 1A:4000032E:木人 gains the effect of 烈毒咬箭 from ' + this.me + ' for 30.00 Seconds.'];
+            let e = {detail: {logs: logs}};
+            this.OnLogEvent(e);
+        }, 5000)
 
         // setTimeout(() => {
         //     let logs = ['[22:26:37.632] 1E:4000031E:木人 loses the effect of 狂风蚀箭 from ' + this.me + '.'];

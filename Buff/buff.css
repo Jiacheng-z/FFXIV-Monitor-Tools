@@ -59,9 +59,31 @@
   display: none;
 }
 
-#jobs-buffs-total {
+#jobs-stat-physical {
+  position: absolute;
+  top: 0;
+  text-shadow: -1px 0 3px black, 0 1px 3px black, 1px 0 3px black, 0 -1px 3px black;
+}
+#jobs-stat-magic {
+  position: absolute;
+  top: 0;
+  text-shadow: -1px 0 3px black, 0 1px 3px black, 1px 0 3px black, 0 -1px 3px black;
+}
+
+#jobs-stat-dot {
+  position: absolute;
+  top: 0;
+}
+
+#jobs-stat-dot {
+  position: absolute;
+  top: 0;
+}
+
+#jobs-stat-buff-sec {
+  position: absolute;
+  top: 0;
   color : white;
-  height: 30px;
   text-shadow: -1px 0 3px black, 0 1px 3px black, 1px 0 3px black, 0 -1px 3px black;
 }
 
@@ -73,7 +95,7 @@
   text-shadow: -1px 0 3px black, 0 1px 3px black, 1px 0 3px black, 0 -1px 3px black;
 }
 
-#jobs-own-dot {
+#jobs-own-dot { /* DOT位置在右上角 */
   position: absolute;
   left: 100%;
   top: 0;
