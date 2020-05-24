@@ -1448,6 +1448,11 @@ class Brds {
         if (secb !== false && secb == 1) { // 开启sec展示
             this.options.TextBrdSec = true;
         }
+
+        let tts = getQueryVariable('tts');
+        if (tts !== false && tts == 0) { // 关闭TTS
+            this.options.TTS = false;
+        }
     }
 
     // 统计信息布局
