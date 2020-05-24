@@ -700,7 +700,8 @@ class BuffTracker {
                 gainEffect: gLang.kEffect.Medicated,
                 loseEffect: gLang.kEffect.Medicated,
                 useEffectDuration: true,
-                icon: 'cactbot/resources/icon/status/potion.png',
+                // icon: 'cactbot/resources/icon/status/potion.png',
+                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/8/87/%E6%8A%80%E8%83%BD%E5%9B%BE%E6%A0%87_%E8%87%AA%E7%88%86.png/40px-%E6%8A%80%E8%83%BD%E5%9B%BE%E6%A0%87_%E8%87%AA%E7%88%86.png',
                 borderColor: '#AA41B2',
                 sortKey: 0,
                 cooldown: 270, //CD
@@ -1062,7 +1063,7 @@ class BuffTracker {
                 // icon: 'cactbot/resources/icon/status/battle-litany.png',
                 icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/3/32/002585.png/40px-002585.png',
                 // Cyan.
-                borderColor: '#099',
+                borderColor: '#009999',
                 sortKey: 1,
                 cooldown: 180,
                 incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
@@ -1076,7 +1077,7 @@ class BuffTracker {
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/dragon-sight.png',
                 icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/d/de/002587.png/40px-002587.png',
-                borderColor: '#fd693a',
+                borderColor: '#f85d48',
                 sortKey: 1,
                 cooldown: 120,
                 incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
@@ -1090,7 +1091,7 @@ class BuffTracker {
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/dragon-sight.png',
                 icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/d/de/002587.png/40px-002587.png',
-                borderColor: '#FA8737',
+                borderColor: '#fa5437',
                 sortKey: 1,
                 cooldown: 120,
                 incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
@@ -1105,7 +1106,7 @@ class BuffTracker {
                 // icon: 'cactbot/resources/icon/status/trick-attack.png',
                 icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/8/82/000618.png/40px-000618.png',
                 // Magenta.
-                borderColor: '#FC4AE6',
+                borderColor: '#ff8400',
                 sortKey: 1,
                 cooldown: 60,
                 incrOwn: false, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
