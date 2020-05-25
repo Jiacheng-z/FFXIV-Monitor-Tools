@@ -22,6 +22,7 @@ FFXIV监控工具
 
 开启秒数参考+关闭TTS+DOT样式修改: `https://jiacheng-z.github.io/FFXIV-Monitor-Tools/Buff/buff.html?brdsec=1&tts=0&dotstyle=44,32`
 
+参数:
 - 开关类:
     - `brdsec`: 是否展示诗人DOT刷新秒数参考. 1: 展示, 0: 隐藏. 默认: 0(隐藏)
     - `tts`: 是否使用TTS进行团辅出现提示. 1: 提醒, 0: 静音. 默认: 1(提醒)
