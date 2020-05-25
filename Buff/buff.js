@@ -566,7 +566,7 @@ class Buff {
                 txt,
                 this.options.DotBarHeight, 0,
                 textColor,
-                1,
+                this.options.DotBorderSize,
                 this.info.borderColor, this.info.borderColor,
                 this.info.icon, this.info);
             list.addElement(key, elem, Math.floor(seconds) + adjustSort);
@@ -706,9 +706,8 @@ class BuffTracker {
                 sortKey: 0,
                 cooldown: 270, //CD
                 incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 10, // 物理增伤
-                incrMagic: 10, // 魔法增伤
-                increases: 10,
+                incrPhysical: 8, // 物理增伤
+                incrMagic: 8, // 魔法增伤
             },
             raging: { // 猛者
                 gainEffect: gLang.kEffect.RagingStrikes,
@@ -1489,14 +1488,88 @@ class Brds {
         this.loseEffectFuncMap = {};
         this.abilityFuncMap = {};
 
-        let secb = getQueryVariable('brdsec');
-        if (secb !== false && secb == 1) { // 开启sec展示
-            this.options.TextBrdSec = true;
+        this.initConfig();
+    }
+
+    // 个性化配置
+    initConfig() {
+        let urlSet = function (name) {
+            let t = getQueryVariable(name);
+            if (t !== false) {
+                return t;
+            }
+            return false;
         }
 
-        let tts = getQueryVariable('tts');
-        if (tts !== false && tts == 0) { // 关闭TTS
+        // 是否展示诗人buff秒数参考
+        if (urlSet('brdsec') === '1') {
+            this.options.TextBrdSec = true;
+        }
+        if (urlSet('brdsecstyle') !== false) {
+            let sc = decodeURI(urlSet('brdsecstyle')).split(',', 2) // 字号,颜色
+            if (sc.length >= 1) {
+                this.options.TextBrdSecFontSize = Number(sc[0]);
+            }
+            if (sc.length >= 2) {
+                this.options.TextBrdSecTextColor = sc[1];
+            }
+        }
+        // 是否开启TTS语音
+        if (urlSet('tts') === '0') {
             this.options.TTS = false;
+        }
+        // 物理文字大小颜色
+        if (urlSet('phystyle') !== false) {
+            let sc = decodeURI(urlSet('phystyle')).split(',', 2) // 字号,颜色
+            if (sc.length >= 1) {
+                this.options.TextPhysicalFontSize = Number(sc[0]);
+            }
+            if (sc.length >= 2) {
+                this.options.TextPhysicalTextColor = sc[1];
+            }
+        }
+        // 魔法文字大小颜色
+        if (urlSet('magstyle') !== false) {
+            let sc = decodeURI(urlSet('magstyle')).split(',', 2) // 字号,颜色
+            if (sc.length >= 1) {
+                this.options.TextMagicFontSize = Number(sc[0]);
+            }
+            if (sc.length >= 2) {
+                this.options.TextMagicTextColor = sc[1];
+            }
+        }
+        // Dot图标长宽
+        if (urlSet('dotstyle') !== false) {
+            let wh = decodeURI(urlSet('dotstyle')).split(',', 4) // 宽,高,bar高,边框有无
+            if (wh.length >= 1) {
+                this.options.DotIconWidth = Number(wh[0]);
+            }
+            if (wh.length >= 2) {
+                this.options.DotIconHeight = Number(wh[1]);
+            }
+            if (wh.length >= 3) {
+                this.options.DotBarHeight = Number(wh[2]);
+            }
+            if (wh.length >= 4) {
+                this.options.DotBorderSize = Number(wh[3]);
+            }
+        }
+        // 团辅最长进度条
+        if (urlSet('buffmaxwidth') !== false) {
+            this.options.BidBuffBarMaxWidth = urlSet('buffmaxwidth');
+        }
+        // 团辅图标长宽
+        if (urlSet('buffstyle') !== false) {
+            let wh = decodeURI(urlSet('buffstyle')).split(',', 3) // 宽,高,边框有无
+            if (wh.length >= 1) {
+                this.options.BigBuffIconWidth = Number(wh[0]);
+            }
+            if (wh.length >= 2) {
+                this.options.BigBuffIconHeight = Number(wh[1]);
+            }
+            if (wh.length >= 3) {
+                this.options.BigBuffBorderSize = Number(wh[2]);
+            }
         }
     }
 
@@ -1507,7 +1580,7 @@ class Brds {
             let root = document.getElementById('container');
             this.o.Stat = document.createElement('div');
             this.o.Stat.id = 'jobs-stat';
-            this.o.Stat.style.height = Number(this.options.DotIconHeight) + Number(this.options.DotBarHeight)
+            // this.o.Stat.style.height = Number(this.options.DotIconHeight) + Number(this.options.DotBarHeight)
             root.appendChild(this.o.Stat);
         }
         while (this.o.Stat.childNodes.length)
@@ -1534,13 +1607,13 @@ class Brds {
 
         // 设置统计div高度
         let sWidth = Number(this.options.TextPhysicalFontSize) * 5
-        let dotHeight = Number(this.options.DotIconHeight) + Number(this.options.DotBarHeight)
-        let fontHeight = Number(this.options.TextPhysicalFontSize) + Number(this.options.TextPhysicalFontSize) + 5
-        if (dotHeight > fontHeight) {
-            this.o.Stat.style.height = dotHeight
-        } else {
+        // let dotHeight = Number(this.options.DotIconHeight) + Number(this.options.DotBarHeight)
+        let fontHeight = Number(this.options.TextPhysicalFontSize) + Number(this.options.TextMagicFontSize) + 5
+        // if (dotHeight > fontHeight) {
+        //     this.o.Stat.style.height = dotHeight
+        // } else {
             this.o.Stat.style.height = fontHeight
-        }
+        // }
 
         // 设置DOT位置
         this.o.StatDot = document.createElement('div');
@@ -1559,6 +1632,8 @@ class Brds {
         // 设置秒数位置
         this.o.StatBuffSec = document.createElement('div');
         this.o.StatBuffSec.id = 'jobs-stat-buff-sec';
+        this.o.StatBuffSec.style.color = this.options.TextBrdSecTextColor;
+        this.o.StatBuffSec.style.fontSize = this.options.TextBrdSecFontSize;
         // this.o.StatBuffSec.style.left = (sWidth + 10) + (this.options.DotIconWidth + 2) * 2 + 10;
         this.o.StatBuffSec.style.left = sWidth + 10;
         this.o.Stat.appendChild(this.o.StatBuffSec);
