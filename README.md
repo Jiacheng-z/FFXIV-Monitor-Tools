@@ -22,12 +22,12 @@ FFXIV监控工具
 样例: 开启秒数参考+关闭TTS+DOT样式修改 https://jiacheng-z.github.io/FFXIV-Monitor-Tools/Buff/buff.html?brdsec=1&tts=0&dotstyle=44,32
 
 - 开关类:
-    - brdsec: 是否展示诗人DOT刷新秒数参考. 1: 展示, 0: 隐藏. 默认: 0(隐藏)
-    - tts: 是否使用TTS进行团辅出现提示. 1: 提醒, 0: 静音. 默认: 1(提醒)
+    - `brdsec`: 是否展示诗人DOT刷新秒数参考. 1: 展示, 0: 隐藏. 默认: 0(隐藏)
+    - `tts`: 是否使用TTS进行团辅出现提示. 1: 提醒, 0: 静音. 默认: 1(提醒)
 - 样式类：
-    - buffmaxwidth: 团辅进度条最大长度. 数值(number)  默认: 250, 页面宽度小于250px时会自适应.
-    - buffstyle: 团辅展示样式. 字符串(string)  格式: <图标宽>,<图标高>,<边框> 默认: 32,20,0
-    - dotstyle: DOT图标样式. 字符串(string) 格式: <图标宽>,<图标高>,<进度条高>,<边框> 默认: 32,25,5,1
-    - phystyle: 物攻文字样式. 字符串(string) 格式: <字号>,<颜色> 默认: 20,ff8129
-    - magstyle: 魔攻文字样式. 字符串(string) 格式: <字号>,<颜色> 默认: 20,07d5ee
-    - brdsecstyle: 诗人刷新参考文字样式. 字符串(string) 格式: <字号>,<颜色> 默认: 20,white
+    - `buffmaxwidth`: 团辅进度条最大长度. 数值(number)  默认: 250, 页面宽度小于250px时会自适应.
+    - `buffstyle`: 团辅展示样式. 字符串(string)  格式: <图标宽>,<图标高>,<边框> 默认: 32,20,0
+    - `dotstyle`: DOT图标样式. 字符串(string) 格式: <图标宽>,<图标高>,<进度条高>,<边框> 默认: 32,25,5,1
+    - `phystyle`: 物攻文字样式. 字符串(string) 格式: <字号>,<颜色> 默认: 20,ff8129
+    - `magstyle`: 魔攻文字样式. 字符串(string) 格式: <字号>,<颜色> 默认: 20,07d5ee
+    - `brdsecstyle`: 诗人刷新参考文字样式. 字符串(string) 格式: <字号>,<颜色> 默认: 20,white
