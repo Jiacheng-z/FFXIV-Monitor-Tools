@@ -1158,9 +1158,9 @@ class BuffTracker {
                 sortKey: 1,
                 cooldown: 120,
                 incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 10, // 物理增伤
-                incrMagic: 10, // 魔法增伤
-                increases: 10,
+                incrPhysical: 15, // 物理增伤
+                incrMagic: 15, // 魔法增伤
+                increases: 15,
                 tts: '贪个',
             },
             technicalFinish: { // 技巧舞步结束
