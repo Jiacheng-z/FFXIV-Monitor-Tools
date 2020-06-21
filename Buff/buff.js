@@ -1487,6 +1487,12 @@ class Brds {
         this.gainEffectFuncMap = {};
         this.loseEffectFuncMap = {};
         this.abilityFuncMap = {};
+        this.partyTracker = new PartyTracker();
+        addOverlayListener('PartyChanged', (e) => {
+            this.partyTracker.onPartyChanged(e);
+            // console.log(e)
+            // console.log(this.partyTracker)
+        });
 
         this.initConfig();
     }
@@ -1499,6 +1505,23 @@ class Brds {
                 return t;
             }
             return false;
+        }
+
+        if (urlSet('scaling')) { //缩放百分比
+            let snum = decodeURI(urlSet('scaling'))
+            if (snum > 100) {
+                snum = snum/100
+                this.options.TextPhysicalFontSize *= snum
+                this.options.TextMagicFontSize *= snum
+                this.options.TextBrdSecFontSize *= snum
+
+                this.options.DotIconWidth *= snum
+                this.options.DotIconHeight *= snum
+                this.options.DotBarHeight *= snum
+
+                this.options.BigBuffIconWidth *= snum
+                this.options.BigBuffIconHeight *= snum
+            }
         }
 
         // 是否展示诗人buff秒数参考
@@ -1724,6 +1747,12 @@ class Brds {
     OnComboChange(skill) {
         for (let i = 0; i < this.comboFuncs.length; ++i)
             this.comboFuncs[i](skill);
+    }
+
+    OnPartyWipe(e) {
+        // TODO: add reset for job-specific ui
+        if (this.buffTracker)
+            this.buffTracker.clear();
     }
 
     // 切换职业
@@ -2012,6 +2041,9 @@ let gBrds;
 UserConfig.getUserConfigLocation('buff', function () {
     addOverlayListener('onPlayerChangedEvent', function (e) {
         gBrds.OnPlayerChanged(e);
+    });
+    addOverlayListener('onPartyWipe', function(e) {
+        gBrds.OnPartyWipe(e);
     });
     addOverlayListener('onLogEvent', function (e) {
         gBrds.OnLogEvent(e);
