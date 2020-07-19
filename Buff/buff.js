@@ -593,6 +593,9 @@ class Buff {
 
     makeAura(key, list, seconds, secondsUntilShow, adjustSort, textColor, txt, opacity, expireCallback) {
         let aura = {};
+        if (this.info.gainEffect == gLang.kEffect.Medicated && seconds >= 120) {
+            return
+        }
 
         aura.removeCallback = () => {
             list.removeElement(key);
@@ -1902,6 +1905,7 @@ class Brds {
 
         setTimeout(() => {
             let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 强化药 from ' + this.me + ' for 30.00 Seconds.'];
+            // let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 强化药 from ' + this.me + ' for 120.00 Seconds.'];
             let e = {detail: {logs: logs}};
             this.OnLogEvent(e);
         }, 1)
