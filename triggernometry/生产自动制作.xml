@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<TriggernometryExport Version="1">
+  <ExportedFolder FFXIVJobFilterEnabled="True" FFXIVJobFilter="24576" Id="66cedcde-e07e-4961-8557-9738dc674ed3" Name="工匠自动" Enabled="false">
+    <Folders />
+    <Triggers>
+      <Trigger Enabled="true" Name="2. 宏1结束触发2" Id="2e4abc23-3d31-4543-9c2e-6a1b2f70ab97" RegularExpression="宏 #1 已完成" PeriodRefire="Deny">
+        <Actions>
+          <Action OrderNumber="1" KeypressType="WindowMessage" KeyPressCode="75" KeyPressWindow="最终幻想XIV" LogLevel="-1" UseTTSTextExpression="结束" TextAuraFontSize="9" TextAuraFontName="宋体" ActionType="KeyPress" ExecutionDelayExpression="1000">
+            <Condition Enabled="false" Grouping="Or" />
+          </Action>
+        </Actions>
+        <Condition Enabled="false" Grouping="Or" />
+      </Trigger>
+      <Trigger Enabled="true" Name="3. 宏2结束 循环" Id="8b51e79c-f457-441c-a60d-bd46915f9f83" RegularExpression="宏 #2 已完成" PeriodRefire="Deny">
+        <Actions>
+          <Action OrderNumber="1" KeypressType="WindowMessage" KeyPressCode="96" KeyPressWindow="最终幻想XIV" LogLevel="-1" TextAuraFontSize="9" TextAuraFontName="宋体" ActionType="KeyPress" ExecutionDelayExpression="3000" Asynchronous="False">
+            <Condition Enabled="false" Grouping="Or" />
+          </Action>
+          <Action OrderNumber="2" KeypressType="WindowMessage" KeyPressCode="96" KeyPressWindow="最终幻想XIV" LogLevel="-1" TextAuraFontSize="9" TextAuraFontName="宋体" ActionType="KeyPress" ExecutionDelayExpression="1000" Asynchronous="False">
+            <Condition Enabled="false" Grouping="Or" />
+          </Action>
+          <Action OrderNumber="3" KeypressType="WindowMessage" KeyPressCode="96" KeyPressWindow="最终幻想XIV" LogLevel="-1" TextAuraFontSize="9" TextAuraFontName="宋体" ActionType="KeyPress" ExecutionDelayExpression="1000" Asynchronous="False">
+            <Condition Enabled="false" Grouping="Or" />
+          </Action>
+        </Actions>
+        <Condition Enabled="false" Grouping="Or" />
+      </Trigger>
+      <Trigger Enabled="true" Name="1. 开始制作 触发宏1" Id="50c8792a-297b-4df5-8f60-409a667d2bc5" RegularExpression="(?&lt;name&gt;[^:]+?)开始制作“">
+        <Actions>
+          <Action OrderNumber="1" KeypressType="WindowMessage" KeyPressCode="74" KeyPressWindow="最终幻想XIV" LogLevel="-1" TextAuraFontSize="9" TextAuraFontName="宋体" ActionType="KeyPress" ExecutionDelayExpression="1000" Asynchronous="False">
+            <Condition Enabled="false" Grouping="Or" />
+          </Action>
+        </Actions>
+        <Condition Enabled="true" Grouping="Or">
+          <ConditionSingle Enabled="true" ExpressionL="${name}" ExpressionTypeL="String" ExpressionR="${_ffxivplayer}" ExpressionTypeR="String" ConditionType="StringEqualNocase" />
+        </Condition>
+      </Trigger>
+    </Triggers>
+  </ExportedFolder>
+</TriggernometryExport>
