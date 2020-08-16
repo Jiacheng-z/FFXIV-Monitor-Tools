@@ -673,7 +673,9 @@ class Buff {
         this.onLose();
         this.clearCooldown(source);
         if (this.ownBuff === true) {
-            this.active = this.makeOwnAura(this.name, this.activeList, seconds, 0, 0, 'white', '', 1);
+            if (this.options.DOT === true) {
+                this.active = this.makeOwnAura(this.name, this.activeList, seconds, 0, 0, 'white', '', 1);
+            }
         } else {
             this.active = this.makeAura(this.name, this.activeList, seconds, 0, 0, 'white', '', 1);
             // this.addCooldown(source, seconds);
@@ -704,7 +706,8 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.Medicated,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/potion.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/8/87/%E6%8A%80%E8%83%BD%E5%9B%BE%E6%A0%87_%E8%87%AA%E7%88%86.png/40px-%E6%8A%80%E8%83%BD%E5%9B%BE%E6%A0%87_%E8%87%AA%E7%88%86.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/8/87/%E6%8A%80%E8%83%BD%E5%9B%BE%E6%A0%87_%E8%87%AA%E7%88%86.png',
+                icon: './img/000000.png',
                 borderColor: '#AA41B2',
                 sortKey: 0,
                 cooldown: 270, //CD
@@ -717,7 +720,8 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.RagingStrikes,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/000000/000352.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/2/2a/000352.png/40px-000352.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/2/2a/000352.png',
+                icon: './img/000352.png',
                 borderColor: '#db6509',
                 sortKey: 1,
                 cooldown: 80,
@@ -731,7 +735,8 @@ class BuffTracker {
                 mobLosesOwnEffect: gLang.kEffect.Stormbite,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/002000/002614.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/c/c0/002614.png/40px-002614.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/c/c0/002614.png',
+                icon: './img/002614.png',
                 borderColor: '#3df6fd',
                 sortKey: 1,
                 buffType: 'physical', // physical, magic
@@ -741,7 +746,8 @@ class BuffTracker {
                 mobLosesOwnEffect: gLang.kEffect.CausticBite,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/002000/002613.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/4/41/002613.png/40px-002613.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/4/41/002613.png',
+                icon: './img/002613.png',
                 borderColor: '#e053bb',
                 sortKey: 1,
                 buffType: 'physical', // physical
@@ -752,7 +758,8 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.FightOrFlight,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/000000/000166.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/8/8b/000166.png/40px-000166.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/8/8b/000166.png',
+                icon: './img/000166.png',
                 borderColor: '#cc392a',
                 sortKey: 1,
                 cooldown: 60,
@@ -766,7 +773,8 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.Requiescat,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/002000/002513.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/d/d5/002513.png/40px-002513.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/d/d5/002513.png',
+                icon: './img/002513.png',
                 borderColor: '#2e70f5',
                 sortKey: 1,
                 cooldown: 60,
@@ -780,7 +788,8 @@ class BuffTracker {
                 mobLosesOwnEffect: gLang.kEffect.GoringBlade,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/002000/002506.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/9/95/002506.png/40px-002506.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/9/95/002506.png',
+                icon: './img/002506.png',
                 borderColor: '#d23e29',
                 sortKey: 1,
                 buffType: 'physical', // physical
@@ -790,7 +799,8 @@ class BuffTracker {
                 mobLosesOwnEffect: gLang.kEffect.CircleOfScorn,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/000000/000161.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/b/b9/000161.png/40px-000161.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/b/b9/000161.png',
+                icon: './img/000161.png',
                 borderColor: '#e77d70',
                 sortKey: 1,
                 buffType: 'physical', // physical
@@ -801,7 +811,8 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.NoMercy,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/003000/003402.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/6/66/003402.png/40px-003402.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/6/66/003402.png',
+                icon: './img/003402.png',
                 borderColor: '#345ec4',
                 sortKey: 1,
                 cooldown: 60,
@@ -815,7 +826,8 @@ class BuffTracker {
                 mobLosesOwnEffect: gLang.kEffect.SonicBreak,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/003000/003417.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/1/16/003417.png/40px-003417.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/1/16/003417.png',
+                icon: './img/003417.png',
                 borderColor: '#755cbb',
                 sortKey: 1,
                 buffType: 'physical', // physical
@@ -825,7 +837,8 @@ class BuffTracker {
                 mobLosesOwnEffect: gLang.kEffect.BowShock,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/003000/003423.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/b/b5/003423.png/40px-003423.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/b/b5/003423.png',
+                icon: './img/003423.png',
                 borderColor: '#d5d557',
                 sortKey: 1,
                 buffType: 'physical', // physical
@@ -836,7 +849,8 @@ class BuffTracker {
                 mobLosesOwnEffect: gLang.kEffect.Dia,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/002000/002641.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/b/ba/002641.png/40px-002641.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/b/ba/002641.png',
+                icon: './img/002641.png',
                 borderColor: '#3eb9fa',
                 sortKey: 1,
                 buffType: 'magic', // physical
@@ -846,8 +860,8 @@ class BuffTracker {
                 gainAbility: gLang.kAbility.ChainStratagem,
                 durationSeconds: 15,
                 // icon: 'cactbot/resources/icon/status/chain-stratagem.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/f/fd/002815.png/40px-002815.png',
-                // Blue.
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/f/fd/002815.png',
+                icon: './img/002815.png',
                 borderColor: '#849dfd',
                 sortKey: 1,
                 cooldown: 120,
@@ -861,7 +875,8 @@ class BuffTracker {
                 mobLosesOwnEffect: gLang.kEffect.Biolysis,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/002000/002820.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/7/78/002820.png/40px-002820.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/7/78/002820.png',
+                icon: './img/002820.png',
                 borderColor: '#2e1fc4',
                 sortKey: 1,
                 buffType: 'magic', // physical
@@ -872,7 +887,8 @@ class BuffTracker {
                 mobLosesOwnEffect: gLang.kEffect.CombustIII,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/003000/003554.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/4/4d/003554.png/40px-003554.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/4/4d/003554.png',
+                icon: './img/003554.png',
                 borderColor: '#62daf8',
                 sortKey: 1,
                 buffType: 'magic', // physical
@@ -882,7 +898,8 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.Divination,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/divination.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/f/fc/003553.png/40px-003553.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/f/fc/003553.png',
+                icon: './img/003553.png',
                 borderColor: '#e8c353',
                 sortKey: 1,
                 cooldown: 120,
@@ -896,8 +913,8 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.Arrow,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/arrow.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/1/10/003113.png/40px-003113.png',
-                // Light Blue.
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/1/10/003113.png',
+                icon: './img/003113.png',
                 borderColor: '#37ccee',
                 sortKey: 1,
                 incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
@@ -909,7 +926,8 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.Balance,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/balance.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/8/8d/003110.png/40px-003110.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/8/8d/003110.png',
+                icon: './img/003110.png',
                 // Orange.
                 borderColor: '#ff5900',
                 sortKey: 1,
@@ -922,8 +940,8 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.Bole,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/bole.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/e/e0/003112.png/40px-003112.png',
-                // Green.
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/e/e0/003112.png',
+                icon: './img/003112.png',
                 borderColor: '#22dd77',
                 sortKey: 1,
                 incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
@@ -935,8 +953,8 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.Ewer,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/ewer.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/6/66/003114.png/40px-003114.png',
-                // Light Blue.
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/6/66/003114.png',
+                icon: './img/003114.png',
                 borderColor: '#66ccdd',
                 sortKey: 1,
                 incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
@@ -948,8 +966,8 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.Spear,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/spear.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/5/5d/003111.png/40px-003111.png',
-                // Dark Blue.
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/5/5d/003111.png',
+                icon: './img/003111.png',
                 borderColor: '#4477dd',
                 sortKey: 1,
                 incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
@@ -961,8 +979,8 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.Spire,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/spire.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/8/88/003115.png/40px-003115.png',
-                // Yellow.
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/8/88/003115.png',
+                icon: './img/003115.png',
                 borderColor: '#ddd044',
                 sortKey: 1,
                 incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
@@ -974,8 +992,8 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.LadyOfCrowns,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/lady-of-crowns.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/5/59/003146.png/40px-003146.png',
-                // Purple.
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/5/59/003146.png',
+                icon: './img/003146.png',
                 borderColor: '#9e5599',
                 sortKey: 1,
                 incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
@@ -987,8 +1005,8 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.LordOfCrowns,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/lord-of-crowns.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/a/a8/003147.png/40px-003147.png',
-                // Dark Red.
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/a/a8/003147.png',
+                icon: './img/003147.png',
                 borderColor: '#9a2222',
                 sortKey: 1,
                 incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
@@ -1001,7 +1019,8 @@ class BuffTracker {
                 mobLosesOwnEffect: gLang.kEffect.Demolish,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/000000/000204.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/2/2b/000204.png/40px-000204.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/2/2b/000204.png',
+                icon: './img/000204.png',
                 borderColor: '#f5cc19',
                 sortKey: 1,
                 buffType: 'physical', // physical
@@ -1011,7 +1030,8 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.RiddleOfFire,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/002000/002541.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/8/8f/002541.png/40px-002541.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/8/8f/002541.png',
+                icon: './img/002541.png',
                 borderColor: '#dc625a',
                 sortKey: 1,
                 cooldown: 90,
@@ -1024,7 +1044,8 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.Brotherhood,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/brotherhood.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/d/db/002542.png/40px-002542.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/d/db/002542.png',
+                icon: './img/002542.png',
                 borderColor: '#994200',
                 sortKey: 1,
                 cooldown: 90,
@@ -1040,7 +1061,8 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.LanceCharge,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/000000/000309.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/0/07/000309.png/40px-000309.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/0/07/000309.png',
+                icon: './img/000309.png',
                 borderColor: '#831819',
                 sortKey: 1,
                 cooldown: 90,
@@ -1053,7 +1075,8 @@ class BuffTracker {
                 mobLosesOwnEffect: gLang.kEffect.ChaosThrust,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/000000/000308.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/d/d6/000308.png/40px-000308.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/d/d6/000308.png',
+                icon: './img/000308.png',
                 borderColor: '#83598c',
                 sortKey: 1,
                 buffType: 'physical', // physical
@@ -1063,8 +1086,8 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.BattleLitany,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/battle-litany.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/3/32/002585.png/40px-002585.png',
-                // Cyan.
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/3/32/002585.png',
+                icon: './img/002585.png',
                 borderColor: '#009999',
                 sortKey: 1,
                 cooldown: 180,
@@ -1078,7 +1101,8 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.LeftEye,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/dragon-sight.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/d/de/002587.png/40px-002587.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/d/de/002587.png',
+                icon: './img/002587.png',
                 borderColor: '#f85d48',
                 sortKey: 1,
                 cooldown: 120,
@@ -1092,7 +1116,8 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.RightEye,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/dragon-sight.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/d/de/002587.png/40px-002587.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/d/de/002587.png',
+                icon: './img/002587.png',
                 borderColor: '#fa5437',
                 sortKey: 1,
                 cooldown: 120,
@@ -1100,14 +1125,14 @@ class BuffTracker {
                 incrPhysical: 10, // 物理增伤
                 incrMagic: 10, // 魔法增伤
             },
-            // 忍着
+            // 忍者
             trick: { // 背刺
                 gainAbility: gLang.kAbility.TrickAttack,
                 gainRegex: Regexes.ability({id: gLang.kAbility.TrickAttack}),
                 durationSeconds: 15,
                 // icon: 'cactbot/resources/icon/status/trick-attack.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/8/82/000618.png/40px-000618.png',
-                // Magenta.
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/8/82/000618.png',
+                icon: './img/000618.png',
                 borderColor: '#ff8400',
                 sortKey: 1,
                 cooldown: 60,
@@ -1116,47 +1141,50 @@ class BuffTracker {
                 incrMagic: 5, // 魔法增伤
                 tts: '背刺',
             },
-            shadowFang: { //[00:03:38.355] 1A:400001B8:木人 gains the effect of 影牙 from xxx for 30.00 Seconds.
-                mobGainsOwnEffect: gLang.kEffect.ShadowFang,
-                mobLosesOwnEffect: gLang.kEffect.ShadowFang,
-                useEffectDuration: true,
-                // icon: 'https://xivapi.com/i/000000/000606.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/e/ee/000606.png/40px-000606.png',
-                borderColor: '#08bcfe',
-                sortKey: 1,
-                buffType: 'physical', // physical
-            },
+            // shadowFang: { //[00:03:38.355] 1A:400001B8:木人 gains the effect of 影牙 from xxx for 30.00 Seconds.
+            //     mobGainsOwnEffect: gLang.kEffect.ShadowFang,
+            //     mobLosesOwnEffect: gLang.kEffect.ShadowFang,
+            //     useEffectDuration: true,
+            //     // icon: 'https://xivapi.com/i/000000/000606.png',
+            //     // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/e/ee/000606.png',
+            //     icon: './img/000606.png',
+            //     borderColor: '#08bcfe',
+            //     sortKey: 1,
+            //     buffType: 'physical', // physical
+            // },
             // 武士
             higanbana: { // [00:12:10.091] 1A:400001B8:木人 gains the effect of 彼岸花 from xxx for 60.00 Seconds.
                 mobGainsOwnEffect: gLang.kEffect.Higanbana,
                 mobLosesOwnEffect: gLang.kEffect.Higanbana,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/003000/003160.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/6/6b/003160.png/40px-003160.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/6/6b/003160.png',
+                icon: './img/003160.png',
                 borderColor: '#d9542a',
                 sortKey: 1,
                 buffType: 'physical', // physical
             },
             // 诗人
             // 机工
-            bioblaster: { // [00:20:02.402] 1A:400001B9:木人 gains the effect of 毒菌冲击 from xxx for 15.00 Seconds.
-                mobGainsOwnEffect: gLang.kEffect.Bioblaster,
-                mobLosesOwnEffect: gLang.kEffect.Bioblaster,
-                useEffectDuration: true,
-                // icon: 'https://xivapi.com/i/003000/003044.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/e/e7/003044.png/40px-003044.png',
-                borderColor: '#acfd19',
-                sortKey: 1,
-                buffType: 'physical', // physical
-            },
+            // bioblaster: { // [00:20:02.402] 1A:400001B9:木人 gains the effect of 毒菌冲击 from xxx for 15.00 Seconds.
+            //     mobGainsOwnEffect: gLang.kEffect.Bioblaster,
+            //     mobLosesOwnEffect: gLang.kEffect.Bioblaster,
+            //     useEffectDuration: true,
+            //     // icon: 'https://xivapi.com/i/003000/003044.png',
+            //     // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/e/e7/003044.png',
+            //     icon: './img/003044.png',
+            //     borderColor: '#acfd19',
+            //     sortKey: 1,
+            //     buffType: 'physical', // physical
+            // },
             // 舞娘
             devilment: { // 进攻之探戈
                 gainEffect: gLang.kEffect.Devilment,
                 loseEffect: gLang.kEffect.Devilment,
                 durationSeconds: 20,
                 // icon: 'cactbot/resources/icon/status/devilment.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/e/ef/003471.png/40px-003471.png',
-                // Dark Green.
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/e/ef/003471.png',
+                icon: './img/003471.png',
                 borderColor: '#006400',
                 sortKey: 1,
                 cooldown: 120,
@@ -1171,8 +1199,8 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.TechnicalFinish,
                 durationSeconds: 20,
                 // icon: 'cactbot/resources/icon/status/technical-finish.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/b/ba/003474.png/40px-003474.png',
-                // Dark Peach.
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/b/ba/003474.png',
+                icon: './img/003474.png',
                 borderColor: '#E0757C',
                 sortKey: 1,
                 cooldown: 120,
@@ -1187,8 +1215,8 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.BattleVoice,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/battlevoice.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/5/55/002601.png/40px-002601.png',
-                // Red.
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/5/55/002601.png',
+                icon: './img/002601.png',
                 borderColor: '#D6371E',
                 sortKey: 1,
                 cooldown: 180,
@@ -1204,28 +1232,31 @@ class BuffTracker {
                 mobLosesOwnEffect: gLang.kEffect.ThunderIII,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/000000/000459.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/c/c1/000459.png/40px-000459.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/c/c1/000459.png',
+                icon: './img/000459.png',
                 borderColor: '#93d5fd',
                 sortKey: 1,
                 buffType: 'magic', // physical
             },
-            thunderIV: { // [00:32:47.727] 1A:400001B8:木人 gains the effect of 霹雷 from xxx for 18.00 Seconds.
-                mobGainsOwnEffect: gLang.kEffect.ThunderIV,
-                mobLosesOwnEffect: gLang.kEffect.ThunderIV,
-                useEffectDuration: true,
-                // icon: 'https://xivapi.com/i/002000/002662.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/8/82/002662.png/40px-002662.png',
-                borderColor: '#ac6af6',
-                sortKey: 1,
-                buffType: 'magic', // physical
-            },
+            // thunderIV: { // [00:32:47.727] 1A:400001B8:木人 gains the effect of 霹雷 from xxx for 18.00 Seconds.
+            //     mobGainsOwnEffect: gLang.kEffect.ThunderIV,
+            //     mobLosesOwnEffect: gLang.kEffect.ThunderIV,
+            //     useEffectDuration: true,
+            //     // icon: 'https://xivapi.com/i/002000/002662.png',
+            //     // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/8/82/002662.png',
+            //     icon: './img/002662.png',
+            //     borderColor: '#ac6af6',
+            //     sortKey: 1,
+            //     buffType: 'magic', // physical
+            // },
             // 召唤
             bioIII: { // [00:40:15.962] 1A:400001B8:木人 gains the effect of 剧毒菌 from xxx for 30.00 Seconds.
                 mobGainsOwnEffect: gLang.kEffect.BioIII,
                 mobLosesOwnEffect: gLang.kEffect.BioIII,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/002000/002689.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/b/b1/002689.png/40px-002689.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/b/b1/002689.png',
+                icon: './img/002689.png',
                 borderColor: '#e3e02d',
                 sortKey: 1,
                 buffType: 'magic', // physical
@@ -1235,7 +1266,8 @@ class BuffTracker {
                 mobLosesOwnEffect: gLang.kEffect.MiasmaIII,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/002000/002690.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/e/e5/002690.png/40px-002690.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/e/e5/002690.png',
+                icon: './img/002690.png',
                 borderColor: '#97abe0',
                 sortKey: 1,
                 buffType: 'magic', // physical
@@ -1245,7 +1277,8 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.Devotion,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/devotion.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/2/25/002688.png/40px-002688.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/2/25/002688.png',
+                icon: './img/002688.png',
                 borderColor: '#ffbf00',
                 sortKey: 1,
                 cooldown: 180,
@@ -1265,7 +1298,8 @@ class BuffTracker {
                 loseEffect: gLang.kEffect.Embolden,
                 durationSeconds: 20,
                 // icon: 'cactbot/resources/icon/status/embolden.png',
-                icon: 'https://huiji-thumb.huijistatic.com/ff14/uploads/thumb/2/2c/003218.png/40px-003218.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/2/2c/003218.png',
+                icon: './img/003218.png',
                 // Lime.
                 borderColor: '#bcbce3',
                 sortKey: 1,
@@ -1563,6 +1597,10 @@ class Brds {
             if (sc.length >= 2) {
                 this.options.TextMagicTextColor = sc[1];
             }
+        }
+        // DOT是否展示
+        if (urlSet('dot') === '0') {
+            this.options.DOT = false;
         }
         // Dot图标长宽
         if (urlSet('dotstyle') !== false) {

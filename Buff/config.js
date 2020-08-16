@@ -33,6 +33,7 @@ let Options = {
         return autoWidth;
     },
     TTS: true, // 是否使用tts播报
+    DOT: true, // 是否展示DOT
 
     // BigBuffShowCooldownSeconds: 20, // 显示团辅冷却倒计时最小时间
 
