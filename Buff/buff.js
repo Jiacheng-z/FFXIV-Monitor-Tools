@@ -673,7 +673,9 @@ class Buff {
         this.onLose();
         this.clearCooldown(source);
         if (this.ownBuff === true) {
-            this.active = this.makeOwnAura(this.name, this.activeList, seconds, 0, 0, 'white', '', 1);
+            if (this.options.DOT === true) {
+                this.active = this.makeOwnAura(this.name, this.activeList, seconds, 0, 0, 'white', '', 1);
+            }
         } else {
             this.active = this.makeAura(this.name, this.activeList, seconds, 0, 0, 'white', '', 1);
             // this.addCooldown(source, seconds);
@@ -1595,6 +1597,10 @@ class Brds {
             if (sc.length >= 2) {
                 this.options.TextMagicTextColor = sc[1];
             }
+        }
+        // DOT是否展示
+        if (urlSet('dot') === '0') {
+            this.options.DOT = false;
         }
         // Dot图标长宽
         if (urlSet('dotstyle') !== false) {
