@@ -19,8 +19,20 @@ class CactbotLanguageCn extends CactbotLanguage {
             CoeurlForm: '猛豹形', // 0x6d
             PerfectBalance: '震脚', // 0x6e
             Medicated: '强化药', // tbc
+            BattleLitany: '战斗连祷', // 0x312
             Embolden: '鼓励', // 0x4d7
+            Arrow: '放浪神之箭', // 0x75c
+            Balance: '太阳神之衡', // 0x53a
+            Bole: '世界树之干', // 0x75b
+            Ewer: '河流神之瓶', // 0x75e
+            Spear: '战争神之枪', // 0x75d
+            Spire: '建筑神之塔', // 0x75f
+            LadyOfCrowns: '王冠之贵妇', // 0x755
+            LordOfCrowns: '王冠之领主', // 0x754
             Hypercharge: '超荷', // 0x2b0
+            LeftEye: '巨龙左眼', // 0x4a0
+            RightEye: '巨龙右眼', // 0x49f
+            Brotherhood: '义结金兰：攻击', // 0x49e  义结金兰：斗气
             Devotion: '灵护', // 0x4bd
             FoeRequiem: '魔人的安魂曲', // up 0x8b, down 0x8c
             LeadenFist: '连击效果提高',
@@ -37,9 +49,9 @@ class CactbotLanguageCn extends CactbotLanguage {
             PresenceOfMind: '神速咏唱',
             Shifu: '士风',
             CircleOfPower: '魔纹环',
-            AstralAttenuation: 'Astral Attenuation', // FIXME
-            UmbralAttenuation: 'Umbral Attenuation', // FIXME
-            PhysicalAttenuation: 'Physical Attenuation', // FIXME
+            AstralAttenuation: '星极性耐性降低',
+            UmbralAttenuation: '灵极性耐性降低',
+            PhysicalAttenuation: '物理受伤加重',
 
             SurgeProtection: '避雷',
 
@@ -93,26 +105,14 @@ class CactbotLanguageCn extends CactbotLanguage {
 
             // 占星
             CombustIII: '焚灼',
-            Arrow: '放浪神之箭', // 0x75c
-            Balance: '太阳神之衡', // 0x53a
-            Bole: '世界树之干', // 0x75b
-            Ewer: '河流神之瓶', // 0x75e
-            Spear: '战争神之枪', // 0x75d
-            Spire: '建筑神之塔', // 0x75f
-            LadyOfCrowns: '王冠之贵妇', // 0x755
-            LordOfCrowns: '王冠之领主', // 0x754
 
             // 武僧
             Demolish: '破碎拳',
             RiddleOfFire: '红莲极意',
-            Brotherhood: '义结金兰：攻击', // 0x49e
 
             // 龙骑
-            BattleLitany: '战斗连祷', // 0x312
             LanceCharge: '猛枪',
             ChaosThrust: '樱花怒放',
-            LeftEye: '巨龙左眼', // 0x4a0
-            RightEye: '巨龙右眼', // 0x49f
 
             // 忍着
             ShadowFang: '影牙',
@@ -160,7 +160,7 @@ class CactbotLanguageCn extends CactbotLanguage {
         this.countdownStartRegex = function () {
             return Regexes.gameLog({
                 capture: true,
-                line: '距离战斗开始还有(?<time>\y{Float})秒！',
+                line: '距离战斗开始还有(?<time>\\y{Float})秒！',
             });
         };
         this.countdownEngageRegex = function () {
