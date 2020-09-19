@@ -1,5 +1,128 @@
 'use strict';
 
+// text on the pull countdown.
+const kPullText = {
+    en: 'Pull',
+    de: 'Start',
+    ja: 'タゲ取る',
+    cn: '开怪',
+    ko: '풀링',
+};
+
+const OwnEffectId = {
+    // 诗人
+    'Stormbite': '4B1',
+    'CausticBite': '4B0',
+}
+
+const kAbility = {
+    DragonKick: '4A',
+    TwinSnakes: '3D',
+    Demolish: '42',
+    Verstone: '1D57',
+    Verfire: '1D56',
+    Veraero: '1D53',
+    Verthunder: '1D51',
+    Verholy: '1D66',
+    Verflare: '1D65',
+    Jolt2: '1D64',
+    Jolt: '1D4F',
+    Impact: '1D62',
+    Scatter: '1D55',
+    Vercure: '1D5A',
+    Verraise: '1D63',
+    Riposte: '1D50',
+    Zwerchhau: '1D58',
+    Redoublement: '1D5C',
+    Moulinet: '1D59',
+    EnchantedRiposte: '1D67',
+    EnchantedZwerchhau: '1D68',
+    EnchantedRedoublement: '1D69',
+    EnchantedMoulinet: '1D6A',
+    Tomahawk: '2E',
+    Overpower: '29',
+    HeavySwing: '1F',
+    SkullSunder: '23',
+    ButchersBlock: '2F',
+    Maim: '25',
+    StormsEye: '2D',
+    StormsPath: '2A',
+    InnerRelease: '1CDD',
+    TrickAttack: '8D2',
+    Embolden: '1D60',
+    Aetherflow: 'A6',
+    ChainStratagem: '1D0C',
+    Hypercharge: 'B45',
+    Adloquium: 'B9',
+    RabbitMedium: '8E0',
+    OneIlmPunch: '48',
+    Bootshine: '35',
+    FastBlade: '09',
+    RiotBlade: '0F',
+    GoringBlade: 'DD2',
+    RoyalAuthority: 'DD3',
+    RageOfHalone: '15',
+    SavageBlade: '0B',
+    ShieldLob: '18',
+    Requiescat: '1CD7',
+    HolySpirit: '1CD8',
+    TotalEclipse: '1CD5',
+    Clemency: 'DD5',
+    ShieldBash: '10',
+    ShieldSwipe: '19',
+    FightOrFlight: '14',
+    BloodWeapon: 'E29',
+    Souleater: 'E30',
+    SyphonStrike: 'E27',
+    HardSlash: 'E21',
+    CarveAndSpit: 'E3B',
+    Plunge: 'E38',
+    Unmend: 'E28',
+    AbyssalDrain: 'E39',
+    PowerSlash: 'E2B',
+    SpinningSlash: 'E23',
+    BloodPrice: 'E2F',
+    TheBlackestNight: '1CE1',
+    Delirium: '1CDE',
+    Combust: 'E0F',
+    Combust2: 'E18',
+    Combust3: '40AA',
+    Draw: 'E06',
+    AspectedBenefic: 'E0B',
+    AspectedHelios: 'E11',
+    Bio: '45C8',
+    Bio2: '45C9',
+    Biolysis: '409C',
+    Contagion: '31B',
+    OffGuard: '2C93',
+    SongOfTorment: '2C7A',
+    PeculiarLight: '2C9D',
+    MythrilTempest: '404E',
+    Prominence: '4049',
+    HolyCircle: '404A',
+    Confiteor: '404B',
+    FourPointFury: '4059',
+    TechnicalFinish: '3F44',
+    Thunder1: '90',
+    Thunder2: '94',
+    Thunder3: '99',
+    Thunder4: '1CFC',
+    Divination: '40A8',
+    LucidDreaming: '1D8A',
+    Miasma: 'A8',
+    Miasma3: '1D01',
+    BioSmn: 'A4',
+    BioSmn2: 'B2',
+    Bio3: '1D00',
+    Tridisaster: 'DFC',
+    EnergyDrain: '407C',
+    EnergySiphon: '407E',
+    DreadwyrmTrance: 'DFD',
+    FirebirdTrance: '40A5',
+
+    RagingStrikes: '65', // 猛者
+};
+
 // 近战职业列表
 let meleeJobs = ['PLD', 'WAR', 'DRK', 'GNB', 'MNK', 'DRG', 'NIN', 'SAM'];
 
@@ -15,36 +138,11 @@ let kMobLosesOwnEffectRegex = null; // 自己在boss身上丢失的buff
 
 let kStatsRegex = Regexes.statChange();
 
-function gainTargetFromLog(log) {
-    let m = log.match(Regexes.parse('] 1A:(\\y{ObjectId}):([^:]*?) gains'));
-    if (m)
-        return m[1] + ':' + m[2];
-    return 0;
-}
-
 function loseTargetFromLog(log) {
     let m = log.match(Regexes.parse('] 1E:(\\y{ObjectId}):([^:]*?) loses'));
     if (m)
         return m[1] + ':' + m[2];
     return 0;
-}
-
-let kGainSecondsRegex = Regexes.parse('for (\\y{Float}) Seconds\\.');
-
-function gainSecondsFromLog(log) {
-    let m = log.match(kGainSecondsRegex);
-    if (m)
-        return m[1];
-    return 0;
-}
-
-let kGainSourceRegex = Regexes.parse(' from (\\y{Name}) for');
-
-function gainSourceFromLog(log) {
-    let m = log.match(kGainSourceRegex);
-    if (m)
-        return m[1];
-    return null;
 }
 
 let kAbilitySourceRegex = Regexes.parse(' 1[56]:\\y{ObjectId}:(\\y{Name}):');
@@ -75,14 +173,14 @@ function getQueryVariable(variable) {
 }
 
 function setupRegexes(playerName) {
-    kYouGainEffectRegex = Regexes.gainsEffect({target: playerName});
-    kYouLoseEffectRegex = Regexes.losesEffect({target: playerName});
-    kYouUseAbilityRegex = Regexes.ability({source: playerName});
-    kAnybodyAbilityRegex = Regexes.ability();
-    kMobGainsEffectRegex = Regexes.gainsEffect({targetId: '4.......'});
-    kMobLosesEffectRegex = Regexes.losesEffect({targetId: '4.......'});
-    kMobGainsOwnEffectRegex = Regexes.gainsEffect({targetId: '4.......', source: playerName})
-    kMobLosesOwnEffectRegex = Regexes.losesEffect({targetId: '4.......', source: playerName})
+    kYouGainEffectRegex = NetRegexes.gainsEffect({target: playerName});
+    kYouLoseEffectRegex = NetRegexes.losesEffect({target: playerName});
+    kYouUseAbilityRegex = NetRegexes.ability({source: playerName});
+    kAnybodyAbilityRegex = NetRegexes.ability();
+    kMobGainsEffectRegex = NetRegexes.gainsEffect({targetId: '4.{7}'});
+    kMobLosesEffectRegex = NetRegexes.losesEffect({targetId: '4.{7}'});
+    kMobGainsOwnEffectRegex = NetRegexes.gainsEffect({targetId: '4.{7}', source: playerName})
+    kMobLosesOwnEffectRegex = NetRegexes.losesEffect({targetId: '4.{7}', source: playerName})
 }
 
 function computeBackgroundColorFrom(element, classList) {
@@ -617,9 +715,9 @@ class BuffTracker {
         this.buffs = {};
 
         this.buffInfo = {
-            potion: { // 强化药
-                gainEffect: gLang.kEffect.Medicated,
-                loseEffect: gLang.kEffect.Medicated,
+            potion: { // 强化药  26|2020-09-20T03:24:38.9810000+08:00|31|强化药|30.00|1039A1D9|水貂桑|1039A1D9|水貂桑|28D6|111340|111340||63c01dd83f9942aec827298ddef1519b
+                gainEffect: EffectId.Medicated,
+                loseEffect: EffectId.Medicated,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/potion.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/8/87/%E6%8A%80%E8%83%BD%E5%9B%BE%E6%A0%87_%E8%87%AA%E7%88%86.png',
@@ -631,9 +729,10 @@ class BuffTracker {
                 incrPhysical: 8, // 物理增伤
                 incrMagic: 8, // 魔法增伤
             },
-            raging: { // 猛者
-                gainEffect: gLang.kEffect.RagingStrikes,
-                loseEffect: gLang.kEffect.RagingStrikes,
+            raging: { // 猛者 26|2020-09-20T03:48:12.5040000+08:00|7d|猛者强击|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|00|111340|111340||7f5d92a566794a793b65f97686f3699f
+                gainEffect: EffectId.RagingStrikes,
+                loseEffect: EffectId.RagingStrikes,
+                durationSeconds: 20,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/000000/000352.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/2/2a/000352.png',
@@ -646,9 +745,9 @@ class BuffTracker {
                 incrMagic: 10, // 魔法增伤
                 tts: '猛者',
             },
-            stormbite: { // 风
-                mobGainsOwnEffect: gLang.kEffect.Stormbite,
-                mobLosesOwnEffect: gLang.kEffect.Stormbite,
+            stormbite: { // 风   26|2020-09-20T03:20:11.1660000+08:00|4b1|狂风蚀箭|30.00|1039A1D9|水貂桑|4000031F|木人|28|7400000|111340||dbf0314ef7fed2a2b2285e2a3b17d02f
+                mobGainsOwnEffect: OwnEffectId.Stormbite,
+                mobLosesOwnEffect: OwnEffectId.Stormbite,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/002000/002614.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/c/c0/002614.png',
@@ -657,9 +756,9 @@ class BuffTracker {
                 sortKey: 1,
                 buffType: 'physical', // physical, magic
             },
-            causticBite: { // 毒
-                mobGainsOwnEffect: gLang.kEffect.CausticBite,
-                mobLosesOwnEffect: gLang.kEffect.CausticBite,
+            causticBite: { // 毒  26|2020-09-20T03:20:13.6610000+08:00|4b0|烈毒咬箭|30.00|1039A1D9|水貂桑|4000031F|木人|28|7400000|111340||2bb99918d00070ccc76dac9d8de81e98
+                mobGainsOwnEffect: OwnEffectId.CausticBite,
+                mobLosesOwnEffect: OwnEffectId.CausticBite,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/002000/002613.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/4/41/002613.png',
@@ -668,10 +767,10 @@ class BuffTracker {
                 sortKey: 1,
                 buffType: 'physical', // physical
             },
-            //骑士
+            //骑士   26|2020-09-20T03:16:28.1830000+08:00|4c|战逃反应|25.00|1039A1D9|水貂桑|1039A1D9|水貂桑|00|114648|114648||944a97734ac0fe2928b2e92739402f83
             fightOrFlight: { // [22:22:27.085] 1A:1039A1D9:xxx gains the effect of 战逃反应 from xxx for 25.00 Seconds.
-                gainEffect: gLang.kEffect.FightOrFlight,
-                loseEffect: gLang.kEffect.FightOrFlight,
+                gainEffect: EffectId.FightOrFlight,
+                loseEffect: EffectId.FightOrFlight,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/000000/000166.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/8/8b/000166.png',
@@ -684,6 +783,7 @@ class BuffTracker {
                 incrMagic: 0, // 魔法增伤
                 // tts: '战逃',
             },
+            // 26|2020-09-20T03:31:40.6740000+08:00|558|安魂祈祷|12.00|1039A1D9|水貂桑|1039A1D9|水貂桑|FF9C|114648|114648||35703e9553d4bf19abcbcd58e0da5257
             requiescat: { // [22:45:16.801] 1A:1039A1D9:xxx gains the effect of 安魂祈祷 from xxx for 12.00 Seconds.
                 gainEffect: gLang.kEffect.Requiescat,
                 loseEffect: gLang.kEffect.Requiescat,
@@ -700,8 +800,8 @@ class BuffTracker {
                 // tts: '安魂',
             },
             goringBlade: { // [22:22:30.877] 1A:400001B8:木人 gains the effect of 沥血剑 from xxx for 21.00 Seconds.
-                mobGainsOwnEffect: gLang.kEffect.GoringBlade,
-                mobLosesOwnEffect: gLang.kEffect.GoringBlade,
+                mobGainsOwnEffect: EffectId.GoringBlade,
+                mobLosesOwnEffect: EffectId.GoringBlade,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/002000/002506.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/9/95/002506.png',
@@ -711,8 +811,8 @@ class BuffTracker {
                 buffType: 'physical', // physical
             },
             circleOfScorn: { // [22:39:30.463] 1A:400001B9:木人 gains the effect of 厄运流转 from xxx for 15.00 Seconds.
-                mobGainsOwnEffect: gLang.kEffect.CircleOfScorn,
-                mobLosesOwnEffect: gLang.kEffect.CircleOfScorn,
+                mobGainsOwnEffect: EffectId.CircleOfScorn,
+                mobLosesOwnEffect: EffectId.CircleOfScorn,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/000000/000161.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/b/b9/000161.png',
@@ -723,8 +823,8 @@ class BuffTracker {
             },
             // 枪刃
             noMercy: { // [22:54:08.026] 1A:1039A1D9:xxx gains the effect of 无情 from xxx for 20.00 Seconds.
-                gainEffect: gLang.kEffect.NoMercy,
-                loseEffect: gLang.kEffect.NoMercy,
+                gainEffect: EffectId.NoMercy,
+                loseEffect: EffectId.NoMercy,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/003000/003402.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/6/66/003402.png',
@@ -738,8 +838,8 @@ class BuffTracker {
                 // tts: '无情',
             },
             sonicBreak: { //[22:54:09.441] 1A:400001B8:木人 gains the effect of 音速破 from xxx for 30.00 Seconds.
-                mobGainsOwnEffect: gLang.kEffect.SonicBreak,
-                mobLosesOwnEffect: gLang.kEffect.SonicBreak,
+                mobGainsOwnEffect: EffectId.SonicBreak,
+                mobLosesOwnEffect: EffectId.SonicBreak,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/003000/003417.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/1/16/003417.png',
@@ -749,8 +849,8 @@ class BuffTracker {
                 buffType: 'physical', // physical
             },
             bowShock: { //[22:54:10.770] 1A:400001B8:木人 gains the effect of 弓形冲波 from xxx for 15.00 Seconds.
-                mobGainsOwnEffect: gLang.kEffect.BowShock,
-                mobLosesOwnEffect: gLang.kEffect.BowShock,
+                mobGainsOwnEffect: EffectId.BowShock,
+                mobLosesOwnEffect: EffectId.BowShock,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/003000/003423.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/b/b5/003423.png',
@@ -810,8 +910,8 @@ class BuffTracker {
                 buffType: 'magic', // physical
             },
             divination: { // 占卜
-                gainEffect: gLang.kEffect.Divination,
-                loseEffect: gLang.kEffect.Divination,
+                gainEffect: EffectId.Divination,
+                loseEffect: EffectId.Divination,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/divination.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/f/fc/003553.png',
@@ -825,8 +925,8 @@ class BuffTracker {
                 tts: '占卜',
             },
             arrow: { // 放浪神之箭
-                gainEffect: gLang.kEffect.Arrow,
-                loseEffect: gLang.kEffect.Arrow,
+                gainEffect: EffectId.TheArrow,
+                loseEffect: EffectId.TheArrow,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/arrow.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/1/10/003113.png',
@@ -838,8 +938,8 @@ class BuffTracker {
                 tts: '近卡',
             },
             balance: { // 太阳神之衡
-                gainEffect: gLang.kEffect.Balance,
-                loseEffect: gLang.kEffect.Balance,
+                gainEffect: EffectId.TheBalance,
+                loseEffect: EffectId.TheBalance,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/balance.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/8/8d/003110.png',
@@ -852,8 +952,8 @@ class BuffTracker {
                 tts: '近卡',
             },
             bole: { // 世界树之干
-                gainEffect: gLang.kEffect.Bole,
-                loseEffect: gLang.kEffect.Bole,
+                gainEffect: EffectId.TheBole,
+                loseEffect: EffectId.TheBole,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/bole.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/e/e0/003112.png',
@@ -865,8 +965,8 @@ class BuffTracker {
                 tts: '远卡',
             },
             ewer: { // 河流神之瓶
-                gainEffect: gLang.kEffect.Ewer,
-                loseEffect: gLang.kEffect.Ewer,
+                gainEffect: EffectId.TheEwer,
+                loseEffect: EffectId.TheEwer,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/ewer.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/6/66/003114.png',
@@ -878,8 +978,8 @@ class BuffTracker {
                 tts: '远卡',
             },
             spear: { // 战争神之枪
-                gainEffect: gLang.kEffect.Spear,
-                loseEffect: gLang.kEffect.Spear,
+                gainEffect: EffectId.TheSpear,
+                loseEffect: EffectId.TheSpear,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/spear.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/5/5d/003111.png',
@@ -891,8 +991,8 @@ class BuffTracker {
                 tts: '近卡',
             },
             spire: { // 建筑神之塔
-                gainEffect: gLang.kEffect.Spire,
-                loseEffect: gLang.kEffect.Spire,
+                gainEffect: EffectId.TheSpire,
+                loseEffect: EffectId.TheSpire,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/spire.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/8/88/003115.png',
@@ -904,8 +1004,8 @@ class BuffTracker {
                 tts: '远卡',
             },
             ladyOfCrowns: { // 王冠之贵妇
-                gainEffect: gLang.kEffect.LadyOfCrowns,
-                loseEffect: gLang.kEffect.LadyOfCrowns,
+                gainEffect: EffectId.LadyOfCrowns,
+                loseEffect: EffectId.LadyOfCrowns,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/lady-of-crowns.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/5/59/003146.png',
@@ -917,8 +1017,8 @@ class BuffTracker {
                 tts: '远卡',
             },
             lordOfCrowns: { // 王冠之领主
-                gainEffect: gLang.kEffect.LordOfCrowns,
-                loseEffect: gLang.kEffect.LordOfCrowns,
+                gainEffect: EffectId.LordOfCrowns,
+                loseEffect: EffectId.LordOfCrowns,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/lord-of-crowns.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/a/a8/003147.png',
@@ -956,8 +1056,8 @@ class BuffTracker {
                 incrMagic: 25, // 魔法增伤
             },
             brotherhood: { // 义结金兰：斗气/攻击
-                gainEffect: gLang.kEffect.Brotherhood,
-                loseEffect: gLang.kEffect.Brotherhood,
+                gainEffect: EffectId.Brotherhood,
+                loseEffect: EffectId.Brotherhood,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/brotherhood.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/d/db/002542.png',
@@ -973,8 +1073,8 @@ class BuffTracker {
             // 龙骑
             // [23:47:39.159] 1A:1039A1D9:xxx gains the effect of 巨龙右眼 from xxx for 20.00 Seconds.
             lanceCharge: { // [23:47:03.086] 1A:1039A1D9:xxx gains the effect of 猛枪 from xxx for 20.00 Seconds.
-                gainEffect: gLang.kEffect.LanceCharge,
-                loseEffect: gLang.kEffect.LanceCharge,
+                gainEffect: EffectId.LanceCharge,
+                loseEffect: EffectId.LanceCharge,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/000000/000309.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/0/07/000309.png',
@@ -1043,8 +1143,8 @@ class BuffTracker {
             },
             // 忍者
             trick: { // 背刺
-                gainAbility: gLang.kAbility.TrickAttack,
-                gainRegex: Regexes.ability({id: gLang.kAbility.TrickAttack}),
+                gainAbility: kAbility.TrickAttack,
+                // gainRegex: Regexes.ability({id: gLang.kAbility.TrickAttack}),
                 durationSeconds: 15,
                 // icon: 'cactbot/resources/icon/status/trick-attack.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/8/82/000618.png',
@@ -1258,9 +1358,14 @@ class BuffTracker {
             buff.hide = overrides.hide === undefined ? buff.hide : overrides.hide;
 
             for (let prop in propToMapMap) {
-                let key = buff[prop];
-                if (!key)
+                if (!(prop in buff))
                     continue;
+                let key = buff[prop];
+                if (typeof key === 'undefined') {
+                    console.error('undefined value for key ' + prop + ' for buff ' + buff.name);
+                    continue;
+                }
+
                 let map = propToMapMap[prop];
                 map[key] = map[key] || [];
                 map[key].push(buff);
@@ -1281,55 +1386,55 @@ class BuffTracker {
             cn: v520,
         };
 
-        for (let key in buffOverrides[this.options.Language]) {
-            for (let key2 in buffOverrides[this.options.Language][key])
-                this.buffInfo[key][key2] = buffOverrides[this.options.Language][key][key2];
+        for (let key in buffOverrides[this.options.ParserLanguage]) {
+            for (let key2 in buffOverrides[this.options.ParserLanguage][key])
+                this.buffInfo[key][key2] = buffOverrides[this.options.ParserLanguage][key][key2];
         }
     }
 
-    onUseAbility(id, log) {
+    onUseAbility(id, matches) {
         let buffs = this.gainAbilityMap[id];
         if (!buffs)
             return;
 
+        console.log(matches)
         for (let b of buffs) {
-            if (b.gainRegex && !log.match(b.gainRegex))
-                continue;
+            // if (b.gainRegex && !log.match(b.gainRegex))
+            //     continue;
 
-            let seconds = b.durationSeconds;
-            let source = abilitySourceFromLog(log);
-            this.onBigBuff('', b.name, seconds, b, source, false);
+            let seconds = parseFloat(matches.duration);
+            this.onBigBuff('', b.name, seconds, b, matches.source, false);
         }
     }
 
-    onGainEffect(buffs, log) {
+    onGainEffect(buffs, matches) {
         if (!buffs)
             return;
         for (let b of buffs) {
             let seconds = -1;
             if (b.useEffectDuration)
-                seconds = gainSecondsFromLog(log);
+                seconds = parseFloat(matches.duration);
             else if ('durationSeconds' in b)
                 seconds = b.durationSeconds;
 
-            let source = gainSourceFromLog(log);
-            this.onBigBuff('', b.name, seconds, b, source, false);
+            this.onBigBuff('', b.name, seconds, b, matches.source, false);
         }
     }
 
-    onGainOwnEffect(buffs, log) {
+    onGainOwnEffect(buffs, matches) {
         if (!buffs)
             return;
+
+        console.log(buffs, matches);
+
         for (let b of buffs) {
             let seconds = -1;
             if (b.useEffectDuration)
-                seconds = gainSecondsFromLog(log);
+                seconds = parseFloat(matches.duration);
             else if ('durationSeconds' in b)
                 seconds = b.durationSeconds;
 
-            let source = gainSourceFromLog(log);
-            let target = gainTargetFromLog(log);
-            this.onBigBuff(target, b.name, seconds, b, source, true);
+            this.onBigBuff(matches.targetId, b.name, seconds, b, matches.source, true);
         }
     }
 
@@ -1349,28 +1454,28 @@ class BuffTracker {
         }
     }
 
-    onYouGainEffect(name, log) {
-        this.onGainEffect(this.gainEffectMap[name], log);
+    onYouGainEffect(name, matches) {
+        this.onGainEffect(this.gainEffectMap[name], matches);
     }
 
-    onYouLoseEffect(name, log) {
-        this.onLoseEffect(this.loseEffectMap[name], log);
+    onYouLoseEffect(name, matches) {
+        this.onLoseEffect(this.loseEffectMap[name], matches);
     }
 
-    onMobGainsEffect(name, log) {
-        this.onGainEffect(this.mobGainsEffectMap[name], log);
+    onMobGainsEffect(name, matches) {
+        this.onGainEffect(this.mobGainsEffectMap[name], matches);
     }
 
-    onMobLosesEffect(name, log) {
-        this.onLoseEffect(this.mobLosesEffectMap[name], log);
+    onMobLosesEffect(name, matches) {
+        this.onLoseEffect(this.mobLosesEffectMap[name], matches);
     }
 
-    onMobGainsOwnEffect(name, log) {
-        this.onGainOwnEffect(this.mobGainsOwnEffectMap[name], log);
+    onMobGainsOwnEffect(name, matches) {
+        this.onGainOwnEffect(this.mobGainsOwnEffectMap[name], matches);
     }
 
-    onMobLosesOwnEffect(name, log) {
-        this.onLoseOwnEffect(this.mobLosesOwnEffectMap[name], log);
+    onMobLosesOwnEffect(name, matches) {
+        this.onLoseOwnEffect(this.mobLosesOwnEffectMap[name], matches);
     }
 
     onBigBuff(target, name, seconds, info, source, ownBuff) {
@@ -1441,8 +1546,8 @@ class Brds {
         this.partyTracker = new PartyTracker();
         addOverlayListener('PartyChanged', (e) => {
             this.partyTracker.onPartyChanged(e);
-            // console.log(e)
-            // console.log(this.partyTracker)
+            console.log(e)
+            console.log(this.partyTracker)
         });
 
         this.initConfig();
@@ -1461,7 +1566,7 @@ class Brds {
         if (urlSet('scaling')) { //缩放百分比
             let snum = decodeURI(urlSet('scaling'))
             if (snum > 100) {
-                snum = snum/100
+                snum = snum / 100
                 this.options.TextPhysicalFontSize *= snum
                 this.options.TextMagicFontSize *= snum
                 this.options.TextBrdSecFontSize *= snum
@@ -1590,7 +1695,7 @@ class Brds {
         // if (dotHeight > fontHeight) {
         //     this.o.Stat.style.height = dotHeight
         // } else {
-            this.o.Stat.style.height = fontHeight
+        this.o.Stat.style.height = fontHeight
         // }
 
         // 设置DOT位置
@@ -1625,9 +1730,8 @@ class Brds {
 
         // 初始化
         this.o = {};
-
         // 统计信息布局
-        this.SetStatLayout()
+        this.SetStatLayout();
 
         let container = document.getElementById('jobs-container'); // 查找对应ID的元素
         if (container == null) {
@@ -1673,11 +1777,11 @@ class Brds {
 
         this.o.pullCountdown.width = window.getComputedStyle(pullCountdownContainer).width;
         this.o.pullCountdown.height = window.getComputedStyle(pullCountdownContainer).height;
-        this.o.pullCountdown.lefttext = gLang.kUIStrings.Pull;
+        this.o.pullCountdown.lefttext = kPullText[this.options.DisplayLanguage] || kPullText['en'];
         this.o.pullCountdown.righttext = 'remain';
         this.o.pullCountdown.hideafter = 0;
         this.o.pullCountdown.fg = 'rgb(255, 120, 120)';
-        this.o.pullCountdown.classList.add('lang-' + (gLang.lang || 'cn'));
+        this.o.pullCountdown.classList.add('lang-' + this.options.DisplayLanguage);
 
         this.o.rightBuffsContainer = document.createElement('div');
         this.o.rightBuffsContainer.id = 'right-side-icons';
@@ -1708,6 +1812,15 @@ class Brds {
             this.buffTracker.clear();
     }
 
+    // 切换区域
+    OnChangeZone(e) {
+        const zoneInfo = ZoneInfo[e.zoneID];
+        this.contentType = zoneInfo ? zoneInfo.contentType : 0;
+
+        if (this.buffTracker)
+            this.buffTracker.clear();
+    }
+
     // 切换职业
     OnPlayerChanged(e) {
         if (this.me !== e.detail.name) {
@@ -1730,6 +1843,70 @@ class Brds {
             this.UpdateJob();
             // Set up the buff tracker after the job bars are created.
             this.buffTracker = new BuffTracker(this.options, this.me, this.job, this.o.leftBuffsList, this.o.rightBuffsList, this.o.StatDotList);
+        }
+    }
+
+    OnNetLog(e) {
+        if (!this.init)
+            return;
+
+        const line = e.line;
+        const log = e.rawLine;
+
+        console.log(e);
+
+        const type = line[0];
+        if (type === '26') {
+            // 其他人给自己上的buff
+            let m = log.match(kYouGainEffectRegex);
+            if (m) {
+                const effectId = m.groups.effectId.toUpperCase();
+                let f = this.gainEffectFuncMap[effectId];
+                if (f)
+                    f(name, m.groups);
+                this.buffTracker.onYouGainEffect(effectId, m.groups); // 技能
+            }
+
+            // 自己给其他人上的buff
+            m = log.match(kMobGainsOwnEffectRegex);
+            if (m) {
+                const effectId = m.groups.effectId.toUpperCase();
+                this.buffTracker.onMobGainsOwnEffect(effectId, m.groups);
+            }
+
+            m = log.match(kMobGainsEffectRegex);
+            if (m) {
+                const effectId = m.groups.effectId.toUpperCase();
+                this.buffTracker.onMobGainsEffect(effectId, m.groups);
+            }
+
+        } else if (type === '30') {
+            let m = log.match(kYouLoseEffectRegex);
+            if (m) {
+                const effectId = m.groups.effectId.toUpperCase();
+                let f = this.loseEffectFuncMap[effectId];
+                if (f)
+                    f(name, m.groups);
+                this.buffTracker.onYouLoseEffect(effectId, m.groups);
+            }
+            m = log.match(kMobLosesEffectRegex);
+            if (m) {
+                const effectId = m.groups.effectId.toUpperCase();
+                this.buffTracker.onMobLosesEffect(effectId, m.groups);
+            }
+        } else if (type === '21' || type === '22') {
+            let m = log.match(kYouUseAbilityRegex);
+            if (m) {
+                let id = m.groups.id;
+                let f = this.abilityFuncMap[id];
+                if (f)
+                    f(id, m.groups);
+                this.buffTracker.onUseAbility(id, m.groups);
+            } else {
+                let m = log.match(kAnybodyAbilityRegex);
+                if (m)
+                    this.buffTracker.onUseAbility(m.groups.id, m.groups);
+            }
         }
     }
 
@@ -1828,6 +2005,10 @@ class Brds {
     }
 
     Test() {
+        // let rawline = '26|2020-09-20T02:40:53.5290000+08:00|7d|猛者强击|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|00|111340|111340||8f03e4245a6f867a176cbe211bd1c6c5';
+        let rawline = '21|2020-09-20T03:37:42.3430000+08:00|1039A1D9|水貂桑|65|猛者强击|1039A1D9|水貂桑|A0E|7D0000|0|0|0|0|0|0|0|0|0|0|0|0|0|0|111340|111340|10000|10000|0|1000|0.2368444|6.108487|0.323041|-3.141593|111340|111340|10000|10000|0|1000|0.2368444|6.108487|0.323041|-3.141593|0000161D|903b34e08109851472bb92d5a3cc5af2';
+        this.OnNetLog({line: rawline.split('|'), rawLine: rawline})
+        return;
         // this.TestChangeJob();
 
         let logs = [];
@@ -1992,11 +2173,17 @@ UserConfig.getUserConfigLocation('buff', function () {
     addOverlayListener('onPlayerChangedEvent', function (e) {
         gBrds.OnPlayerChanged(e);
     });
-    addOverlayListener('onPartyWipe', function(e) {
+    addOverlayListener('onPartyWipe', function (e) {
         gBrds.OnPartyWipe(e);
+    });
+    addOverlayListener('ChangeZone', function (e) {
+        gBrds.OnChangeZone(e);
     });
     addOverlayListener('onLogEvent', function (e) {
         gBrds.OnLogEvent(e);
+    });
+    addOverlayListener('LogLine', (e) => {
+        gBrds.OnNetLog(e);
     });
 
     gBrds = new Brds(Options);
