@@ -1735,8 +1735,12 @@ class Brds {
             barsLayoutContainer.classList.add('tank');
         else if (Util.isHealerJob(this.job))
             barsLayoutContainer.classList.add('healer');
-        else if (Util.isCombatJob(this.job))
+        else if (Util.isDpsJob(this.job))
             barsLayoutContainer.classList.add('dps');
+        else if (Util.isCraftingJob(this.job))
+            barsLayoutContainer.classList.add('crafting');
+        else if (Util.isGatheringJob(this.job))
+            barsLayoutContainer.classList.add('gathering');
 
         let pullCountdownContainer = document.createElement('div');
         pullCountdownContainer.id = 'pull-bar';
