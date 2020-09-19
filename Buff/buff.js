@@ -1434,9 +1434,7 @@ class Brds {
         this.me = null;
         this.job = '';
         this.o = {};
-        this.combo = 0;
 
-        this.comboFuncs = [];
         this.gainEffectFuncMap = {};
         this.loseEffectFuncMap = {};
         this.abilityFuncMap = {};
@@ -1621,7 +1619,6 @@ class Brds {
 
     // 更新职业(布局)
     UpdateJob() {
-        this.comboFuncs = [];
         this.gainEffectFuncMap = {};
         this.loseEffectFuncMap = {};
         this.abilityFuncMap = {};
@@ -1703,11 +1700,6 @@ class Brds {
         // Hoist the buffs up to hide everything else.
         barsLayoutContainer.appendChild(this.o.rightBuffsContainer);
         barsLayoutContainer.classList.add('justbuffs');
-    }
-
-    OnComboChange(skill) {
-        for (let i = 0; i < this.comboFuncs.length; ++i)
-            this.comboFuncs[i](skill);
     }
 
     OnPartyWipe(e) {
@@ -1813,7 +1805,6 @@ class Brds {
                     let m = log.match(kYouUseAbilityRegex);
                     if (m) {
                         let id = m.groups.id;
-                        this.combo.HandleAbility(id);
                         let f = this.abilityFuncMap[id];
                         if (f)
                             f(id);
