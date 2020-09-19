@@ -147,6 +147,8 @@ class TimerIcon extends HTMLElement {
         }
         #text {
           position: absolute;
+          overflow: hidden;
+          word-break: break-all;
         }
       </style>
       <div id="root" style="position: relative">
