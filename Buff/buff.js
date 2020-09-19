@@ -74,90 +74,6 @@ function getQueryVariable(variable) {
     return (false);
 }
 
-class ComboTracker {
-    constructor(comboBreakers, callback) {
-        this.comboTimer = null;
-        this.comboBreakers = comboBreakers;
-        this.comboNodes = {}; // { key => { re: string, next: [node keys], last: bool } }
-        this.startList = [];
-        this.callback = callback;
-        this.current = null;
-        this.considerNext = this.startList;
-    }
-
-    AddCombo(skillList) {
-        if (this.startList.indexOf(skillList[0]) == -1)
-            this.startList.push(skillList[0]);
-
-        for (let i = 0; i < skillList.length; ++i) {
-            let node = this.comboNodes[skillList[i]];
-            if (node == undefined) {
-                node = {
-                    id: skillList[i],
-                    next: [],
-                };
-                this.comboNodes[skillList[i]] = node;
-            }
-            if (i != skillList.length - 1)
-                node.next.push(skillList[i + 1]);
-            else
-                node.last = true;
-        }
-    }
-
-    HandleAbility(id) {
-        for (let i = 0; i < this.considerNext.length; ++i) {
-            let next = this.considerNext[i];
-            if (this.comboNodes[next].id == id) {
-                this.StateTransition(next);
-                return true;
-            }
-        }
-        if (this.comboBreakers.indexOf(id) >= 0) {
-            this.AbortCombo();
-            return true;
-        }
-        return false;
-    }
-
-    StateTransition(nextState) {
-        if (this.current == null && nextState == null)
-            return;
-
-        window.clearTimeout(this.comboTimer);
-        this.comboTimer = null;
-        this.current = nextState;
-
-        if (nextState == null) {
-            this.considerNext = this.startList;
-        } else {
-            this.considerNext = [];
-            Array.prototype.push.apply(this.considerNext, this.comboNodes[nextState].next);
-            Array.prototype.push.apply(this.considerNext, this.startList);
-
-            if (!this.comboNodes[nextState].last) {
-                let kComboDelayMs = 15000;
-                this.comboTimer = window.setTimeout(this.AbortCombo.bind(this), kComboDelayMs);
-            }
-        }
-        this.callback(nextState);
-    }
-
-    AbortCombo() {
-        this.StateTransition(null);
-    }
-}
-
-function setupComboTracker(callback) {
-    let comboTracker = new ComboTracker(Object.freeze([]), callback);
-    // comboTracker.AddCombo([
-    //     gLang.kAbility.HeavySwing,
-    //     gLang.kAbility.SkullSunder,
-    //     gLang.kAbility.ButchersBlock,
-    // ]);
-    return comboTracker;
-}
-
 function setupRegexes(playerName) {
     kYouGainEffectRegex = Regexes.gainsEffect({target: playerName});
     kYouLoseEffectRegex = Regexes.losesEffect({target: playerName});
@@ -1809,15 +1725,12 @@ class Brds {
         }
 
         if (!this.init) {
-            this.combo = setupComboTracker(this.OnComboChange.bind(this));
             this.init = true;
         }
 
         let updateJob = false;
         if (e.detail.job != this.job) {
             this.job = e.detail.job;
-            // Combos are job specific.
-            this.combo.AbortCombo();
             updateJob = true;
         }
 
