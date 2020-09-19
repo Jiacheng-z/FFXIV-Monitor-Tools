@@ -39,8 +39,35 @@ let UserConfig = {
 
       // The plugin auto-detects the language, so set this first.
       // If options files want to override it, they can for testing.
-      if (e.detail.language)
-        Options.Language = e.detail.language;
+
+      // Backward compatibility (language is now separated to three types.)
+      if (e.detail.language) {
+        Options.ParserLanguage = e.detail.language;
+        Options.ShortLocale = e.detail.language;
+        Options.DisplayLanguage = e.detail.language;
+      }
+      // Parser Language
+      if (e.detail.parserLanguage) {
+        Options.ParserLanguage = e.detail.parserLanguage;
+        // Backward compatibility, everything "Language" should be changed to "ParserLanguage"
+        Options.Language = e.detail.parserLanguage;
+      }
+      const supportedLanguage = ['en', 'de', 'fr', 'ja', 'cn', 'ko'];
+      // System Language
+      if (e.detail.systemLocale) {
+        Options.SystemLocale = e.detail.systemLocale;
+        Options.ShortLocale = e.detail.systemLocale.substring(0, 2);
+        if (Options.ShortLocale == 'zh')
+          Options.ShortLocale = 'cn';
+        if (!supportedLanguage.includes(Options.ShortLocale))
+          Options.ShortLocale = Options.ParserLanguage;
+      }
+      // User's setting Language
+      Options.DisplayLanguage = e.detail.displayLanguage;
+      if (!supportedLanguage.includes(Options.DisplayLanguage))
+        Options.DisplayLanguage = Options.ParserLanguage || 'en';
+
+      this.addUnlockText(Options.DisplayLanguage);
 
       // Handle processOptions after default language selection above,
       // but before css below which may load skin files.
@@ -179,4 +206,35 @@ let UserConfig = {
     if (template.processExtraOptions)
       template.processExtraOptions(options, savedConfig);
   },
+  addUnlockText: (lang) => {
+    const unlockText = {
+      en: '🔓 Unlocked (lock overlay before using)',
+      de: '🔓 Entsperrt (Sperre das Overlay vor der Nutzung)',
+      fr: '🔓 Débloqué (Bloquez l\'overlay avant utilisation)',
+      ja: '🔓 ロック解除 (オーバーレイを使用する前にロックしてください)',
+      cn: '🔓 已解除锁定 (你需要将此悬浮窗锁定后方可使用)',
+      ko: '🔓 위치 잠금 해제됨 (사용하기 전에 위치 잠금을 설정하세요)',
+    };
+
+    const id = 'cactbot-unlocked-text';
+    let textElem = document.getElementById(id);
+    if (!textElem) {
+      textElem = document.createElement('div');
+      textElem.id = id;
+      textElem.classList.add('text');
+      // Set element display to none in case the page has not included defaults.css.
+      textElem.style.display = 'none';
+      document.body.append(textElem);
+    }
+    textElem.innerHTML = unlockText[lang] || unlockText['en'];
+  },
 };
+
+// This event comes early and is not cached, so set up event listener immediately.
+document.addEventListener('onOverlayStateUpdate', (e) => {
+  let docClassList = document.documentElement.classList;
+  if (e.detail.isLocked)
+    docClassList.remove('resizeHandle', 'unlocked');
+  else
+    docClassList.add('resizeHandle', 'unlocked');
+});
