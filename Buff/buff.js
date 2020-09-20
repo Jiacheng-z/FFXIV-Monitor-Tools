@@ -1309,7 +1309,6 @@ class BuffTracker {
             else if ('durationSeconds' in b)
                 seconds = b.durationSeconds;
 
-            console.log(b, matches)
             if (matches.count !== '00' && b.incrPhysicalCount !== null) { // 存在物理Count形式buff
                 if (b.incrPhysicalCount[matches.count] !== null) {
                     b.incrPhysical = b.incrPhysicalCount[matches.count];
@@ -1780,8 +1779,6 @@ class Brds {
             }
 
         } else if (type === '30') {
-            console.log(log.match(NetRegexes.losesEffect()));
-
             let m = log.match(kYouLoseEffectRegex);
             if (m) {
                 const effectId = m.groups.effectId.toUpperCase();
