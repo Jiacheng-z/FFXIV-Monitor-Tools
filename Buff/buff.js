@@ -22,116 +22,35 @@ const OwnEffectId = {
 
     // 学者
     'Biolysis': '767', // 蛊毒法
-    'ChainStratagem': '4C5' // 连环计
+    'ChainStratagem': '4C5', // 连环计
+
+    // 占星
+    'CombustIII': '759', // 焚灼
+
+    // 武僧
+    'Demolish': 'F6',// 破碎拳
+    'RiddleOfFire': '49D', // 红莲极意
+
+    // 龙骑
+    'ChaosThrust': '76', // 樱花怒放
+    'BattleLitany': '312', // 战斗连祷
+    'LeftEye': '5AE', // 巨龙左眼
+    'RightEye': '5AD', // 巨龙右眼
+
+    // 忍着
+    'TrickAttack': '27E', // 背刺
+    'ShadowFang': '1FC', // 影牙
+
+    // 武士
+    'Higanbana': '4CC', // 彼岸花
+    // 机工
+    'Bioblaster': '74A', // 毒菌冲击
+    // 黑魔
+    'ThunderIII': 'A3', // 暴雷
+    // 召唤
+    'BioIII': '4BE', // 剧毒菌
+    'MiasmaIII': '4BF', // 瘴暍
 }
-
-const kAbility = {
-    DragonKick: '4A',
-    TwinSnakes: '3D',
-    Demolish: '42',
-    Verstone: '1D57',
-    Verfire: '1D56',
-    Veraero: '1D53',
-    Verthunder: '1D51',
-    Verholy: '1D66',
-    Verflare: '1D65',
-    Jolt2: '1D64',
-    Jolt: '1D4F',
-    Impact: '1D62',
-    Scatter: '1D55',
-    Vercure: '1D5A',
-    Verraise: '1D63',
-    Riposte: '1D50',
-    Zwerchhau: '1D58',
-    Redoublement: '1D5C',
-    Moulinet: '1D59',
-    EnchantedRiposte: '1D67',
-    EnchantedZwerchhau: '1D68',
-    EnchantedRedoublement: '1D69',
-    EnchantedMoulinet: '1D6A',
-    Tomahawk: '2E',
-    Overpower: '29',
-    HeavySwing: '1F',
-    SkullSunder: '23',
-    ButchersBlock: '2F',
-    Maim: '25',
-    StormsEye: '2D',
-    StormsPath: '2A',
-    InnerRelease: '1CDD',
-    TrickAttack: '8D2',
-    Embolden: '1D60',
-    Aetherflow: 'A6',
-    ChainStratagem: '1D0C',
-    Hypercharge: 'B45',
-    Adloquium: 'B9',
-    RabbitMedium: '8E0',
-    OneIlmPunch: '48',
-    Bootshine: '35',
-    FastBlade: '09',
-    RiotBlade: '0F',
-    GoringBlade: 'DD2',
-    RoyalAuthority: 'DD3',
-    RageOfHalone: '15',
-    SavageBlade: '0B',
-    ShieldLob: '18',
-    Requiescat: '1CD7',
-    HolySpirit: '1CD8',
-    TotalEclipse: '1CD5',
-    Clemency: 'DD5',
-    ShieldBash: '10',
-    ShieldSwipe: '19',
-    FightOrFlight: '14',
-    BloodWeapon: 'E29',
-    Souleater: 'E30',
-    SyphonStrike: 'E27',
-    HardSlash: 'E21',
-    CarveAndSpit: 'E3B',
-    Plunge: 'E38',
-    Unmend: 'E28',
-    AbyssalDrain: 'E39',
-    PowerSlash: 'E2B',
-    SpinningSlash: 'E23',
-    BloodPrice: 'E2F',
-    TheBlackestNight: '1CE1',
-    Delirium: '1CDE',
-    Combust: 'E0F',
-    Combust2: 'E18',
-    Combust3: '40AA',
-    Draw: 'E06',
-    AspectedBenefic: 'E0B',
-    AspectedHelios: 'E11',
-    Bio: '45C8',
-    Bio2: '45C9',
-    Biolysis: '409C',
-    Contagion: '31B',
-    OffGuard: '2C93',
-    SongOfTorment: '2C7A',
-    PeculiarLight: '2C9D',
-    MythrilTempest: '404E',
-    Prominence: '4049',
-    HolyCircle: '404A',
-    Confiteor: '404B',
-    FourPointFury: '4059',
-    TechnicalFinish: '3F44',
-    Thunder1: '90',
-    Thunder2: '94',
-    Thunder3: '99',
-    Thunder4: '1CFC',
-    Divination: '40A8',
-    LucidDreaming: '1D8A',
-    Miasma: 'A8',
-    Miasma3: '1D01',
-    BioSmn: 'A4',
-    BioSmn2: 'B2',
-    Bio3: '1D00',
-    Tridisaster: 'DFC',
-    EnergyDrain: '407C',
-    EnergySiphon: '407E',
-    DreadwyrmTrance: 'DFD',
-    FirebirdTrance: '40A5',
-
-    RagingStrikes: '65', // 猛者
-};
 
 // 近战职业列表
 let meleeJobs = ['PLD', 'WAR', 'DRK', 'GNB', 'MNK', 'DRG', 'NIN', 'SAM'];
@@ -201,7 +120,6 @@ function setupRegexes(playerId, playerName, partyTracker) {
         }
     }
     let partyIdsStr = partyIds.join("|");
-    console.log(playerId, playerName, partyTracker);
     kMobGainsPartyEffectRegex = NetRegexes.gainsEffect({targetId: '4.{7}', sourceId: '(' + partyIdsStr + ')'});
     kMobLosesPartyEffectRegex = NetRegexes.losesEffect({targetId: '4.{7}', sourceId: '(' + partyIdsStr + ')'});
 
@@ -638,7 +556,7 @@ class Buff {
 
     makeAura(key, list, seconds, secondsUntilShow, adjustSort, textColor, txt, opacity, expireCallback) {
         let aura = {};
-        if (this.info.gainEffect == gLang.kEffect.Medicated && seconds >= 120) {
+        if (this.info.gainEffect === EffectId.Medicated && seconds >= 120) {
             return
         }
 
@@ -776,28 +694,6 @@ class BuffTracker {
                 incrMagic: 10, // 魔法增伤
                 tts: '猛者',
             },
-            stormbite: { // 风   26|2020-09-20T03:20:11.1660000+08:00|4b1|狂风蚀箭|30.00|1039A1D9|水貂桑|4000031F|木人|28|7400000|111340||dbf0314ef7fed2a2b2285e2a3b17d02f
-                mobGainsOwnEffect: OwnEffectId.Stormbite,
-                mobLosesOwnEffect: OwnEffectId.Stormbite,
-                useEffectDuration: true,
-                // icon: 'https://xivapi.com/i/002000/002614.png',
-                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/c/c0/002614.png',
-                icon: '../resources/img/002614.png',
-                borderColor: '#3df6fd',
-                sortKey: 1,
-                buffType: 'physical', // physical, magic
-            },
-            causticBite: { // 毒  26|2020-09-20T03:20:13.6610000+08:00|4b0|烈毒咬箭|30.00|1039A1D9|水貂桑|4000031F|木人|28|7400000|111340||2bb99918d00070ccc76dac9d8de81e98
-                mobGainsOwnEffect: OwnEffectId.CausticBite,
-                mobLosesOwnEffect: OwnEffectId.CausticBite,
-                useEffectDuration: true,
-                // icon: 'https://xivapi.com/i/002000/002613.png',
-                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/4/41/002613.png',
-                icon: '../resources/img/002613.png',
-                borderColor: '#e053bb',
-                sortKey: 1,
-                buffType: 'physical', // physical
-            },
             //骑士   26|2020-09-20T03:16:28.1830000+08:00|4c|战逃反应|25.00|1039A1D9|水貂桑|1039A1D9|水貂桑|00|114648|114648||944a97734ac0fe2928b2e92739402f83
             fightOrFlight: { // [22:22:27.085] 1A:1039A1D9:xxx gains the effect of 战逃反应 from xxx for 25.00 Seconds.
                 gainEffect: EffectId.FightOrFlight,
@@ -830,28 +726,6 @@ class BuffTracker {
                 incrMagic: 50, // 魔法增伤
                 // tts: '安魂',
             },
-            goringBlade: { // [22:22:30.877] 1A:400001B8:木人 gains the effect of 沥血剑 from xxx for 21.00 Seconds.
-                mobGainsOwnEffect: EffectId.GoringBlade,
-                mobLosesOwnEffect: EffectId.GoringBlade,
-                useEffectDuration: true,
-                // icon: 'https://xivapi.com/i/002000/002506.png',
-                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/9/95/002506.png',
-                icon: '../resources/img/002506.png',
-                borderColor: '#d23e29',
-                sortKey: 1,
-                buffType: 'physical', // physical
-            },
-            // circleOfScorn: { // [22:39:30.463] 1A:400001B9:木人 gains the effect of 厄运流转 from xxx for 15.00 Seconds.
-            //     mobGainsOwnEffect: EffectId.CircleOfScorn,
-            //     mobLosesOwnEffect: EffectId.CircleOfScorn,
-            //     useEffectDuration: true,
-            //     // icon: 'https://xivapi.com/i/000000/000161.png',
-            //     // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/b/b9/000161.png',
-            //     icon: '../resources/img/000161.png',
-            //     borderColor: '#e77d70',
-            //     sortKey: 1,
-            //     buffType: 'physical', // physical
-            // },
             // 枪刃
             noMercy: { // [22:54:08.026] 1A:1039A1D9:xxx gains the effect of 无情 from xxx for 20.00 Seconds.
                 gainEffect: EffectId.NoMercy,
@@ -868,46 +742,12 @@ class BuffTracker {
                 incrMagic: 20, // 魔法增伤
                 // tts: '无情',
             },
-            // sonicBreak: { //[22:54:09.441] 1A:400001B8:木人 gains the effect of 音速破 from xxx for 30.00 Seconds.
-            //     mobGainsOwnEffect: EffectId.SonicBreak,
-            //     mobLosesOwnEffect: EffectId.SonicBreak,
-            //     useEffectDuration: true,
-            //     // icon: 'https://xivapi.com/i/003000/003417.png',
-            //     // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/1/16/003417.png',
-            //     icon: '../resources/img/003417.png',
-            //     borderColor: '#755cbb',
-            //     sortKey: 1,
-            //     buffType: 'physical', // physical
-            // },
-            // bowShock: { //[22:54:10.770] 1A:400001B8:木人 gains the effect of 弓形冲波 from xxx for 15.00 Seconds.
-            //     mobGainsOwnEffect: EffectId.BowShock,
-            //     mobLosesOwnEffect: EffectId.BowShock,
-            //     useEffectDuration: true,
-            //     // icon: 'https://xivapi.com/i/003000/003423.png',
-            //     // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/b/b5/003423.png',
-            //     icon: '../resources/img/003423.png',
-            //     borderColor: '#d5d557',
-            //     sortKey: 1,
-            //     buffType: 'physical', // physical
-            // },
-            // 白魔
-            dia: { // 26|2020-09-20T17:04:10.5120000+08:00|74f|天辉|30.00|1039A1D9|水貂桑|4000031F|木人|00|7400000|48422||507ae34e5244f9018a0e5fa444c62d7c
-                mobGainsOwnEffect: OwnEffectId.Dia,
-                mobLosesOwnEffect: OwnEffectId.Dia,
-                useEffectDuration: true,
-                // icon: 'https://xivapi.com/i/002000/002641.png',
-                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/b/ba/002641.png',
-                icon: '../resources/img/002641.png',
-                borderColor: '#3eb9fa',
-                sortKey: 1,
-                buffType: 'magic', // physical
-            },
             // 学者
             // 26|2020-09-20T17:11:46.0110000+08:00|4c5|连环计|15.00|1039A1D9|水貂桑|4000031F|木人|00|7400000|46919||cef9177cfc401552bc4e8155d546096e
-            // 21|2020-09-20T17:11:45.2110000+08:00|1039A1D9|水貂桑|1D0C|连环计|4000031F|木人|F60E|4C50000|0|0|0|0|0|0|0|0|0|0|0|0|0|0|7400000|7400000|0|10000|0|1000|-603.1267|-762.9036|25.02|2.283125|46919|46919|9819|10000|0|1000|-598.9421|-772.7528|25.02|-0.4017591|0000335B|131b13cb7c37d87af35d4b9ca6a2f444
             chain: { // 连环计
-                gainAbility: kAbility.ChainStratagem,
-                durationSeconds: 15,
+                gainEffect: OwnEffectId.ChainStratagem,
+                loseEffect: OwnEffectId.ChainStratagem,
+                useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/chain-stratagem.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/f/fd/002815.png',
                 icon: '../resources/img/002815.png',
@@ -919,29 +759,7 @@ class BuffTracker {
                 incrMagic: 5, // 魔法增伤
                 tts: '连环计',
             },
-            biolysis: { //26|2020-09-20T17:11:43.3880000+08:00|767|蛊毒法|30.00|1039A1D9|水貂桑|4000031F|木人|00|7400000|46919||161fecdddc980c9bfeca7224ccbf98ae
-                mobGainsOwnEffect: OwnEffectId.Biolysis,
-                mobLosesOwnEffect: OwnEffectId.Biolysis,
-                useEffectDuration: true,
-                // icon: 'https://xivapi.com/i/002000/002820.png',
-                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/7/78/002820.png',
-                icon: '../resources/img/002820.png',
-                borderColor: '#2e1fc4',
-                sortKey: 1,
-                buffType: 'magic', // physical
-            },
             // 占星
-            combustIII: { //[23:24:52.095] 1A:400001B8:木人 gains the effect of 焚灼 from xxx for 30.00 Seconds.
-                mobGainsOwnEffect: gLang.kEffect.CombustIII,
-                mobLosesOwnEffect: gLang.kEffect.CombustIII,
-                useEffectDuration: true,
-                // icon: 'https://xivapi.com/i/003000/003554.png',
-                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/4/4d/003554.png',
-                icon: '../resources/img/003554.png',
-                borderColor: '#62daf8',
-                sortKey: 1,
-                buffType: 'magic', // physical
-            },
             divination: { // 占卜
                 gainEffect: EffectId.Divination,
                 loseEffect: EffectId.Divination,
@@ -1062,21 +880,10 @@ class BuffTracker {
                 increasesJob: {melee: 8, ranged: 4},
                 tts: '近卡',
             },
-            // 武僧  [23:31:06.105] 1A:1039A1D9:xxx gains the effect of 义结金兰：攻击 from xxx for 15.00 Seconds.
-            Demolish: { //[23:31:10.291] 1A:400001B8:木人 gains the effect of 破碎拳 from xxx for 18.00 Seconds.
-                mobGainsOwnEffect: gLang.kEffect.Demolish,
-                mobLosesOwnEffect: gLang.kEffect.Demolish,
-                useEffectDuration: true,
-                // icon: 'https://xivapi.com/i/000000/000204.png',
-                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/2/2b/000204.png',
-                icon: '../resources/img/000204.png',
-                borderColor: '#f5cc19',
-                sortKey: 1,
-                buffType: 'physical', // physical
-            },
+            // 武僧
             riddleOfFire: { // [23:31:04.573] 1A:1039A1D9:xxx gains the effect of 红莲极意 from xxx for 20.00 Seconds.
-                gainEffect: gLang.kEffect.RiddleOfFire,
-                loseEffect: gLang.kEffect.RiddleOfFire,
+                gainEffect: OwnEffectId.RiddleOfFire,
+                loseEffect: OwnEffectId.RiddleOfFire,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/002000/002541.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/8/8f/002541.png',
@@ -1104,7 +911,6 @@ class BuffTracker {
                 tts: '桃园',
             },
             // 龙骑
-            // [23:47:39.159] 1A:1039A1D9:xxx gains the effect of 巨龙右眼 from xxx for 20.00 Seconds.
             lanceCharge: { // [23:47:03.086] 1A:1039A1D9:xxx gains the effect of 猛枪 from xxx for 20.00 Seconds.
                 gainEffect: EffectId.LanceCharge,
                 loseEffect: EffectId.LanceCharge,
@@ -1119,20 +925,9 @@ class BuffTracker {
                 incrPhysical: 15, // 物理增伤
                 incrMagic: 15, // 魔法增伤
             },
-            chaosThrust: { //[23:47:07.481] 1A:400001B8:木人 gains the effect of 樱花怒放 from xxx for 24.00 Seconds.
-                mobGainsOwnEffect: gLang.kEffect.ChaosThrust,
-                mobLosesOwnEffect: gLang.kEffect.ChaosThrust,
-                useEffectDuration: true,
-                // icon: 'https://xivapi.com/i/000000/000308.png',
-                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/d/d6/000308.png',
-                icon: '../resources/img/000308.png',
-                borderColor: '#83598c',
-                sortKey: 1,
-                buffType: 'physical', // physical
-            },
             litany: { //战斗连祷 [23:47:29.214] 1A:1039A1D9:xxx gains the effect of 战斗连祷 from xxx for 20.00 Seconds.
-                gainEffect: gLang.kEffect.BattleLitany,
-                loseEffect: gLang.kEffect.BattleLitany,
+                gainEffect: OwnEffectId.BattleLitany,
+                loseEffect: OwnEffectId.BattleLitany,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/battle-litany.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/3/32/002585.png',
@@ -1146,8 +941,8 @@ class BuffTracker {
                 tts: '连祷',
             },
             lefteye: { // 巨龙左眼
-                gainEffect: gLang.kEffect.LeftEye,
-                loseEffect: gLang.kEffect.LeftEye,
+                gainEffect: OwnEffectId.LeftEye,
+                loseEffect: OwnEffectId.LeftEye,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/dragon-sight.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/d/de/002587.png',
@@ -1161,8 +956,8 @@ class BuffTracker {
                 tts: '左眼',
             },
             righteye: { // 巨龙右眼
-                gainEffect: gLang.kEffect.RightEye,
-                loseEffect: gLang.kEffect.RightEye,
+                gainEffect: OwnEffectId.RightEye,
+                loseEffect: OwnEffectId.RightEye,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/dragon-sight.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/d/de/002587.png',
@@ -1176,9 +971,9 @@ class BuffTracker {
             },
             // 忍者
             trick: { // 背刺
-                gainAbility: kAbility.TrickAttack,
-                // gainRegex: Regexes.ability({id: gLang.kAbility.TrickAttack}),
-                durationSeconds: 15,
+                gainEffect: OwnEffectId.TrickAttack,
+                loseEffect: OwnEffectId.TrickAttack,
+                useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/trick-attack.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/8/82/000618.png',
                 icon: '../resources/img/000618.png',
@@ -1190,46 +985,11 @@ class BuffTracker {
                 incrMagic: 5, // 魔法增伤
                 tts: '背刺',
             },
-            // shadowFang: { //[00:03:38.355] 1A:400001B8:木人 gains the effect of 影牙 from xxx for 30.00 Seconds.
-            //     mobGainsOwnEffect: gLang.kEffect.ShadowFang,
-            //     mobLosesOwnEffect: gLang.kEffect.ShadowFang,
-            //     useEffectDuration: true,
-            //     // icon: 'https://xivapi.com/i/000000/000606.png',
-            //     // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/e/ee/000606.png',
-            //     icon: '../resources/img/000606.png',
-            //     borderColor: '#08bcfe',
-            //     sortKey: 1,
-            //     buffType: 'physical', // physical
-            // },
-            // 武士
-            higanbana: { // [00:12:10.091] 1A:400001B8:木人 gains the effect of 彼岸花 from xxx for 60.00 Seconds.
-                mobGainsOwnEffect: gLang.kEffect.Higanbana,
-                mobLosesOwnEffect: gLang.kEffect.Higanbana,
-                useEffectDuration: true,
-                // icon: 'https://xivapi.com/i/003000/003160.png',
-                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/6/6b/003160.png',
-                icon: '../resources/img/003160.png',
-                borderColor: '#d9542a',
-                sortKey: 1,
-                buffType: 'physical', // physical
-            },
-            // 诗人
-            // 机工
-            // bioblaster: { // [00:20:02.402] 1A:400001B9:木人 gains the effect of 毒菌冲击 from xxx for 15.00 Seconds.
-            //     mobGainsOwnEffect: gLang.kEffect.Bioblaster,
-            //     mobLosesOwnEffect: gLang.kEffect.Bioblaster,
-            //     useEffectDuration: true,
-            //     // icon: 'https://xivapi.com/i/003000/003044.png',
-            //     // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/e/e7/003044.png',
-            //     icon: '../resources/img/003044.png',
-            //     borderColor: '#acfd19',
-            //     sortKey: 1,
-            //     buffType: 'physical', // physical
-            // },
+
             // 舞娘
             devilment: { // 进攻之探戈
-                gainEffect: gLang.kEffect.Devilment,
-                loseEffect: gLang.kEffect.Devilment,
+                gainEffect: EffectId.Devilment,
+                loseEffect: EffectId.Devilment,
                 durationSeconds: 20,
                 // icon: 'cactbot/resources/icon/status/devilment.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/e/ef/003471.png',
@@ -1244,8 +1004,8 @@ class BuffTracker {
                 tts: '贪个',
             },
             technicalFinish: { // 技巧舞步结束
-                gainEffect: gLang.kEffect.TechnicalFinish,
-                loseEffect: gLang.kEffect.TechnicalFinish,
+                gainEffect: EffectId.TechnicalFinish,
+                loseEffect: EffectId.TechnicalFinish,
                 durationSeconds: 20,
                 // icon: 'cactbot/resources/icon/status/technical-finish.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/b/ba/003474.png',
@@ -1260,8 +1020,8 @@ class BuffTracker {
                 tts: '技巧',
             },
             battlevoice: { // 战斗之声
-                gainEffect: gLang.kEffect.BattleVoice,
-                loseEffect: gLang.kEffect.BattleVoice,
+                gainEffect: EffectId.BattleVoice,
+                loseEffect: EffectId.BattleVoice,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/battlevoice.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/5/55/002601.png',
@@ -1275,55 +1035,10 @@ class BuffTracker {
                 increases: 4,
                 tts: '战斗之声',
             },
-            // 黑魔
-            thunderIII: { // [00:32:47.727] 1A:400001B8:木人 gains the effect of 暴雷 from xxx for 24.00 Seconds.
-                mobGainsOwnEffect: gLang.kEffect.ThunderIII,
-                mobLosesOwnEffect: gLang.kEffect.ThunderIII,
-                useEffectDuration: true,
-                // icon: 'https://xivapi.com/i/000000/000459.png',
-                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/c/c1/000459.png',
-                icon: '../resources/img/000459.png',
-                borderColor: '#93d5fd',
-                sortKey: 1,
-                buffType: 'magic', // physical
-            },
-            // thunderIV: { // [00:32:47.727] 1A:400001B8:木人 gains the effect of 霹雷 from xxx for 18.00 Seconds.
-            //     mobGainsOwnEffect: gLang.kEffect.ThunderIV,
-            //     mobLosesOwnEffect: gLang.kEffect.ThunderIV,
-            //     useEffectDuration: true,
-            //     // icon: 'https://xivapi.com/i/002000/002662.png',
-            //     // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/8/82/002662.png',
-            //     icon: '../resources/img/002662.png',
-            //     borderColor: '#ac6af6',
-            //     sortKey: 1,
-            //     buffType: 'magic', // physical
-            // },
             // 召唤
-            bioIII: { // [00:40:15.962] 1A:400001B8:木人 gains the effect of 剧毒菌 from xxx for 30.00 Seconds.
-                mobGainsOwnEffect: gLang.kEffect.BioIII,
-                mobLosesOwnEffect: gLang.kEffect.BioIII,
-                useEffectDuration: true,
-                // icon: 'https://xivapi.com/i/002000/002689.png',
-                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/b/b1/002689.png',
-                icon: '../resources/img/002689.png',
-                borderColor: '#e3e02d',
-                sortKey: 1,
-                buffType: 'magic', // physical
-            },
-            miasmaIII: { // [00:40:20.731] 1A:400001B8:木人 gains the effect of 瘴暍 from xxx for 30.00 Seconds.
-                mobGainsOwnEffect: gLang.kEffect.MiasmaIII,
-                mobLosesOwnEffect: gLang.kEffect.MiasmaIII,
-                useEffectDuration: true,
-                // icon: 'https://xivapi.com/i/002000/002690.png',
-                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/e/e5/002690.png',
-                icon: '../resources/img/002690.png',
-                borderColor: '#97abe0',
-                sortKey: 1,
-                buffType: 'magic', // physical
-            },
             devotion: { // 灵护
-                gainEffect: gLang.kEffect.Devotion,
-                loseEffect: gLang.kEffect.Devotion,
+                gainEffect: EffectId.Devotion,
+                loseEffect: EffectId.Devotion,
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/devotion.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/2/25/002688.png',
@@ -1342,9 +1057,9 @@ class BuffTracker {
                 // Potato Chippy gains the effect of Embolden from Tater Tot for 20.00 Seconds. (5)
                 // Instead, use somebody using the effect on you:
                 //   16:106C22EF:Tater Tot:1D60:Embolden:106C22EF:Potato Chippy:500020F:4D7: etc etc
-                gainAbility: gLang.kAbility.Embolden,
-                gainRegex: Regexes.abilityFull({id: gLang.kAbility.Embolden, target: this.playerName}),
-                loseEffect: gLang.kEffect.Embolden,
+                gainAbility: EffectId.Embolden,
+                loseEffect: EffectId.Embolden,
+                gainRegex: Regexes.abilityFull({id: EffectId.Embolden, target: this.playerName}),
                 durationSeconds: 20,
                 // icon: 'cactbot/resources/icon/status/embolden.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/2/2c/003218.png',
@@ -1357,6 +1072,210 @@ class BuffTracker {
                 incrPhysical: 0, // 物理增伤
                 incrMagic: 0, // 魔法增伤
                 tts: '鼓励',
+            },
+
+            // DOT
+            stormbite: { // 风   26|2020-09-20T03:20:11.1660000+08:00|4b1|狂风蚀箭|30.00|1039A1D9|水貂桑|4000031F|木人|28|7400000|111340||dbf0314ef7fed2a2b2285e2a3b17d02f
+                mobGainsOwnEffect: OwnEffectId.Stormbite,
+                mobLosesOwnEffect: OwnEffectId.Stormbite,
+                useEffectDuration: true,
+                // icon: 'https://xivapi.com/i/002000/002614.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/c/c0/002614.png',
+                icon: '../resources/img/002614.png',
+                borderColor: '#3df6fd',
+                sortKey: 1,
+                buffType: 'physical', // physical, magic
+            },
+            causticBite: { // 毒  26|2020-09-20T03:20:13.6610000+08:00|4b0|烈毒咬箭|30.00|1039A1D9|水貂桑|4000031F|木人|28|7400000|111340||2bb99918d00070ccc76dac9d8de81e98
+                mobGainsOwnEffect: OwnEffectId.CausticBite,
+                mobLosesOwnEffect: OwnEffectId.CausticBite,
+                useEffectDuration: true,
+                // icon: 'https://xivapi.com/i/002000/002613.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/4/41/002613.png',
+                icon: '../resources/img/002613.png',
+                borderColor: '#e053bb',
+                sortKey: 1,
+                buffType: 'physical', // physical
+            },
+            goringBlade: { // [22:22:30.877] 1A:400001B8:木人 gains the effect of 沥血剑 from xxx for 21.00 Seconds.
+                mobGainsOwnEffect: EffectId.GoringBlade,
+                mobLosesOwnEffect: EffectId.GoringBlade,
+                useEffectDuration: true,
+                // icon: 'https://xivapi.com/i/002000/002506.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/9/95/002506.png',
+                icon: '../resources/img/002506.png',
+                borderColor: '#d23e29',
+                sortKey: 1,
+                buffType: 'physical', // physical
+            },
+            // circleOfScorn: { // [22:39:30.463] 1A:400001B9:木人 gains the effect of 厄运流转 from xxx for 15.00 Seconds.
+            //     mobGainsOwnEffect: EffectId.CircleOfScorn,
+            //     mobLosesOwnEffect: EffectId.CircleOfScorn,
+            //     useEffectDuration: true,
+            //     // icon: 'https://xivapi.com/i/000000/000161.png',
+            //     // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/b/b9/000161.png',
+            //     icon: '../resources/img/000161.png',
+            //     borderColor: '#e77d70',
+            //     sortKey: 1,
+            //     buffType: 'physical', // physical
+            // },
+            // sonicBreak: { //[22:54:09.441] 1A:400001B8:木人 gains the effect of 音速破 from xxx for 30.00 Seconds.
+            //     mobGainsOwnEffect: EffectId.SonicBreak,
+            //     mobLosesOwnEffect: EffectId.SonicBreak,
+            //     useEffectDuration: true,
+            //     // icon: 'https://xivapi.com/i/003000/003417.png',
+            //     // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/1/16/003417.png',
+            //     icon: '../resources/img/003417.png',
+            //     borderColor: '#755cbb',
+            //     sortKey: 1,
+            //     buffType: 'physical', // physical
+            // },
+            // bowShock: { //[22:54:10.770] 1A:400001B8:木人 gains the effect of 弓形冲波 from xxx for 15.00 Seconds.
+            //     mobGainsOwnEffect: EffectId.BowShock,
+            //     mobLosesOwnEffect: EffectId.BowShock,
+            //     useEffectDuration: true,
+            //     // icon: 'https://xivapi.com/i/003000/003423.png',
+            //     // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/b/b5/003423.png',
+            //     icon: '../resources/img/003423.png',
+            //     borderColor: '#d5d557',
+            //     sortKey: 1,
+            //     buffType: 'physical', // physical
+            // },
+            // 白魔
+            dia: { // 26|2020-09-20T17:04:10.5120000+08:00|74f|天辉|30.00|1039A1D9|水貂桑|4000031F|木人|00|7400000|48422||507ae34e5244f9018a0e5fa444c62d7c
+                mobGainsOwnEffect: OwnEffectId.Dia,
+                mobLosesOwnEffect: OwnEffectId.Dia,
+                useEffectDuration: true,
+                // icon: 'https://xivapi.com/i/002000/002641.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/b/ba/002641.png',
+                icon: '../resources/img/002641.png',
+                borderColor: '#3eb9fa',
+                sortKey: 1,
+                buffType: 'magic', // physical
+            },
+            biolysis: { //26|2020-09-20T17:11:43.3880000+08:00|767|蛊毒法|30.00|1039A1D9|水貂桑|4000031F|木人|00|7400000|46919||161fecdddc980c9bfeca7224ccbf98ae
+                mobGainsOwnEffect: OwnEffectId.Biolysis,
+                mobLosesOwnEffect: OwnEffectId.Biolysis,
+                useEffectDuration: true,
+                // icon: 'https://xivapi.com/i/002000/002820.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/7/78/002820.png',
+                icon: '../resources/img/002820.png',
+                borderColor: '#2e1fc4',
+                sortKey: 1,
+                buffType: 'magic', // physical
+            },
+            combustIII: { //[23:24:52.095] 1A:400001B8:木人 gains the effect of 焚灼 from xxx for 30.00 Seconds.
+                mobGainsOwnEffect: OwnEffectId.CombustIII,
+                mobLosesOwnEffect: OwnEffectId.CombustIII,
+                useEffectDuration: true,
+                // icon: 'https://xivapi.com/i/003000/003554.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/4/4d/003554.png',
+                icon: '../resources/img/003554.png',
+                borderColor: '#62daf8',
+                sortKey: 1,
+                buffType: 'magic', // physical
+            },
+            Demolish: { //[23:31:10.291] 1A:400001B8:木人 gains the effect of 破碎拳 from xxx for 18.00 Seconds. f6
+                mobGainsOwnEffect: OwnEffectId.Demolish,
+                mobLosesOwnEffect: OwnEffectId.Demolish,
+                useEffectDuration: true,
+                // icon: 'https://xivapi.com/i/000000/000204.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/2/2b/000204.png',
+                icon: '../resources/img/000204.png',
+                borderColor: '#f5cc19',
+                sortKey: 1,
+                buffType: 'physical', // physical
+            },
+            chaosThrust: { //[23:47:07.481] 1A:400001B8:木人 gains the effect of 樱花怒放 from xxx for 24.00 Seconds.
+                mobGainsOwnEffect: OwnEffectId.ChaosThrust,
+                mobLosesOwnEffect: OwnEffectId.ChaosThrust,
+                useEffectDuration: true,
+                // icon: 'https://xivapi.com/i/000000/000308.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/d/d6/000308.png',
+                icon: '../resources/img/000308.png',
+                borderColor: '#83598c',
+                sortKey: 1,
+                buffType: 'physical', // physical
+            },
+            // shadowFang: { //[00:03:38.355] 1A:400001B8:木人 gains the effect of 影牙 from xxx for 30.00 Seconds.
+            //     mobGainsOwnEffect: OwnEffectId.ShadowFang,
+            //     mobLosesOwnEffect: OwnEffectId.ShadowFang,
+            //     useEffectDuration: true,
+            //     // icon: 'https://xivapi.com/i/000000/000606.png',
+            //     // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/e/ee/000606.png',
+            //     icon: '../resources/img/000606.png',
+            //     borderColor: '#08bcfe',
+            //     sortKey: 1,
+            //     buffType: 'physical', // physical
+            // },
+            // 武士
+            higanbana: { // [00:12:10.091] 1A:400001B8:木人 gains the effect of 彼岸花 from xxx for 60.00 Seconds.
+                mobGainsOwnEffect: OwnEffectId.Higanbana,
+                mobLosesOwnEffect: OwnEffectId.Higanbana,
+                useEffectDuration: true,
+                // icon: 'https://xivapi.com/i/003000/003160.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/6/6b/003160.png',
+                icon: '../resources/img/003160.png',
+                borderColor: '#d9542a',
+                sortKey: 1,
+                buffType: 'physical', // physical
+            },
+            // 机工
+            // bioblaster: { // [00:20:02.402] 1A:400001B9:木人 gains the effect of 毒菌冲击 from xxx for 15.00 Seconds.
+            //     mobGainsOwnEffect: OwnEffectId.Bioblaster,
+            //     mobLosesOwnEffect: OwnEffectId.Bioblaster,
+            //     useEffectDuration: true,
+            //     // icon: 'https://xivapi.com/i/003000/003044.png',
+            //     // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/e/e7/003044.png',
+            //     icon: '../resources/img/003044.png',
+            //     borderColor: '#acfd19',
+            //     sortKey: 1,
+            //     buffType: 'physical', // physical
+            // },
+            // 黑魔
+            thunderIII: { // 26|2020-09-20T21:48:04.2490000+08:00|a3|暴雷|24.00|1039A1D9|水貂桑|4002724E|甲鲎|0A|43720|54853||57f87e2b3856ce677285b9ced2ba43fd
+                mobGainsOwnEffect: OwnEffectId.ThunderIII,
+                mobLosesOwnEffect: OwnEffectId.ThunderIII,
+                useEffectDuration: true,
+                // icon: 'https://xivapi.com/i/000000/000459.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/c/c1/000459.png',
+                icon: '../resources/img/000459.png',
+                borderColor: '#93d5fd',
+                sortKey: 1,
+                buffType: 'magic', // physical
+            },
+            // thunderIV: { // [00:32:47.727] 1A:400001B8:木人 gains the effect of 霹雷 from xxx for 18.00 Seconds.
+            //     mobGainsOwnEffect: EffectId.ThunderIV,
+            //     mobLosesOwnEffect: EffectId.ThunderIV,
+            //     useEffectDuration: true,
+            //     // icon: 'https://xivapi.com/i/002000/002662.png',
+            //     // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/8/82/002662.png',
+            //     icon: '../resources/img/002662.png',
+            //     borderColor: '#ac6af6',
+            //     sortKey: 1,
+            //     buffType: 'magic', // physical
+            // },
+            bioIII: { // 26|2020-09-20T21:37:32.3880000+08:00|4be|剧毒菌|30.00|1039A1D9|水貂桑|40026548|甲鲎|00|43720|54853||7e166dae6aa83b67d37ce587bf0aa656
+                mobGainsOwnEffect: OwnEffectId.BioIII,
+                mobLosesOwnEffect: OwnEffectId.BioIII,
+                useEffectDuration: true,
+                // icon: 'https://xivapi.com/i/002000/002689.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/b/b1/002689.png',
+                icon: '../resources/img/002689.png',
+                borderColor: '#e3e02d',
+                sortKey: 1,
+                buffType: 'magic', // physical
+            },
+            miasmaIII: { // 26|2020-09-20T21:42:37.0400000+08:00|4bf|瘴暍|30.00|1039A1D9|水貂桑|400271AA|甲鲎|00|43720|54853||671edb497f98c18fc37270cef85dd01b
+                mobGainsOwnEffect: OwnEffectId.MiasmaIII,
+                mobLosesOwnEffect: OwnEffectId.MiasmaIII,
+                useEffectDuration: true,
+                // icon: 'https://xivapi.com/i/002000/002690.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/e/e5/002690.png',
+                icon: '../resources/img/002690.png',
+                borderColor: '#97abe0',
+                sortKey: 1,
+                buffType: 'magic', // physical
             },
         };
 
@@ -1390,6 +1309,7 @@ class BuffTracker {
             for (let prop in propToMapMap) {
                 if (!(prop in buff))
                     continue;
+
                 let key = buff[prop];
                 if (typeof key === 'undefined') {
                     console.error('undefined value for key ' + prop + ' for buff ' + buff.name);
@@ -1427,7 +1347,6 @@ class BuffTracker {
         if (!buffs)
             return;
 
-        console.log(matches)
         for (let b of buffs) {
             // if (b.gainRegex && !log.match(b.gainRegex))
             //     continue;
@@ -1452,6 +1371,13 @@ class BuffTracker {
         }
     }
 
+    onLoseEffect(buffs, matches) {
+        if (!buffs)
+            return;
+        for (let b of buffs)
+            this.onLoseBigBuff(matches.targetId, b.name, b);
+    }
+
     onGainOwnEffect(buffs, matches) {
         if (!buffs)
             return;
@@ -1467,12 +1393,6 @@ class BuffTracker {
         }
     }
 
-    onLoseEffect(buffs, log) {
-        if (!buffs)
-            return;
-        for (let b of buffs)
-            this.onLoseBigBuff('', b.name, b);
-    }
 
     onLoseOwnEffect(buffs, log) {
         if (!buffs)
@@ -1567,15 +1487,17 @@ class Brds {
         this.abilityFuncMap = {};
         this.partyTracker = new PartyTracker();
         addOverlayListener('PartyChanged', (e) => {
+            console.log(e);
             e = {
                 party: [
                     {id: "103E4CCF", inParty: true, job: 28, level: 0, name: "伊黛亚·李", worldId: 1178},
                     {id: "1039A1D9", inParty: true, job: 28, level: 0, name: "水貂桑", worldId: 1178},
+                    {id: "1039A8BB", inParty: true, job: 38, level: 0, name: "红魔", worldId: 1178},
+                    {id: "1039A8D9", name: "鸑鷟之诗", worldId: 1178, job: 24, inParty: true}
                 ],
                 type: 'PartyChanged'
             }
             this.partyTracker.onPartyChanged(e);
-            console.log(e);
         });
 
         this.initConfig();
@@ -1887,6 +1809,8 @@ class Brds {
             console.log(e);
         }
         if (type === '26') {
+            console.log(log.match(NetRegexes.gainsEffect()));
+
             // 其他人给自己上的buff
             let m = log.match(kYouGainEffectRegex);
             if (m) {
@@ -1901,6 +1825,7 @@ class Brds {
             m = log.match(kMobGainsOwnEffectRegex);
             if (m) {
                 const effectId = m.groups.effectId.toUpperCase();
+                this.buffTracker.onYouGainEffect(effectId, m.groups);
                 this.buffTracker.onMobGainsOwnEffect(effectId, m.groups);
             }
 
@@ -1910,13 +1835,9 @@ class Brds {
                 this.buffTracker.onYouGainEffect(effectId, m.groups);
             }
 
-            // m = log.match(kMobGainsEffectRegex);
-            // if (m) {
-            //     const effectId = m.groups.effectId.toUpperCase();
-            //     this.buffTracker.onMobGainsEffect(effectId, m.groups);
-            // }
-
         } else if (type === '30') {
+            console.log(log.match(NetRegexes.losesEffect()));
+
             let m = log.match(kYouLoseEffectRegex);
             if (m) {
                 const effectId = m.groups.effectId.toUpperCase();
@@ -1930,17 +1851,18 @@ class Brds {
             m = log.match(kMobLosesOwnEffectRegex);
             if (m) {
                 const effectId = m.groups.effectId.toUpperCase();
+                this.buffTracker.onYouLoseEffect(effectId, m.groups);
                 this.buffTracker.onMobLosesOwnEffect(effectId, log);
             }
 
-            // m = log.match(kMobLosesEffectRegex);
-            // if (m) {
-            //     const effectId = m.groups.effectId.toUpperCase();
-            //     this.buffTracker.onMobLosesEffect(effectId, m.groups);
-            // }
+            m = log.match(kMobLosesPartyEffectRegex);
+            if (m) {
+                const effectId = m.groups.effectId.toUpperCase();
+                this.buffTracker.onYouLoseEffect(effectId, m.groups);
+            }
+
         } else if (type === '21' || type === '22') {
             let m = log.match(kYouUseAbilityRegex);
-            console.log(m);
             if (m) {
                 let id = m.groups.id;
                 let f = this.abilityFuncMap[id];
@@ -2000,7 +1922,7 @@ class Brds {
     }
 
     Test() {
-        /*
+
         setTimeout(() => {
             let line = '26|2020-09-20T03:24:38.9810000+08:00|31|强化药|30.00|1039A1D9|水貂桑|1039A1D9|水貂桑|28D6|111340|111340||63c01dd83f9942aec827298ddef1519b';
             this.OnNetLog({line: line.split('|'), rawLine: line})
@@ -2019,16 +1941,43 @@ class Brds {
             let line = '26|2020-09-20T03:20:13.6610000+08:00|4b0|烈毒咬箭|30.00|1039A1D9|水貂桑|4000031F|木人|28|7400000|111340||2bb99918d00070ccc76dac9d8de81e98';
             this.OnNetLog({line: line.split('|'), rawLine: line})
         }, 2000);
-        */
+
         // 学者
         setTimeout(() => {
-            let line = '26|2020-09-20T18:34:48.5250000+08:00|4c5|连环计|15.00|103E4CCF|伊黛亚·李|40017047|梦寐的刹帝利|00|176868|93263||ea00b0bcf5bad3afc108c29be0233c9f';
+            let line = '26|2020-09-20T18:34:48.5250000+08:00|4c5|连环计|15.00|103E4CCF|伊黛亚·李|4000031F|木人|00|176868|93263||ea00b0bcf5bad3afc108c29be0233c9f';
             this.OnNetLog({line: line.split('|'), rawLine: line})
         }, 3000);
         setTimeout(() => {
             let line = '30|2020-09-20T17:46:59.8170000+08:00|4c5|连环计|0.00|103E4CCF|伊黛亚·李|4000031F|木人|00|7400000|97064||d701742e13324007985444a7be589683';
             this.OnNetLog({line: line.split('|'), rawLine: line})
+        }, 6000);
+
+        // // 龙骑
+        // setTimeout(() => {
+        //     let line = '26|2020-09-20T20:28:51.3110000+08:00|5ae|巨龙左眼|20.00|103E4CCF|伊黛亚·李|1039A1D9|水貂桑|00|76590|75581||258897ab642d7a4dd88d77fa8dd43576';
+        //     this.OnNetLog({line: line.split('|'), rawLine: line})
+        // }, 1000);
+        // setTimeout(() => {
+        //     let line = '26|2020-09-20T20:28:51.3110000+08:00|5ad|巨龙右眼|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|78|75581|75581||0bf27d1121ea2df8f2ac1a67497b008c';
+        //     this.OnNetLog({line: line.split('|'), rawLine: line})
+        // }, 2000);
+
+        // 忍着
+        setTimeout(() => {
+            let line = '26|2020-09-20T20:42:28.6830000+08:00|27e|受伤加重|15.00|1039A1D9|水貂桑|4000031F|木人|00|7400000|55427||a0b1d7a1f64355c3b9e642eab6e64aa0';
+            this.OnNetLog({line: line.split('|'), rawLine: line})
+        }, 1000);
+        setTimeout(() => {
+            let line = '30|2020-09-20T17:46:59.8170000+08:00|27e|受伤加重|0.00|1039A1D9|水貂桑|4000031F|木人|00|7400000|55427||d701742e13324007985444a7be589683';
+            this.OnNetLog({line: line.split('|'), rawLine: line})
+        }, 4000);
+        setTimeout(() => {
+            let line = '26|2020-09-20T20:42:28.6830000+08:00|27e|受伤加重|15.00|103E4CCF|伊黛亚·李|4000031F|木人|00|7400000|55427||a0b1d7a1f64355c3b9e642eab6e64aa0';
+            this.OnNetLog({line: line.split('|'), rawLine: line})
         }, 5000);
+
+        // 26|2020-09-20T21:28:39.0320000+08:00|8d|战斗之声|20.00|1039A1D9|水貂桑|40026FC8|陆行鸟|00|76590|111340||852f0f6be28070f73fd879577cb448d7
+        // 26|2020-09-20T21:33:48.1490000+08:00|5ae|巨龙左眼|20.00|1039A1D9|水貂桑|40026FC8|陆行鸟|00|76590|75581||1509fff44f53bb5592a7dd6642ba73fd
 
         return;
         // this.TestChangeJob();
