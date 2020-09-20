@@ -657,6 +657,7 @@ class BuffTracker {
             divination: { // 占卜
                 gainEffect: EffectId.Divination,
                 loseEffect: EffectId.Divination,
+                gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限给自己
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/divination.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/f/fc/003553.png',
@@ -672,6 +673,7 @@ class BuffTracker {
             arrow: { // 放浪神之箭
                 gainEffect: EffectId.TheArrow,
                 loseEffect: EffectId.TheArrow,
+                gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限给自己
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/arrow.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/1/10/003113.png',
@@ -685,6 +687,7 @@ class BuffTracker {
             balance: { // 太阳神之衡
                 gainEffect: EffectId.TheBalance,
                 loseEffect: EffectId.TheBalance,
+                gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限给自己
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/balance.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/8/8d/003110.png',
@@ -699,6 +702,7 @@ class BuffTracker {
             bole: { // 世界树之干
                 gainEffect: EffectId.TheBole,
                 loseEffect: EffectId.TheBole,
+                gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限给自己
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/bole.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/e/e0/003112.png',
@@ -712,6 +716,7 @@ class BuffTracker {
             ewer: { // 河流神之瓶
                 gainEffect: EffectId.TheEwer,
                 loseEffect: EffectId.TheEwer,
+                gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限给自己
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/ewer.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/6/66/003114.png',
@@ -725,6 +730,7 @@ class BuffTracker {
             spear: { // 战争神之枪
                 gainEffect: EffectId.TheSpear,
                 loseEffect: EffectId.TheSpear,
+                gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限给自己
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/spear.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/5/5d/003111.png',
@@ -738,6 +744,7 @@ class BuffTracker {
             spire: { // 建筑神之塔
                 gainEffect: EffectId.TheSpire,
                 loseEffect: EffectId.TheSpire,
+                gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限给自己
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/spire.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/8/88/003115.png',
@@ -751,6 +758,7 @@ class BuffTracker {
             ladyOfCrowns: { // 王冠之贵妇
                 gainEffect: EffectId.LadyOfCrowns,
                 loseEffect: EffectId.LadyOfCrowns,
+                gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限给自己
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/lady-of-crowns.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/5/59/003146.png',
@@ -764,6 +772,7 @@ class BuffTracker {
             lordOfCrowns: { // 王冠之领主
                 gainEffect: EffectId.LordOfCrowns,
                 loseEffect: EffectId.LordOfCrowns,
+                gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限给自己
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/lord-of-crowns.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/a/a8/003147.png',
@@ -792,6 +801,7 @@ class BuffTracker {
             brotherhood: { // 义结金兰：斗气/攻击
                 gainEffect: EffectId.Brotherhood,
                 loseEffect: EffectId.Brotherhood,
+                gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限给自己
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/brotherhood.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/d/db/002542.png',
@@ -822,6 +832,7 @@ class BuffTracker {
             litany: { //战斗连祷 [23:47:29.214] 1A:1039A1D9:xxx gains the effect of 战斗连祷 from xxx for 20.00 Seconds.
                 gainEffect: OwnEffectId.BattleLitany,
                 loseEffect: OwnEffectId.BattleLitany,
+                gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限给自己
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/battle-litany.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/3/32/002585.png',
@@ -837,6 +848,7 @@ class BuffTracker {
             lefteye: { // 巨龙左眼
                 gainEffect: OwnEffectId.LeftEye,
                 loseEffect: OwnEffectId.LeftEye,
+                gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限给自己
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/dragon-sight.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/d/de/002587.png',
@@ -852,6 +864,7 @@ class BuffTracker {
             righteye: { // 巨龙右眼
                 gainEffect: OwnEffectId.RightEye,
                 loseEffect: OwnEffectId.RightEye,
+                gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限给自己
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/dragon-sight.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/d/de/002587.png',
@@ -883,6 +896,7 @@ class BuffTracker {
             devilment: { // 进攻之探戈
                 gainEffect: EffectId.Devilment,
                 loseEffect: EffectId.Devilment,
+                gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限给自己
                 durationSeconds: 20,
                 // icon: 'cactbot/resources/icon/status/devilment.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/e/ef/003471.png',
@@ -899,6 +913,7 @@ class BuffTracker {
             technicalFinish: { // 技巧舞步结束
                 gainEffect: EffectId.TechnicalFinish,
                 loseEffect: EffectId.TechnicalFinish,
+                gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限给自己
                 durationSeconds: 20,
                 // icon: 'cactbot/resources/icon/status/technical-finish.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/b/ba/003474.png',
@@ -916,8 +931,6 @@ class BuffTracker {
             raging: { // 猛者 26|2020-09-20T03:48:12.5040000+08:00|7d|猛者强击|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|00|111340|111340||7f5d92a566794a793b65f97686f3699f
                 gainEffect: EffectId.RagingStrikes,
                 loseEffect: EffectId.RagingStrikes,
-                // gainNetRegex: Regexes.abilityFull({id: EffectId.Embolden, target: this.playerId}),
-                gainNetRegex: NetRegexes.gainsEffect(),
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/000000/000352.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/2/2a/000352.png',
@@ -933,6 +946,7 @@ class BuffTracker {
             battlevoice: { // 战斗之声
                 gainEffect: EffectId.BattleVoice,
                 loseEffect: EffectId.BattleVoice,
+                gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限其他人给自己
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/battlevoice.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/5/55/002601.png',
@@ -950,6 +964,7 @@ class BuffTracker {
             devotion: { // 灵护
                 gainEffect: EffectId.Devotion,
                 loseEffect: EffectId.Devotion,
+                gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限其他人给自己
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/devotion.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/2/25/002688.png',
@@ -975,14 +990,14 @@ class BuffTracker {
             // 26|2020-09-20T22:04:20.0830000+08:00|511|鼓励|20.00|1039A1D9|水貂桑|4002759B|陆行鸟|01|76590|52289||63e1491deabf976eaa7e16edbb05e3e8
             // 30|2020-09-20T22:04:24.0480000+08:00|511|鼓励|0.00|1039A1D9|水貂桑|4002759B|陆行鸟|01|76590|52289||91727e97f2e91e3b4823830ea6a35adb
             // 30|2020-09-20T22:04:24.0480000+08:00|511|鼓励|0.00|1039A1D9|水貂桑|4002759B|陆行鸟|01|76590|52289||91727e97f2e91e3b4823830ea6a35adb
-            emboldenFor: { // 鼓励(从赤魔得到) 511
+            emboldenToMe: { // 鼓励(从赤魔得到) 511
                 // Embolden is special and has some extra text at the end, depending on embolden stage:
                 // Potato Chippy gains the effect of Embolden from Tater Tot for 20.00 Seconds. (5)
                 // Instead, use somebody using the effect on you:
                 //   16:106C22EF:Tater Tot:1D60:Embolden:106C22EF:Potato Chippy:500020F:4D7: etc etc
                 gainEffect: EffectId.Embolden,
                 loseEffect: EffectId.Embolden,
-                gainRegex: Regexes.abilityFull({id: EffectId.Embolden, targetId: this.playerId}),
+                gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限其他人给自己
                 durationSeconds: 20,
                 // icon: 'cactbot/resources/icon/status/embolden.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/2/2c/003218.png',
@@ -1277,10 +1292,13 @@ class BuffTracker {
     // }
 
     // 对自己的BUFF、小队对敌人的BUFF
-    onGainEffect(buffs, matches) {
+    onGainEffect(buffs, log, matches) {
         if (!buffs)
             return;
         for (let b of buffs) {
+            if (b.gainNetRegex && !log.match(b.gainNetRegex))
+                continue;
+
             let seconds = -1;
             if (b.useEffectDuration)
                 seconds = parseFloat(matches.duration);
@@ -1321,8 +1339,8 @@ class BuffTracker {
             this.onLoseBigBuff(matches.targetId, b.name, b);
     }
 
-    onYouGainEffect(name, matches) {
-        this.onGainEffect(this.gainEffectMap[name], matches);
+    onYouGainEffect(name, log, matches) {
+        this.onGainEffect(this.gainEffectMap[name], log, matches);
     }
 
     onYouLoseEffect(name, matches) {
@@ -1738,21 +1756,21 @@ class Brds {
                 let f = this.gainEffectFuncMap[effectId];
                 if (f)
                     f(name, m.groups);
-                this.buffTracker.onYouGainEffect(effectId, m.groups);
+                this.buffTracker.onYouGainEffect(effectId, log, m.groups);
             }
 
             // 自己给其他人上的buff
             m = log.match(kMobGainsOwnEffectRegex);
             if (m) {
                 const effectId = m.groups.effectId.toUpperCase();
-                this.buffTracker.onYouGainEffect(effectId, m.groups);
+                this.buffTracker.onYouGainEffect(effectId, log, m.groups);
                 this.buffTracker.onMobGainsOwnEffect(effectId, m.groups);
             }
 
             m = log.match(kMobGainsPartyEffectRegex);
             if (m) {
                 const effectId = m.groups.effectId.toUpperCase();
-                this.buffTracker.onYouGainEffect(effectId, m.groups);
+                this.buffTracker.onYouGainEffect(effectId, log, m.groups);
             }
 
         } else if (type === '30') {
@@ -1848,29 +1866,37 @@ class Brds {
             this.OnNetLog({line: line.split('|'), rawLine: line})
         }, 1);
 
-        // 诗人
-        setTimeout(() => {
-            let line = '26|2020-09-20T02:40:53.5290000+08:00|7d|猛者强击|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|00|111340|111340||8f03e4245a6f867a176cbe211bd1c6c5';
-            this.OnNetLog({line: line.split('|'), rawLine: line})
-        }, 100);
-        setTimeout(() => {
-            let line = '26|2020-09-20T03:20:11.1660000+08:00|4b1|狂风蚀箭|30.00|1039A1D9|水貂桑|4000031F|木人|28|7400000|111340||dbf0314ef7fed2a2b2285e2a3b17d02f';
-            this.OnNetLog({line: line.split('|'), rawLine: line})
-        }, 1000);
-        setTimeout(() => {
-            let line = '26|2020-09-20T03:20:13.6610000+08:00|4b0|烈毒咬箭|30.00|1039A1D9|水貂桑|4000031F|木人|28|7400000|111340||2bb99918d00070ccc76dac9d8de81e98';
-            this.OnNetLog({line: line.split('|'), rawLine: line})
-        }, 2000);
+        // // 诗人
+        // setTimeout(() => {
+        //     let line = '26|2020-09-20T22:44:12.4840000+08:00|8d|战斗之声|20.00|1039A1D9|水貂桑|40027A75|陆行鸟|00|76590|111340||f655b2f774c6675d7991b1e5180462d2';
+        //     this.OnNetLog({line: line.split('|'), rawLine: line})
+        // }, 100);
+        // setTimeout(() => {
+        //     let line = '26|2020-09-20T22:44:12.4840000+08:00|8d|战斗之声|20.00|103E4CCF|伊黛亚·李|1039A1D9|水貂桑|00|76590|111340||f655b2f774c6675d7991b1e5180462d2';
+        //     this.OnNetLog({line: line.split('|'), rawLine: line})
+        // }, 2000);
+        // setTimeout(() => {
+        //     let line = '26|2020-09-20T02:40:53.5290000+08:00|7d|猛者强击|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|00|111340|111340||8f03e4245a6f867a176cbe211bd1c6c5';
+        //     this.OnNetLog({line: line.split('|'), rawLine: line})
+        // }, 100);
+        // setTimeout(() => {
+        //     let line = '26|2020-09-20T03:20:11.1660000+08:00|4b1|狂风蚀箭|30.00|1039A1D9|水貂桑|4000031F|木人|28|7400000|111340||dbf0314ef7fed2a2b2285e2a3b17d02f';
+        //     this.OnNetLog({line: line.split('|'), rawLine: line})
+        // }, 1000);
+        // setTimeout(() => {
+        //     let line = '26|2020-09-20T03:20:13.6610000+08:00|4b0|烈毒咬箭|30.00|1039A1D9|水貂桑|4000031F|木人|28|7400000|111340||2bb99918d00070ccc76dac9d8de81e98';
+        //     this.OnNetLog({line: line.split('|'), rawLine: line})
+        // }, 2000);
 
-        // 学者
-        setTimeout(() => {
-            let line = '26|2020-09-20T18:34:48.5250000+08:00|4c5|连环计|15.00|103E4CCF|伊黛亚·李|4000031F|木人|00|176868|93263||ea00b0bcf5bad3afc108c29be0233c9f';
-            this.OnNetLog({line: line.split('|'), rawLine: line})
-        }, 3000);
-        setTimeout(() => {
-            let line = '30|2020-09-20T17:46:59.8170000+08:00|4c5|连环计|0.00|103E4CCF|伊黛亚·李|4000031F|木人|00|7400000|97064||d701742e13324007985444a7be589683';
-            this.OnNetLog({line: line.split('|'), rawLine: line})
-        }, 6000);
+        // // 学者
+        // setTimeout(() => {
+        //     let line = '26|2020-09-20T18:34:48.5250000+08:00|4c5|连环计|15.00|103E4CCF|伊黛亚·李|4000031F|木人|00|176868|93263||ea00b0bcf5bad3afc108c29be0233c9f';
+        //     this.OnNetLog({line: line.split('|'), rawLine: line})
+        // }, 3000);
+        // setTimeout(() => {
+        //     let line = '30|2020-09-20T17:46:59.8170000+08:00|4c5|连环计|0.00|103E4CCF|伊黛亚·李|4000031F|木人|00|7400000|97064||d701742e13324007985444a7be589683';
+        //     this.OnNetLog({line: line.split('|'), rawLine: line})
+        // }, 6000);
 
         // // 龙骑
         // setTimeout(() => {
@@ -1882,20 +1908,21 @@ class Brds {
         //     this.OnNetLog({line: line.split('|'), rawLine: line})
         // }, 2000);
 
-        // 忍着
-        setTimeout(() => {
-            let line = '26|2020-09-20T20:42:28.6830000+08:00|27e|受伤加重|15.00|1039A1D9|水貂桑|4000031F|木人|00|7400000|55427||a0b1d7a1f64355c3b9e642eab6e64aa0';
-            this.OnNetLog({line: line.split('|'), rawLine: line})
-        }, 1000);
-        setTimeout(() => {
-            let line = '30|2020-09-20T17:46:59.8170000+08:00|27e|受伤加重|0.00|1039A1D9|水貂桑|4000031F|木人|00|7400000|55427||d701742e13324007985444a7be589683';
-            this.OnNetLog({line: line.split('|'), rawLine: line})
-        }, 4000);
-        setTimeout(() => {
-            let line = '26|2020-09-20T20:42:28.6830000+08:00|27e|受伤加重|15.00|103E4CCF|伊黛亚·李|4000031F|木人|00|7400000|55427||a0b1d7a1f64355c3b9e642eab6e64aa0';
-            this.OnNetLog({line: line.split('|'), rawLine: line})
-        }, 5000);
+        // // 忍着
+        // setTimeout(() => {
+        //     let line = '26|2020-09-20T20:42:28.6830000+08:00|27e|受伤加重|15.00|1039A1D9|水貂桑|4000031F|木人|00|7400000|55427||a0b1d7a1f64355c3b9e642eab6e64aa0';
+        //     this.OnNetLog({line: line.split('|'), rawLine: line})
+        // }, 1000);
+        // setTimeout(() => {
+        //     let line = '30|2020-09-20T17:46:59.8170000+08:00|27e|受伤加重|0.00|1039A1D9|水貂桑|4000031F|木人|00|7400000|55427||d701742e13324007985444a7be589683';
+        //     this.OnNetLog({line: line.split('|'), rawLine: line})
+        // }, 4000);
+        // setTimeout(() => {
+        //     let line = '26|2020-09-20T20:42:28.6830000+08:00|27e|受伤加重|15.00|103E4CCF|伊黛亚·李|4000031F|木人|00|7400000|55427||a0b1d7a1f64355c3b9e642eab6e64aa0';
+        //     this.OnNetLog({line: line.split('|'), rawLine: line})
+        // }, 5000);
 
+        // 26|2020-09-20T22:44:12.4840000+08:00|8d|战斗之声|20.00|1039A1D9|水貂桑|40027A75|陆行鸟|00|76590|111340||f655b2f774c6675d7991b1e5180462d2
         // 26|2020-09-20T21:28:39.0320000+08:00|8d|战斗之声|20.00|1039A1D9|水貂桑|40026FC8|陆行鸟|00|76590|111340||852f0f6be28070f73fd879577cb448d7
         // 26|2020-09-20T21:33:48.1490000+08:00|5ae|巨龙左眼|20.00|1039A1D9|水貂桑|40026FC8|陆行鸟|00|76590|75581||1509fff44f53bb5592a7dd6642ba73fd
 
