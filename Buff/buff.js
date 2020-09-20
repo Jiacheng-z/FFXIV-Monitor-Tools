@@ -1309,12 +1309,12 @@ class BuffTracker {
             else if ('durationSeconds' in b)
                 seconds = b.durationSeconds;
 
-            if (matches.count !== '00' && b.incrPhysicalCount !== null) { // 存在物理Count形式buff
+            if (matches.count !== '00' && b.hasOwnProperty('incrPhysicalCount')) { // 存在物理Count形式buff
                 if (b.incrPhysicalCount[matches.count] !== null) {
                     b.incrPhysical = b.incrPhysicalCount[matches.count];
                 }
             }
-            if (matches.count !== '00' && b.incrMagicCount !== null) { // 存在魔法Count形式buff
+            if (matches.count !== '00' && b.hasOwnProperty('incrMagicCount')) { // 存在魔法Count形式buff
                 if (b.incrMagicCount[matches.count] !== null) {
                     b.incrMagic = b.incrMagicCount[matches.count];
                 }
@@ -1348,7 +1348,7 @@ class BuffTracker {
             else if ('durationSeconds' in b)
                 seconds = b.durationSeconds;
 
-            this.onBigBuff(matches.targetId, b.gainEffect, seconds, b, matches.source, true);
+            this.onBigBuff(matches.targetId, b.mobGainsOwnEffect, seconds, b, matches.source, true);
         }
     }
 
@@ -1357,7 +1357,7 @@ class BuffTracker {
         if (!buffs)
             return;
         for (let b of buffs)
-            this.onLoseBigBuff(matches.targetId, b.gainEffect, b);
+            this.onLoseBigBuff(matches.targetId, b.mobGainsOwnEffect, b);
     }
 
     onYouGainEffect(name, log, matches) {
@@ -1444,6 +1444,7 @@ class Brds {
         this.partyTracker = new PartyTracker();
         addOverlayListener('PartyChanged', (e) => {
             this.partyTracker.onPartyChanged(e);
+            console.log(e, this.partyTracker);
         });
 
         this.initConfig();
@@ -1718,12 +1719,10 @@ class Brds {
 
     // 切换职业
     OnPlayerChanged(e) {
-        let meId = '';
         if (this.me !== e.detail.name) {
             this.me = e.detail.name;
-            meId = e.detail.id.toString(16).toUpperCase();
             // setup regexes prior to the combo tracker
-            setupRegexes(meId, this.partyTracker);
+            setupRegexes(e.detail.id.toString(16).toUpperCase(), this.partyTracker);
         }
 
         if (!this.init) {
@@ -1739,7 +1738,7 @@ class Brds {
         if (updateJob) {
             this.UpdateJob();
             // Set up the buff tracker after the job bars are created.
-            this.buffTracker = new BuffTracker(this.options, meId, this.job, this.o.leftBuffsList, this.o.rightBuffsList, this.o.StatDotList);
+            this.buffTracker = new BuffTracker(this.options, e.detail.id.toString(16).toUpperCase(), this.job, this.o.leftBuffsList, this.o.rightBuffsList, this.o.StatDotList);
         }
     }
 
@@ -1841,14 +1840,14 @@ class Brds {
         //     let line = '26|2020-09-20T02:40:53.5290000+08:00|7d|猛者强击|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|00|111340|111340||8f03e4245a6f867a176cbe211bd1c6c5';
         //     this.OnNetLog({line: line.split('|'), rawLine: line})
         // }, 100);
-        // setTimeout(() => {
-        //     let line = '26|2020-09-20T03:20:11.1660000+08:00|4b1|狂风蚀箭|30.00|1039A1D9|水貂桑|4000031F|木人|28|7400000|111340||dbf0314ef7fed2a2b2285e2a3b17d02f';
-        //     this.OnNetLog({line: line.split('|'), rawLine: line})
-        // }, 1000);
-        // setTimeout(() => {
-        //     let line = '26|2020-09-20T03:20:13.6610000+08:00|4b0|烈毒咬箭|30.00|1039A1D9|水貂桑|4000031F|木人|28|7400000|111340||2bb99918d00070ccc76dac9d8de81e98';
-        //     this.OnNetLog({line: line.split('|'), rawLine: line})
-        // }, 2000);
+        setTimeout(() => {
+            let line = '26|2020-09-20T03:20:11.1660000+08:00|4b1|狂风蚀箭|30.00|1039A1D9|水貂桑|4000031F|木人|28|7400000|111340||dbf0314ef7fed2a2b2285e2a3b17d02f';
+            this.OnNetLog({line: line.split('|'), rawLine: line})
+        }, 1000);
+        setTimeout(() => {
+            let line = '26|2020-09-20T03:20:13.6610000+08:00|4b0|烈毒咬箭|30.00|1039A1D9|水貂桑|4000031F|木人|28|7400000|111340||2bb99918d00070ccc76dac9d8de81e98';
+            this.OnNetLog({line: line.split('|'), rawLine: line})
+        }, 2000);
 
         // // 学者
         // setTimeout(() => {
@@ -1863,6 +1862,10 @@ class Brds {
         // // 龙骑
         // setTimeout(() => {
         //     let line = '26|2020-09-20T20:28:51.3110000+08:00|5ae|巨龙左眼|20.00|103E4CCF|伊黛亚·李|1039A1D9|水貂桑|00|76590|75581||258897ab642d7a4dd88d77fa8dd43576';
+        //     this.OnNetLog({line: line.split('|'), rawLine: line})
+        // }, 1000);
+        // setTimeout(() => {
+        //     let line = '26|2020-09-21T00:47:46.5170000+08:00|5ae|巨龙左眼|20.00|1039A1D9|水貂桑|400287BF|陆行鸟|00|76590|75581||c0d0b4a74b720167676b664b7f882ffb';
         //     this.OnNetLog({line: line.split('|'), rawLine: line})
         // }, 1000);
         // setTimeout(() => {
@@ -1903,35 +1906,35 @@ class Brds {
         // 30|2020-09-20T22:04:24.0480000+08:00|511|鼓励|0.00|1039A1D9|水貂桑|4002759B|陆行鸟|01|76590|52289||91727e97f2e91e3b4823830ea6a35adb
 
         // 从别人身上得到
-        setTimeout(() => {
-            let line = '26|2020-09-20T22:04:04.0780000+08:00|511|鼓励|20.00|103E4CCF|伊黛亚·李|1039A1D9|水貂桑|05|76590|52289||cc9ad3416a052b54bbdb68804582dcc5';
-            this.OnNetLog({line: line.split('|'), rawLine: line})
-        }, 1)
-
-        setTimeout(() => {
-            let line = '26|2020-09-20T22:04:04.0780000+08:00|511|鼓励|20.00|103E4CCF|伊黛亚·李|1039A1D9|水貂桑|04|76590|52289||cc9ad3416a052b54bbdb68804582dcc5';
-            this.OnNetLog({line: line.split('|'), rawLine: line})
-        }, 4000)
-
-        setTimeout(() => {
-            let line = '26|2020-09-20T22:04:04.0780000+08:00|511|鼓励|20.00|103E4CCF|伊黛亚·李|1039A1D9|水貂桑|03|76590|52289||cc9ad3416a052b54bbdb68804582dcc5';
-            this.OnNetLog({line: line.split('|'), rawLine: line})
-        }, 6000)
-
-        setTimeout(() => {
-            let line = '26|2020-09-20T22:04:04.0780000+08:00|511|鼓励|20.00|103E4CCF|伊黛亚·李|1039A1D9|水貂桑|02|76590|52289||cc9ad3416a052b54bbdb68804582dcc5';
-            this.OnNetLog({line: line.split('|'), rawLine: line})
-        }, 10000)
+        // setTimeout(() => {
+        //     let line = '26|2020-09-20T22:04:04.0780000+08:00|511|鼓励|20.00|103E4CCF|伊黛亚·李|1039A1D9|水貂桑|05|76590|52289||cc9ad3416a052b54bbdb68804582dcc5';
+        //     this.OnNetLog({line: line.split('|'), rawLine: line})
+        // }, 1)
+        //
+        // setTimeout(() => {
+        //     let line = '26|2020-09-20T22:04:04.0780000+08:00|511|鼓励|20.00|103E4CCF|伊黛亚·李|1039A1D9|水貂桑|04|76590|52289||cc9ad3416a052b54bbdb68804582dcc5';
+        //     this.OnNetLog({line: line.split('|'), rawLine: line})
+        // }, 4000)
+        //
+        // setTimeout(() => {
+        //     let line = '26|2020-09-20T22:04:04.0780000+08:00|511|鼓励|20.00|103E4CCF|伊黛亚·李|1039A1D9|水貂桑|03|76590|52289||cc9ad3416a052b54bbdb68804582dcc5';
+        //     this.OnNetLog({line: line.split('|'), rawLine: line})
+        // }, 6000)
+        //
+        // setTimeout(() => {
+        //     let line = '26|2020-09-20T22:04:04.0780000+08:00|511|鼓励|20.00|103E4CCF|伊黛亚·李|1039A1D9|水貂桑|02|76590|52289||cc9ad3416a052b54bbdb68804582dcc5';
+        //     this.OnNetLog({line: line.split('|'), rawLine: line})
+        // }, 10000)
 
         // setTimeout(() => {
         //     let line = '26|2020-09-20T22:04:04.0780000+08:00|511|鼓励|20.00|103E4CCF|伊黛亚·李|1039A1D9|水貂桑|01|76590|52289||cc9ad3416a052b54bbdb68804582dcc5';
         //     this.OnNetLog({line: line.split('|'), rawLine: line})
         // }, 14000)
 
-        setTimeout(() => {
-            let line = '30|2020-09-20T22:04:24.0480000+08:00|511|鼓励|0.00|103E4CCF|伊黛亚·李|1039A1D9|水貂桑|01|76590|52289||91727e97f2e91e3b4823830ea6a35adb';
-            this.OnNetLog({line: line.split('|'), rawLine: line})
-        }, 13000)
+        // setTimeout(() => {
+        //     let line = '30|2020-09-20T22:04:24.0480000+08:00|511|鼓励|0.00|103E4CCF|伊黛亚·李|1039A1D9|水貂桑|01|76590|52289||91727e97f2e91e3b4823830ea6a35adb';
+        //     this.OnNetLog({line: line.split('|'), rawLine: line})
+        // }, 13000)
 
         // 自己给自己
         // setTimeout(() => {
