@@ -52,8 +52,6 @@ const OwnEffectId = {
     'MiasmaIII': '4BF', // 瘴暍
 }
 
-// 近战职业列表
-let meleeJobs = ['PLD', 'WAR', 'DRK', 'GNB', 'MNK', 'DRG', 'NIN', 'SAM'];
 
 // Regexes to be filled out once we know the player's name.
 let kYouGainEffectRegex = null;
@@ -63,34 +61,8 @@ let kMobLosesOwnEffectRegex = null; // 自己在boss身上丢失的buff
 let kMobGainsPartyEffectRegex = null; // 小队给目标身上增加的buff
 let kMobLosesPartyEffectRegex = null; // 小队在目标身上丢失的buff
 
-let kYouUseAbilityRegex = null;
-let kAnybodyAbilityRegex = null;
-let kMobGainsEffectRegex = null;
-let kMobLosesEffectRegex = null;
-
-
-let kStatsRegex = Regexes.statChange();
-
-function loseTargetFromLog(log) {
-    let m = log.match(Regexes.parse('] 1E:(\\y{ObjectId}):([^:]*?) loses'));
-    if (m)
-        return m[1] + ':' + m[2];
-    return 0;
-}
-
-let kAbilitySourceRegex = Regexes.parse(' 1[56]:\\y{ObjectId}:(\\y{Name}):');
-
-function abilitySourceFromLog(log) {
-    let m = log.match(kAbilitySourceRegex);
-    if (m)
-        return m[1];
-    return null;
-}
-
-// 是否为近战职业
-function isMeleeJob(job) {
-    return meleeJobs.indexOf(job) >= 0;
-}
+// 近战职业列表
+let meleeJobs = ['PLD', 'WAR', 'DRK', 'GNB', 'MNK', 'DRG', 'NIN', 'SAM'];
 
 // 获取url参数
 function getQueryVariable(variable) {
@@ -105,6 +77,7 @@ function getQueryVariable(variable) {
     return (false);
 }
 
+// 设置正则匹配
 function setupRegexes(playerId, playerName, partyTracker) {
     // 对自己增加的buff
     kYouGainEffectRegex = NetRegexes.gainsEffect({targetId: playerId});
@@ -122,25 +95,6 @@ function setupRegexes(playerId, playerName, partyTracker) {
     let partyIdsStr = partyIds.join("|");
     kMobGainsPartyEffectRegex = NetRegexes.gainsEffect({targetId: '4.{7}', sourceId: '(' + partyIdsStr + ')'});
     kMobLosesPartyEffectRegex = NetRegexes.losesEffect({targetId: '4.{7}', sourceId: '(' + partyIdsStr + ')'});
-
-    // 自己释放的能力
-    kYouUseAbilityRegex = NetRegexes.ability({source: playerName});
-    // 任何人释放的能力
-    // kAnybodyAbilityRegex = NetRegexes.ability();
-    // 对目标释放的技能
-    // kMobGainsEffectRegex = NetRegexes.gainsEffect({targetId: '4.{7}'});
-    // kMobLosesEffectRegex = NetRegexes.losesEffect({targetId: '4.{7}'});
-}
-
-function computeBackgroundColorFrom(element, classList) {
-    let div = document.createElement('div');
-    let classes = classList.split('.');
-    for (let i = 0; i < classes.length; ++i)
-        div.classList.add(classes[i]);
-    element.appendChild(div);
-    let color = window.getComputedStyle(div).backgroundColor;
-    element.removeChild(div);
-    return color;
 }
 
 function makeAuraTimerIcon(name, seconds, opacity, iconWidth, iconHeight, iconText, barHeight, textHeight, textColor, borderSize, borderColor, barColor, auraIcon, buffInfo) {
@@ -370,8 +324,6 @@ class Buff {
         // TODO: or maybe add some buffer between sections?
         this.ownBuff = ownBuff;
         this.activeList = list;
-        this.cooldownList = list;
-        this.readyList = list;
 
         // tracked auras
         this.active = null;
@@ -382,48 +334,6 @@ class Buff {
         this.readySortKeyBase = 1000;
         this.cooldownSortKeyBase = 2000;
     }
-
-    // addCooldown(source, effectSeconds) {
-    //     if (!this.info.cooldown)
-    //         return;
-    //     if (this.cooldown[source]) {
-    //         // Unexpected use of the same cooldown by the same name.
-    //         this.cooldown[source].removeCallback();
-    //     }
-    //
-    //     let cooldownKey = 'c:' + this.name + ':' + source;
-    //
-    //     let secondsUntilShow = this.info.cooldown - this.options.BigBuffShowCooldownSeconds;
-    //     secondsUntilShow = Math.min(Math.max(effectSeconds, secondsUntilShow), this.info.cooldown);
-    //     let showSeconds = this.info.cooldown - secondsUntilShow;
-    //     let addReadyCallback = () => {
-    //         this.addReady(source);
-    //     };
-    //
-    //     this.cooldown[source] = this.makeAura(cooldownKey, this.cooldownList, showSeconds,
-    //         secondsUntilShow, this.cooldownSortKeyBase, 'grey', '', 0.5, addReadyCallback);
-    // }
-
-    // addReady(source) {
-    //     if (this.ready[source]) {
-    //         // Unexpected use of the same cooldown by the same name.
-    //         this.ready[source].removeCallback();
-    //     }
-    //
-    //     // TODO: could consider looking at the party list to make initials unique?
-    //     let txt = '';
-    //     let initials = source.split(' ');
-    //     if (initials.length == 2)
-    //         txt = initials[0][0] + initials[1][0];
-    //     else
-    //         txt = initials[0].slice(0, 3);
-    //
-    //     let color = this.info.borderColor;
-    //
-    //     let readyKey = 'r:' + this.name + ':' + source;
-    //     this.ready[source] = this.makeAura(readyKey, this.readyList, -1, 0,
-    //         this.readySortKeyBase, color, txt, 0.6);
-    // }
 
     // 计算buff, 展示剩余多少时间刷buff是值得
     buffsCalculation(list) {
@@ -1064,12 +974,12 @@ class BuffTracker {
             // 26|2020-09-20T22:04:20.0830000+08:00|511|鼓励|20.00|1039A1D9|水貂桑|4002759B|陆行鸟|01|76590|52289||63e1491deabf976eaa7e16edbb05e3e8
             // 30|2020-09-20T22:04:24.0480000+08:00|511|鼓励|0.00|1039A1D9|水貂桑|4002759B|陆行鸟|01|76590|52289||91727e97f2e91e3b4823830ea6a35adb
             // 30|2020-09-20T22:04:24.0480000+08:00|511|鼓励|0.00|1039A1D9|水貂桑|4002759B|陆行鸟|01|76590|52289||91727e97f2e91e3b4823830ea6a35adb
-            embolden: { // 鼓励
+            emboldenFor: { // 鼓励(从赤魔得到) 511
                 // Embolden is special and has some extra text at the end, depending on embolden stage:
                 // Potato Chippy gains the effect of Embolden from Tater Tot for 20.00 Seconds. (5)
                 // Instead, use somebody using the effect on you:
                 //   16:106C22EF:Tater Tot:1D60:Embolden:106C22EF:Potato Chippy:500020F:4D7: etc etc
-                gainAbility: EffectId.Embolden,
+                gainEffect: EffectId.Embolden,
                 loseEffect: EffectId.Embolden,
                 gainRegex: Regexes.abilityFull({id: EffectId.Embolden, target: this.playerName}),
                 durationSeconds: 20,
@@ -1296,15 +1206,12 @@ class BuffTracker {
         this.loseEffectMap = {};
         this.mobGainsOwnEffectMap = {};
         this.mobLosesOwnEffectMap = {};
-        this.gainAbilityMap = {};
 
         let propToMapMap = {
             gainEffect: this.gainEffectMap,
             loseEffect: this.loseEffectMap,
             mobGainsOwnEffect: this.mobGainsOwnEffectMap,
             mobLosesOwnEffect: this.mobLosesOwnEffectMap,
-
-            gainAbility: this.gainAbilityMap,
         };
 
         for (let i = 0; i < keys.length; ++i) {
@@ -1354,19 +1261,19 @@ class BuffTracker {
         }
     }
 
-    onUseAbility(id, matches) {
-        let buffs = this.gainAbilityMap[id];
-        if (!buffs)
-            return;
-
-        for (let b of buffs) {
-            // if (b.gainRegex && !log.match(b.gainRegex))
-            //     continue;
-
-            let seconds = parseFloat(matches.duration);
-            this.onBigBuff('', b.name, seconds, b, matches.source, false);
-        }
-    }
+    // onUseAbility(id, matches) {
+    //     let buffs = this.gainAbilityMap[id];
+    //     if (!buffs)
+    //         return;
+    //
+    //     for (let b of buffs) {
+    //         // if (b.gainRegex && !log.match(b.gainRegex))
+    //         //     continue;
+    //
+    //         let seconds = parseFloat(matches.duration);
+    //         this.onBigBuff('', b.name, seconds, b, matches.source, false);
+    //     }
+    // }
 
     // 对自己的BUFF、小队对敌人的BUFF
     onGainEffect(buffs, matches) {
@@ -1406,13 +1313,11 @@ class BuffTracker {
     }
 
 
-    onLoseOwnEffect(buffs, log) {
+    onLoseOwnEffect(buffs, matches) {
         if (!buffs)
             return;
-        for (let b of buffs) {
-            let target = loseTargetFromLog(log);
-            this.onLoseBigBuff(target, b.name, b);
-        }
+        for (let b of buffs)
+            this.onLoseBigBuff(matches.targetId, b.name, b);
     }
 
     onYouGainEffect(name, matches) {
@@ -1440,7 +1345,7 @@ class BuffTracker {
             list = this.leftBuffDiv;
 
         if (info.increasesJob != null) { // 根据远近判断
-            if (isMeleeJob(this.job)) {
+            if (meleeJobs.includes(this.job)) {
                 info.incrPhysical = info.increasesJob.melee; // 物理增伤
                 info.incrMagic = info.increasesJob.melee; // 魔法增伤
             } else {
@@ -1874,18 +1779,18 @@ class Brds {
             }
 
         } else if (type === '21' || type === '22') {
-            let m = log.match(kYouUseAbilityRegex);
-            if (m) {
-                let id = m.groups.id;
-                let f = this.abilityFuncMap[id];
-                if (f)
-                    f(id, m.groups);
-                this.buffTracker.onUseAbility(id, m.groups);
-            } else {
-                // let m = log.match(kAnybodyAbilityRegex);
-                // if (m)
-                //     this.buffTracker.onUseAbility(m.groups.id, m.groups);
-            }
+            // let m = log.match(kYouUseAbilityRegex);
+            // if (m) {
+            //     let id = m.groups.id;
+            //     let f = this.abilityFuncMap[id];
+            //     if (f)
+            //         f(id, m.groups);
+            //     this.buffTracker.onUseAbility(id, m.groups);
+            // } else {
+            // let m = log.match(kAnybodyAbilityRegex);
+            // if (m)
+            //     this.buffTracker.onUseAbility(m.groups.id, m.groups);
+            // }
         }
     }
 
