@@ -11,8 +11,18 @@ const kPullText = {
 
 const OwnEffectId = {
     // 诗人
-    'Stormbite': '4B1',
-    'CausticBite': '4B0',
+    'Stormbite': '4B1', // 风
+    'CausticBite': '4B0', // 毒
+
+    // 骑士
+    'Requiescat': '558', // 安魂祈祷
+
+    // 白膜
+    'Dia': '74F', // 天辉
+
+    // 学者
+    'Biolysis': '767', // 蛊毒法
+    'ChainStratagem': '4C5' // 连环计
 }
 
 const kAbility = {
@@ -129,12 +139,16 @@ let meleeJobs = ['PLD', 'WAR', 'DRK', 'GNB', 'MNK', 'DRG', 'NIN', 'SAM'];
 // Regexes to be filled out once we know the player's name.
 let kYouGainEffectRegex = null;
 let kYouLoseEffectRegex = null;
+let kMobGainsOwnEffectRegex = null; // 自己给boss上的buff
+let kMobLosesOwnEffectRegex = null; // 自己在boss身上丢失的buff
+let kMobGainsPartyEffectRegex = null; // 小队给目标身上增加的buff
+let kMobLosesPartyEffectRegex = null; // 小队在目标身上丢失的buff
+
 let kYouUseAbilityRegex = null;
 let kAnybodyAbilityRegex = null;
 let kMobGainsEffectRegex = null;
 let kMobLosesEffectRegex = null;
-let kMobGainsOwnEffectRegex = null; // 自己给boss上的buff
-let kMobLosesOwnEffectRegex = null; // 自己在boss身上丢失的buff
+
 
 let kStatsRegex = Regexes.statChange();
 
@@ -172,15 +186,32 @@ function getQueryVariable(variable) {
     return (false);
 }
 
-function setupRegexes(playerName) {
-    kYouGainEffectRegex = NetRegexes.gainsEffect({target: playerName});
-    kYouLoseEffectRegex = NetRegexes.losesEffect({target: playerName});
+function setupRegexes(playerId, playerName, partyTracker) {
+    // 对自己增加的buff
+    kYouGainEffectRegex = NetRegexes.gainsEffect({targetId: playerId});
+    kYouLoseEffectRegex = NetRegexes.losesEffect({targetId: playerId});
+    // 自己对目标(敌人/宠物)释放的buff/DOT
+    kMobGainsOwnEffectRegex = NetRegexes.gainsEffect({targetId: '4.{7}', sourceId: playerId});
+    kMobLosesOwnEffectRegex = NetRegexes.losesEffect({targetId: '4.{7}', sourceId: playerId});
+    // 小队对目标(敌人/宠物)释放的Buff/DOT
+    let partyIds = [];
+    for (let id of partyTracker.partyIds) {
+        if (id !== playerId) {
+            partyIds.push(id);
+        }
+    }
+    let partyIdsStr = partyIds.join("|");
+    console.log(playerId, playerName, partyTracker);
+    kMobGainsPartyEffectRegex = NetRegexes.gainsEffect({targetId: '4.{7}', sourceId: '(' + partyIdsStr + ')'});
+    kMobLosesPartyEffectRegex = NetRegexes.losesEffect({targetId: '4.{7}', sourceId: '(' + partyIdsStr + ')'});
+
+    // 自己释放的能力
     kYouUseAbilityRegex = NetRegexes.ability({source: playerName});
-    kAnybodyAbilityRegex = NetRegexes.ability();
-    kMobGainsEffectRegex = NetRegexes.gainsEffect({targetId: '4.{7}'});
-    kMobLosesEffectRegex = NetRegexes.losesEffect({targetId: '4.{7}'});
-    kMobGainsOwnEffectRegex = NetRegexes.gainsEffect({targetId: '4.{7}', source: playerName})
-    kMobLosesOwnEffectRegex = NetRegexes.losesEffect({targetId: '4.{7}', source: playerName})
+    // 任何人释放的能力
+    // kAnybodyAbilityRegex = NetRegexes.ability();
+    // 对目标释放的技能
+    // kMobGainsEffectRegex = NetRegexes.gainsEffect({targetId: '4.{7}'});
+    // kMobLosesEffectRegex = NetRegexes.losesEffect({targetId: '4.{7}'});
 }
 
 function computeBackgroundColorFrom(element, classList) {
@@ -729,10 +760,10 @@ class BuffTracker {
                 incrPhysical: 8, // 物理增伤
                 incrMagic: 8, // 魔法增伤
             },
+            // 诗人
             raging: { // 猛者 26|2020-09-20T03:48:12.5040000+08:00|7d|猛者强击|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|00|111340|111340||7f5d92a566794a793b65f97686f3699f
                 gainEffect: EffectId.RagingStrikes,
                 loseEffect: EffectId.RagingStrikes,
-                durationSeconds: 20,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/000000/000352.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/2/2a/000352.png',
@@ -785,8 +816,8 @@ class BuffTracker {
             },
             // 26|2020-09-20T03:31:40.6740000+08:00|558|安魂祈祷|12.00|1039A1D9|水貂桑|1039A1D9|水貂桑|FF9C|114648|114648||35703e9553d4bf19abcbcd58e0da5257
             requiescat: { // [22:45:16.801] 1A:1039A1D9:xxx gains the effect of 安魂祈祷 from xxx for 12.00 Seconds.
-                gainEffect: gLang.kEffect.Requiescat,
-                loseEffect: gLang.kEffect.Requiescat,
+                gainEffect: OwnEffectId.Requiescat,
+                loseEffect: OwnEffectId.Requiescat,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/002000/002513.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/d/d5/002513.png',
@@ -810,17 +841,17 @@ class BuffTracker {
                 sortKey: 1,
                 buffType: 'physical', // physical
             },
-            circleOfScorn: { // [22:39:30.463] 1A:400001B9:木人 gains the effect of 厄运流转 from xxx for 15.00 Seconds.
-                mobGainsOwnEffect: EffectId.CircleOfScorn,
-                mobLosesOwnEffect: EffectId.CircleOfScorn,
-                useEffectDuration: true,
-                // icon: 'https://xivapi.com/i/000000/000161.png',
-                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/b/b9/000161.png',
-                icon: '../resources/img/000161.png',
-                borderColor: '#e77d70',
-                sortKey: 1,
-                buffType: 'physical', // physical
-            },
+            // circleOfScorn: { // [22:39:30.463] 1A:400001B9:木人 gains the effect of 厄运流转 from xxx for 15.00 Seconds.
+            //     mobGainsOwnEffect: EffectId.CircleOfScorn,
+            //     mobLosesOwnEffect: EffectId.CircleOfScorn,
+            //     useEffectDuration: true,
+            //     // icon: 'https://xivapi.com/i/000000/000161.png',
+            //     // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/b/b9/000161.png',
+            //     icon: '../resources/img/000161.png',
+            //     borderColor: '#e77d70',
+            //     sortKey: 1,
+            //     buffType: 'physical', // physical
+            // },
             // 枪刃
             noMercy: { // [22:54:08.026] 1A:1039A1D9:xxx gains the effect of 无情 from xxx for 20.00 Seconds.
                 gainEffect: EffectId.NoMercy,
@@ -837,32 +868,32 @@ class BuffTracker {
                 incrMagic: 20, // 魔法增伤
                 // tts: '无情',
             },
-            sonicBreak: { //[22:54:09.441] 1A:400001B8:木人 gains the effect of 音速破 from xxx for 30.00 Seconds.
-                mobGainsOwnEffect: EffectId.SonicBreak,
-                mobLosesOwnEffect: EffectId.SonicBreak,
-                useEffectDuration: true,
-                // icon: 'https://xivapi.com/i/003000/003417.png',
-                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/1/16/003417.png',
-                icon: '../resources/img/003417.png',
-                borderColor: '#755cbb',
-                sortKey: 1,
-                buffType: 'physical', // physical
-            },
-            bowShock: { //[22:54:10.770] 1A:400001B8:木人 gains the effect of 弓形冲波 from xxx for 15.00 Seconds.
-                mobGainsOwnEffect: EffectId.BowShock,
-                mobLosesOwnEffect: EffectId.BowShock,
-                useEffectDuration: true,
-                // icon: 'https://xivapi.com/i/003000/003423.png',
-                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/b/b5/003423.png',
-                icon: '../resources/img/003423.png',
-                borderColor: '#d5d557',
-                sortKey: 1,
-                buffType: 'physical', // physical
-            },
+            // sonicBreak: { //[22:54:09.441] 1A:400001B8:木人 gains the effect of 音速破 from xxx for 30.00 Seconds.
+            //     mobGainsOwnEffect: EffectId.SonicBreak,
+            //     mobLosesOwnEffect: EffectId.SonicBreak,
+            //     useEffectDuration: true,
+            //     // icon: 'https://xivapi.com/i/003000/003417.png',
+            //     // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/1/16/003417.png',
+            //     icon: '../resources/img/003417.png',
+            //     borderColor: '#755cbb',
+            //     sortKey: 1,
+            //     buffType: 'physical', // physical
+            // },
+            // bowShock: { //[22:54:10.770] 1A:400001B8:木人 gains the effect of 弓形冲波 from xxx for 15.00 Seconds.
+            //     mobGainsOwnEffect: EffectId.BowShock,
+            //     mobLosesOwnEffect: EffectId.BowShock,
+            //     useEffectDuration: true,
+            //     // icon: 'https://xivapi.com/i/003000/003423.png',
+            //     // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/b/b5/003423.png',
+            //     icon: '../resources/img/003423.png',
+            //     borderColor: '#d5d557',
+            //     sortKey: 1,
+            //     buffType: 'physical', // physical
+            // },
             // 白魔
-            dia: { //[23:07:47.882] 1A:400001B8:木人 gains the effect of 天辉 from xxx for 30.00 Seconds.
-                mobGainsOwnEffect: gLang.kEffect.Dia,
-                mobLosesOwnEffect: gLang.kEffect.Dia,
+            dia: { // 26|2020-09-20T17:04:10.5120000+08:00|74f|天辉|30.00|1039A1D9|水貂桑|4000031F|木人|00|7400000|48422||507ae34e5244f9018a0e5fa444c62d7c
+                mobGainsOwnEffect: OwnEffectId.Dia,
+                mobLosesOwnEffect: OwnEffectId.Dia,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/002000/002641.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/b/ba/002641.png',
@@ -872,8 +903,10 @@ class BuffTracker {
                 buffType: 'magic', // physical
             },
             // 学者
+            // 26|2020-09-20T17:11:46.0110000+08:00|4c5|连环计|15.00|1039A1D9|水貂桑|4000031F|木人|00|7400000|46919||cef9177cfc401552bc4e8155d546096e
+            // 21|2020-09-20T17:11:45.2110000+08:00|1039A1D9|水貂桑|1D0C|连环计|4000031F|木人|F60E|4C50000|0|0|0|0|0|0|0|0|0|0|0|0|0|0|7400000|7400000|0|10000|0|1000|-603.1267|-762.9036|25.02|2.283125|46919|46919|9819|10000|0|1000|-598.9421|-772.7528|25.02|-0.4017591|0000335B|131b13cb7c37d87af35d4b9ca6a2f444
             chain: { // 连环计
-                gainAbility: gLang.kAbility.ChainStratagem,
+                gainAbility: kAbility.ChainStratagem,
                 durationSeconds: 15,
                 // icon: 'cactbot/resources/icon/status/chain-stratagem.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/f/fd/002815.png',
@@ -886,9 +919,9 @@ class BuffTracker {
                 incrMagic: 5, // 魔法增伤
                 tts: '连环计',
             },
-            biolysis: { //[23:15:37.240] 1A:400001B8:木人 gains the effect of 蛊毒法 from xxx for 30.00 Seconds.
-                mobGainsOwnEffect: gLang.kEffect.Biolysis,
-                mobLosesOwnEffect: gLang.kEffect.Biolysis,
+            biolysis: { //26|2020-09-20T17:11:43.3880000+08:00|767|蛊毒法|30.00|1039A1D9|水貂桑|4000031F|木人|00|7400000|46919||161fecdddc980c9bfeca7224ccbf98ae
+                mobGainsOwnEffect: OwnEffectId.Biolysis,
+                mobLosesOwnEffect: OwnEffectId.Biolysis,
                 useEffectDuration: true,
                 // icon: 'https://xivapi.com/i/002000/002820.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/7/78/002820.png',
@@ -1330,20 +1363,17 @@ class BuffTracker {
         let keys = Object.keys(this.buffInfo);
         this.gainEffectMap = {};
         this.loseEffectMap = {};
-        this.gainAbilityMap = {};
-        this.mobGainsEffectMap = {};
-        this.mobLosesEffectMap = {};
         this.mobGainsOwnEffectMap = {};
         this.mobLosesOwnEffectMap = {};
+        this.gainAbilityMap = {};
 
         let propToMapMap = {
             gainEffect: this.gainEffectMap,
             loseEffect: this.loseEffectMap,
-            gainAbility: this.gainAbilityMap,
-            mobGainsEffect: this.mobGainsEffectMap,
-            mobLosesEffect: this.mobLosesEffectMap,
             mobGainsOwnEffect: this.mobGainsOwnEffectMap,
             mobLosesOwnEffect: this.mobLosesOwnEffectMap,
+
+            gainAbility: this.gainAbilityMap,
         };
 
         for (let i = 0; i < keys.length; ++i) {
@@ -1407,6 +1437,7 @@ class BuffTracker {
         }
     }
 
+    // 对自己的BUFF、小队对敌人的BUFF
     onGainEffect(buffs, matches) {
         if (!buffs)
             return;
@@ -1417,15 +1448,13 @@ class BuffTracker {
             else if ('durationSeconds' in b)
                 seconds = b.durationSeconds;
 
-            this.onBigBuff('', b.name, seconds, b, matches.source, false);
+            this.onBigBuff(matches.targetId, b.name, seconds, b, matches.source, false);
         }
     }
 
     onGainOwnEffect(buffs, matches) {
         if (!buffs)
             return;
-
-        console.log(buffs, matches);
 
         for (let b of buffs) {
             let seconds = -1;
@@ -1460,14 +1489,6 @@ class BuffTracker {
 
     onYouLoseEffect(name, matches) {
         this.onLoseEffect(this.loseEffectMap[name], matches);
-    }
-
-    onMobGainsEffect(name, matches) {
-        this.onGainEffect(this.mobGainsEffectMap[name], matches);
-    }
-
-    onMobLosesEffect(name, matches) {
-        this.onLoseEffect(this.mobLosesEffectMap[name], matches);
     }
 
     onMobGainsOwnEffect(name, matches) {
@@ -1536,6 +1557,7 @@ class Brds {
     constructor(options) {
         this.options = options;
         this.init = false;
+        this.meId = '';
         this.me = null;
         this.job = '';
         this.o = {};
@@ -1545,9 +1567,15 @@ class Brds {
         this.abilityFuncMap = {};
         this.partyTracker = new PartyTracker();
         addOverlayListener('PartyChanged', (e) => {
+            e = {
+                party: [
+                    {id: "103E4CCF", inParty: true, job: 28, level: 0, name: "伊黛亚·李", worldId: 1178},
+                    {id: "1039A1D9", inParty: true, job: 28, level: 0, name: "水貂桑", worldId: 1178},
+                ],
+                type: 'PartyChanged'
+            }
             this.partyTracker.onPartyChanged(e);
-            console.log(e)
-            console.log(this.partyTracker)
+            console.log(e);
         });
 
         this.initConfig();
@@ -1826,7 +1854,7 @@ class Brds {
         if (this.me !== e.detail.name) {
             this.me = e.detail.name;
             // setup regexes prior to the combo tracker
-            setupRegexes(this.me);
+            setupRegexes(e.detail.id.toString(16).toUpperCase(), this.me, this.partyTracker);
         }
 
         if (!this.init) {
@@ -1853,9 +1881,11 @@ class Brds {
         const line = e.line;
         const log = e.rawLine;
 
-        console.log(e);
 
         const type = line[0];
+        if (type === '26' || type === '30' || type === '21' || type === '22') {
+            console.log(e);
+        }
         if (type === '26') {
             // 其他人给自己上的buff
             let m = log.match(kYouGainEffectRegex);
@@ -1864,7 +1894,7 @@ class Brds {
                 let f = this.gainEffectFuncMap[effectId];
                 if (f)
                     f(name, m.groups);
-                this.buffTracker.onYouGainEffect(effectId, m.groups); // 技能
+                this.buffTracker.onYouGainEffect(effectId, m.groups);
             }
 
             // 自己给其他人上的buff
@@ -1874,11 +1904,17 @@ class Brds {
                 this.buffTracker.onMobGainsOwnEffect(effectId, m.groups);
             }
 
-            m = log.match(kMobGainsEffectRegex);
+            m = log.match(kMobGainsPartyEffectRegex);
             if (m) {
                 const effectId = m.groups.effectId.toUpperCase();
-                this.buffTracker.onMobGainsEffect(effectId, m.groups);
+                this.buffTracker.onYouGainEffect(effectId, m.groups);
             }
+
+            // m = log.match(kMobGainsEffectRegex);
+            // if (m) {
+            //     const effectId = m.groups.effectId.toUpperCase();
+            //     this.buffTracker.onMobGainsEffect(effectId, m.groups);
+            // }
 
         } else if (type === '30') {
             let m = log.match(kYouLoseEffectRegex);
@@ -1889,13 +1925,22 @@ class Brds {
                     f(name, m.groups);
                 this.buffTracker.onYouLoseEffect(effectId, m.groups);
             }
-            m = log.match(kMobLosesEffectRegex);
+
+            // 自己给其他人上的buff
+            m = log.match(kMobLosesOwnEffectRegex);
             if (m) {
                 const effectId = m.groups.effectId.toUpperCase();
-                this.buffTracker.onMobLosesEffect(effectId, m.groups);
+                this.buffTracker.onMobLosesOwnEffect(effectId, log);
             }
+
+            // m = log.match(kMobLosesEffectRegex);
+            // if (m) {
+            //     const effectId = m.groups.effectId.toUpperCase();
+            //     this.buffTracker.onMobLosesEffect(effectId, m.groups);
+            // }
         } else if (type === '21' || type === '22') {
             let m = log.match(kYouUseAbilityRegex);
+            console.log(m);
             if (m) {
                 let id = m.groups.id;
                 let f = this.abilityFuncMap[id];
@@ -1903,9 +1948,9 @@ class Brds {
                     f(id, m.groups);
                 this.buffTracker.onUseAbility(id, m.groups);
             } else {
-                let m = log.match(kAnybodyAbilityRegex);
-                if (m)
-                    this.buffTracker.onUseAbility(m.groups.id, m.groups);
+                // let m = log.match(kAnybodyAbilityRegex);
+                // if (m)
+                //     this.buffTracker.onUseAbility(m.groups.id, m.groups);
             }
         }
     }
@@ -1923,28 +1968,11 @@ class Brds {
                     this.Test();
                     continue;
                 }
-                if (log[16] == 'C') {
-                    let stats = log.match(kStatsRegex).groups;
-                    this.skillSpeed = stats.skillSpeed;
-                    this.spellSpeed = stats.spellSpeed;
-                    continue;
-                }
             } else if (log[15] == '1') {
                 if (log[16] == 'A') {
-                    let m = log.match(kYouGainEffectRegex);
-                    if (m) {
-                        let name = m.groups.effect;
-                        let f = this.gainEffectFuncMap[name];
-                        if (f)
-                            f(name, log);
-                        this.buffTracker.onYouGainEffect(name, log);
-                    }
-                    m = log.match(kMobGainsEffectRegex);
-                    if (m)
-                        this.buffTracker.onMobGainsEffect(m.groups.effect, log);
 
                     //鼓励匹配
-                    m = log.match(Regexes.parse('] 1A:\\y{ObjectId}:' + this.me + ' gains the effect of 鼓励 from (\\y{Name}) for \\y{Float} Seconds. \\(([0-9]+)\\)'));
+                    let m = log.match(Regexes.parse('] 1A:\\y{ObjectId}:' + this.me + ' gains the effect of 鼓励 from (\\y{Name}) for \\y{Float} Seconds. \\(([0-9]+)\\)'));
                     if (m) {
                         let isMe = false;
                         if (this.me == m[1]) {
@@ -1954,43 +1982,10 @@ class Brds {
                         changeEmbolden(isMe, m[2], this.o.rightBuffsList)
                         buffsCalculation(this.job, this.options, this.o.rightBuffsList)
                     }
-
-                    m = log.match(kMobGainsOwnEffectRegex);
-                    if (m)
-                        this.buffTracker.onMobGainsOwnEffect(m.groups.effect, log);
-
-                } else if (log[16] == 'E') {
-                    let m = log.match(kYouLoseEffectRegex);
-                    if (m) {
-                        let name = m.groups.effect;
-                        let f = this.loseEffectFuncMap[name];
-                        if (f)
-                            f(name, log);
-                        this.buffTracker.onYouLoseEffect(name, log);
-                    }
-                    m = log.match(kMobLosesEffectRegex);
-                    if (m)
-                        this.buffTracker.onMobLosesEffect(m.groups.effect, log);
-
-                    m = log.match(kMobLosesOwnEffectRegex);
-                    if (m)
-                        this.buffTracker.onMobLosesOwnEffect(m.groups.effect, log);
                 }
                 // TODO: consider flags for missing.
                 // flags:damage is 1:0 in most misses.
                 if (log[16] == '5' || log[16] == '6') {
-                    let m = log.match(kYouUseAbilityRegex);
-                    if (m) {
-                        let id = m.groups.id;
-                        let f = this.abilityFuncMap[id];
-                        if (f)
-                            f(id);
-                        this.buffTracker.onUseAbility(id, log);
-                    } else {
-                        let m = log.match(kAnybodyAbilityRegex);
-                        if (m)
-                            this.buffTracker.onUseAbility(m.groups.id, log);
-                    }
                     // use of GP Potion
                     let cordialRegex = Regexes.ability({source: this.me, id: '20(017FD|F5A3D|F844F|0420F|0317D)'});
                     if (log.match(cordialRegex)) {
@@ -2005,9 +2000,36 @@ class Brds {
     }
 
     Test() {
-        // let rawline = '26|2020-09-20T02:40:53.5290000+08:00|7d|猛者强击|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|00|111340|111340||8f03e4245a6f867a176cbe211bd1c6c5';
-        let rawline = '21|2020-09-20T03:37:42.3430000+08:00|1039A1D9|水貂桑|65|猛者强击|1039A1D9|水貂桑|A0E|7D0000|0|0|0|0|0|0|0|0|0|0|0|0|0|0|111340|111340|10000|10000|0|1000|0.2368444|6.108487|0.323041|-3.141593|111340|111340|10000|10000|0|1000|0.2368444|6.108487|0.323041|-3.141593|0000161D|903b34e08109851472bb92d5a3cc5af2';
-        this.OnNetLog({line: rawline.split('|'), rawLine: rawline})
+        /*
+        setTimeout(() => {
+            let line = '26|2020-09-20T03:24:38.9810000+08:00|31|强化药|30.00|1039A1D9|水貂桑|1039A1D9|水貂桑|28D6|111340|111340||63c01dd83f9942aec827298ddef1519b';
+            this.OnNetLog({line: line.split('|'), rawLine: line})
+        }, 1);
+
+        // 诗人
+        setTimeout(() => {
+            let line = '26|2020-09-20T02:40:53.5290000+08:00|7d|猛者强击|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|00|111340|111340||8f03e4245a6f867a176cbe211bd1c6c5';
+            this.OnNetLog({line: line.split('|'), rawLine: line})
+        }, 100);
+        setTimeout(() => {
+            let line = '26|2020-09-20T03:20:11.1660000+08:00|4b1|狂风蚀箭|30.00|1039A1D9|水貂桑|4000031F|木人|28|7400000|111340||dbf0314ef7fed2a2b2285e2a3b17d02f';
+            this.OnNetLog({line: line.split('|'), rawLine: line})
+        }, 1000);
+        setTimeout(() => {
+            let line = '26|2020-09-20T03:20:13.6610000+08:00|4b0|烈毒咬箭|30.00|1039A1D9|水貂桑|4000031F|木人|28|7400000|111340||2bb99918d00070ccc76dac9d8de81e98';
+            this.OnNetLog({line: line.split('|'), rawLine: line})
+        }, 2000);
+        */
+        // 学者
+        setTimeout(() => {
+            let line = '26|2020-09-20T18:34:48.5250000+08:00|4c5|连环计|15.00|103E4CCF|伊黛亚·李|40017047|梦寐的刹帝利|00|176868|93263||ea00b0bcf5bad3afc108c29be0233c9f';
+            this.OnNetLog({line: line.split('|'), rawLine: line})
+        }, 3000);
+        setTimeout(() => {
+            let line = '30|2020-09-20T17:46:59.8170000+08:00|4c5|连环计|0.00|103E4CCF|伊黛亚·李|4000031F|木人|00|7400000|97064||d701742e13324007985444a7be589683';
+            this.OnNetLog({line: line.split('|'), rawLine: line})
+        }, 5000);
+
         return;
         // this.TestChangeJob();
 
@@ -2179,9 +2201,9 @@ UserConfig.getUserConfigLocation('buff', function () {
     addOverlayListener('ChangeZone', function (e) {
         gBrds.OnChangeZone(e);
     });
-    addOverlayListener('onLogEvent', function (e) {
-        gBrds.OnLogEvent(e);
-    });
+    // addOverlayListener('onLogEvent', function (e) {
+    //     gBrds.OnLogEvent(e);
+    // });
     addOverlayListener('LogLine', (e) => {
         gBrds.OnNetLog(e);
     });
@@ -2189,3 +2211,4 @@ UserConfig.getUserConfigLocation('buff', function () {
     gBrds = new Brds(Options);
 });
 
+// 26|2020-09-20T19:07:04.7520000+08:00|84c|以太复制：防护|9999.00|101ABEBF|年迈的蓝胖|101ABEBF|年迈的蓝胖|00|18607|18607||ed5a3a570030f7eb77a06ddaee47ce43
