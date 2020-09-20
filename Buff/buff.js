@@ -78,7 +78,7 @@ function getQueryVariable(variable) {
 }
 
 // 设置正则匹配
-function setupRegexes(playerId, playerName, partyTracker) {
+function setupRegexes(playerId, partyTracker) {
     // 对自己增加的buff
     kYouGainEffectRegex = NetRegexes.gainsEffect({targetId: playerId});
     kYouLoseEffectRegex = NetRegexes.losesEffect({targetId: playerId});
@@ -564,9 +564,9 @@ class Buff {
 }
 
 class BuffTracker {
-    constructor(options, playerName, job, leftBuffDiv, rightBuffDiv, ownBuffDiv) {
+    constructor(options, playerId, job, leftBuffDiv, rightBuffDiv, ownBuffDiv) {
         this.options = options;
-        this.playerName = playerName;
+        this.playerId = playerId;
         this.job = job;
         this.ownBuffDiv = ownBuffDiv;
         this.leftBuffDiv = leftBuffDiv;
@@ -587,22 +587,6 @@ class BuffTracker {
                 incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
                 incrPhysical: 8, // 物理增伤
                 incrMagic: 8, // 魔法增伤
-            },
-            // 诗人
-            raging: { // 猛者 26|2020-09-20T03:48:12.5040000+08:00|7d|猛者强击|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|00|111340|111340||7f5d92a566794a793b65f97686f3699f
-                gainEffect: EffectId.RagingStrikes,
-                loseEffect: EffectId.RagingStrikes,
-                useEffectDuration: true,
-                // icon: 'https://xivapi.com/i/000000/000352.png',
-                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/2/2a/000352.png',
-                icon: '../resources/img/000352.png',
-                borderColor: '#db6509',
-                sortKey: 1,
-                cooldown: 80,
-                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 10, // 物理增伤
-                incrMagic: 10, // 魔法增伤
-                tts: '猛者',
             },
             //骑士   26|2020-09-20T03:16:28.1830000+08:00|4c|战逃反应|25.00|1039A1D9|水貂桑|1039A1D9|水貂桑|00|114648|114648||944a97734ac0fe2928b2e92739402f83
             fightOrFlight: { // [22:22:27.085] 1A:1039A1D9:xxx gains the effect of 战逃反应 from xxx for 25.00 Seconds.
@@ -895,7 +879,6 @@ class BuffTracker {
                 incrMagic: 5, // 魔法增伤
                 tts: '背刺',
             },
-
             // 舞娘
             devilment: { // 进攻之探戈
                 gainEffect: EffectId.Devilment,
@@ -928,6 +911,24 @@ class BuffTracker {
                 incrMagic: 5, // 魔法增伤
                 increases: 5,
                 tts: '技巧',
+            },
+            // 诗人
+            raging: { // 猛者 26|2020-09-20T03:48:12.5040000+08:00|7d|猛者强击|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|00|111340|111340||7f5d92a566794a793b65f97686f3699f
+                gainEffect: EffectId.RagingStrikes,
+                loseEffect: EffectId.RagingStrikes,
+                // gainNetRegex: Regexes.abilityFull({id: EffectId.Embolden, target: this.playerId}),
+                gainNetRegex: NetRegexes.gainsEffect(),
+                useEffectDuration: true,
+                // icon: 'https://xivapi.com/i/000000/000352.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/2/2a/000352.png',
+                icon: '../resources/img/000352.png',
+                borderColor: '#db6509',
+                sortKey: 1,
+                cooldown: 80,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 10, // 物理增伤
+                incrMagic: 10, // 魔法增伤
+                tts: '猛者',
             },
             battlevoice: { // 战斗之声
                 gainEffect: EffectId.BattleVoice,
@@ -981,7 +982,7 @@ class BuffTracker {
                 //   16:106C22EF:Tater Tot:1D60:Embolden:106C22EF:Potato Chippy:500020F:4D7: etc etc
                 gainEffect: EffectId.Embolden,
                 loseEffect: EffectId.Embolden,
-                gainRegex: Regexes.abilityFull({id: EffectId.Embolden, target: this.playerName}),
+                gainRegex: Regexes.abilityFull({id: EffectId.Embolden, targetId: this.playerId}),
                 durationSeconds: 20,
                 // icon: 'cactbot/resources/icon/status/embolden.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/2/2c/003218.png',
@@ -1690,10 +1691,12 @@ class Brds {
 
     // 切换职业
     OnPlayerChanged(e) {
+        let meId = '';
         if (this.me !== e.detail.name) {
             this.me = e.detail.name;
+            meId = e.detail.id.toString(16).toUpperCase();
             // setup regexes prior to the combo tracker
-            setupRegexes(e.detail.id.toString(16).toUpperCase(), this.me, this.partyTracker);
+            setupRegexes(meId, this.partyTracker);
         }
 
         if (!this.init) {
@@ -1709,7 +1712,7 @@ class Brds {
         if (updateJob) {
             this.UpdateJob();
             // Set up the buff tracker after the job bars are created.
-            this.buffTracker = new BuffTracker(this.options, this.me, this.job, this.o.leftBuffsList, this.o.rightBuffsList, this.o.StatDotList);
+            this.buffTracker = new BuffTracker(this.options, meId, this.job, this.o.leftBuffsList, this.o.rightBuffsList, this.o.StatDotList);
         }
     }
 
