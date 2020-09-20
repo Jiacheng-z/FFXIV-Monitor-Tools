@@ -50,6 +50,8 @@ const OwnEffectId = {
     // 召唤
     'BioIII': '4BE', // 剧毒菌
     'MiasmaIII': '4BF', // 瘴暍
+    // 赤魔
+    'EmboldenIsMe': '4D7', // 鼓励 自己给自己
 }
 
 
@@ -212,22 +214,21 @@ function makeOwnAuraTimerIcon(name, seconds, opacity, iconWidth, iconHeight, ico
     return div;
 }
 
-function changeEmbolden(isMe, num, list) {
-    let listDim = {5: 10, 4: 8, 3: 6, 2: 4, 1: 2};
-    let tgs = list.rootElement.getElementsByClassName('buffs');
+// 寻找Count类型的BUFF
+function findCountBuff(domList, tname) {
+    let tgs = domList.rootElement.getElementsByClassName('buffs');
     for (let i = 0; i < tgs.length; i++) {
         let bname = tgs[i].getAttribute('buffs-name')
-        if (bname === '=>embolden') {
-            if (isMe === true) {
-                tgs[i].setAttribute('buffs-incr-physical', 0) // 作用物理
-                tgs[i].setAttribute('buffs-incr-magic', listDim[num]) // 作用魔法
-            } else {
-                tgs[i].setAttribute('buffs-incr-physical', listDim[num]) // 作用物理
-                tgs[i].setAttribute('buffs-incr-magic', 0) // 作用魔法
-            }
-            break;
+        if (bname === tname) {
+            return tgs[i];
         }
     }
+    return null;
+}
+
+function updateCountBuff(dom, physical, magic) {
+    dom.setAttribute('buffs-incr-physical', physical) // 作用物理
+    dom.setAttribute('buffs-incr-magic', magic) // 作用魔法
 }
 
 // 计算buff, 展示剩余多少时间刷buff是值得
@@ -991,14 +992,10 @@ class BuffTracker {
             // 30|2020-09-20T22:04:24.0480000+08:00|511|鼓励|0.00|1039A1D9|水貂桑|4002759B|陆行鸟|01|76590|52289||91727e97f2e91e3b4823830ea6a35adb
             // 30|2020-09-20T22:04:24.0480000+08:00|511|鼓励|0.00|1039A1D9|水貂桑|4002759B|陆行鸟|01|76590|52289||91727e97f2e91e3b4823830ea6a35adb
             emboldenToMe: { // 鼓励(从赤魔得到) 511
-                // Embolden is special and has some extra text at the end, depending on embolden stage:
-                // Potato Chippy gains the effect of Embolden from Tater Tot for 20.00 Seconds. (5)
-                // Instead, use somebody using the effect on you:
-                //   16:106C22EF:Tater Tot:1D60:Embolden:106C22EF:Potato Chippy:500020F:4D7: etc etc
                 gainEffect: EffectId.Embolden,
                 loseEffect: EffectId.Embolden,
                 gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限其他人给自己
-                durationSeconds: 20,
+                useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/embolden.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/2/2c/003218.png',
                 icon: '../resources/img/003218.png',
@@ -1009,6 +1006,27 @@ class BuffTracker {
                 incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
                 incrPhysical: 0, // 物理增伤
                 incrMagic: 0, // 魔法增伤
+                incrPhysicalCount: {'05': 10, '04': 8, '03': 6, '02': 4, '01': 2}, // 物理增伤
+                incrMagicCount: {'05': 0, '04': 0, '03': 0, '02': 0, '01': 0}, // 魔法增伤
+                tts: '鼓励',
+            },
+            emboldenIsMe: { // 鼓励(自己给自己) 4d7
+                gainEffect: OwnEffectId.EmboldenIsMe,
+                loseEffect: OwnEffectId.EmboldenIsMe,
+                gainNetRegex: NetRegexes.gainsEffect({sourceId: this.playerId, targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限其他人给自己
+                useEffectDuration: true,
+                // icon: 'cactbot/resources/icon/status/embolden.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/2/2c/003218.png',
+                icon: '../resources/img/003218.png',
+                // Lime.
+                borderColor: '#bcbce3',
+                sortKey: 1,
+                cooldown: 120,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 0, // 物理增伤
+                incrMagic: 0, // 魔法增伤
+                incrPhysicalCount: {'05': 0, '04': 0, '03': 0, '02': 0, '01': 0}, // 物理增伤
+                incrMagicCount: {'05': 10, '04': 8, '03': 6, '02': 4, '01': 2}, // 魔法增伤
                 tts: '鼓励',
             },
 
@@ -1277,20 +1295,6 @@ class BuffTracker {
         }
     }
 
-    // onUseAbility(id, matches) {
-    //     let buffs = this.gainAbilityMap[id];
-    //     if (!buffs)
-    //         return;
-    //
-    //     for (let b of buffs) {
-    //         // if (b.gainRegex && !log.match(b.gainRegex))
-    //         //     continue;
-    //
-    //         let seconds = parseFloat(matches.duration);
-    //         this.onBigBuff('', b.name, seconds, b, matches.source, false);
-    //     }
-    // }
-
     // 对自己的BUFF、小队对敌人的BUFF
     onGainEffect(buffs, log, matches) {
         if (!buffs)
@@ -1305,7 +1309,25 @@ class BuffTracker {
             else if ('durationSeconds' in b)
                 seconds = b.durationSeconds;
 
-            this.onBigBuff(matches.targetId, b.name, seconds, b, matches.source, false);
+            console.log(b, matches)
+            if (matches.count !== '00' && b.incrPhysicalCount !== null) { // 存在物理Count形式buff
+                if (b.incrPhysicalCount[matches.count] !== null) {
+                    b.incrPhysical = b.incrPhysicalCount[matches.count];
+                }
+            }
+            if (matches.count !== '00' && b.incrMagicCount !== null) { // 存在魔法Count形式buff
+                if (b.incrMagicCount[matches.count] !== null) {
+                    b.incrMagic = b.incrMagicCount[matches.count];
+                }
+            }
+            let dom = findCountBuff(this.rightBuffDiv, matches.targetId + "=>" + b.gainEffect);
+            if (dom !== null) {  // 不是首次创建
+                updateCountBuff(dom, b.incrPhysical, b.incrMagic)
+                buffsCalculation(this.job, this.options, this.rightBuffDiv)
+                continue;
+            }
+
+            this.onBigBuff(matches.targetId, b.gainEffect, seconds, b, matches.source, false);
         }
     }
 
@@ -1313,7 +1335,7 @@ class BuffTracker {
         if (!buffs)
             return;
         for (let b of buffs)
-            this.onLoseBigBuff(matches.targetId, b.name, b);
+            this.onLoseBigBuff(matches.targetId, b.gainEffect, b);
     }
 
     onGainOwnEffect(buffs, matches) {
@@ -1327,7 +1349,7 @@ class BuffTracker {
             else if ('durationSeconds' in b)
                 seconds = b.durationSeconds;
 
-            this.onBigBuff(matches.targetId, b.name, seconds, b, matches.source, true);
+            this.onBigBuff(matches.targetId, b.gainEffect, seconds, b, matches.source, true);
         }
     }
 
@@ -1336,7 +1358,7 @@ class BuffTracker {
         if (!buffs)
             return;
         for (let b of buffs)
-            this.onLoseBigBuff(matches.targetId, b.name, b);
+            this.onLoseBigBuff(matches.targetId, b.gainEffect, b);
     }
 
     onYouGainEffect(name, log, matches) {
@@ -1355,7 +1377,7 @@ class BuffTracker {
         this.onLoseOwnEffect(this.mobLosesOwnEffectMap[name], matches);
     }
 
-    onBigBuff(target, name, seconds, info, source, ownBuff) {
+    onBigBuff(targetId, effectId, seconds, info, source, ownBuff) {
         if (seconds <= 0)
             return;
 
@@ -1374,7 +1396,8 @@ class BuffTracker {
             }
         }
 
-        let tname = target + "=>" + name
+        let tname = targetId + "=>" + effectId
+
         let buff = this.buffs[tname];
         if (!buff) {
             if (ownBuff === true) {
@@ -1413,26 +1436,14 @@ class Brds {
     constructor(options) {
         this.options = options;
         this.init = false;
-        this.meId = '';
         this.me = null;
         this.job = '';
         this.o = {};
 
         this.gainEffectFuncMap = {};
         this.loseEffectFuncMap = {};
-        this.abilityFuncMap = {};
         this.partyTracker = new PartyTracker();
         addOverlayListener('PartyChanged', (e) => {
-            console.log(e);
-            e = {
-                party: [
-                    {id: "103E4CCF", inParty: true, job: 28, level: 0, name: "伊黛亚·李", worldId: 1178},
-                    {id: "1039A1D9", inParty: true, job: 28, level: 0, name: "水貂桑", worldId: 1178},
-                    {id: "1039A8BB", inParty: true, job: 38, level: 0, name: "红魔", worldId: 1178},
-                    {id: "1039A8D9", name: "鸑鷟之诗", worldId: 1178, job: 24, inParty: true}
-                ],
-                type: 'PartyChanged'
-            }
             this.partyTracker.onPartyChanged(e);
         });
 
@@ -1612,7 +1623,6 @@ class Brds {
     UpdateJob() {
         this.gainEffectFuncMap = {};
         this.loseEffectFuncMap = {};
-        this.abilityFuncMap = {};
 
         // 初始化
         this.o = {};
@@ -1743,12 +1753,7 @@ class Brds {
 
 
         const type = line[0];
-        if (type === '26' || type === '30' || type === '21' || type === '22') {
-            console.log(e);
-        }
         if (type === '26') {
-            console.log(log.match(NetRegexes.gainsEffect()));
-
             // 其他人给自己上的buff
             let m = log.match(kYouGainEffectRegex);
             if (m) {
@@ -1759,7 +1764,7 @@ class Brds {
                 this.buffTracker.onYouGainEffect(effectId, log, m.groups);
             }
 
-            // 自己给其他人上的buff
+            // 小队(自己)给(BOSS/宠物)的(BUFF/DOT)
             m = log.match(kMobGainsOwnEffectRegex);
             if (m) {
                 const effectId = m.groups.effectId.toUpperCase();
@@ -1767,6 +1772,7 @@ class Brds {
                 this.buffTracker.onMobGainsOwnEffect(effectId, m.groups);
             }
 
+            // 小队(其他人)给(BOSS/宠物)的BUFF
             m = log.match(kMobGainsPartyEffectRegex);
             if (m) {
                 const effectId = m.groups.effectId.toUpperCase();
@@ -1798,20 +1804,6 @@ class Brds {
                 const effectId = m.groups.effectId.toUpperCase();
                 this.buffTracker.onYouLoseEffect(effectId, m.groups);
             }
-
-        } else if (type === '21' || type === '22') {
-            // let m = log.match(kYouUseAbilityRegex);
-            // if (m) {
-            //     let id = m.groups.id;
-            //     let f = this.abilityFuncMap[id];
-            //     if (f)
-            //         f(id, m.groups);
-            //     this.buffTracker.onUseAbility(id, m.groups);
-            // } else {
-            // let m = log.match(kAnybodyAbilityRegex);
-            // if (m)
-            //     this.buffTracker.onUseAbility(m.groups.id, m.groups);
-            // }
         }
     }
 
@@ -1828,43 +1820,16 @@ class Brds {
                     this.Test();
                     continue;
                 }
-            } else if (log[15] == '1') {
-                if (log[16] == 'A') {
-
-                    //鼓励匹配
-                    let m = log.match(Regexes.parse('] 1A:\\y{ObjectId}:' + this.me + ' gains the effect of 鼓励 from (\\y{Name}) for \\y{Float} Seconds. \\(([0-9]+)\\)'));
-                    if (m) {
-                        let isMe = false;
-                        if (this.me == m[1]) {
-                            isMe = true;
-                        }
-                        // 鼓励变更
-                        changeEmbolden(isMe, m[2], this.o.rightBuffsList)
-                        buffsCalculation(this.job, this.options, this.o.rightBuffsList)
-                    }
-                }
-                // TODO: consider flags for missing.
-                // flags:damage is 1:0 in most misses.
-                if (log[16] == '5' || log[16] == '6') {
-                    // use of GP Potion
-                    let cordialRegex = Regexes.ability({source: this.me, id: '20(017FD|F5A3D|F844F|0420F|0317D)'});
-                    if (log.match(cordialRegex)) {
-                        this.gpPotion = true;
-                        setTimeout(() => {
-                            this.gpPotion = false;
-                        }, 2000);
-                    }
-                }
             }
         }
     }
 
     Test() {
 
-        setTimeout(() => {
-            let line = '26|2020-09-20T03:24:38.9810000+08:00|31|强化药|30.00|1039A1D9|水貂桑|1039A1D9|水貂桑|28D6|111340|111340||63c01dd83f9942aec827298ddef1519b';
-            this.OnNetLog({line: line.split('|'), rawLine: line})
-        }, 1);
+        // setTimeout(() => {
+        //     let line = '26|2020-09-20T03:24:38.9810000+08:00|31|强化药|30.00|1039A1D9|水貂桑|1039A1D9|水貂桑|28D6|111340|111340||63c01dd83f9942aec827298ddef1519b';
+        //     this.OnNetLog({line: line.split('|'), rawLine: line})
+        // }, 1);
 
         // // 诗人
         // setTimeout(() => {
@@ -1926,154 +1891,81 @@ class Brds {
         // 26|2020-09-20T21:28:39.0320000+08:00|8d|战斗之声|20.00|1039A1D9|水貂桑|40026FC8|陆行鸟|00|76590|111340||852f0f6be28070f73fd879577cb448d7
         // 26|2020-09-20T21:33:48.1490000+08:00|5ae|巨龙左眼|20.00|1039A1D9|水貂桑|40026FC8|陆行鸟|00|76590|75581||1509fff44f53bb5592a7dd6642ba73fd
 
-        return;
-        // this.TestChangeJob();
+        // 赤魔
+        // 26|2020-09-20T22:04:03.9440000+08:00|4d7|鼓励|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|05|52289|52289||140096ff8fe52cfc344ee31759a6b422
+        // 26|2020-09-20T22:04:04.0780000+08:00|511|鼓励|20.00|1039A1D9|水貂桑|4002759B|陆行鸟|05|76590|52289||cc9ad3416a052b54bbdb68804582dcc5
+        // 26|2020-09-20T22:04:07.9110000+08:00|4d7|鼓励|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|04|52289|52289||369bee40aab7cfa72bc77aacd0165e89
+        // 26|2020-09-20T22:04:08.0440000+08:00|511|鼓励|20.00|1039A1D9|水貂桑|4002759B|陆行鸟|04|76590|52289||e9c9aec09171bb3d4923e00aafc962db
+        // 26|2020-09-20T22:04:11.9220000+08:00|4d7|鼓励|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|03|52289|52289||b132a58f47a1244ea60dc97ed136d1ac
+        // 26|2020-09-20T22:04:12.0550000+08:00|511|鼓励|20.00|1039A1D9|水貂桑|4002759B|陆行鸟|03|76590|52289||530cf250118e141c356b6414bd99e237
+        // 26|2020-09-20T22:04:15.9350000+08:00|4d7|鼓励|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|02|52289|52289||b6f281d9939cadf98e0a3c4e20971f45
+        // 26|2020-09-20T22:04:16.0710000+08:00|511|鼓励|20.00|1039A1D9|水貂桑|4002759B|陆行鸟|02|76590|52289||abe03f69fcb61b9ae37e632b1fcf71eb
+        // 26|2020-09-20T22:04:19.9490000+08:00|4d7|鼓励|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|01|52289|52289||ed928b5ff87c09a4538e74809e11cccd
+        // 26|2020-09-20T22:04:20.0830000+08:00|511|鼓励|20.00|1039A1D9|水貂桑|4002759B|陆行鸟|01|76590|52289||63e1491deabf976eaa7e16edbb05e3e8
+        // 30|2020-09-20T22:04:24.0480000+08:00|4d7|鼓励|0.00|1039A1D9|水貂桑|1039A1D9|水貂桑|01|76590|52289||91727e97f2e91e3b4823830ea6a35adb
+        // 30|2020-09-20T22:04:24.0480000+08:00|511|鼓励|0.00|1039A1D9|水貂桑|4002759B|陆行鸟|01|76590|52289||91727e97f2e91e3b4823830ea6a35adb
 
-        let logs = [];
-        let t = '[10:10:10.000] ';
-        // logs.push(t + '1A:10000000:' + this.me + ' gains the effect of 强化药 from ' + this.me + ' for 30.00 Seconds.');
-        // logs.push(t + '1A:10000000:' + this.me + ' gains the effect of 猛者强击 from ' + this.me + ' for 20.00 Seconds.');
-        // logs.push(t + '15:10000000:Tako Yaki:1D60:Embolden:10000000:' + this.me + ':500020F:4D70000:0:0:0:0:0:0:0:0:0:0:0:0:0:0:42194:42194:10000:10000:0:1000:-655.3301:-838.5481:29.80905:0.523459:42194:42194:10000:10000:0:1000:-655.3301:-838.5481:29.80905:0.523459:00001DE7');
-        // logs.push(t + '1A:10000000:' + this.me + ' gains the effect of Battle Litany from  for 25 Seconds.');
-        // logs.push(t + '1A:10000000:' + this.me + ' gains the effect of The Balance from  for 12 Seconds.');
-        // logs.push(t + '1A:10000000:Okonomi Yaki gains the effect of Foe Requiem from Okonomi Yaki for 9999.00 Seconds.');
-        // logs.push(t + '15:1048638C:Okonomi Yaki:8D2:Trick Attack:40000C96:Striking Dummy:20710103:154B:');
-        // logs.push(t + '1A:10000000:' + this.me + ' gains the effect of Left Eye from That Guy for 15.0 Seconds.');
-        // logs.push(t + '1A:10000000:' + this.me + ' gains the effect of Right Eye from That Guy for 15.0 Seconds.');
-        // logs.push(t + '15:1048638C:Tako Yaki:1D0C:Chain Stratagem:40000C96:Striking Dummy:28710103:154B:');
-        // logs.push(t + '15:1048638C:Tako Yaki:B45:Hypercharge:40000C96:Striking Dummy:28710103:154B:');
-        // logs.push(t + '1A:10000000:' + this.me + ' gains the effect of Devotion from That Guy for 15.0 Seconds.');
-        // logs.push(t + '1A:10000000:' + this.me + ' gains the effect of Brotherhood from That Guy for 15.0 Seconds.');
-        // logs.push(t + '1A:10000000:' + this.me + ' gains the effect of Brotherhood from Other Guy for 15.0 Seconds.');
-        // let e = {detail: {logs: logs}};
-        // this.OnLogEvent(e);
-
+        // 从别人身上得到
         setTimeout(() => {
-            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 强化药 from ' + this.me + ' for 30.00 Seconds.'];
-            // let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 强化药 from ' + this.me + ' for 120.00 Seconds.'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
+            let line = '26|2020-09-20T22:04:04.0780000+08:00|511|鼓励|20.00|103E4CCF|伊黛亚·李|1039A1D9|水貂桑|05|76590|52289||cc9ad3416a052b54bbdb68804582dcc5';
+            this.OnNetLog({line: line.split('|'), rawLine: line})
         }, 1)
 
         setTimeout(() => {
-            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 猛者强击 from ' + this.me + ' for 20.00 Seconds.'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
-        }, 100)
-
-        setTimeout(() => {
-            let logs = ['[22:26:37.632] 1A:4000031E:木人 gains the effect of 狂风蚀箭 from ' + this.me + ' for 30.00 Seconds.'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
-        }, 1000)
-
-        setTimeout(() => {
-            let logs = ['[22:26:37.632] 1A:4000031E:木人 gains the effect of 烈毒咬箭 from ' + this.me + ' for 30.00 Seconds.'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
-        }, 2000)
-
-        setTimeout(() => {
-            let logs = ['[22:26:37.632] 1A:4000032E:木人 gains the effect of 狂风蚀箭 from ' + this.me + ' for 30.00 Seconds.'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
-        }, 3000)
-
-        setTimeout(() => {
-            let logs = ['[01:05:59.585] 15:1039A1D9:' + this.me + ':8D2:攻其不备:4000031E:木人:1E710003:384B0000:5050F:27E0000:0:0:0:0:0:0:0:0:0:0:0:0:7400000:7400000:0:0:0:1000:-603.1267:-762.9036:25.02:2.283125:82278:82278:10000:10000:0:1000:-604.8576:-761.8551:25:2.115644:00003E39'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
+            let line = '26|2020-09-20T22:04:04.0780000+08:00|511|鼓励|20.00|103E4CCF|伊黛亚·李|1039A1D9|水貂桑|04|76590|52289||cc9ad3416a052b54bbdb68804582dcc5';
+            this.OnNetLog({line: line.split('|'), rawLine: line})
         }, 4000)
 
         setTimeout(() => {
-            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 义结金兰：攻击 from Okonomi Yaki for 25.00 Seconds.'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
-        }, 4000)
-
-        setTimeout(() => {
-            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 放浪神之箭 from Okonomi Yaki for 15.00 Seconds.'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
-        }, 5000)
-
-        setTimeout(() => {
-            let logs = ['[22:26:37.632] 1A:4000031E:木人 gains the effect of 狂风蚀箭 from ' + this.me + ' for 30.00 Seconds.'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
+            let line = '26|2020-09-20T22:04:04.0780000+08:00|511|鼓励|20.00|103E4CCF|伊黛亚·李|1039A1D9|水貂桑|03|76590|52289||cc9ad3416a052b54bbdb68804582dcc5';
+            this.OnNetLog({line: line.split('|'), rawLine: line})
         }, 6000)
 
         setTimeout(() => {
-            let logs = ['[22:26:37.632] 1A:4000031E:木人 gains the effect of 烈毒咬箭 from ' + this.me + ' for 30.00 Seconds.'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
-        }, 6000)
-
-        setTimeout(() => {
-            let logs = ['[10:10:10.000] 1E:10000000:' + this.me + ' loses the effect of 放浪神之箭 from Okonomi Yaki.'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
-        }, 7000)
-
-        setTimeout(() => {
-            let logs = ['[10:10:10.000] 1A:10000000:' + this.me + ' gains the effect of 河流神之瓶 from Okonomi Yaki for 15.00 Seconds.'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
-        }, 7000)
-
-
-        setTimeout(() => {
-            let logs = ['[00:53:40.317] 15:10000000:Tako Yaki:1D60:Embolden:10000000:' + this.me + ':500020F:4D70000:0:0:0:0:0:0:0:0:0:0:0:0:0:0:42194:42194:10000:10000:0:1000:-655.3301:-838.5481:29.80905:0.523459:42194:42194:10000:10000:0:1000:-655.3301:-838.5481:29.80905:0.523459:00001DE7'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
-        }, 8000)
-
-        setTimeout(() => {
-            let logs = ['[00:53:41.096] 1A:1039A1D9:' + this.me + ' gains the effect of 鼓励 from xxx for 20.00 Seconds. (5)'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
-        }, 8000)
-
-        setTimeout(() => {
-            let logs = ['[00:53:41.096] 1A:1039A1D9:' + this.me + ' gains the effect of 鼓励 from xxx for 20.00 Seconds. (4)'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
-        }, 12000)
-
-        setTimeout(() => {
-            let logs = ['[00:53:41.096] 1A:1039A1D9:' + this.me + ' gains the effect of 鼓励 from xxx for 20.00 Seconds. (3)'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
-        }, 16000)
-
-        setTimeout(() => {
-            let logs = ['[00:53:41.096] 1A:1039A1D9:' + this.me + ' gains the effect of 鼓励 from xxx for 20.00 Seconds. (2)'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
-        }, 20000)
-
-        setTimeout(() => {
-            let logs = ['[00:53:41.096] 1A:1039A1D9:' + this.me + ' gains the effect of 鼓励 from xxx for 20.00 Seconds. (1)'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
-        }, 24000)
-
-        setTimeout(() => {
-            let logs = ['[00:53:41.096] 1E:1039A1D9:' + this.me + ' loses the effect of 鼓励 from xxx. (1)'];
-            let e = {detail: {logs: logs}};
-            this.OnLogEvent(e);
-        }, 28000)
+            let line = '26|2020-09-20T22:04:04.0780000+08:00|511|鼓励|20.00|103E4CCF|伊黛亚·李|1039A1D9|水貂桑|02|76590|52289||cc9ad3416a052b54bbdb68804582dcc5';
+            this.OnNetLog({line: line.split('|'), rawLine: line})
+        }, 10000)
 
         // setTimeout(() => {
-        //     let logs = ['[22:26:37.632] 1E:4000031E:木人 loses the effect of 狂风蚀箭 from ' + this.me + '.'];
-        //     let e = {detail: {logs: logs}};
-        //     this.OnLogEvent(e);
-        // }, 8000)
+        //     let line = '26|2020-09-20T22:04:04.0780000+08:00|511|鼓励|20.00|103E4CCF|伊黛亚·李|1039A1D9|水貂桑|01|76590|52289||cc9ad3416a052b54bbdb68804582dcc5';
+        //     this.OnNetLog({line: line.split('|'), rawLine: line})
+        // }, 14000)
+
+        setTimeout(() => {
+            let line = '30|2020-09-20T22:04:24.0480000+08:00|511|鼓励|0.00|103E4CCF|伊黛亚·李|1039A1D9|水貂桑|01|76590|52289||91727e97f2e91e3b4823830ea6a35adb';
+            this.OnNetLog({line: line.split('|'), rawLine: line})
+        }, 13000)
+
+        // 自己给自己
         // setTimeout(() => {
-        //     let logs = ['[22:26:37.632] 1E:4000031E:木人 loses the effect of 烈毒咬箭 from ' + this.me + '.'];
-        //     let e = {detail: {logs: logs}};
-        //     this.OnLogEvent(e);
-        // }, 9000)
+        //     let line = '26|2020-09-20T22:04:03.9440000+08:00|4d7|鼓励|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|05|52289|52289||140096ff8fe52cfc344ee31759a6b422';
+        //     this.OnNetLog({line: line.split('|'), rawLine: line})
+        // }, 1)
+        //
+        // setTimeout(() => {
+        //     let line = '26|2020-09-20T22:04:07.9110000+08:00|4d7|鼓励|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|04|52289|52289||369bee40aab7cfa72bc77aacd0165e89';
+        //     this.OnNetLog({line: line.split('|'), rawLine: line})
+        // }, 4000)
+        //
+        // setTimeout(() => {
+        //     let line = '26|2020-09-20T22:04:11.9220000+08:00|4d7|鼓励|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|03|52289|52289||b132a58f47a1244ea60dc97ed136d1ac';
+        //     this.OnNetLog({line: line.split('|'), rawLine: line})
+        // }, 6000)
+        //
+        // setTimeout(() => {
+        //     let line = '26|2020-09-20T22:04:15.9350000+08:00|4d7|鼓励|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|02|52289|52289||b6f281d9939cadf98e0a3c4e20971f45';
+        //     this.OnNetLog({line: line.split('|'), rawLine: line})
+        // }, 10000)
+        //
+        // setTimeout(() => {
+        //     let line = '26|2020-09-20T22:04:19.9490000+08:00|4d7|鼓励|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|01|52289|52289||ed928b5ff87c09a4538e74809e11cccd';
+        //     this.OnNetLog({line: line.split('|'), rawLine: line})
+        // }, 14000)
+        //
+        // setTimeout(() => {
+        //     let line = '30|2020-09-20T22:04:24.0480000+08:00|4d7|鼓励|0.00|1039A1D9|水貂桑|1039A1D9|水貂桑|01|76590|52289||91727e97f2e91e3b4823830ea6a35adb';
+        //     this.OnNetLog({line: line.split('|'), rawLine: line})
+        // }, 18000)
     }
 
     TestChangeJob() {
