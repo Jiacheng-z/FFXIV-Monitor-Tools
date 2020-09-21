@@ -95,6 +95,8 @@ function setupRegexes(playerId, partyTracker) {
     // 对自己增加的buff
     kYouGainEffectRegex = NetRegexes.gainsEffect({targetId: playerId});
     kYouLoseEffectRegex = NetRegexes.losesEffect({targetId: playerId});
+    // 自己对目标的敌人目标的能力技(连环计/背刺)
+    kYouUseAbilityRegex = NetRegexes.ability({targetId: '4.{7}', sourceId: playerId});
     // 自己对目标(敌人/宠物)释放的buff/DOT
     kMobGainsOwnEffectRegex = NetRegexes.gainsEffect({targetId: '4.{7}', sourceId: playerId});
     kMobLosesOwnEffectRegex = NetRegexes.losesEffect({targetId: '4.{7}', sourceId: playerId});
@@ -106,10 +108,15 @@ function setupRegexes(playerId, partyTracker) {
         }
     }
     let partyIdsStr = partyIds.join("|");
-    // kMobGainsPartyEffectRegex = NetRegexes.gainsEffect({targetId: '4.{7}', sourceId: '(' + partyIdsStr + ')'});
-    // kMobLosesPartyEffectRegex = NetRegexes.losesEffect({targetId: '4.{7}', sourceId: '(' + partyIdsStr + ')'});
-    kYouUseAbilityRegex = NetRegexes.ability({targetId: '4.{7}', sourceId: playerId});
-    kPartyUseAbilityRegex = NetRegexes.ability({targetId: '4.{7}', sourceId: '(' + partyIdsStr + ')'});
+    if (partyIdsStr === "") {
+        // kMobGainsPartyEffectRegex = null;
+        // kMobLosesPartyEffectRegex = null;
+        kPartyUseAbilityRegex = null;
+    } else {
+        // kMobGainsPartyEffectRegex = NetRegexes.gainsEffect({targetId: '4.{7}', sourceId: '(' + partyIdsStr + ')'});
+        // kMobLosesPartyEffectRegex = NetRegexes.losesEffect({targetId: '4.{7}', sourceId: '(' + partyIdsStr + ')'});
+        kPartyUseAbilityRegex = NetRegexes.ability({targetId: '4.{7}', sourceId: '(' + partyIdsStr + ')'});
+    }
 
     console.log(partyTracker, kMobGainsPartyEffectRegex, kPartyUseAbilityRegex);
 }
@@ -1470,7 +1477,6 @@ class Brds {
         addOverlayListener('PartyChanged', (e) => {
             this.partyTracker.onPartyChanged(e);
             setupRegexes(this.meId, this.partyTracker);
-            console.log(e, this.partyTracker);
         });
 
         this.initConfig();
