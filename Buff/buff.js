@@ -95,11 +95,11 @@ function setupRegexes(playerId, partyTracker) {
     // 对自己增加的buff
     kYouGainEffectRegex = NetRegexes.gainsEffect({targetId: playerId});
     kYouLoseEffectRegex = NetRegexes.losesEffect({targetId: playerId});
-    // 自己对目标的敌人目标的能力技(连环计/背刺)
-    kYouUseAbilityRegex = NetRegexes.ability({targetId: '4.{7}', sourceId: playerId});
     // 自己对目标(敌人/宠物)释放的buff/DOT
     kMobGainsOwnEffectRegex = NetRegexes.gainsEffect({targetId: '4.{7}', sourceId: playerId});
     kMobLosesOwnEffectRegex = NetRegexes.losesEffect({targetId: '4.{7}', sourceId: playerId});
+    // 自己对目标的敌人目标的能力技(连环计/背刺)
+    kYouUseAbilityRegex = NetRegexes.ability({targetId: '4.{7}', sourceId: playerId});
     // 小队对目标(敌人/宠物)释放的Buff/DOT
     let partyIds = [];
     for (let id of partyTracker.partyIds) {
