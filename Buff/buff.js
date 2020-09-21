@@ -9,6 +9,11 @@ const kPullText = {
     ko: '풀링',
 };
 
+const kAbility = {
+    TrickAttack: '8D2',
+    ChainStratagem: '1D0C',
+}
+
 const OwnEffectId = {
     // 诗人
     'Stormbite': '4B1', // 风
@@ -63,6 +68,9 @@ let kMobLosesOwnEffectRegex = null; // 自己在boss身上丢失的buff
 let kMobGainsPartyEffectRegex = null; // 小队给目标身上增加的buff
 let kMobLosesPartyEffectRegex = null; // 小队在目标身上丢失的buff
 
+let kYouUseAbilityRegex = null;
+let kPartyUseAbilityRegex = null;
+
 // 近战职业列表
 let meleeJobs = ['PLD', 'WAR', 'DRK', 'GNB', 'MNK', 'DRG', 'NIN', 'SAM'];
 
@@ -81,6 +89,9 @@ function getQueryVariable(variable) {
 
 // 设置正则匹配
 function setupRegexes(playerId, partyTracker) {
+    if (playerId === '') {
+        return
+    }
     // 对自己增加的buff
     kYouGainEffectRegex = NetRegexes.gainsEffect({targetId: playerId});
     kYouLoseEffectRegex = NetRegexes.losesEffect({targetId: playerId});
@@ -95,8 +106,12 @@ function setupRegexes(playerId, partyTracker) {
         }
     }
     let partyIdsStr = partyIds.join("|");
-    kMobGainsPartyEffectRegex = NetRegexes.gainsEffect({targetId: '4.{7}', sourceId: '(' + partyIdsStr + ')'});
-    kMobLosesPartyEffectRegex = NetRegexes.losesEffect({targetId: '4.{7}', sourceId: '(' + partyIdsStr + ')'});
+    // kMobGainsPartyEffectRegex = NetRegexes.gainsEffect({targetId: '4.{7}', sourceId: '(' + partyIdsStr + ')'});
+    // kMobLosesPartyEffectRegex = NetRegexes.losesEffect({targetId: '4.{7}', sourceId: '(' + partyIdsStr + ')'});
+    kYouUseAbilityRegex = NetRegexes.ability({targetId: '4.{7}', sourceId: playerId});
+    kPartyUseAbilityRegex = NetRegexes.ability({targetId: '4.{7}', sourceId: '(' + partyIdsStr + ')'});
+
+    console.log(partyTracker, kMobGainsPartyEffectRegex, kPartyUseAbilityRegex);
 }
 
 function makeAuraTimerIcon(name, seconds, opacity, iconWidth, iconHeight, iconText, barHeight, textHeight, textColor, borderSize, borderColor, barColor, auraIcon, buffInfo) {
@@ -640,9 +655,8 @@ class BuffTracker {
             // 学者
             // 26|2020-09-20T17:11:46.0110000+08:00|4c5|连环计|15.00|1039A1D9|水貂桑|4000031F|木人|00|7400000|46919||cef9177cfc401552bc4e8155d546096e
             chain: { // 连环计
-                gainEffect: OwnEffectId.ChainStratagem,
-                loseEffect: OwnEffectId.ChainStratagem,
-                useEffectDuration: true,
+                gainAbility: kAbility.ChainStratagem,
+                durationSeconds: 15,
                 // icon: 'cactbot/resources/icon/status/chain-stratagem.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/f/fd/002815.png',
                 icon: '../resources/img/002815.png',
@@ -879,9 +893,8 @@ class BuffTracker {
             },
             // 忍者
             trick: { // 背刺
-                gainEffect: OwnEffectId.TrickAttack,
-                loseEffect: OwnEffectId.TrickAttack,
-                useEffectDuration: true,
+                gainAbility: kAbility.TrickAttack,
+                durationSeconds: 15,
                 // icon: 'cactbot/resources/icon/status/trick-attack.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/8/82/000618.png',
                 icon: '../resources/img/000618.png',
@@ -1240,12 +1253,14 @@ class BuffTracker {
         this.loseEffectMap = {};
         this.mobGainsOwnEffectMap = {};
         this.mobLosesOwnEffectMap = {};
+        this.gainAbilityMap = {};
 
         let propToMapMap = {
             gainEffect: this.gainEffectMap,
             loseEffect: this.loseEffectMap,
             mobGainsOwnEffect: this.mobGainsOwnEffectMap,
             mobLosesOwnEffect: this.mobLosesOwnEffectMap,
+            gainAbility: this.gainAbilityMap,
         };
 
         for (let i = 0; i < keys.length; ++i) {
@@ -1376,6 +1391,15 @@ class BuffTracker {
         this.onLoseOwnEffect(this.mobLosesOwnEffectMap[name], matches);
     }
 
+    onUseAbility(id, matches) {
+        let buffs = this.gainAbilityMap[id];
+        if (!buffs)
+            return;
+
+        for (let b of buffs)
+            this.onBigBuff(matches.targetId, b.gainAbility, b.durationSeconds, b, matches.source, false);
+    }
+
     onBigBuff(targetId, effectId, seconds, info, source, ownBuff) {
         if (seconds <= 0)
             return;
@@ -1435,6 +1459,7 @@ class Brds {
     constructor(options) {
         this.options = options;
         this.init = false;
+        this.meId = '';
         this.me = null;
         this.job = '';
         this.o = {};
@@ -1444,6 +1469,7 @@ class Brds {
         this.partyTracker = new PartyTracker();
         addOverlayListener('PartyChanged', (e) => {
             this.partyTracker.onPartyChanged(e);
+            setupRegexes(this.meId, this.partyTracker);
             console.log(e, this.partyTracker);
         });
 
@@ -1720,9 +1746,10 @@ class Brds {
     // 切换职业
     OnPlayerChanged(e) {
         if (this.me !== e.detail.name) {
+            this.meId = e.detail.id.toString(16).toUpperCase();
             this.me = e.detail.name;
             // setup regexes prior to the combo tracker
-            setupRegexes(e.detail.id.toString(16).toUpperCase(), this.partyTracker);
+            setupRegexes(this.meId, this.partyTracker);
         }
 
         if (!this.init) {
@@ -1760,6 +1787,7 @@ class Brds {
                 if (f)
                     f(name, m.groups);
                 this.buffTracker.onYouGainEffect(effectId, log, m.groups);
+                return;
             }
 
             // 小队(自己)给(BOSS/宠物)的(BUFF/DOT)
@@ -1768,6 +1796,7 @@ class Brds {
                 const effectId = m.groups.effectId.toUpperCase();
                 this.buffTracker.onYouGainEffect(effectId, log, m.groups);
                 this.buffTracker.onMobGainsOwnEffect(effectId, m.groups);
+                return;
             }
 
             // 小队(其他人)给(BOSS/宠物)的BUFF
@@ -1799,6 +1828,15 @@ class Brds {
             if (m) {
                 const effectId = m.groups.effectId.toUpperCase();
                 this.buffTracker.onYouLoseEffect(effectId, m.groups);
+            }
+        } else if (type === '21' || type === '22') {
+            let m = log.match(kYouUseAbilityRegex);
+            if (m) {
+                this.buffTracker.onUseAbility(m.groups.id, m.groups);
+            } else {
+                let m = log.match(kPartyUseAbilityRegex);
+                if (m)
+                    this.buffTracker.onUseAbility(m.groups.id, m.groups);
             }
         }
     }
@@ -1850,10 +1888,10 @@ class Brds {
         }, 2000);
 
         // // 学者
-        // setTimeout(() => {
-        //     let line = '26|2020-09-20T18:34:48.5250000+08:00|4c5|连环计|15.00|103E4CCF|伊黛亚·李|4000031F|木人|00|176868|93263||ea00b0bcf5bad3afc108c29be0233c9f';
-        //     this.OnNetLog({line: line.split('|'), rawLine: line})
-        // }, 3000);
+        setTimeout(() => {
+            let line = '26|2020-09-20T18:34:48.5250000+08:00|4c5|连环计|15.00|10028650|伊黛亚·李|4000031F|木人|00|176868|93263||ea00b0bcf5bad3afc108c29be0233c9f';
+            this.OnNetLog({line: line.split('|'), rawLine: line})
+        }, 3000);
         // setTimeout(() => {
         //     let line = '30|2020-09-20T17:46:59.8170000+08:00|4c5|连环计|0.00|103E4CCF|伊黛亚·李|4000031F|木人|00|7400000|97064||d701742e13324007985444a7be589683';
         //     this.OnNetLog({line: line.split('|'), rawLine: line})
