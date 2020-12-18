@@ -118,7 +118,7 @@ function setupRegexes(playerId, partyTracker) {
         kPartyUseAbilityRegex = NetRegexes.ability({targetId: '4.{7}', sourceId: '(' + partyIdsStr + ')'});
     }
 
-    console.log(partyTracker, kMobGainsPartyEffectRegex, kPartyUseAbilityRegex);
+    // console.log(partyTracker, kMobGainsPartyEffectRegex, kPartyUseAbilityRegex);
 }
 
 function makeAuraTimerIcon(name, seconds, opacity, iconWidth, iconHeight, iconText, barHeight, textHeight, textColor, borderSize, borderColor, barColor, auraIcon, buffInfo) {
@@ -450,6 +450,10 @@ class Buff {
                 window.clearTimeout(aura.addTimeout);
                 aura.addTimeout = null;
             }
+            if (aura.dotNoticeTimeout) {
+                window.clearTimeout(aura.dotNoticeTimeout);
+                aura.dotNoticeTimeout = null;
+            }
             if (aura.removeTimeout) {
                 window.clearTimeout(aura.removeTimeout);
                 aura.removeTimeout = null;
@@ -469,6 +473,15 @@ class Buff {
             aura.addTimeout = null;
 
             if (seconds > 0) {
+                // 设置定时通知
+                if (this.info.dotNotice === true) {
+                    aura.dotNoticeTimeout = window.setTimeout(() => {
+                        let cmd = {'call': 'cactbotSay', 'text': "续buff"}; // TODO::可配置
+                        window.callOverlayHandler(cmd);
+                    }, (Math.floor(seconds) - 7) * 1000); // 提前7秒触发 TODO::可配置
+                }
+
+                // 设置定时取消
                 aura.removeTimeout = window.setTimeout(() => {
                     aura.removeCallback();
                     if (expireCallback)
@@ -1061,6 +1074,7 @@ class BuffTracker {
                 borderColor: '#3df6fd',
                 sortKey: 1,
                 buffType: 'physical', // physical, magic
+                dotNotice: true,
             },
             causticBite: { // 毒  26|2020-09-20T03:20:13.6610000+08:00|4b0|烈毒咬箭|30.00|1039A1D9|水貂桑|4000031F|木人|28|7400000|111340||2bb99918d00070ccc76dac9d8de81e98
                 mobGainsOwnEffect: OwnEffectId.CausticBite,
