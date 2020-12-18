@@ -474,11 +474,11 @@ class Buff {
 
             if (seconds > 0) {
                 // 设置定时通知
-                if (this.info.dotNotice === true) {
+                if (this.options.TTS === true && this.info.dotNotice === true && this.options.DotNoticeLessThanSecond > 0 && this.options.DotNoticeTTS !== "") {
                     aura.dotNoticeTimeout = window.setTimeout(() => {
-                        let cmd = {'call': 'cactbotSay', 'text': "续buff"}; // TODO::可配置
+                        let cmd = {'call': 'cactbotSay', 'text': this.options.DotNoticeTTS};
                         window.callOverlayHandler(cmd);
-                    }, (Math.floor(seconds) - 7) * 1000); // 提前7秒触发 TODO::可配置
+                    }, (Math.floor(seconds) - (this.options.DotNoticeLessThanSecond + 1)) * 1000);
                 }
 
                 // 设置定时取消
@@ -1142,6 +1142,7 @@ class BuffTracker {
                 borderColor: '#3eb9fa',
                 sortKey: 1,
                 buffType: 'magic', // physical
+                dotNotice: true,
             },
             biolysis: { //26|2020-09-20T17:11:43.3880000+08:00|767|蛊毒法|30.00|1039A1D9|水貂桑|4000031F|木人|00|7400000|46919||161fecdddc980c9bfeca7224ccbf98ae
                 mobGainsOwnEffect: OwnEffectId.Biolysis,
@@ -1153,6 +1154,7 @@ class BuffTracker {
                 borderColor: '#2e1fc4',
                 sortKey: 1,
                 buffType: 'magic', // physical
+                dotNotice: true,
             },
             combustIII: { //[23:24:52.095] 1A:400001B8:木人 gains the effect of 焚灼 from xxx for 30.00 Seconds.
                 mobGainsOwnEffect: OwnEffectId.CombustIII,
@@ -1164,6 +1166,7 @@ class BuffTracker {
                 borderColor: '#62daf8',
                 sortKey: 1,
                 buffType: 'magic', // physical
+                dotNotice: true,
             },
             Demolish: { //[23:31:10.291] 1A:400001B8:木人 gains the effect of 破碎拳 from xxx for 18.00 Seconds. f6
                 mobGainsOwnEffect: OwnEffectId.Demolish,
@@ -1209,6 +1212,7 @@ class BuffTracker {
                 borderColor: '#d9542a',
                 sortKey: 1,
                 buffType: 'physical', // physical
+                dotNotice: true,
             },
             // 机工
             // bioblaster: { // [00:20:02.402] 1A:400001B9:木人 gains the effect of 毒菌冲击 from xxx for 15.00 Seconds.
@@ -1233,6 +1237,7 @@ class BuffTracker {
                 borderColor: '#93d5fd',
                 sortKey: 1,
                 buffType: 'magic', // physical
+                dotNotice: true,
             },
             // thunderIV: { // [00:32:47.727] 1A:400001B8:木人 gains the effect of 霹雷 from xxx for 18.00 Seconds.
             //     mobGainsOwnEffect: EffectId.ThunderIV,
@@ -1255,6 +1260,7 @@ class BuffTracker {
                 borderColor: '#e3e02d',
                 sortKey: 1,
                 buffType: 'magic', // physical
+                dotNotice: true,
             },
             miasmaIII: { // 26|2020-09-20T21:42:37.0400000+08:00|4bf|瘴暍|30.00|1039A1D9|水貂桑|400271AA|甲鲎|00|43720|54853||671edb497f98c18fc37270cef85dd01b
                 mobGainsOwnEffect: OwnEffectId.MiasmaIII,
@@ -1579,6 +1585,14 @@ class Brds {
             if (wh.length >= 4) {
                 this.options.DotBorderSize = Number(wh[3]);
             }
+        }
+        // 小于多少秒提醒
+        if (urlSet('dotnoticeless')) {
+            this.options.DotNoticeLessThanSecond = Math.floor(decodeURI(urlSet('dotnoticeless')));
+        }
+        // 通知语音
+        if (urlSet('dotnoticetts')) {
+            this.options.DotNoticeTTS = decodeURI(urlSet('dotnoticetts'));
         }
         // 团辅最长进度条
         if (urlSet('buffmaxwidth') !== false) {

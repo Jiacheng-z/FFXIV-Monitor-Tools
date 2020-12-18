@@ -19,6 +19,8 @@ let Options = {
     DotBarHeight: 5, // DOT下进度条高度
     DotBorderSize: 1, // DOT边框
     // DotBarDuration: false, // 是否展示DOT进度条倒计时 true 展示， false 不展示
+    DotNoticeLessThanSecond: 7, // <0 取消提醒, >0 剩余n秒时提醒
+    DotNoticeTTS: "续DoT", // 提醒语音
 
     // 团辅相关配置
     BigBuffIconWidth: 32,//团辅监控图标宽度（像素）
