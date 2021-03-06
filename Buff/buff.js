@@ -329,7 +329,7 @@ function buffsCalculation(job, options, list) {
     if (job === 'BRD' && options.TextBrdSec === true) {
         let statSec = document.getElementById('jobs-stat-buff-sec');
         if (Number(showip) > 0) {
-            statSec.innerText = Math.floor((30 * 900 * (Number(showip) / 100)) / ((1 + (Number(showip) / 100)) * (230 - 100))) + 's';
+            statSec.innerText = Math.floor((30 * 900 * (Number(showip) / 100)) / ((1 + (Number(showip) / 100)) * (240 - 100))) + 's';
         } else {
             statSec.innerText = '';
         }
