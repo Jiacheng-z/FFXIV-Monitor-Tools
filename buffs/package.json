@@ -1,0 +1,14 @@
+{
+  "name": "buffs",
+  "version": "1.0.0",
+  "description": "buff tts base on cactbot",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jiacheng",
+  "license": "ISC",
+  "dependencies": {
+    "cactbot": "github:quisquous/cactbot"
+  }
+}
