@@ -39,7 +39,7 @@ export default (
         'raidemulator',
         'test',
         'timerbarTest',
-        'buffs',
+        'buff',
       ].includes(key)
     )
       extension = 'ts';

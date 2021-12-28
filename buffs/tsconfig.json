@@ -20,12 +20,11 @@
     "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "./ui",
-    "./types",
-    "./resources",
-    "./util",
-    "./test",
-    "./webpack"
+    "./webpack",
+    "./buff",
+    "./cactbot/types",
+    "./cactbot/util",
+    "./cactbot/resources",
   ],
   "exclude": [
     "./eslint",

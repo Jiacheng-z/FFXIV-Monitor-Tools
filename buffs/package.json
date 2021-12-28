@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "buff tts base on cactbot",
   "type": "module",
+  "types": "./cactbot/types",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "cross-env NODE_OPTIONS=\"--loader ts-node/esm\" TS_NODE_PROJECT=\"tsconfig-for-webpack.json\" webpack --progress --config webpack/webpack.prod.ts",

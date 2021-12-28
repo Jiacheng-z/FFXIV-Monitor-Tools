@@ -55,7 +55,7 @@ export default mergeWithRules({
   mode: 'production',
   cache: {
     type: 'filesystem',
-    name: 'buffs',
+    name: 'buff',
   },
   ...optimizationOverride,
   ...cssMinifyConfigOverride,
