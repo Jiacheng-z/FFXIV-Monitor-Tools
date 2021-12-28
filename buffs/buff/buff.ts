@@ -4,9 +4,12 @@ import {JobsEventEmitter} from "../cactbot/ui/jobs/event_emitter";
 import {Player} from "../cactbot/ui/jobs/player";
 import PartyTracker from "../cactbot/resources/party";
 import {Bars} from "../cactbot/ui/jobs/bars";
-import {ComponentManager} from "../cactbot/ui/jobs/components";
+import {ComponentManager} from "./components";
 
-UserConfig.getUserConfigLocation('jobs', defaultOptions, () => {
+import '../cactbot/resources/defaults.css';
+import '../cactbot/ui/jobs/jobs.css';
+
+UserConfig.getUserConfigLocation('buff', defaultOptions, () => {
     const options = { ...defaultOptions };
 
     // Because Chinese/Korean regions are still on older version of FF14,
