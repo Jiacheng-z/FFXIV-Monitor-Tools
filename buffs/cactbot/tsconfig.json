@@ -1,0 +1,36 @@
+{
+  "extends": "./tsconfig.base.json",
+  "ts-node": {
+    "compiler": "ttypescript"
+  },
+  "compilerOptions": {
+    "checkJs": false,
+    "sourceMap": true,
+    "allowSyntheticDefaultImports": true,
+    "outDir": "./dist",
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noImplicitOverride": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    //    "noPropertyAccessFromIndexSignature": false, // used by trigger output strings
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "./ui",
+    "./types",
+    "./resources",
+    "./util",
+    "./test",
+    "./webpack"
+  ],
+  "exclude": [
+    "./eslint",
+    "./.eslintrc.cjs",
+    "./dist",
+    "**/*.spec.ts"
+  ]
+}

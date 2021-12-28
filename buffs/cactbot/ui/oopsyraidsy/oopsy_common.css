@@ -1,0 +1,77 @@
+.mistake-row {
+  display: flex;
+  height: 18px;
+}
+
+.mistake-icon {
+  text-align: center;
+  text-shadow: -1px 0 2px grey, 0 1px 2px grey;
+  width: 20px;
+}
+
+.mistake-icon::before {
+  display: inline-block;
+  font-style: normal;
+  font-variant: normal;
+  text-rendering: auto;
+
+  /* these are icon fonts, so there's no fallback for this */
+  /* stylelint-disable-next-line font-family-no-missing-generic-family-keyword */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.mistake-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mistake-icon.pull::before {
+  color: green;
+  content: '\f04b';
+}
+
+.mistake-icon.death::before {
+  color: red;
+  content: '\f54c';
+}
+
+.mistake-icon.warn::before {
+  color: yellow;
+  content: '\f071';
+}
+
+.mistake-icon.fail::before {
+  color: red;
+  content: '\f05e';
+}
+
+.mistake-icon.wipe::before {
+  color: blue;
+  content: '\f2ed';
+}
+
+.mistake-icon.potion::before {
+  color: purple;
+  content: '\f000';
+}
+
+.mistake-icon.good::before {
+  color: green;
+  content: '\f00c';
+}
+
+.mistake-icon.damage::before {
+  color: white;
+  content: '\f102';
+}
+
+.mistake-icon.heal::before {
+  color: cyan;
+  content: '\f0fe';
+}
+
+.resizeHandle .hide-if-resizing {
+  display: none;
+}

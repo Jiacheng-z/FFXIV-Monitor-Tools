@@ -1,0 +1,89 @@
+name: Create Release Artifact
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  create-release:
+    runs-on: windows-latest
+    if: ${{ github.repository == 'quisquous/cactbot' }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Set up msbuild
+        uses: microsoft/setup-msbuild@v1.0.2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - uses: actions/cache@v2
+        id: npm-cache
+        with:
+          path: ~/.npm
+          key: modules-${{ hashFiles('package-lock.json') }}
+
+      - name: Fetch NPM Dependencies
+        # TODO: fix cache@v2 to cache node_modules
+        # if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: |
+          npm ci --ignore-scripts
+
+      # Gets the numerical output of the git tag and assigns it to an environment variable
+      - name: Get Tag Version
+        run: |
+          echo "CACTBOT_RELEASE=cactbot-${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+        shell: bash
+      - name: Check dependencies cache
+        id: cache-dependencies
+        uses: actions/cache@v2
+        with:
+          path: ./plugin/ThirdParty
+          key: ${{ runner.os }}-cactbot-${{ hashFiles('./util/fetch_deps.ts', './util/DEPS.json5') }}
+          restore-keys: |
+            ${{ runner.os }}-cactbot-
+      - name: Fetch Dependencies
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
+        run: |
+          npm run fetch-deps
+        shell: bash
+      - name: Build Cactbot Plugin
+        shell: cmd
+        run: |
+          msbuild /p:Configuration=Release /p:Platform=x64 plugin/Cactbot.sln
+
+      - name: Build JavaScript UI Module Bundles
+        run: |
+          npm run build
+      - name: Setup Staging Directory
+        run: |
+          ./util/publish.sh
+        shell: bash
+      - name: Create Release Artifact
+        run: |
+          mkdir ${{ env.CACTBOT_RELEASE }}
+          mv publish/cactbot-release/cactbot/ ${{ env.CACTBOT_RELEASE }}
+          compress-archive ${{ env.CACTBOT_RELEASE }} ${{ env.CACTBOT_RELEASE }}.zip
+        shell: pwsh
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ env.CACTBOT_RELEASE }}
+          body: |
+            Changes in this release:
+            - plugin
+            - raidboss
+          draft: true
+          prerelease: false
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./${{ env.CACTBOT_RELEASE }}.zip
+          asset_name: ${{ env.CACTBOT_RELEASE }}.zip
+          asset_content_type: application/zip

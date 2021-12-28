@@ -1,0 +1,56 @@
+name: Update gh-pages
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  check-gh-pages:
+    runs-on: ubuntu-latest
+    outputs:
+      found: ${{ steps.check-gh-pages.outputs.found }}
+    steps:
+      - name: Check gh-pages Exists
+        id: check-gh-pages
+        shell: bash
+        run: |
+          GITHUB_URL="https://github.com/${{ github.repository }}"
+          if git ls-remote --exit-code --heads $GITHUB_URL gh-pages; then
+            echo "::set-output name=found::true"
+            echo "gh-pages branch found. Updating..."
+          else
+            echo "::set-output name=found::false"
+            echo "gh-pages branch not found. Skipping..."
+          fi
+  update-gh-pages:
+    runs-on: ubuntu-latest
+    needs: check-gh-pages
+    if: needs.check-gh-pages.outputs.found == 'true'
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - name: Cache Dependencies
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: ./node_modules
+          key: modules-${{ hashFiles('package-lock.json') }}
+      - name: Install Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          npm ci --ignore-scripts
+      - name: Build
+        run: |
+          npm run coverage-report
+          npm run build-gh-pages
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          user_name: "github-actions"
+          user_email: "github-actions@github.com"
+          commit_message: "gh-pages build: ${{ github.event.head_commit.message }}"
+          enable_jekyll: true # Don't commit the .nojekyll file
