@@ -32,6 +32,9 @@ const OwnEffectId = {
     // 占星
     'CombustIII': '759', // 焚灼
 
+    // 贤者
+    'EukrasianDosisIii': 'A38',
+
     // 武僧
     'Demolish': 'F6',// 破碎拳
     'RiddleOfFire': '49D', // 红莲极意
@@ -705,6 +708,22 @@ class BuffTracker {
                 incrMagic: 6, // 魔法增伤
                 tts: '占卜',
             },
+            // astrodyne: { // 占卜
+            //     gainEffect: EffectId.astrodyne,
+            //     loseEffect: EffectId.Divination,
+            //     gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限给自己
+            //     useEffectDuration: true,
+            //     // icon: 'cactbot/resources/icon/status/divination.png',
+            //     // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/f/fc/003553.png',
+            //     icon: '../resources/img/003553.png',
+            //     borderColor: '#e8c353',
+            //     sortKey: 1,
+            //     cooldown: 120,
+            //     incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+            //     incrPhysical: 6, // 物理增伤
+            //     incrMagic: 6, // 魔法增伤
+            //     tts: '占卜',
+            // },
             arrow: { // 放浪神之箭
                 gainEffect: EffectId.TheArrow,
                 loseEffect: EffectId.TheArrow,
@@ -790,34 +809,34 @@ class BuffTracker {
                 increasesJob: {melee: 3, ranged: 6},
                 tts: '远卡',
             },
-            ladyOfCrowns: { // 王冠之贵妇
-                gainEffect: EffectId.LadyOfCrowns,
-                loseEffect: EffectId.LadyOfCrowns,
-                gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限给自己
-                useEffectDuration: true,
-                // icon: 'cactbot/resources/icon/status/lady-of-crowns.png',
-                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/5/59/003146.png',
-                icon: '../resources/img/003146.png',
-                borderColor: '#9e5599',
-                sortKey: 1,
-                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                increasesJob: {melee: 4, ranged: 8},
-                tts: '远卡',
-            },
-            lordOfCrowns: { // 王冠之领主
-                gainEffect: EffectId.LordOfCrowns,
-                loseEffect: EffectId.LordOfCrowns,
-                gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限给自己
-                useEffectDuration: true,
-                // icon: 'cactbot/resources/icon/status/lord-of-crowns.png',
-                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/a/a8/003147.png',
-                icon: '../resources/img/003147.png',
-                borderColor: '#9a2222',
-                sortKey: 1,
-                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                increasesJob: {melee: 8, ranged: 4},
-                tts: '近卡',
-            },
+            // ladyOfCrowns: { // 王冠之贵妇
+            //     gainEffect: EffectId.LadyOfCrowns,
+            //     loseEffect: EffectId.LadyOfCrowns,
+            //     gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限给自己
+            //     useEffectDuration: true,
+            //     // icon: 'cactbot/resources/icon/status/lady-of-crowns.png',
+            //     // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/5/59/003146.png',
+            //     icon: '../resources/img/003146.png',
+            //     borderColor: '#9e5599',
+            //     sortKey: 1,
+            //     incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+            //     increasesJob: {melee: 4, ranged: 8},
+            //     tts: '远卡',
+            // },
+            // lordOfCrowns: { // 王冠之领主
+            //     gainEffect: EffectId.LordOfCrowns,
+            //     loseEffect: EffectId.LordOfCrowns,
+            //     gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限给自己
+            //     useEffectDuration: true,
+            //     // icon: 'cactbot/resources/icon/status/lord-of-crowns.png',
+            //     // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/a/a8/003147.png',
+            //     icon: '../resources/img/003147.png',
+            //     borderColor: '#9a2222',
+            //     sortKey: 1,
+            //     incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+            //     increasesJob: {melee: 8, ranged: 4},
+            //     tts: '近卡',
+            // },
             // 武僧
             riddleOfFire: { // [23:31:04.573] 1A:1039A1D9:xxx gains the effect of 红莲极意 from xxx for 20.00 Seconds.
                 gainEffect: OwnEffectId.RiddleOfFire,
@@ -1163,6 +1182,18 @@ class BuffTracker {
                 // icon: 'https://xivapi.com/i/003000/003554.png',
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/4/4d/003554.png',
                 icon: '../resources/img/003554.png',
+                borderColor: '#62daf8',
+                sortKey: 1,
+                buffType: 'magic', // physical
+                dotNotice: true,
+            },
+            eukrasianDosisIii: { //[23:24:52.095] 1A:400001B8:木人 gains the effect of 焚灼 from xxx for 30.00 Seconds.
+                mobGainsOwnEffect: OwnEffectId.EukrasianDosisIii,
+                mobLosesOwnEffect: OwnEffectId.EukrasianDosisIii,
+                useEffectDuration: true,
+                // icon: 'https://xivapi.com/i/003000/003554.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/4/4d/003554.png',
+                icon: '../resources/img/',
                 borderColor: '#62daf8',
                 sortKey: 1,
                 buffType: 'magic', // physical
