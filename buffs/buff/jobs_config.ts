@@ -1,4 +1,4 @@
-import UserConfig from '../../resources/user_config';
+import UserConfig from '../cactbot/resources/user_config';
 
 UserConfig.registerOptions('jobs', {
   options: [

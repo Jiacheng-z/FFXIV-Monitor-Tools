@@ -7,11 +7,79 @@ import { BuffTracker } from '../buff_tracker';
 import { JobsEventEmitter } from '../event_emitter';
 import { JobsOptions } from '../jobs_options';
 import { Player } from '../player';
-import { doesJobNeedMPBar, RegexesHolder } from '../utils';
+import { doesJobNeedMPBar, isPvPZone, RegexesHolder } from '../utils';
 
+import { ASTComponent } from './ast';
 import { BaseComponent, ComponentInterface, ShouldShow } from './base';
+import { BLMComponent } from './blm';
+import { BLUComponent } from './blu';
+import { BRDComponent } from './brd';
+import { DNCComponent } from './dnc';
+import { DRGComponent } from './drg';
+import { DRKComponent } from './drk';
+import { GNBComponent } from './gnb';
+import { MCHComponent } from './mch';
+import { MNKComponent } from './mnk';
+import { NINComponent } from './nin';
+import { PLDComponent } from './pld';
+import { RDMComponent } from './rdm';
+import { RPRComponent } from './rpr';
+import { SAMComponent } from './sam';
+import { SCHComponent } from './sch';
+import { SGEComponent } from './sge';
+import { SMN5xComponent, SMNComponent } from './smn';
+import { WARComponent } from './war';
+import { WHMComponent } from './whm';
 
-// const ComponentMap: Record<Job, typeof BaseComponent> = {}
+const ComponentMap: Record<Job, typeof BaseComponent> = {
+  // tank
+  GLA: PLDComponent,
+  PLD: PLDComponent,
+  MRD: WARComponent,
+  WAR: WARComponent,
+  DRK: DRKComponent,
+  GNB: GNBComponent,
+  // healer
+  CNJ: WHMComponent,
+  WHM: WHMComponent,
+  SCH: SCHComponent,
+  AST: ASTComponent,
+  SGE: SGEComponent,
+  // melee dps
+  PGL: MNKComponent,
+  MNK: MNKComponent,
+  LNC: BaseComponent,
+  DRG: DRGComponent,
+  ROG: NINComponent,
+  NIN: NINComponent,
+  SAM: SAMComponent,
+  RPR: RPRComponent,
+  // ranged dps
+  ARC: BRDComponent,
+  BRD: BRDComponent,
+  MCH: MCHComponent,
+  DNC: DNCComponent,
+  // magic dps
+  ACN: SMNComponent,
+  SMN: SMNComponent,
+  THM: BLMComponent,
+  BLM: BLMComponent,
+  RDM: RDMComponent,
+  BLU: BLUComponent,
+  // crafter & gatherer
+  CRP: BaseComponent,
+  BSM: BaseComponent,
+  ARM: BaseComponent,
+  GSM: BaseComponent,
+  LTW: BaseComponent,
+  WVR: BaseComponent,
+  ALC: BaseComponent,
+  CUL: BaseComponent,
+  MIN: BaseComponent,
+  BTN: BaseComponent,
+  FSH: BaseComponent,
+  NONE: BaseComponent,
+};
 
 export class ComponentManager {
   bars: Bars;
@@ -28,7 +96,9 @@ export class ComponentManager {
   shouldShow: ShouldShow;
   contentType?: number;
   inPvPZone?: boolean;
-
+  // food buffs
+  foodBuffExpiresTimeMs: number;
+  foodBuffTimer: number;
   // gp potions
   gpAlarmReady: boolean;
   gpPotion: boolean;
@@ -46,6 +116,8 @@ export class ComponentManager {
     this.shouldShow = {};
     this.contentType = undefined;
 
+    this.foodBuffExpiresTimeMs = 0;
+    this.foodBuffTimer = 0;
     this.gpAlarmReady = false;
     this.gpPotion = false;
 
@@ -54,11 +126,28 @@ export class ComponentManager {
     this.setupListeners();
   }
 
+  getJobComponents(job: Job): BaseComponent {
+    // For CN/KR that is still in 5.x
+    if (this.o.is5x) {
+      if (job === 'SMN')
+        return new SMN5xComponent(this.o);
+    }
+
+    const Component = ComponentMap[job];
+    if (!Component)
+      return new BaseComponent(this.o);
+
+    return new Component(this.o);
+  }
+
   setupListeners(): void {
     this.ee.registerOverlayListeners();
 
     // bind party changed event
-    this.ee.on('party', (party) => this.partyTracker.onPartyChanged({ party }));
+    this.ee.on('party', (party) => {
+      this.partyTracker.onPartyChanged({ party })
+      // TODO::设置小队正则
+    });
 
     this.player.on('job', (job) => {
       this.gpAlarmReady = false;
@@ -77,12 +166,21 @@ export class ComponentManager {
       // hide container html element if the player is a crafter
       this.bars.setJobsContainerVisibility(!Util.isCraftingJob(job));
 
+      // initialize components
+      this.component = this.getJobComponents(job);
+
       // add food buff trigger
       this.player.onYouGainEffect((id, matches) => {
         if (id === EffectId.WellFed) {
           // const seconds = parseFloat(matches.duration ?? '0');
           // const now = Date.now(); // This is in ms.
           // this.foodBuffExpiresTimeMs = now + (seconds * 1000);
+          // this.bars._updateFoodBuff({
+          //   inCombat: this.component?.inCombat ?? false,
+          //   foodBuffExpiresTimeMs: this.foodBuffExpiresTimeMs,
+          //   foodBuffTimer: this.foodBuffTimer,
+          //   contentType: this.contentType,
+          // });
         }
       });
       // As you cannot change jobs in combat, we can assume that
@@ -121,8 +219,9 @@ export class ComponentManager {
       }
       this.buffTracker?.onUseAbility(id, matches);
     });
+    this.player.on('action/party', (id, matches) => this.buffTracker?.onUseAbility(id, matches));
 
-    this.player.on('action/other', (id, matches) => this.buffTracker?.onUseAbility(id, matches));
+    // this.player.on('action/other', (id, matches) => this.buffTracker?.onUseAbility(id, matches));
 
     this.player.on(
       'effect/gain/you',
@@ -147,8 +246,13 @@ export class ComponentManager {
     });
 
     this.ee.on('zone/change', (id, _name, info) => {
+      this.inPvPZone = isPvPZone(id);
       this.contentType = info?.contentType;
+
       this.buffTracker?.clear();
+
+      // Hide UI except HP and MP bar if change to pvp area.
+      this.bars._updateUIVisibility(this.inPvPZone);
     });
 
     this.ee.on('log/game', (_log, _line, rawLine) => {

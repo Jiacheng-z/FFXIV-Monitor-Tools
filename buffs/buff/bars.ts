@@ -1,10 +1,11 @@
-import { UnreachableCode } from '../cactbot/resources/not_reached';
-import ResourceBar from '../cactbot/resources/resourcebar';
-import TimerBar from '../cactbot/resources/timerbar';
-import TimerBox from '../cactbot/resources/timerbox';
-import Util from '../cactbot/resources/util';
-import WidgetList, { Toward } from '../cactbot/resources/widget_list';
-import { Job } from '../cactbot/types/job';
+import foodImage from '../../resources/ffxiv/status/food.png';
+import { UnreachableCode } from '../../resources/not_reached';
+import ResourceBar from '../../resources/resourcebar';
+import TimerBar from '../../resources/timerbar';
+import TimerBox from '../../resources/timerbox';
+import Util from '../../resources/util';
+import WidgetList, { Toward } from '../../resources/widget_list';
+import { Job } from '../../types/job';
 
 import { ShouldShow } from './components/base';
 import {
@@ -729,26 +730,26 @@ export class Bars {
     const showAfterMs = TimeToShowWellFedWarning();
 
     if (!canShow || showAfterMs > 0) {
-      // this.o.leftBuffsList.removeElement('foodbuff');
+      this.o.leftBuffsList.removeElement('foodbuff');
       if (canShow)
         return window.setTimeout(this._updateFoodBuff.bind(this), showAfterMs);
     } else {
-      // const div = makeAuraTimerIcon(
-      //   'foodbuff',
-      //   -1,
-      //   1,
-      //   this.options.BigBuffIconWidth,
-      //   this.options.BigBuffIconHeight,
-      //   '',
-      //   this.options.BigBuffBarHeight,
-      //   this.options.BigBuffTextHeight,
-      //   'white',
-      //   this.options.BigBuffBorderSize,
-      //   'yellow',
-      //   'yellow',
-      //   foodImage,
-      // );
-      // this.o.leftBuffsList.addElement('foodbuff', div, -1);
+      const div = makeAuraTimerIcon(
+        'foodbuff',
+        -1,
+        1,
+        this.options.BigBuffIconWidth,
+        this.options.BigBuffIconHeight,
+        '',
+        this.options.BigBuffBarHeight,
+        this.options.BigBuffTextHeight,
+        'white',
+        this.options.BigBuffBorderSize,
+        'yellow',
+        'yellow',
+        foodImage,
+      );
+      this.o.leftBuffsList.addElement('foodbuff', div, -1);
     }
   }
 

@@ -1,5 +1,5 @@
-import ContentType from '../../resources/content_type';
-import { Job } from '../../types/job';
+import ContentType from '../cactbot/resources/content_type';
+import { Job } from '../cactbot/types/job';
 
 export const kMeleeWithMpJobs: Job[] = ['PLD', 'DRK'];
 

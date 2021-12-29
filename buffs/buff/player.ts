@@ -1,11 +1,11 @@
 import EventEmitter from 'eventemitter3';
 import { isEqual } from 'lodash';
 
-import logDefinitions from '../../resources/netlog_defs';
-import ZoneInfo from '../../resources/zone_info';
-import { EventResponses as OverlayEventResponses, JobDetail } from '../../types/event';
-import { Job } from '../../types/job';
-import { NetFields } from '../../types/net_fields';
+import logDefinitions from '../cactbot/resources/netlog_defs';
+import ZoneInfo from '../cactbot/resources/zone_info';
+import { EventResponses as OverlayEventResponses, JobDetail } from '../cactbot/types/event';
+import { Job } from '../cactbot/types/job';
+import { NetFields } from '../cactbot/types/net_fields';
 
 import { ComboCallback, ComboTracker } from './combo_tracker';
 import { JobsEventEmitter, PartialFieldMatches } from './event_emitter';

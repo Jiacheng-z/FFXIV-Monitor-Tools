@@ -1,5 +1,5 @@
-import PartyTracker from '../../resources/party';
-import UserConfig from '../../resources/user_config';
+import PartyTracker from '../cactbot/resources/party';
+import UserConfig from '../cactbot/resources/user_config';
 
 import { Bars } from './bars';
 import { ComponentManager } from './components';
@@ -7,7 +7,7 @@ import { JobsEventEmitter } from './event_emitter';
 import defaultOptions from './jobs_options';
 import { Player } from './player';
 
-import '../../resources/defaults.css';
+import '../cactbot/resources/defaults.css';
 import './jobs.css';
 
 UserConfig.getUserConfigLocation('jobs', defaultOptions, () => {
