@@ -1,11 +1,11 @@
-import {Bars} from "../../cactbot/ui/jobs/bars";
-import {JobsEventEmitter, PartialFieldMatches} from "../../cactbot/ui/jobs/event_emitter";
-import {JobsOptions} from "../../cactbot/ui/jobs/jobs_options";
-import PartyTracker from "../../cactbot/resources/party";
-import {Player} from "../../cactbot/ui/jobs/player";
-import {kComboDelay, kComboDelay5x} from "../../cactbot/ui/jobs/constants";
-import {JobDetail} from "../../cactbot/types/event";
-import {ComboTracker} from "../../cactbot/ui/jobs/combo_tracker";
+import PartyTracker from '../../cactbot/resources/party';
+import { JobDetail } from '../../cactbot/types/event';
+import { Bars } from '../bars';
+import { ComboTracker } from '../combo_tracker';
+import { kComboDelay, kComboDelay5x } from '../constants';
+import { JobsEventEmitter, PartialFieldMatches } from '../event_emitter';
+import { JobsOptions } from '../jobs_options';
+import { Player } from '../player';
 
 export type ShouldShow = {
   buffList?: boolean;

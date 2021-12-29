@@ -1,12 +1,17 @@
-import {Bars} from "../../cactbot/ui/jobs/bars";
-import {BuffTracker} from "../../cactbot/ui/jobs/buff_tracker";
-import {JobsEventEmitter} from "../../cactbot/ui/jobs/event_emitter";
-import {JobsOptions} from "../../cactbot/ui/jobs/jobs_options";
-import PartyTracker from "../../cactbot/resources/party";
-import {Player} from "../../cactbot/ui/jobs/player";
-import {RegexesHolder} from "../../cactbot/ui/jobs/utils";
-import {BaseComponent, ComponentInterface, ShouldShow} from "./base";
-import Util from "../../cactbot/resources/util";
+import EffectId from '../../cactbot/resources/effect_id';
+import PartyTracker from '../../cactbot/resources/party';
+import Util from '../../cactbot/resources/util';
+import { Job } from '../../cactbot/types/job';
+import { Bars } from '../bars';
+import { BuffTracker } from '../buff_tracker';
+import { JobsEventEmitter } from '../event_emitter';
+import { JobsOptions } from '../jobs_options';
+import { Player } from '../player';
+import { doesJobNeedMPBar, RegexesHolder } from '../utils';
+
+import { BaseComponent, ComponentInterface, ShouldShow } from './base';
+
+// const ComponentMap: Record<Job, typeof BaseComponent> = {}
 
 export class ComponentManager {
   bars: Bars;
@@ -22,6 +27,13 @@ export class ComponentManager {
   // misc variables
   shouldShow: ShouldShow;
   contentType?: number;
+  inPvPZone?: boolean;
+
+  // gp potions
+  gpAlarmReady: boolean;
+  gpPotion: boolean;
+  // true if player is too far away from their target
+  far?: boolean;
 
   constructor(private o: ComponentInterface) {
     this.bars = o.bars;
@@ -34,6 +46,11 @@ export class ComponentManager {
     this.shouldShow = {};
     this.contentType = undefined;
 
+    this.gpAlarmReady = false;
+    this.gpPotion = false;
+
+    this.far = undefined;
+
     this.setupListeners();
   }
 
@@ -44,15 +61,17 @@ export class ComponentManager {
     this.ee.on('party', (party) => this.partyTracker.onPartyChanged({ party }));
 
     this.player.on('job', (job) => {
+      this.gpAlarmReady = false;
 
       this.bars._setupJobContainers(job, {
         buffList: this.shouldShow.buffList ?? true,
         pullBar: this.shouldShow.pullBar ?? true,
-        hpBar: false,
-        mpBar: false,
-        cpBar: false,
-        gpBar: false,
-        mpTicker: false,
+        hpBar: this.shouldShow.hpBar ?? (!Util.isCraftingJob(job) && !Util.isGatheringJob(job)),
+        mpBar: this.shouldShow.mpBar ??
+          (!Util.isCraftingJob(job) && !Util.isGatheringJob(job) && doesJobNeedMPBar(job)),
+        cpBar: this.shouldShow.cpBar ?? Util.isCraftingJob(job),
+        gpBar: this.shouldShow.gpBar ?? Util.isGatheringJob(job),
+        mpTicker: this.shouldShow.mpTicker ?? this.options.ShowMPTicker.includes(job),
       });
 
       // hide container html element if the player is a crafter
@@ -60,6 +79,11 @@ export class ComponentManager {
 
       // add food buff trigger
       this.player.onYouGainEffect((id, matches) => {
+        if (id === EffectId.WellFed) {
+          // const seconds = parseFloat(matches.duration ?? '0');
+          // const now = Date.now(); // This is in ms.
+          // this.foodBuffExpiresTimeMs = now + (seconds * 1000);
+        }
       });
       // As you cannot change jobs in combat, we can assume that
       // it is always false here.
@@ -69,12 +93,12 @@ export class ComponentManager {
       if (this.bars.o.leftBuffsList && this.bars.o.rightBuffsList) {
         // Set up the buff tracker after the job bars are created.
         this.buffTracker = new BuffTracker(
-            this.options,
-            this.player.name,
-            this.bars.o.leftBuffsList,
-            this.bars.o.rightBuffsList,
-            this.partyTracker,
-            this.is5x,
+          this.options,
+          this.player.name,
+          this.bars.o.leftBuffsList,
+          this.bars.o.rightBuffsList,
+          this.partyTracker,
+          this.is5x,
         );
       }
     });
@@ -89,14 +113,20 @@ export class ComponentManager {
     });
 
     this.player.on('action/you', (id, matches) => {
+      if (this.regexes?.cordialRegex.test(id)) {
+        this.gpPotion = true;
+        window.setTimeout(() => {
+          this.gpPotion = false;
+        }, 2000);
+      }
       this.buffTracker?.onUseAbility(id, matches);
     });
 
     this.player.on('action/other', (id, matches) => this.buffTracker?.onUseAbility(id, matches));
 
     this.player.on(
-        'effect/gain/you',
-        (id, matches) => this.buffTracker?.onYouGainEffect(id, matches),
+      'effect/gain/you',
+      (id, matches) => this.buffTracker?.onYouGainEffect(id, matches),
     );
 
     this.player.on('effect/gain', (id, matches) => {
@@ -106,8 +136,8 @@ export class ComponentManager {
     });
 
     this.player.on(
-        'effect/lose/you',
-        (id, matches) => this.buffTracker?.onYouLoseEffect(id, matches),
+      'effect/lose/you',
+      (id, matches) => this.buffTracker?.onYouLoseEffect(id, matches),
     );
 
     this.player.on('effect/lose', (id, matches) => {
@@ -117,20 +147,8 @@ export class ComponentManager {
     });
 
     this.ee.on('zone/change', (id, _name, info) => {
-      this.inPvPZone = isPvPZone(id);
       this.contentType = info?.contentType;
-
-      this.bars._updateFoodBuff({
-        inCombat: this.component?.inCombat ?? false,
-        foodBuffExpiresTimeMs: this.foodBuffExpiresTimeMs,
-        foodBuffTimer: this.foodBuffTimer,
-        contentType: this.contentType,
-      });
-
       this.buffTracker?.clear();
-
-      // Hide UI except HP and MP bar if change to pvp area.
-      this.bars._updateUIVisibility(this.inPvPZone);
     });
 
     this.ee.on('log/game', (_log, _line, rawLine) => {
@@ -158,18 +176,18 @@ export class ComponentManager {
 
     // Hide CP Bar when not crafting
     const anyRegexMatched = (line: string, array: RegExp[]) =>
-        array.some((regex) => regex.test(line));
+      array.some((regex) => regex.test(line));
 
     // if the current player is crafting, show the bars;
     // otherwise, hide them
     if (anyRegexMatched(message, this.regexes.craftingStartRegexes))
       this.bars.setJobsContainerVisibility(true);
     if (
-        anyRegexMatched(message, this.regexes.craftingStopRegexes) ||
-        this.regexes.craftingFinishRegexes.some((regex) => {
-          const m = regex.exec(message)?.groups;
-          return m && (!m.player || m.player === this.player.name);
-        })
+      anyRegexMatched(message, this.regexes.craftingStopRegexes) ||
+      this.regexes.craftingFinishRegexes.some((regex) => {
+        const m = regex.exec(message)?.groups;
+        return m && (!m.player || m.player === this.player.name);
+      })
     )
       this.bars.setJobsContainerVisibility(false);
   }

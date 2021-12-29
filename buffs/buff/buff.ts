@@ -1,13 +1,13 @@
 import UserConfig from "../cactbot/resources/user_config";
-import defaultOptions from "../cactbot/ui/jobs/jobs_options";
-import {JobsEventEmitter} from "../cactbot/ui/jobs/event_emitter";
-import {Player} from "../cactbot/ui/jobs/player";
+import defaultOptions from "./jobs_options";
+import {JobsEventEmitter} from "./event_emitter";
+import {Player} from "./player";
 import PartyTracker from "../cactbot/resources/party";
-import {Bars} from "../cactbot/ui/jobs/bars";
+import {Bars} from "./bars";
 import {ComponentManager} from "./components";
 
 import '../cactbot/resources/defaults.css';
-import '../cactbot/ui/jobs/jobs.css';
+import './jobs.css';
 
 UserConfig.getUserConfigLocation('buff', defaultOptions, () => {
     const options = { ...defaultOptions };
