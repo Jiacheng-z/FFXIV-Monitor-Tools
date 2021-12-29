@@ -1,11 +1,11 @@
 import EventEmitter from 'eventemitter3';
 
-import logDefinitions from '../../resources/netlog_defs';
-import { addOverlayListener } from '../../resources/overlay_plugin_api';
-import ZoneInfo from '../../resources/zone_info';
-import { EventResponses as OverlayEventResponses, Party } from '../../types/event';
-import { NetFields } from '../../types/net_fields';
-import { ToMatches } from '../../types/net_matches';
+import logDefinitions from '../cactbot/resources/netlog_defs';
+import { addOverlayListener } from '../cactbot/resources/overlay_plugin_api';
+import ZoneInfo from '../cactbot/resources/zone_info';
+import { EventResponses as OverlayEventResponses, Party } from '../cactbot/types/event';
+import { NetFields } from '../cactbot/types/net_fields';
+import { ToMatches } from '../cactbot/types/net_matches';
 
 import { Player } from './player';
 import { normalizeLogLine } from './utils';
