@@ -1847,6 +1847,7 @@ class Brds {
             // 其他人给自己上的buff
             let m = log.match(kYouGainEffectRegex);
             if (m) {
+                console.log(m);
                 const effectId = m.groups.effectId.toUpperCase();
                 let f = this.gainEffectFuncMap[effectId];
                 if (f)
@@ -1858,6 +1859,7 @@ class Brds {
             // 小队(自己)给(BOSS/宠物)的(BUFF/DOT)
             m = log.match(kMobGainsOwnEffectRegex);
             if (m) {
+                console.log(m);
                 const effectId = m.groups.effectId.toUpperCase();
                 this.buffTracker.onYouGainEffect(effectId, log, m.groups);
                 this.buffTracker.onMobGainsOwnEffect(effectId, m.groups);
@@ -1867,6 +1869,7 @@ class Brds {
             // 小队(其他人)给(BOSS/宠物)的BUFF
             m = log.match(kMobGainsPartyEffectRegex);
             if (m) {
+                console.log(m);
                 const effectId = m.groups.effectId.toUpperCase();
                 this.buffTracker.onYouGainEffect(effectId, log, m.groups);
             }
