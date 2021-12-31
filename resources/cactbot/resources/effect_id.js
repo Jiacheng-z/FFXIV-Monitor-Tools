@@ -1144,7 +1144,7 @@ const EffectId = {
   'RightArmOperational': '46A',
   'RightArmPrimed': 'A0F',
   'RightArmReassembly': '467',
-  'RightEye': '5AD', // TODO::776
+  'RightEye': '776', // TODO::776  5AD
   'RightUnseen': '6AB',
   'RightWithThee': '8C3',
   'RightwardWhimsy': 'B18',
