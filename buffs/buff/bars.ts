@@ -1,4 +1,3 @@
-import foodImage from '../cactbot/resources/ffxiv/status/food.png';
 import { UnreachableCode } from '../cactbot/resources/not_reached';
 import ResourceBar from '../cactbot/resources/resourcebar';
 import TimerBar from '../cactbot/resources/timerbar';
@@ -15,13 +14,12 @@ import {
   kMPUI1Rate,
   kMPUI2Rate,
   kMPUI3Rate,
-  kWellFedContentTypes,
 } from './constants';
 import { JobsEventEmitter } from './event_emitter';
 import './jobs_config';
 import { JobsOptions } from './jobs_options';
 import { Player } from './player';
-import { computeBackgroundColorFrom, makeAuraTimerIcon } from './utils';
+import { computeBackgroundColorFrom } from './utils';
 
 // // text on the pull countdown.
 // const kPullText = {
@@ -34,7 +32,7 @@ import { computeBackgroundColorFrom, makeAuraTimerIcon } from './utils';
 // };
 
 type JobDomObjects = {
-  injury?: HTMLElement;
+  damageUp?: HTMLElement;
   buffsList?: WidgetList;
   dotsList?: WidgetList;
 
@@ -114,9 +112,9 @@ export class Bars {
 
     // 添加增伤模块
     const injuryContainer = document.createElement('div');
-    injuryContainer.id = 'injury';
+    injuryContainer.id = 'damage-up';
     barsLayoutContainer.appendChild(injuryContainer);
-    this.o.injury = this.addInjuryBar();
+    this.o.damageUp = this.addDamageUpBar();
 
     // 添加左侧buff框
     const buffContainer = document.createElement('div');
@@ -293,8 +291,8 @@ export class Bars {
     return bar;
   }
 
-    addInjuryBar(): HTMLElement {
-      let barsContainer = document.getElementById('injury');
+    addDamageUpBar(): HTMLElement {
+      let barsContainer = document.getElementById('damage-up');
       if (!barsContainer) {
         barsContainer = document.createElement('div');
         barsContainer.id = 'injury';
@@ -302,7 +300,7 @@ export class Bars {
 
       // 物理增伤
       const physicalContainer = document.createElement('div');
-      physicalContainer.id = 'injury-physical';
+      physicalContainer.id = 'damage-up-physical';
       physicalContainer.style.color = '#ff8129'; // TODO::配置 文字颜色
       physicalContainer.style.fontSize = '20'; // TODO::配置 文字大小
       physicalContainer.setAttribute('value', String(0));
@@ -311,7 +309,7 @@ export class Bars {
 
       // 魔法增伤
       const magicContainer = document.createElement('div');
-      magicContainer.id = 'injury-magic';
+      magicContainer.id = 'damage-up-magic';
       magicContainer.style.color = '#07d5ee'; // TODO::配置 文字颜色
       magicContainer.style.fontSize = '20'; // TODO::配置 文字大小
       magicContainer.style.top = '20'; // TODO::配置 同 physicalContainer.style.fontSize
@@ -700,63 +698,6 @@ export class Bars {
     opacityContainer.style.opacity = transparent
       ? this.options.OpacityOutOfCombat.toString()
       : '1.0';
-  }
-
-  _updateFoodBuff(o: {
-    inCombat: boolean;
-    contentType?: number;
-    foodBuffExpiresTimeMs: number;
-    foodBuffTimer: number;
-  }): number | undefined {
-    // Non-combat jobs don't set up the left buffs list.
-    if (!this.o.leftBuffsList)
-      return;
-
-    const CanShowWellFedWarning = () => {
-      if (!this.options.HideWellFedAboveSeconds)
-        return false;
-      if (o.inCombat)
-        return false;
-      if (o.contentType === undefined)
-        return false;
-      return kWellFedContentTypes.includes(o.contentType);
-    };
-
-    // Returns the number of ms until it should be shown. If <= 0, show it.
-    const TimeToShowWellFedWarning = () => {
-      const nowMs = Date.now();
-      const showAtMs = o.foodBuffExpiresTimeMs - (this.options.HideWellFedAboveSeconds * 1000);
-      return showAtMs - nowMs;
-    };
-
-    window.clearTimeout(o.foodBuffTimer);
-    o.foodBuffTimer = 0;
-
-    const canShow = CanShowWellFedWarning();
-    const showAfterMs = TimeToShowWellFedWarning();
-
-    if (!canShow || showAfterMs > 0) {
-      this.o.leftBuffsList.removeElement('foodbuff');
-      if (canShow)
-        return window.setTimeout(this._updateFoodBuff.bind(this), showAfterMs);
-    } else {
-      const div = makeAuraTimerIcon(
-        'foodbuff',
-        -1,
-        1,
-        this.options.BigBuffIconWidth,
-        this.options.BigBuffIconHeight,
-        '',
-        this.options.BigBuffBarHeight,
-        this.options.BigBuffTextHeight,
-        'white',
-        this.options.BigBuffBorderSize,
-        'yellow',
-        'yellow',
-        foodImage,
-      );
-      this.o.leftBuffsList.addElement('foodbuff', div, -1);
-    }
   }
 
   _setPullCountdown(seconds: number): void {

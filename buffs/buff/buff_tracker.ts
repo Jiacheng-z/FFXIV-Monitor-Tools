@@ -35,9 +35,11 @@ import { NetMatches } from '../cactbot/types/net_matches';
 import { kAbility } from './constants';
 import { JobsOptions } from './jobs_options';
 import { makeAuraTimerIcon } from './utils';
+import {callOverlayHandler} from "../cactbot/resources/overlay_plugin_api";
 
 export interface BuffInfo {
   name: string;
+  activeAbility?: string[];
   cooldownAbility?: string[];
   gainEffect?: string[];
   loseEffect?: string[];
@@ -54,6 +56,11 @@ export interface BuffInfo {
   hide?: boolean;
   stack?: number;
   partyOnly?: boolean;
+
+  target?: 'you' | 'boss' ; // 赋给自己? true:给自己, false:给boss
+  physicalUp?: number; //物理增伤百分比
+  magicUp?: number; // 魔法增伤百分比
+  tts?: string; // tts播报
 }
 
 export interface Aura {
@@ -171,6 +178,19 @@ export class Buff {
     opacity: number,
     expireCallback?: () => void,
   ): Aura {
+    // 制作强化药
+    if (this.info.gainEffect) {
+      for (const e of this.info.gainEffect) {
+        if (e === EffectId.Medicated && seconds >= 120) {
+          return {
+            addCallback(): void {},
+            removeCallback(): void {},
+            addTimeout: null,  removeTimeout: null
+          };
+        }
+      }
+    }
+
     const aura: Aura = {
       removeCallback: () => {
         list.removeElement(key);
@@ -182,6 +202,7 @@ export class Buff {
           window.clearTimeout(aura.removeTimeout);
           aura.removeTimeout = null;
         }
+        // TODO::刷DOT计算
       },
 
       addCallback: () => {
@@ -193,15 +214,25 @@ export class Buff {
           this.options.BigBuffIconHeight,
           txt,
           this.options.BigBuffBarHeight,
-          this.options.BigBuffTextHeight,
+          0,
           textColor,
           this.options.BigBuffBorderSize,
           this.info.borderColor,
           this.info.borderColor,
           this.info.icon,
+          this.info
         );
         list.addElement(key, elem, this.info.sortKey + adjustSort);
         aura.addTimeout = null;
+        // TODO::刷DOT计算
+
+        // 语音播报 TODO::tts DOT开关 buff开关
+        if (this.info.tts != null && this.info.tts != '') {
+          void callOverlayHandler({
+            call: 'cactbotSay',
+            text: this.info.tts,
+          });
+        }
 
         if (seconds > 0) {
           aura.removeTimeout = window.setTimeout(() => {
@@ -268,6 +299,7 @@ export class BuffTracker {
   buffs: { [s: string]: Buff };
   gainEffectMap: { [s: string]: BuffInfo[] };
   loseEffectMap: { [s: string]: BuffInfo[] };
+  activeAbilityMap: { [s: string]: BuffInfo[]; };
   cooldownAbilityMap: { [s: string]: BuffInfo[] };
   mobGainsEffectMap: { [s: string]: BuffInfo[] };
   mobLosesEffectMap: { [s: string]: BuffInfo[] };
@@ -295,10 +327,10 @@ export class BuffTracker {
         borderColor: '#db6509',
         sortKey: 0,
         cooldown: 80,
-        // incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-        // incrPhysical: 10, // 物理增伤
-        // incrMagic: 10, // 魔法增伤
-        // tts: '猛者',
+        target: 'you',
+        physicalUp: 10,
+        magicUp: 10,
+        tts: '猛者',
       },
       potion: {
         gainEffect: [EffectId.Medicated],
@@ -692,6 +724,7 @@ export class BuffTracker {
 
     this.gainEffectMap = {};
     this.loseEffectMap = {};
+    this.activeAbilityMap = {};
     this.cooldownAbilityMap = {};
     this.mobGainsEffectMap = {};
     this.mobLosesEffectMap = {};
@@ -699,6 +732,7 @@ export class BuffTracker {
     const propToMapMap = {
       gainEffect: this.gainEffectMap,
       loseEffect: this.loseEffectMap,
+      activeAbility: this.activeAbilityMap,
       cooldownAbility: this.cooldownAbilityMap,
       mobGainsEffect: this.mobGainsEffectMap,
       mobLosesEffect: this.mobLosesEffectMap,
@@ -740,7 +774,7 @@ export class BuffTracker {
   }
 
   onUseAbility(id: string, matches: Partial<NetMatches['Ability']>): void {
-    const buffs = this.cooldownAbilityMap[id];
+    const buffs = this.activeAbilityMap[id];
     if (!buffs)
       return;
 
@@ -751,15 +785,20 @@ export class BuffTracker {
           return;
       }
 
-      // This durationSeconds is not used for countdown active time,
-      // but for preventing cooldown icon appear when effect is still active and duplicated.
-      // +1 for delay between ability and effect.
-      // FIXME: if you miss the buff, cooldown will appear at least after normal duration end.
-      let seconds = 0;
-      if (b.durationSeconds)
-        seconds = b.durationSeconds + 1;
+      let seconds = -1;
+      if (b.useEffectDuration)
+        seconds = parseFloat(matches?.duration ?? '0');
+      else if ('durationSeconds' in b)
+        seconds = b.durationSeconds ?? seconds;
+      if ('stack' in b && b.stack !== parseInt(matches?.count ?? '0'))
+        return;
 
-      this.onBigBuff(b.name, seconds, b, matches?.source, 'cooldown');
+      this.onBigBuff(matches?.targetId, b.name, seconds, b, matches?.source, 'active');
+
+      // if (b.durationSeconds)
+      //   seconds = b.durationSeconds + 1;
+      //
+      // this.onBigBuff(b.name, seconds, b, matches?.source, 'cooldown');
     }
   }
 
@@ -778,7 +817,10 @@ export class BuffTracker {
       if ('stack' in b && b.stack !== parseInt(matches?.count ?? '0'))
         return;
 
-      this.onBigBuff(b.name, seconds, b, matches?.source, 'active');
+      this.onBigBuff(matches?.targetId, b.name, seconds, b, matches?.source, 'active');
+      // Some cooldowns (like potions) have no cooldownAbility, so also track them here.
+      // if (!b.cooldownAbility)
+      //   this.onBigBuff(b.name, seconds, b, matches?.source, 'cooldown');
     }
   }
 
@@ -809,23 +851,25 @@ export class BuffTracker {
   }
 
   onBigBuff(
+    target = 'unknown',
     name: string,
     seconds = 0,
     info: BuffInfo,
     source = '',
     option: 'active' | 'cooldown',
   ): void {
+    if (seconds <= 0)
+      return;
+
+    // TODO::根据职业判断远近职业
+    // TODO::判断物理魔法增伤
+
+    name = target + "=>" + name // 针对对boss技能. 保证不同boss分开倒计时.
+
     let list = this.buffsListDiv;
     let buff = this.buffs[name];
     if (!buff)
       buff = this.buffs[name] = new Buff(name, info, list, this.options);
-
-    const shareList = info.sharesCooldownWith || [];
-    for (const share of shareList) {
-      const existingBuff = this.buffs[share];
-      if (existingBuff)
-        existingBuff.clearCooldown(source);
-    }
 
     if (option === 'active' && seconds > 0)
       buff.onGain(seconds);

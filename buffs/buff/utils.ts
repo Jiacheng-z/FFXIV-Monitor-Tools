@@ -15,6 +15,7 @@ import { CactbotBaseRegExp } from '../cactbot/types/net_trigger';
 
 import { kLevelMod, kMeleeWithMpJobs } from './constants';
 import { SpeedBuffs } from './player';
+import {BuffInfo} from "./buff_tracker";
 
 const getLocaleRegex = (locale: string, regexes: {
   'en': RegExp;
@@ -157,6 +158,16 @@ export const computeBackgroundColorFrom = (element: HTMLElement, classList: stri
   return color;
 };
 
+export const bigBuff30sWidth = (): number => {
+  let body = document.getElementsByTagName('body')
+  if (!body || !body[0])
+    return 250
+
+  // TODO::BigBuffIconWidth DotIconWidth
+  let width = body[0].clientWidth - 32 - (32 + 1) - 5;
+  return (width > 250)? 250: width;
+};
+
 export const makeAuraTimerIcon = (
   name: string,
   seconds: number,
@@ -171,9 +182,19 @@ export const makeAuraTimerIcon = (
   borderColor: string,
   barColor: string,
   auraIcon: string,
+  info: BuffInfo,
 ): HTMLDivElement => {
   const div = document.createElement('div');
   div.style.opacity = opacity.toString();
+  div.className = 'buffs'
+  // 设置buff详细信息
+  div.setAttribute('buffs-name', name)
+  let target = (info.target != null) ? info.target:'you';
+  let physical = (info.physicalUp != null) ? info.physicalUp:0;
+  let magic = (info.magicUp != null) ? info.magicUp:0;
+  div.setAttribute('buffs-target', target) // 作用自己
+  div.setAttribute('buffs-incr-physical', physical.toString()) // 作用物理
+  div.setAttribute('buffs-incr-magic', magic.toString()) // 作用魔法
 
   const icon = TimerIcon.create({
     width: iconWidth.toString(),
@@ -184,16 +205,19 @@ export const makeAuraTimerIcon = (
   div.appendChild(icon);
 
   const barDiv = document.createElement('div');
-  barDiv.style.position = 'relative';
-  barDiv.style.top = iconHeight.toString();
+  barDiv.style.position = 'absolute'; //绝对位置
+  barDiv.style.left = iconWidth.toString(); // 图标位置
+  barDiv.style.fontSize = '50%'; // 字体大小
   div.appendChild(barDiv);
 
   if (seconds >= 0) {
     const bar = TimerBar.create();
-    bar.width = iconWidth.toString();
+    let c = bigBuff30sWidth()/30;
+    bar.width = (seconds * c).toString() // 动态长度
     bar.height = barHeight.toString();
     bar.fg = barColor;
     bar.duration = seconds;
+    bar.lefttext = 'remain';
     barDiv.appendChild(bar);
   }
 
@@ -221,7 +245,7 @@ export const makeAuraTimerIcon = (
     icon.text = iconText;
   icon.bordercolor = borderColor;
   icon.icon = auraIcon;
-  icon.duration = seconds;
+  // icon.duration = seconds;
 
   return div;
 };
