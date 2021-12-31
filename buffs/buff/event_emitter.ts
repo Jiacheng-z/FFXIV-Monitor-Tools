@@ -103,15 +103,16 @@ export class JobsEventEmitter extends EventEmitter<EventMap> {
           this.emit('effect/lose', matches.effectId, matches);
         break;
       }
-      case logDefinitions.NetworkDoT.type: {
-        const matches = normalizeLogLine(ev.line, logDefinitions.NetworkDoT.fields);
-        const damage = parseInt(matches.damage ?? '0', 16); // damage is in hex
-        if (matches.which === 'DoT')
-          this.emit('tick/dot', damage, matches);
-        else if (matches.which === 'HoT')
-          this.emit('tick/hot', damage, matches);
-        break;
-      }
+
+      // case logDefinitions.NetworkDoT.type: {
+      //   const matches = normalizeLogLine(ev.line, logDefinitions.NetworkDoT.fields);
+      //   const damage = parseInt(matches.damage ?? '0', 16); // damage is in hex
+      //   if (matches.which === 'DoT')
+      //     this.emit('tick/dot', damage, matches);
+      //   else if (matches.which === 'HoT')
+      //     this.emit('tick/hot', damage, matches);
+      //   break;
+      // }
 
       default:
         break;

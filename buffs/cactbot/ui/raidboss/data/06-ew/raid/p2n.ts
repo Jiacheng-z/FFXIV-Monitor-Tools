@@ -1,3 +1,4 @@
+import Conditions from '../../../../../resources/conditions';
 import NetRegexes from '../../../../../resources/netregexes';
 import Outputs from '../../../../../resources/outputs';
 import { callOverlayHandler } from '../../../../../resources/overlay_plugin_api';
@@ -9,10 +10,12 @@ import { TriggerSet } from '../../../../../types/trigger';
 
 export interface Data extends RaidbossData {
   bodyActor?: PluginCombatantState;
+  flareTarget?: string;
 }
 
 const triggerSet: TriggerSet<Data> = {
   zoneId: ZoneId.AsphodelosTheSecondCircle,
+  timelineFile: 'p2n.txt',
   triggers: [
     {
       id: 'P2N Murky Depths',
@@ -110,18 +113,26 @@ const triggerSet: TriggerSet<Data> = {
         nc: {
           en: 'North Corners',
           de: 'nördliche Ecken',
+          fr: 'Au coin nord',
+          ko: '북쪽 모서리',
         },
         ec: {
           en: 'East Corners',
           de: 'östliche Ecken',
+          fr: 'Au coin est',
+          ko: '동쪽 모서리',
         },
         sc: {
           en: 'South Corners',
           de: 'südliche Ecken',
+          fr: 'Au coin sud',
+          ko: '남쪽 모서리',
         },
         wc: {
           en: 'West Corners',
           de: 'westliche Ecken',
+          fr: 'Au coin ouest',
+          ko: '서쪽 모서리',
         },
       },
     },
@@ -132,13 +143,7 @@ const triggerSet: TriggerSet<Data> = {
       netRegexDe: NetRegexes.startsUsing({ id: '67F6', source: 'Hippokampos', capture: false }),
       netRegexFr: NetRegexes.startsUsing({ id: '67F6', source: 'Hippokampos', capture: false }),
       netRegexJa: NetRegexes.startsUsing({ id: '67F6', source: 'ヒッポカムポス', capture: false }),
-      alertText: (_data, _matches, output) => output.text!(),
-      outputStrings: {
-        text: {
-          en: 'Aoe--Get on grid',
-          de: 'AoE--Geh auf die Gitter',
-        },
-      },
+      response: Responses.aoe(),
     },
     {
       // Spread aoe marker on some players, not all
@@ -148,18 +153,7 @@ const triggerSet: TriggerSet<Data> = {
       netRegexDe: NetRegexes.startsUsing({ id: '6809', source: 'Hippokampos' }),
       netRegexFr: NetRegexes.startsUsing({ id: '6809', source: 'Hippokampos' }),
       netRegexJa: NetRegexes.startsUsing({ id: '6809', source: 'ヒッポカムポス' }),
-      condition: (data, matches) => matches.target === data.me,
-      response: Responses.spread(),
-    },
-    {
-      // Drops aoe zones beneath you -> run to dodge (on everyone)
-      id: 'P2N Sewage Erruption',
-      type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '680D', source: 'Hippokampos', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '680D', source: 'Hippokampos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '680D', source: 'Hippokampos', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '680D', source: 'ヒッポカムポス', capture: false }),
-      suppressSeconds: 5,
+      condition: Conditions.targetIsYou(),
       response: Responses.spread(),
     },
     {
@@ -173,6 +167,38 @@ const triggerSet: TriggerSet<Data> = {
       response: Responses.doritoStack(),
     },
     {
+      id: 'P2N Coherence Flare',
+      type: 'HeadMarker',
+      // This always comes before 6D14 below for the line stack marker.
+      netRegex: NetRegexes.headMarker({ id: '0057' }),
+      condition: Conditions.targetIsYou(),
+      alertText: (_data, _matches, output) => output.text!(),
+      run: (data, matches) => data.flareTarget = matches.target,
+      outputStrings: {
+        text: {
+          en: 'Flare on YOU',
+          de: 'Flare auf DIR',
+          fr: 'Brasier sur VOUS',
+          ja: '自分にフレア',
+          cn: '核爆点名',
+          ko: '플레어 대상자',
+        },
+      },
+    },
+    {
+      id: 'P2N Coherence Stack',
+      // Coherence (6801) cast has an unknown (6D14) ability with the target before it.
+      type: 'Ability',
+      netRegex: NetRegexes.ability({ id: '6D14' }),
+      condition: (data) => data.flareTarget !== data.me,
+      alertText: (data, matches, output) => output.lineStackOn!({ player: data.ShortName(matches.target) }),
+      outputStrings: {
+        lineStackOn: {
+          en: 'Line stack on ${player}',
+        },
+      },
+    },
+    {
       // Raidwide knockback -> dont get knocked into slurry
       id: 'P2N Shockwave',
       type: 'StartsUsing',
@@ -180,13 +206,7 @@ const triggerSet: TriggerSet<Data> = {
       netRegexDe: NetRegexes.startsUsing({ id: '6807', source: 'Hippokampos', capture: false }),
       netRegexFr: NetRegexes.startsUsing({ id: '6807', source: 'Hippokampos', capture: false }),
       netRegexJa: NetRegexes.startsUsing({ id: '6807', source: 'ヒッポカムポス', capture: false }),
-      alertText: (_data, _matches, output) => output.text!(),
-      outputStrings: {
-        text: {
-          en: 'Knockback--Stay on grid',
-          de: 'Rückstoß--Bleib auf den Gittern stehen',
-        },
-      },
+      response: Responses.knockback(),
     },
     {
       // Aoe from head outside the arena
@@ -206,6 +226,65 @@ const triggerSet: TriggerSet<Data> = {
       outputStrings: {
         e: Outputs.east,
         w: Outputs.west,
+      },
+    },
+  ],
+  timelineReplace: [
+    {
+      'locale': 'de',
+      'replaceSync': {
+        'Hippokampos': 'Hippokampos',
+      },
+      'replaceText': {
+        '\\(knockback\\)': '(Rückstoß)',
+        'Coherence Flare': 'Kohärenz Flare',
+        'Coherence Line': 'Kohärenz Linie',
+        'Dissociation(?! Dive)': 'Dissoziation',
+        'Dissociation Dive': 'Dissoziation Sturzflug',
+        'Doubled Impact': 'Doppeleinschlag',
+        'Murky Depths': 'Trübe Tiefen',
+        'Predatory Sight': 'Mal der Beute',
+        'Sewage Deluge': 'Abwasserflut',
+        'Sewage Eruption': 'Abwassereruption',
+        'Shockwave': 'Schockwelle',
+        'Spoken Cataract': 'Gehauchter Katarakt',
+        'Tainted Flood': 'Verseuchte Flut',
+      },
+    },
+    {
+      'locale': 'fr',
+      'missingTranslations': true,
+      'replaceSync': {
+        'Hippokampos': 'hippokampos',
+      },
+      'replaceText': {
+        'Dissociation': 'Dissociation',
+        'Doubled Impact': 'Double impact',
+        'Murky Depths': 'Tréfonds troubles',
+        'Predatory Sight': 'Marque de la proie',
+        'Sewage Deluge': 'Déluge d\'eaux usées',
+        'Sewage Eruption': 'Éruption d\'eaux usées',
+        'Shockwave': 'Onde de choc',
+        'Spoken Cataract': 'Souffle et cataracte',
+        'Tainted Flood': 'Inondation infâme',
+      },
+    },
+    {
+      'locale': 'ja',
+      'missingTranslations': true,
+      'replaceSync': {
+        'Hippokampos': 'ヒッポカムポス',
+      },
+      'replaceText': {
+        'Dissociation': 'ディソシエーション',
+        'Doubled Impact': 'ダブルインパクト',
+        'Murky Depths': 'マーキーディープ',
+        'Predatory Sight': '生餌の刻印',
+        'Sewage Deluge': 'スウェッジデリージュ',
+        'Sewage Eruption': 'スウェッジエラプション',
+        'Shockwave': 'ショックウェーブ',
+        'Spoken Cataract': 'ブレス＆カタラクティス',
+        'Tainted Flood': 'テインテッドフラッド',
       },
     },
   ],
