@@ -18,6 +18,7 @@ const OwnEffectId = {
     // 诗人
     'Stormbite': '4B1', // 风
     'CausticBite': '4B0', // 毒
+    'RadiantFinale': 'B94', // 最终
 
     // 骑士
     'Requiescat': '558', // 安魂祈祷
@@ -32,6 +33,9 @@ const OwnEffectId = {
     // 占星
     'CombustIII': '759', // 焚灼
 
+    // 贤者
+    'EukrasianDosisIii': 'A38',
+
     // 武僧
     'Demolish': 'F6',// 破碎拳
     'RiddleOfFire': '49D', // 红莲极意
@@ -41,6 +45,7 @@ const OwnEffectId = {
     'BattleLitany': '312', // 战斗连祷
     'LeftEye': '5AE', // 巨龙左眼
     'RightEye': '5AD', // 巨龙右眼
+    'RightEye2': '776', // 巨龙右眼
 
     // 忍着
     'TrickAttack': '27E', // 背刺
@@ -48,6 +53,8 @@ const OwnEffectId = {
 
     // 武士
     'Higanbana': '4CC', // 彼岸花
+    //镰刀
+    'DeathsDesign': 'A1A', // buff
     // 机工
     'Bioblaster': '74A', // 毒菌冲击
     // 黑魔
@@ -705,6 +712,21 @@ class BuffTracker {
                 incrMagic: 6, // 魔法增伤
                 tts: '占卜',
             },
+            astrodyne: { // 宏图
+                gainEffect: EffectId.HarmonyOfMind,
+                loseEffect: EffectId.HarmonyOfMind,
+                gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限给自己
+                useEffectDuration: true,
+                // icon: 'cactbot/resources/icon/status/divination.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/f/fc/003553.png',
+                icon: '../resources/img/003558.png',
+                borderColor: '#413952',
+                sortKey: 1,
+                cooldown: 120,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 5, // 物理增伤
+                incrMagic: 5, // 魔法增伤
+            },
             arrow: { // 放浪神之箭
                 gainEffect: EffectId.TheArrow,
                 loseEffect: EffectId.TheArrow,
@@ -830,8 +852,8 @@ class BuffTracker {
                 sortKey: 1,
                 cooldown: 90,
                 incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 25, // 物理增伤
-                incrMagic: 25, // 魔法增伤
+                incrPhysical: 15, // 物理增伤
+                incrMagic: 15, // 魔法增伤
             },
             brotherhood: { // 义结金兰：斗气/攻击
                 gainEffect: EffectId.Brotherhood,
@@ -843,10 +865,10 @@ class BuffTracker {
                 icon: '../resources/img/002542.png',
                 borderColor: '#994200',
                 sortKey: 1,
-                cooldown: 90,
+                cooldown: 120,
                 incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
                 incrPhysical: 5, // 物理增伤
-                incrMagic: 0, // 魔法增伤
+                incrMagic: 5, // 魔法增伤
                 tts: '桃园',
             },
             // 龙骑
@@ -859,10 +881,10 @@ class BuffTracker {
                 icon: '../resources/img/000309.png',
                 borderColor: '#831819',
                 sortKey: 1,
-                cooldown: 90,
+                cooldown: 60,
                 incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 15, // 物理增伤
-                incrMagic: 15, // 魔法增伤
+                incrPhysical: 10, // 物理增伤
+                incrMagic: 10, // 魔法增伤
             },
             litany: { //战斗连祷 [23:47:29.214] 1A:1039A1D9:xxx gains the effect of 战斗连祷 from xxx for 20.00 Seconds.
                 gainEffect: OwnEffectId.BattleLitany,
@@ -874,7 +896,7 @@ class BuffTracker {
                 icon: '../resources/img/002585.png',
                 borderColor: '#009999',
                 sortKey: 1,
-                cooldown: 180,
+                cooldown: 120,
                 incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
                 incrPhysical: 5, // 物理增伤
                 incrMagic: 5, // 魔法增伤
@@ -896,7 +918,22 @@ class BuffTracker {
                 incrMagic: 5, // 魔法增伤
                 tts: '左眼',
             },
-            righteye: { // 巨龙右眼
+            righteye: { // 巨龙右眼 单人
+                gainEffect: OwnEffectId.RightEye2,
+                loseEffect: OwnEffectId.RightEye2,
+                gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限给自己
+                useEffectDuration: true,
+                // icon: 'cactbot/resources/icon/status/dragon-sight.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/d/de/002587.png',
+                icon: '../resources/img/002587.png',
+                borderColor: '#fa5437',
+                sortKey: 1,
+                cooldown: 120,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 10, // 物理增伤
+                incrMagic: 10, // 魔法增伤
+            },
+            righteye2: { // 巨龙右眼 双人
                 gainEffect: OwnEffectId.RightEye,
                 loseEffect: OwnEffectId.RightEye,
                 gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限给自己
@@ -925,6 +962,21 @@ class BuffTracker {
                 incrPhysical: 5, // 物理增伤
                 incrMagic: 5, // 魔法增伤
                 tts: '背刺',
+            },
+            // 镰刀
+            arcaneCircle: { // 秘环
+                gainEffect: EffectId.ArcaneCircle,
+                loseEffect: EffectId.ArcaneCircle,
+                gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限给自己
+                durationSeconds: 20,
+                icon: '../resources/img/003633.png',
+                borderColor: '#d459dd',
+                sortKey: 1,
+                cooldown: 120,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 3, // 物理增伤
+                incrMagic: 3, // 魔法增伤
+                tts: '秘环',
             },
             // 舞娘
             devilment: { // 进攻之探戈
@@ -994,6 +1046,21 @@ class BuffTracker {
                 increases: 4,
                 tts: '战斗之声',
             },
+            radiantFinale: { // 终章
+                gainEffect: OwnEffectId.RadiantFinale,
+                loseEffect: OwnEffectId.RadiantFinale,
+                gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限其他人给自己
+                useEffectDuration: true,
+                icon: '../resources/img/002622.png',
+                borderColor: '#fdf55a',
+                sortKey: 1,
+                cooldown: 110,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 6, // 物理增伤
+                incrMagic: 6, // 魔法增伤
+                increases: 6,
+                tts: '终章',
+            },
             // 召唤
             devotion: { // 灵护
                 gainEffect: EffectId.Devotion,
@@ -1010,6 +1077,22 @@ class BuffTracker {
                 incrPhysical: 5, // 物理增伤
                 incrMagic: 5, // 魔法增伤
                 tts: '灵护',
+            },
+            searingLight: { // 灼热之光
+                gainEffect: EffectId.SearingLight,
+                loseEffect: EffectId.SearingLight,
+                gainNetRegex: NetRegexes.gainsEffect({targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限其他人给自己
+                useEffectDuration: true,
+                // icon: 'cactbot/resources/icon/status/devotion.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/2/25/002688.png',
+                icon: '../resources/img/002752.png',
+                borderColor: '#fdd4fe',
+                sortKey: 1,
+                cooldown: 120,
+                incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+                incrPhysical: 3, // 物理增伤
+                incrMagic: 3, // 魔法增伤
+                tts: '灼热',
             },
             // 赤魔
             // 26|2020-09-20T22:04:03.9440000+08:00|4d7|鼓励|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|05|52289|52289||140096ff8fe52cfc344ee31759a6b422
@@ -1037,15 +1120,15 @@ class BuffTracker {
                 sortKey: 1,
                 cooldown: 120,
                 incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 0, // 物理增伤
-                incrMagic: 0, // 魔法增伤
-                incrPhysicalCount: {'05': 10, '04': 8, '03': 6, '02': 4, '01': 2}, // 物理增伤
-                incrMagicCount: {'05': 0, '04': 0, '03': 0, '02': 0, '01': 0}, // 魔法增伤
+                incrPhysical: 5, // 物理增伤
+                incrMagic: 5, // 魔法增伤
+                incrPhysicalCount: {'00':5, '05': 10, '04': 8, '03': 6, '02': 4, '01': 2}, // 物理增伤
+                incrMagicCount: {'00':5, '05': 0, '04': 0, '03': 0, '02': 0, '01': 0}, // 魔法增伤
                 tts: '鼓励',
             },
             emboldenIsMe: { // 鼓励(自己给自己) 4d7
-                gainEffect: OwnEffectId.EmboldenIsMe,
-                loseEffect: OwnEffectId.EmboldenIsMe,
+                gainEffect: EffectId.EmboldenSelf,
+                loseEffect: EffectId.EmboldenSelf,
                 gainNetRegex: NetRegexes.gainsEffect({sourceId: this.playerId, targetId: this.playerId}), // (AOE-BUFF,会激活宠物buff) 仅限其他人给自己
                 useEffectDuration: true,
                 // icon: 'cactbot/resources/icon/status/embolden.png',
@@ -1057,7 +1140,7 @@ class BuffTracker {
                 cooldown: 120,
                 incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
                 incrPhysical: 0, // 物理增伤
-                incrMagic: 0, // 魔法增伤
+                incrMagic: 5, // 魔法增伤
                 incrPhysicalCount: {'05': 0, '04': 0, '03': 0, '02': 0, '01': 0}, // 物理增伤
                 incrMagicCount: {'05': 10, '04': 8, '03': 6, '02': 4, '01': 2}, // 魔法增伤
                 tts: '鼓励',
@@ -1168,6 +1251,19 @@ class BuffTracker {
                 buffType: 'magic', // physical
                 dotNotice: true,
             },
+            // 贤者
+            eukrasianDosisIii: { //[23:24:52.095] 1A:400001B8:木人 gains the effect of 焚灼 from xxx for 30.00 Seconds.
+                mobGainsOwnEffect: OwnEffectId.EukrasianDosisIii,
+                mobLosesOwnEffect: OwnEffectId.EukrasianDosisIii,
+                useEffectDuration: true,
+                // icon: 'https://xivapi.com/i/003000/003554.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/4/4d/003554.png',
+                icon: '../resources/img/003682.png',
+                borderColor: '#c4acf6',
+                sortKey: 1,
+                buffType: 'magic', // physical
+                dotNotice: true,
+            },
             Demolish: { //[23:31:10.291] 1A:400001B8:木人 gains the effect of 破碎拳 from xxx for 18.00 Seconds. f6
                 mobGainsOwnEffect: OwnEffectId.Demolish,
                 mobLosesOwnEffect: OwnEffectId.Demolish,
@@ -1210,6 +1306,19 @@ class BuffTracker {
                 // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/6/6b/003160.png',
                 icon: '../resources/img/003160.png',
                 borderColor: '#d9542a',
+                sortKey: 1,
+                buffType: 'physical', // physical
+                dotNotice: true,
+            },
+            // 镰刀   DeathsDesign
+            deathsDesign: { // [00:12:10.091] 1A:400001B8:木人 gains the effect of 彼岸花 from xxx for 60.00 Seconds.
+                mobGainsOwnEffect: OwnEffectId.DeathsDesign,
+                mobLosesOwnEffect: OwnEffectId.DeathsDesign,
+                useEffectDuration: true,
+                // icon: 'https://xivapi.com/i/003000/003160.png',
+                // icon: 'https://huiji-public.huijistatic.com/ff14/uploads/6/6b/003160.png',
+                icon: '../resources/img/003606.png',
+                borderColor: '#49298c',
                 sortKey: 1,
                 buffType: 'physical', // physical
                 dotNotice: true,
@@ -1816,6 +1925,7 @@ class Brds {
             // 其他人给自己上的buff
             let m = log.match(kYouGainEffectRegex);
             if (m) {
+                console.log(m);
                 const effectId = m.groups.effectId.toUpperCase();
                 let f = this.gainEffectFuncMap[effectId];
                 if (f)
@@ -1827,6 +1937,7 @@ class Brds {
             // 小队(自己)给(BOSS/宠物)的(BUFF/DOT)
             m = log.match(kMobGainsOwnEffectRegex);
             if (m) {
+                console.log(m);
                 const effectId = m.groups.effectId.toUpperCase();
                 this.buffTracker.onYouGainEffect(effectId, log, m.groups);
                 this.buffTracker.onMobGainsOwnEffect(effectId, m.groups);
@@ -1836,6 +1947,7 @@ class Brds {
             // 小队(其他人)给(BOSS/宠物)的BUFF
             m = log.match(kMobGainsPartyEffectRegex);
             if (m) {
+                console.log(m);
                 const effectId = m.groups.effectId.toUpperCase();
                 this.buffTracker.onYouGainEffect(effectId, log, m.groups);
             }
