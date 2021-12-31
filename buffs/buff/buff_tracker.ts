@@ -27,8 +27,9 @@ import standardFinishImage from '../cactbot/resources/ffxiv/status/standard-fini
 import technicalFinishImage from '../cactbot/resources/ffxiv/status/technical-finish.png';
 import trickAttackImage from '../cactbot/resources/ffxiv/status/trick-attack.png';
 import umbralImage from '../cactbot/resources/ffxiv/status/umbral.png';
+import ragingStrikesImage from '../resources/images/000352.png';
 import PartyTracker from '../cactbot/resources/party';
-import WidgetList from '../cactbot/resources/widget_list';
+import WidgetList from './widget_list';
 import { NetMatches } from '../cactbot/types/net_matches';
 
 import { kAbility } from './constants';
@@ -272,22 +273,33 @@ export class BuffTracker {
   mobLosesEffectMap: { [s: string]: BuffInfo[] };
 
   constructor(
-    private options: JobsOptions,
-    private playerName: string,
-    private leftBuffDiv: WidgetList,
-    private rightBuffDiv: WidgetList,
-    private partyTracker: PartyTracker,
-    private is5x: boolean,
+      private options: JobsOptions,
+      private playerName: string,
+      private buffsListDiv: WidgetList,
+      private partyTracker: PartyTracker,
+      private is5x: boolean,
   ) {
     this.options = options;
     this.playerName = playerName;
-    this.leftBuffDiv = leftBuffDiv;
-    this.rightBuffDiv = rightBuffDiv;
+    this.buffsListDiv = buffsListDiv;
     this.buffs = {};
 
     this.partyTracker = partyTracker;
 
     this.buffInfo = {
+      raging: { // 猛者 26|2020-09-20T03:48:12.5040000+08:00|7d|猛者强击|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|00|111340|111340||7f5d92a566794a793b65f97686f3699f
+        gainEffect: [EffectId.RagingStrikes],
+        loseEffect: [EffectId.RagingStrikes],
+        useEffectDuration: true,
+        icon: ragingStrikesImage,
+        borderColor: '#db6509',
+        sortKey: 0,
+        cooldown: 80,
+        // incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
+        // incrPhysical: 10, // 物理增伤
+        // incrMagic: 10, // 魔法增伤
+        // tts: '猛者',
+      },
       potion: {
         gainEffect: [EffectId.Medicated],
         loseEffect: [EffectId.Medicated],
@@ -767,9 +779,6 @@ export class BuffTracker {
         return;
 
       this.onBigBuff(b.name, seconds, b, matches?.source, 'active');
-      // Some cooldowns (like potions) have no cooldownAbility, so also track them here.
-      if (!b.cooldownAbility)
-        this.onBigBuff(b.name, seconds, b, matches?.source, 'cooldown');
     }
   }
 
@@ -806,10 +815,7 @@ export class BuffTracker {
     source = '',
     option: 'active' | 'cooldown',
   ): void {
-    let list = this.rightBuffDiv;
-    if (info.side === 'left' && this.leftBuffDiv)
-      list = this.leftBuffDiv;
-
+    let list = this.buffsListDiv;
     let buff = this.buffs[name];
     if (!buff)
       buff = this.buffs[name] = new Buff(name, info, list, this.options);

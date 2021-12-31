@@ -348,6 +348,18 @@ div.justbuffs div#procs-container {
   background-color: rgb(65, 0, 200);
 }
 
+#smn-stacks-ruby > div.active {
+  background-color: rgb(240, 30, 30);
+}
+
+#smn-stacks-emerald > div.active {
+  background-color: rgb(0, 140, 0);
+}
+
+#smn-stacks-topaz > div.active {
+  background-color: rgb(238, 234, 14);
+}
+
 /* Procs */
 
 /*
@@ -1006,6 +1018,22 @@ div.justbuffs div#procs-container {
   background-color: rgb(240, 30, 30);
 }
 
+.smn-color-demisummon.ifrit {
+  background-color: rgb(240, 30, 30);
+}
+
+.smn-color-demisummon.garuda {
+  background-color: rgb(0, 140, 0);
+}
+
+.smn-color-demisummon.titan {
+  background-color: rgb(238, 234, 14);
+}
+
+.smn-color-lucid {
+  background-color: rgb(227, 148, 210);
+}
+
 /* RDM */
 .rdm-color-white-mana {
   background-color: rgb(220, 220, 240);
@@ -1056,4 +1084,22 @@ div.justbuffs div#procs-container {
 #jobs-container[data-inpvp="true"] #procs-container,
 #jobs-container[data-inpvp="true"] #opacity-container > #bars > div:not(#hp-bar):not(#mp-bar) {
   display: none;
+}
+
+
+#injury-physical {
+  position: absolute;
+  top: 0;
+  text-shadow: -1px 0 3px black, 0 1px 3px black, 1px 0 3px black, 0 -1px 3px black;
+}
+#injury-magic {
+  position: absolute;
+  top: 0;
+  text-shadow: -1px 0 3px black, 0 1px 3px black, 1px 0 3px black, 0 -1px 3px black;
+}
+
+#dots-list {
+  position: absolute;
+  top: 0;
+  left: 100%;
 }

@@ -7,7 +7,7 @@ import {Bars} from "./bars";
 import {ComponentManager} from "./components";
 
 import '../cactbot/resources/defaults.css';
-import './jobs.css';
+import './buff.css';
 
 UserConfig.getUserConfigLocation('buff', defaultOptions, () => {
     const options = { ...defaultOptions };

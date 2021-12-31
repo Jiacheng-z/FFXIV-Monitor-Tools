@@ -188,14 +188,12 @@ export class ComponentManager {
             // it is always false here.
             this.bars._updateProcBoxNotifyState(false);
 
-            // TODO: this is always created by _updateJob, so maybe this.o needs be optional?
-            if (this.bars.o.leftBuffsList && this.bars.o.rightBuffsList) {
-                // Set up the buff tracker after the job bars are created.
+            // Set up the buff tracker after the job bars are created.
+            if (this.bars.o.buffsList) {
                 this.buffTracker = new BuffTracker(
                     this.options,
                     this.player.name,
-                    this.bars.o.leftBuffsList,
-                    this.bars.o.rightBuffsList,
+                    this.bars.o.buffsList,
                     this.partyTracker,
                     this.is5x,
                 );
@@ -224,11 +222,9 @@ export class ComponentManager {
             this.buffTracker?.onUseAbility(id, matches);
         });
         this.player.on('action/party', (id, matches) => {
-            console.log('action/party', id, matches)
+            console.log('action/party', id, matches, matches.source,matches.targetId)
             this.buffTracker?.onUseAbility(id, matches)
         });
-
-        // this.player.on('action/other', (id, matches) => this.buffTracker?.onUseAbility(id, matches));
 
         this.player.on( // 给自己添加的
             'effect/gain/you',
