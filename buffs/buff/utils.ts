@@ -16,6 +16,7 @@ import { CactbotBaseRegExp } from '../cactbot/types/net_trigger';
 import { kLevelMod, kMeleeWithMpJobs } from './constants';
 import { SpeedBuffs } from './player';
 import {BuffInfo} from "./buff_tracker";
+import widget_list from './widget_list';
 
 const getLocaleRegex = (locale: string, regexes: {
   'en': RegExp;
@@ -42,12 +43,12 @@ export class RegexesHolder {
   constructor(lang: Lang, playerName: string) {
     this.StatsRegex = NetRegexes.statChange();
 
-    this.YouGainEffectRegex = NetRegexes.gainsEffect({ target: playerName });
-    this.YouLoseEffectRegex = NetRegexes.losesEffect({ target: playerName });
-    this.YouUseAbilityRegex = NetRegexes.ability({ source: playerName });
+    this.YouGainEffectRegex = NetRegexes.gainsEffect({target: playerName});
+    this.YouLoseEffectRegex = NetRegexes.losesEffect({target: playerName});
+    this.YouUseAbilityRegex = NetRegexes.ability({source: playerName});
     this.AnybodyAbilityRegex = NetRegexes.ability();
-    this.MobGainsEffectRegex = NetRegexes.gainsEffect({ targetId: '4.{7}' });
-    this.MobLosesEffectRegex = NetRegexes.losesEffect({ targetId: '4.{7}' });
+    this.MobGainsEffectRegex = NetRegexes.gainsEffect({targetId: '4.{7}'});
+    this.MobLosesEffectRegex = NetRegexes.losesEffect({targetId: '4.{7}'});
     this.MobGainsEffectFromYouRegex = NetRegexes.gainsEffect({
       targetId: '4.{7}',
       source: playerName,
@@ -80,11 +81,11 @@ export class RegexesHolder {
 }
 
 export const doesJobNeedMPBar = (job: Job): boolean =>
-  Util.isCasterDpsJob(job) || Util.isHealerJob(job) || kMeleeWithMpJobs.includes(job);
+    Util.isCasterDpsJob(job) || Util.isHealerJob(job) || kMeleeWithMpJobs.includes(job);
 
 /** compute greased lightning stacks by player's level */
 const getLightningStacksByLevel = (level: number): number =>
-  level < 20 ? 1 : level < 40 ? 2 : level < 76 ? 3 : 4;
+    level < 20 ? 1 : level < 40 ? 2 : level < 76 ? 3 : 4;
 
 type PlayerLike = {
   job: Job;
@@ -158,15 +159,110 @@ export const computeBackgroundColorFrom = (element: HTMLElement, classList: stri
   return color;
 };
 
-export const bigBuff30sWidth = (): number => {
-  let body = document.getElementsByTagName('body')
-  if (!body || !body[0])
-    return 250
+export const findCountBuff = (dom: widget_list, tname: string): Element | undefined | null => {
+  let tgs = dom.rootElement.getElementsByClassName('buffs');
+  for (let i = 0; i < tgs.length; i++) {
+    // @ts-ignore
+    if (tgs[i].getAttribute('buffs-name') == tname) {
+      return tgs[i];
+    }
+  }
+  return null;
+}
 
-  // TODO::BigBuffIconWidth DotIconWidth
-  let width = body[0].clientWidth - 32 - (32 + 1) - 5;
-  return (width > 250)? 250: width;
-};
+export const updateCountBuff = (dom: Element | undefined, physical: number | undefined, magic: number | undefined) => {
+  if (!dom) {
+    return
+  }
+  if (physical) {
+    dom.setAttribute('buffs-incr-physical', physical.toString()) // 作用物理
+  }
+  if (magic) {
+    dom.setAttribute('buffs-incr-magic', magic.toString()) // 作用魔法
+  }
+}
+
+// 计算buff, 展示剩余多少时间刷buff是值得
+export const buffsCalculation = (dom: widget_list) => {
+  let tgs = dom.rootElement.getElementsByClassName('buffs');
+  let toip = 0; // 自己的物理增伤 (换算成攻击) (1 + a)(1 + b) = 1 + a + b + ab
+  let toim = 0; // 自己的魔法增伤 (换算成攻击)
+  let tbip = 0; // 对boss的物理增伤
+  let tbim = 0; // 对boss的魔法增伤
+
+  for (let i = 0; i < tgs.length; i++) {
+    // @ts-ignore
+    let bio = tgs[i].getAttribute('buffs-target') // 作用自己
+    // @ts-ignore
+    let bipStr = tgs[i].getAttribute('buffs-incr-physical') // 作用物理
+    // @ts-ignore
+    let bimStr = tgs[i].getAttribute('buffs-incr-magic') // 作用魔法
+
+    if (bio === undefined || bipStr === undefined || bimStr === undefined) {
+      continue;
+    }
+
+    let bip = Number(bipStr)
+    let bim = Number(bimStr)
+    if (bio === 'you') { // 作用自己, 乘法公式
+      if (bip > 0) {
+        if (toip <= 0) {
+          toip = bip;
+        } else {
+          toip = toip + bip + ((toip * bip) / 100)
+        }
+      }
+
+      if (bim > 0) {
+        if (toim <= 0) {
+          toim = bim;
+        } else {
+          toim = toim + bim + ((toim * bim) / 100)
+        }
+      }
+    } else { // 对boss增伤
+      if (bip > 0) {
+        tbip += bip
+      }
+      if (bim > 0) {
+        tbim += bim
+      }
+    }
+  }
+
+  let showip = Math.floor((toip + tbip) * 10) / 10
+  let showim = Math.floor((toim + tbim) * 10) / 10
+
+  let statp = document.getElementById('damage-up-physical');
+  if (statp != null) {
+    statp.setAttribute('value', showip.toString())
+    if (showip <= 0) {
+      statp.innerText = '';
+    } else {
+      statp.innerText = '物: ' + showip + '%';
+    }
+  }
+
+  let statm = document.getElementById('damage-up-magic');
+  if (statm != null) {
+    statm.setAttribute('value', showim.toString())
+    if (showim <= 0) {
+      statm.innerText = '';
+    } else {
+      statm.innerText = '魔: ' + showim + '%';
+    }
+  }
+
+  // 诗人计算秒数
+  // if (job === 'BRD' && options.TextBrdSec === true) {
+  //   let statSec = document.getElementById('jobs-stat-buff-sec');
+  //   if (Number(showip) > 0) {
+  //     statSec.innerText = Math.floor((30 * 900 * (Number(showip) / 100)) / ((1 + (Number(showip) / 100)) * (240 - 100))) + 's';
+  //   } else {
+  //     statSec.innerText = '';
+  //   }
+  // }
+}
 
 export const makeAuraTimerIcon = (
   name: string,
@@ -181,6 +277,7 @@ export const makeAuraTimerIcon = (
   borderSize: number,
   borderColor: string,
   barColor: string,
+  barWidth: number,
   auraIcon: string,
   info: BuffInfo,
 ): HTMLDivElement => {
@@ -212,8 +309,7 @@ export const makeAuraTimerIcon = (
 
   if (seconds >= 0) {
     const bar = TimerBar.create();
-    let c = bigBuff30sWidth()/30;
-    bar.width = (seconds * c).toString() // 动态长度
+    bar.width = barWidth.toString() // 动态长度
     bar.height = barHeight.toString();
     bar.fg = barColor;
     bar.duration = seconds;

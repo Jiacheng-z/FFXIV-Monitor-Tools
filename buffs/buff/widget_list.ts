@@ -23,7 +23,7 @@ export default class WidgetList extends HTMLElement {
   private _rowcolsize = 5;
   private _maxnumber = 1000;
   private _connected = false;
-  private rootElement: HTMLElement;
+  rootElement: HTMLElement;
 
   static get observedAttributes(): string[] {
     return ['toward', 'elementwidth', 'elementheight', 'rowcolsize', 'maxnumber'];
@@ -261,7 +261,17 @@ export default class WidgetList extends HTMLElement {
 
     let sortKeyFn: Sorter;
     if (typeof sortKey === 'number')
-      sortKeyFn = () => sortKey;
+      // sortKeyFn = () => sortKey;
+      sortKeyFn = () => {
+        const container = this.shadowRoot?.getElementById(`child${id}`);
+        if (!container) {
+          return sortKey
+        }
+        // @ts-ignore
+        let elemText = container.firstChild.lastChild.lastChild.shadowRoot?.getElementById('lefttext');
+        console.log(id,Math.floor(elemText.innerText))
+        return Math.floor(elemText.innerText)
+      };
     else
       sortKeyFn = sortKey;
 

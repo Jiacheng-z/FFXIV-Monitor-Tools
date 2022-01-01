@@ -1103,3 +1103,14 @@ div.justbuffs div#procs-container {
   top: 0;
   left: 100%;
 }
+
+#menu {
+  position: fixed;
+  bottom: 60px;
+  right: 0;
+  display: none !important;
+}
+
+.unlocked #menu {
+  display: block !important;
+}

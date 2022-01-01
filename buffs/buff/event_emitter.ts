@@ -77,7 +77,8 @@ export class JobsEventEmitter extends EventEmitter<EventMap> {
     });
   }
 
-  private processLogLine(ev: OverlayEventResponses['LogLine']): void {
+  processLogLine(ev: OverlayEventResponses['LogLine']): void {
+    console.log(ev)
     const type = ev.line[logDefinitions.None.fields.type];
 
     this.emit('log', ev.line, ev.rawLine);

@@ -14,11 +14,26 @@ export interface JobsNonConfigOptions {
   MidHealthThresholdPercent: number;
   LowHealthThresholdPercent: number;
   BigBuffShowCooldownSeconds: number;
+
+  PhysicalFontSize: number;
+  MagicFontSize: number;
+
   BigBuffIconWidth: number;
   BigBuffIconHeight: number;
   BigBuffBarHeight: number;
   BigBuffTextHeight: number;
   BigBuffBorderSize: number;
+  BigBuffBarMaxWidth: number;
+  BigBuffNoticeTTSOn: boolean;
+
+  DotIconWidth: number;
+  DotIconHeight: number;
+  DotBarHeight: number;
+  DotTextHeight: number;
+  DotBorderSize: number;
+  DotNoticeLessThanSecond: number;
+  DotNoticeTTS: string;
+
   GpAlarmPoint: number;
   GpAlarmSoundVolume: number;
   NotifyExpiredProcsInCombat: number;
@@ -58,11 +73,26 @@ const defaultJobsNonConfigOptions: JobsNonConfigOptions = {
   MidHealthThresholdPercent: 0.8,
   LowHealthThresholdPercent: 0.2,
   BigBuffShowCooldownSeconds: 20,
-  BigBuffIconWidth: 44,
-  BigBuffIconHeight: 32,
-  BigBuffBarHeight: 5,
+
+  PhysicalFontSize: 20,
+  MagicFontSize: 20,
+
+  BigBuffIconWidth: 32,
+  BigBuffIconHeight: 20,
+  BigBuffBarHeight: 20,
   BigBuffTextHeight: 0,
-  BigBuffBorderSize: 1,
+  BigBuffBorderSize: 0,
+  BigBuffBarMaxWidth: 250, // 30秒团辅进度条最大宽度
+  BigBuffNoticeTTSOn: true,
+
+  DotIconWidth: 32,
+  DotIconHeight: 25,
+  DotBarHeight: 5,
+  DotTextHeight: 0,
+  DotBorderSize: 1,
+  DotNoticeLessThanSecond: 7, // <0 取消提醒, >0 剩余n秒时提醒
+  DotNoticeTTS: "续DoT", // 提醒语音
+
   GpAlarmPoint: 0,
   GpAlarmSoundVolume: 0.8,
   NotifyExpiredProcsInCombat: 5,
@@ -98,9 +128,9 @@ const defaultJobsConfigOptions: JobsConfigOptions = {
   BlmLowMPThreshold: 2399,
 };
 
-export interface JobsOptions extends BaseOptions, JobsConfigOptions, JobsNonConfigOptions {}
+export interface BuffOptions extends BaseOptions, JobsConfigOptions, JobsNonConfigOptions {}
 
-const Options: JobsOptions = {
+const Options: BuffOptions = {
   ...UserConfig.getDefaultBaseOptions(),
   ...defaultJobsNonConfigOptions,
   ...defaultJobsConfigOptions,

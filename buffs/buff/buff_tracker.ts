@@ -1,41 +1,15 @@
 import EffectId from '../cactbot/resources/effect_id';
-import arcaneCircleImage from '../cactbot/resources/ffxiv/status/arcane-circle.png';
-import arrowImage from '../cactbot/resources/ffxiv/status/arrow.png';
-import astralImage from '../cactbot/resources/ffxiv/status/astral.png';
-import balanceImage from '../cactbot/resources/ffxiv/status/balance.png';
-import battleLitanyImage from '../cactbot/resources/ffxiv/status/battle-litany.png';
-import battleVoiceImage from '../cactbot/resources/ffxiv/status/battlevoice.png';
-import boleImage from '../cactbot/resources/ffxiv/status/bole.png';
-import brotherhoodImage from '../cactbot/resources/ffxiv/status/brotherhood.png';
-import chainStratagemImage from '../cactbot/resources/ffxiv/status/chain-stratagem.png';
-import devilmentImage from '../cactbot/resources/ffxiv/status/devilment.png';
-import devotionImage from '../cactbot/resources/ffxiv/status/devotion.png';
-import divinationImage from '../cactbot/resources/ffxiv/status/divination.png';
-import dragonSightImage from '../cactbot/resources/ffxiv/status/dragon-sight.png';
-import emboldenImage from '../cactbot/resources/ffxiv/status/embolden.png';
-import ewerImage from '../cactbot/resources/ffxiv/status/ewer.png';
-import ladyOfCrownsImage from '../cactbot/resources/ffxiv/status/lady-of-crowns.png';
-import lordOfCrownsImage from '../cactbot/resources/ffxiv/status/lord-of-crowns.png';
-import offguardImage from '../cactbot/resources/ffxiv/status/offguard.png';
-import peculiarLightImage from '../cactbot/resources/ffxiv/status/peculiar-light.png';
-import physicalImage from '../cactbot/resources/ffxiv/status/physical.png';
-import potionImage from '../cactbot/resources/ffxiv/status/potion.png';
-import searingLightImage from '../cactbot/resources/ffxiv/status/searing-light.png';
-import spearImage from '../cactbot/resources/ffxiv/status/spear.png';
-import spireImage from '../cactbot/resources/ffxiv/status/spire.png';
-import standardFinishImage from '../cactbot/resources/ffxiv/status/standard-finish.png';
-import technicalFinishImage from '../cactbot/resources/ffxiv/status/technical-finish.png';
-import trickAttackImage from '../cactbot/resources/ffxiv/status/trick-attack.png';
-import umbralImage from '../cactbot/resources/ffxiv/status/umbral.png';
-import ragingStrikesImage from '../resources/images/000352.png';
+
 import PartyTracker from '../cactbot/resources/party';
 import WidgetList from './widget_list';
 import { NetMatches } from '../cactbot/types/net_matches';
+import Util from '../cactbot/resources/util';
 
-import { kAbility } from './constants';
-import { JobsOptions } from './jobs_options';
-import { makeAuraTimerIcon } from './utils';
+import { BuffOptions } from './buff_options';
+import {buffsCalculation, findCountBuff, makeAuraTimerIcon, updateCountBuff} from './utils';
 import {callOverlayHandler} from "../cactbot/resources/overlay_plugin_api";
+import {BuffInfoList} from "./buff_info";
+import {Job} from "../cactbot/types/job";
 
 export interface BuffInfo {
   name: string;
@@ -60,6 +34,10 @@ export interface BuffInfo {
   target?: 'you' | 'boss' ; // 赋给自己? true:给自己, false:给boss
   physicalUp?: number; //物理增伤百分比
   magicUp?: number; // 魔法增伤百分比
+  physicalUpCount?: { [s: string]: number }; //物理增伤百分比
+  magicUpCount?:  { [s: string]: number }; // 魔法增伤百分比
+  meleeUp?: number; // 近战增伤比
+  rangedUp?: number; // 远程增伤
   tts?: string; // tts播报
 }
 
@@ -75,7 +53,7 @@ export interface Aura {
 export class Buff {
   name: string;
   info: BuffInfo;
-  options: JobsOptions;
+  options: BuffOptions;
   activeList: WidgetList;
   cooldownList: WidgetList;
   readyList: WidgetList;
@@ -85,7 +63,7 @@ export class Buff {
   readySortKeyBase: number;
   cooldownSortKeyBase: number;
 
-  constructor(name: string, info: BuffInfo, list: WidgetList, options: JobsOptions) {
+  constructor(name: string, info: BuffInfo, list: WidgetList, options: BuffOptions) {
     this.name = name;
     this.info = info;
     this.options = options;
@@ -167,6 +145,16 @@ export class Buff {
     }, 3 * 60 * 1000);
   }
 
+  bigBuffAutoWidth(seconds: number): number {
+    let body = document.getElementsByTagName('body')
+    if (!body || !body[0])
+      return seconds * (this.options.BigBuffBarMaxWidth/30)
+
+    let width = body[0].clientWidth - this.options.BigBuffIconWidth - (this.options.DotIconWidth + this.options.DotBorderSize) - 5;
+    let c = (width > this.options.BigBuffBarMaxWidth)? this.options.BigBuffBarMaxWidth/30: width/30;
+    return seconds * c
+  }
+
   makeAura(
     key: string,
     list: WidgetList,
@@ -202,7 +190,7 @@ export class Buff {
           window.clearTimeout(aura.removeTimeout);
           aura.removeTimeout = null;
         }
-        // TODO::刷DOT计算
+        buffsCalculation(list)
       },
 
       addCallback: () => {
@@ -219,19 +207,17 @@ export class Buff {
           this.options.BigBuffBorderSize,
           this.info.borderColor,
           this.info.borderColor,
+          this.bigBuffAutoWidth(seconds),
           this.info.icon,
           this.info
         );
-        list.addElement(key, elem, this.info.sortKey + adjustSort);
+        list.addElement(key, elem, Math.floor(seconds) + adjustSort);
         aura.addTimeout = null;
-        // TODO::刷DOT计算
+        buffsCalculation(list)
 
-        // 语音播报 TODO::tts DOT开关 buff开关
-        if (this.info.tts != null && this.info.tts != '') {
-          void callOverlayHandler({
-            call: 'cactbotSay',
-            text: this.info.tts,
-          });
+        // 语音播报
+        if (this.options.BigBuffNoticeTTSOn == true && this.info.tts != null && this.info.tts != '') {
+          callOverlayHandler({call: 'cactbotSay',text: this.info.tts});
         }
 
         if (seconds > 0) {
@@ -305,42 +291,23 @@ export class BuffTracker {
   mobLosesEffectMap: { [s: string]: BuffInfo[] };
 
   constructor(
-      private options: JobsOptions,
+      private options: BuffOptions,
       private playerName: string,
+      private playerJob: Job,
       private buffsListDiv: WidgetList,
       private partyTracker: PartyTracker,
       private is5x: boolean,
   ) {
     this.options = options;
     this.playerName = playerName;
+    this.playerJob = playerJob;
     this.buffsListDiv = buffsListDiv;
     this.buffs = {};
 
     this.partyTracker = partyTracker;
 
-    this.buffInfo = {
-      raging: { // 猛者 26|2020-09-20T03:48:12.5040000+08:00|7d|猛者强击|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|00|111340|111340||7f5d92a566794a793b65f97686f3699f
-        gainEffect: [EffectId.RagingStrikes],
-        loseEffect: [EffectId.RagingStrikes],
-        useEffectDuration: true,
-        icon: ragingStrikesImage,
-        borderColor: '#db6509',
-        sortKey: 0,
-        cooldown: 80,
-        target: 'you',
-        physicalUp: 10,
-        magicUp: 10,
-        tts: '猛者',
-      },
-      potion: {
-        gainEffect: [EffectId.Medicated],
-        loseEffect: [EffectId.Medicated],
-        useEffectDuration: true,
-        icon: potionImage,
-        borderColor: '#AA41B2',
-        sortKey: 0,
-        cooldown: 270,
-      },
+    this.buffInfo = BuffInfoList.buffInfo;
+    /*this.buffInfo = {
       astralAttenuation: {
         mobGainsEffect: EffectId.AstralAttenuation,
         mobLosesEffect: EffectId.AstralAttenuation,
@@ -540,19 +507,6 @@ export class BuffTracker {
         sortKey: 6,
         cooldown: 120,
       },
-      battlevoice: {
-        cooldownAbility: [kAbility.BattleVoice],
-        gainEffect: [EffectId.BattleVoice],
-        loseEffect: [EffectId.BattleVoice],
-        useEffectDuration: true,
-        durationSeconds: 15,
-        partyOnly: true,
-        icon: battleVoiceImage,
-        // Red.
-        borderColor: '#D6371E',
-        sortKey: 7,
-        cooldown: 120,
-      },
       chain: {
         cooldownAbility: [kAbility.ChainStratagem],
         mobGainsEffect: EffectId.ChainStratagem,
@@ -638,10 +592,11 @@ export class BuffTracker {
         sortKey: 14,
         cooldown: 120,
       },
-    };
+    };*/
 
     // Abilities that are different in 5.x.
-    const v5x = {
+    const v5x = BuffInfoList.buffInfoV5;
+    /*const v5x = {
       litany: {
         cooldownAbility: [kAbility.BattleLitany],
         gainEffect: [EffectId.BattleLitany],
@@ -671,19 +626,6 @@ export class BuffTracker {
         borderColor: '#57FC4A',
         sortKey: 3,
         cooldown: 120,
-      },
-      battlevoice: {
-        cooldownAbility: [kAbility.BattleVoice],
-        gainEffect: [EffectId.BattleVoice],
-        loseEffect: [EffectId.BattleVoice],
-        useEffectDuration: true,
-        durationSeconds: 20,
-        partyOnly: true,
-        icon: battleVoiceImage,
-        // Red.
-        borderColor: '#D6371E',
-        sortKey: 7,
-        cooldown: 180,
       },
       brotherhood: {
         cooldownAbility: [kAbility.Brotherhood],
@@ -715,7 +657,7 @@ export class BuffTracker {
         sortKey: 12,
         cooldown: 180,
       },
-    };
+    };*/
 
     if (this.is5x) {
       for (const [key, entry] of Object.entries(v5x))
@@ -817,6 +759,33 @@ export class BuffTracker {
       if ('stack' in b && b.stack !== parseInt(matches?.count ?? '0'))
         return;
 
+      // 存在count形式buff
+      if (matches.count != null && matches.count !== '00') {
+        if (b.physicalUpCount != null && b.physicalUpCount[matches.count] != null) {
+          b.physicalUp = b.physicalUpCount[matches.count];
+        }
+        if (b.magicUpCount != null && b.magicUpCount[matches.count] != null) {
+          b.magicUp = b.magicUpCount[matches.count];
+        }
+
+        let dom = findCountBuff(this.buffsListDiv, matches?.targetId + "=>" + b.name)
+        if (dom !== null) {
+          updateCountBuff(dom, b.physicalUp, b.magicUp)
+          buffsCalculation(this.buffsListDiv)
+          continue;
+        }
+      }
+
+      if ((b.meleeUp != null && b.meleeUp > 0) || (b.rangedUp != null && b.rangedUp > 0)) {
+        if (Util.isMeleeDpsJob(this.playerJob) || Util.isTankJob(this.playerJob)) {
+          b.physicalUp = b.meleeUp;
+          b.magicUp = b.meleeUp;
+        } else {
+          b.physicalUp = b.rangedUp;
+          b.magicUp = b.rangedUp;
+        }
+      }
+
       this.onBigBuff(matches?.targetId, b.name, seconds, b, matches?.source, 'active');
       // Some cooldowns (like potions) have no cooldownAbility, so also track them here.
       // if (!b.cooldownAbility)
@@ -826,12 +795,12 @@ export class BuffTracker {
 
   onLoseEffect(
     buffs: BuffInfo[] | undefined,
-    _matches: Partial<NetMatches['LosesEffect']>,
+    matches: Partial<NetMatches['LosesEffect']>,
   ): void {
     if (!buffs)
       return;
     for (const b of buffs)
-      this.onLoseBigBuff(b.name);
+      this.onLoseBigBuff(matches?.targetId, b.name);
   }
 
   onYouGainEffect(name: string, matches: Partial<NetMatches['GainsEffect']>): void {
@@ -861,9 +830,6 @@ export class BuffTracker {
     if (seconds <= 0)
       return;
 
-    // TODO::根据职业判断远近职业
-    // TODO::判断物理魔法增伤
-
     name = target + "=>" + name // 针对对boss技能. 保证不同boss分开倒计时.
 
     let list = this.buffsListDiv;
@@ -877,7 +843,8 @@ export class BuffTracker {
       buff.onCooldown(seconds, source);
   }
 
-  onLoseBigBuff(name: string): void {
+  onLoseBigBuff(target = 'unknown',name: string): void {
+    name = target + "=>" + name // 针对对boss技能. 保证不同boss分开倒计时.
     this.buffs[name]?.onLose();
   }
 

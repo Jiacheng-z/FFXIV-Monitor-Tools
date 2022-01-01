@@ -17,7 +17,7 @@ import {
 } from './constants';
 import { JobsEventEmitter } from './event_emitter';
 import './jobs_config';
-import { JobsOptions } from './jobs_options';
+import { BuffOptions } from './buff_options';
 import { Player } from './player';
 import { computeBackgroundColorFrom } from './utils';
 
@@ -57,7 +57,7 @@ export class Bars {
   public ee: JobsEventEmitter;
   public readonly player: Player;
 
-  constructor(private options: JobsOptions, o: {
+  constructor(private options: BuffOptions, o: {
     emitter: JobsEventEmitter;
     player: Player;
   }) {
@@ -120,13 +120,13 @@ export class Bars {
     const buffContainer = document.createElement('div');
     buffContainer.id = 'buffs-list';
     buffContainer.style.position = 'absolute';
-    buffContainer.style.top = (20 * 2 + 10).toString(); // TODO::配置 文字大小*2
+    buffContainer.style.top = (this.options.PhysicalFontSize + this.options.MagicFontSize + 10).toString();
     barsLayoutContainer.appendChild(buffContainer);
     this.o.buffsList = this.addBuffsList({
       id: 'buffs-list',
-      iconWidth: 32, // 动态
-      iconHeight: 20,
-      barHeight: 20, // 与icon一样高
+      iconWidth: this.options.BigBuffIconWidth,
+      iconHeight: this.options.BigBuffIconHeight,
+      barHeight: this.options.BigBuffIconHeight, // 与icon一样高
       toward: 'down right',
     });
 
@@ -136,9 +136,9 @@ export class Bars {
     barsLayoutContainer.appendChild(dotContainer);
     this.o.dotsList = this.addDotsList({
       id: 'dots-list',
-      iconWidth: 32,
-      iconHeight: 25,
-      barHeight: 5,
+      iconWidth: this.options.DotIconWidth,
+      iconHeight: this.options.DotIconHeight,
+      barHeight: this.options.DotBarHeight,
       toward: 'left down',
     });
 
@@ -295,26 +295,26 @@ export class Bars {
       let barsContainer = document.getElementById('damage-up');
       if (!barsContainer) {
         barsContainer = document.createElement('div');
-        barsContainer.id = 'injury';
+        barsContainer.id = 'damage-up';
       }
 
       // 物理增伤
       const physicalContainer = document.createElement('div');
       physicalContainer.id = 'damage-up-physical';
-      physicalContainer.style.color = '#ff8129'; // TODO::配置 文字颜色
-      physicalContainer.style.fontSize = '20'; // TODO::配置 文字大小
+      physicalContainer.style.color = '#ff8129';
+      physicalContainer.style.fontSize = this.options.PhysicalFontSize.toString();
       physicalContainer.setAttribute('value', String(0));
-      physicalContainer.innerText = '物: 10%';
+      // physicalContainer.innerText = '物: 10%';
       barsContainer.appendChild(physicalContainer);
 
       // 魔法增伤
       const magicContainer = document.createElement('div');
       magicContainer.id = 'damage-up-magic';
-      magicContainer.style.color = '#07d5ee'; // TODO::配置 文字颜色
-      magicContainer.style.fontSize = '20'; // TODO::配置 文字大小
-      magicContainer.style.top = '20'; // TODO::配置 同 physicalContainer.style.fontSize
+      magicContainer.style.color = '#07d5ee';
+      magicContainer.style.fontSize = this.options.MagicFontSize.toString();
+      magicContainer.style.top = this.options.PhysicalFontSize.toString();
       magicContainer.setAttribute('value', String(0));
-      magicContainer.innerText = '魔: 20%';
+      // magicContainer.innerText = '魔: 20%';
       barsContainer.appendChild(magicContainer);
 
       // 在团辅出现时更新
@@ -503,10 +503,10 @@ export class Bars {
       throw new UnreachableCode();
 
     const buffsList = WidgetList.create({
-      rowcolsize: 1,
+      rowcolsize: 20,
       maxnumber: 20,
       toward: o.toward,
-      elementwidth: (o.iconWidth + 2).toString(),
+      // elementwidth: (o.iconWidth + 2).toString(),
       elementheight: (o.iconHeight + 1).toString(),
     });
     barsContainer.appendChild(buffsList);

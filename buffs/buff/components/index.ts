@@ -5,7 +5,7 @@ import {Job} from '../../cactbot/types/job';
 import {Bars} from '../bars';
 import {BuffTracker} from '../buff_tracker';
 import {JobsEventEmitter} from '../event_emitter';
-import {JobsOptions} from '../jobs_options';
+import {BuffOptions} from '../buff_options';
 import {Player} from '../player';
 import {doesJobNeedMPBar, isPvPZone, RegexesHolder} from '../utils';
 
@@ -85,7 +85,7 @@ export class ComponentManager {
     bars: Bars;
     buffTracker?: BuffTracker;
     ee: JobsEventEmitter;
-    options: JobsOptions;
+    options: BuffOptions;
     partyTracker: PartyTracker;
     is5x: boolean;
     player: Player;
@@ -145,7 +145,6 @@ export class ComponentManager {
 
         // bind party changed event
         this.ee.on('party', (party) => {
-            console.log('party', party)
             this.partyTracker.onPartyChanged({party})
         });
 
@@ -193,6 +192,7 @@ export class ComponentManager {
                 this.buffTracker = new BuffTracker(
                     this.options,
                     this.player.name,
+                    this.player.job,
                     this.bars.o.buffsList,
                     this.partyTracker,
                     this.is5x,

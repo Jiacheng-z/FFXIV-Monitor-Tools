@@ -79,7 +79,7 @@ let kYouUseAbilityRegex = null;
 let kPartyUseAbilityRegex = null;
 
 // 近战职业列表
-let meleeJobs = ['PLD', 'WAR', 'DRK', 'GNB', 'MNK', 'DRG', 'NIN', 'SAM'];
+let meleeJobs = ['PLD', 'WAR', 'DRK', 'GNB', 'MNK', 'DRG', 'NIN', 'SAM', 'RPR'];
 
 // 获取url参数
 function getQueryVariable(variable) {
@@ -1025,8 +1025,8 @@ class BuffTracker {
                 sortKey: 1,
                 cooldown: 80,
                 incrOwn: true, // 自身增伤, 应用乘法叠加, true 自身增伤乘法叠加, false boss增伤加法叠加
-                incrPhysical: 10, // 物理增伤
-                incrMagic: 10, // 魔法增伤
+                incrPhysical: 15, // 物理增伤
+                incrMagic: 15, // 魔法增伤
                 tts: '猛者',
             },
             battlevoice: { // 战斗之声
