@@ -4,7 +4,7 @@ import Util from '../../cactbot/resources/util';
 import {Job} from '../../cactbot/types/job';
 import {Bars} from '../bars';
 import {BuffTracker} from '../buff_tracker';
-import {JobsEventEmitter} from '../event_emitter';
+import {DotTracker, JobsEventEmitter} from '../event_emitter';
 import {BuffOptions} from '../buff_options';
 import {Player} from '../player';
 import {doesJobNeedMPBar, isPvPZone, RegexesHolder} from '../utils';
@@ -84,6 +84,7 @@ const ComponentMap: Record<Job, typeof BaseComponent> = {
 export class ComponentManager {
     bars: Bars;
     buffTracker?: BuffTracker;
+    dotTracker?: DotTracker;
     ee: JobsEventEmitter;
     options: BuffOptions;
     partyTracker: PartyTracker;
@@ -149,7 +150,6 @@ export class ComponentManager {
         });
 
         this.player.on('job', (job) => {
-            console.log('job', job)
             this.gpAlarmReady = false;
 
             this.bars._setupJobContainers(job, {
@@ -198,6 +198,10 @@ export class ComponentManager {
                     this.is5x,
                 );
             }
+            if (this.bars.o.dotsList) {
+                this.dotTracker = new DotTracker({emitter: this.o.emitter, player: this.player})
+                // TODO::绑定职业dot技能
+            }
         });
 
         // update RegexesHolder when the player name changes
@@ -206,40 +210,23 @@ export class ComponentManager {
         });
 
         this.ee.on('battle/wipe', () => {
-            console.log('battle/wipe')
             this._onPartyWipe();
         });
 
         // 自己放的能力技
         this.player.on('action/you', (id, matches) => {
-            console.log('action/you', id, matches)
-            if (this.regexes?.cordialRegex.test(id)) {
-                this.gpPotion = true;
-                window.setTimeout(() => {
-                    this.gpPotion = false;
-                }, 2000);
-            }
             this.buffTracker?.onUseAbility(id, matches);
         });
         this.player.on('action/party', (id, matches) => {
-            console.log('action/party', id, matches, matches.source,matches.targetId)
             this.buffTracker?.onUseAbility(id, matches)
         });
-
+        // 获得的buff
         this.player.on( // 给自己添加的
             'effect/gain/you',
             (id, matches) => {
                 this.buffTracker?.onYouGainEffect(id, matches)
             },
         );
-
-        // this.player.on('effect/gain', (id, matches) => {
-        //     console.log('effect/gain', id, matches)
-        //     // mob id starts with '4'
-        //     if (matches.targetId?.startsWith('4'))
-        //         this.buffTracker?.onMobGainsEffect(id, matches);
-        // });
-
         this.player.on(
             'effect/lose/you',
             (id, matches) => {
@@ -247,8 +234,13 @@ export class ComponentManager {
             },
         );
 
+        // 使用的技能
+        // this.player.on('effect/gain', (id, matches) => {
+        //     // mob id starts with '4'
+        //     if (matches.targetId?.startsWith('4'))
+        //         this.buffTracker?.onMobGainsEffect(id, matches);
+        // });
         // this.player.on('effect/lose', (id, matches) => {
-        //     console.log('effect/lose', id,matches)
         //     // mob id starts with '4'
         //     if (matches.targetId?.startsWith('4'))
         //         this.buffTracker?.onMobLosesEffect(id, matches);

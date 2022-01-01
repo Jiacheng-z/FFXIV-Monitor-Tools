@@ -269,7 +269,6 @@ export default class WidgetList extends HTMLElement {
         }
         // @ts-ignore
         let elemText = container.firstChild.lastChild.lastChild.shadowRoot?.getElementById('lefttext');
-        console.log(id,Math.floor(elemText.innerText))
         return Math.floor(elemText.innerText)
       };
     else
