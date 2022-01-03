@@ -3,6 +3,23 @@ import { BaseOptions } from '../cactbot/types/data';
 import { Job } from '../cactbot/types/job';
 import {BuffInfo} from "./buff_info";
 
+export interface UserConfigOptions {
+  Scale: number;
+
+  BigBuffNoticeTTSOn: boolean;
+  DotNoticeLessThanSecond: number;
+  DotNoticeTTSOn: boolean;
+  DotNoticeTTS: string;
+}
+
+export const defaultUserConfig: UserConfigOptions = {
+  Scale: 125,
+  BigBuffNoticeTTSOn: true,
+  DotNoticeLessThanSecond: 7,
+  DotNoticeTTSOn: true,
+  DotNoticeTTS: "续DoT", // 提醒语音
+}
+
 export interface JobsNonConfigOptions {
   JustBuffTracker: boolean;
   LowerOpacityOutOfCombat: boolean;

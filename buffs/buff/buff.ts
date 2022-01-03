@@ -8,7 +8,7 @@ import {ComponentManager} from "./components";
 
 import '../cactbot/resources/defaults.css';
 import './buff.css';
-import {getQueryVariable} from "./utils";
+import {getQueryVariable, loadConfig} from "./utils";
 
 let emit: JobsEventEmitter;
 // let play: Player;
@@ -48,16 +48,39 @@ UserConfig.getUserConfigLocation('buff', defaultOptions, () => {
             Test()
         })
         menuDiv.append(btn)
+
+        let btn2 = document.createElement("button")
+        btn2.id = "settings"
+        btn2.innerHTML = "设置"
+        btn2.addEventListener("click", function () {
+            const regex = /\w*.html/;
+            if (!regex.exec(window.location.href)) {
+                console.error(`Unable to parse location for summary: ${window.location.href}`);
+                return;
+            }
+            const url = window.location.href.replace(regex, 'settings.html');
+            window.open(url, "_blank", "width=800,height=800")
+        })
+        menuDiv.append(btn2)
+
         document.body.append(menuDiv);
     }
 });
 
 function rewriteOption(options: BuffOptions): BuffOptions {
+    const config = loadConfig();
+    options.Scale = config.Scale;
+    options.BigBuffNoticeTTSOn = config.BigBuffNoticeTTSOn;
+    options.DotNoticeLessThanSecond = config.DotNoticeLessThanSecond;
+    options.DotNoticeTTSOn = config.DotNoticeTTSOn;
+    options.DotNoticeTTS = config.DotNoticeTTS;
+
     // 缩放比例
     const uscale = decodeURI(getQueryVariable('scaling'));
-    if (uscale != ''){
+    if (uscale != '') {
         options.Scale = Number(uscale)
     }
+
     // tts总开关
     const uttsOn = decodeURI(getQueryVariable('tts'));
     if (uttsOn === '0') {
@@ -125,8 +148,3 @@ function Test() {
     // send(16, '26|2020-09-20T22:04:07.9110000+08:00|511|鼓励|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|01|52289|52289||369bee40aab7cfa72bc77aacd0165e89');
     // send(18, '30|2020-09-20T22:04:24.0480000+08:00|511|鼓励|0.00|1039A1D9|水貂桑|1039A1D9|水貂桑|01|76590|52289||91727e97f2e91e3b4823830ea6a35adb');
 }
-
-// document.querySelector("#settings").addEventListener("click", function () {
-//     window.open("xxx.html", "_blank", "width=800,height-800")
-// })
-

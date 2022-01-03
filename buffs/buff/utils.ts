@@ -18,6 +18,7 @@ import { SpeedBuffs } from './player';
 import {BuffInfo} from "./buff_info";
 import widget_list from './widget_list';
 import {DotInfo} from "./dot_info";
+import {defaultUserConfig, UserConfigOptions} from "./buff_options";
 
 const getLocaleRegex = (locale: string, regexes: {
   'en': RegExp;
@@ -446,4 +447,17 @@ export const getQueryVariable = (variable: string): string => {
     }
   }
   return '';
+}
+
+const configNameSpace = "buffsConfig"
+export const loadConfig = (): UserConfigOptions => {
+  const c = localStorage.getItem(configNameSpace);
+  if (c)
+    return JSON.parse(c);
+
+  return defaultUserConfig;
+}
+
+export const setConfig = (obj: UserConfigOptions) =>{
+  localStorage.setItem(configNameSpace, JSON.stringify(obj));
 }
