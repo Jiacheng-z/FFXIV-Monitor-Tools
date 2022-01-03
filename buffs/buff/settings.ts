@@ -10,7 +10,8 @@ if (btnDefault) {
         if (confirm("确定要还原设置?")) {
             setConfig(defaultUserConfig);
         }
-        window.location.reload();
+        window.opener?.location?.reload();
+        location.reload();
     })
 }
 let btnSave = document.getElementById("save");
@@ -53,6 +54,7 @@ function save() {
     } catch (e) {
         alert(e);
     }
-    window.location.reload();
+    window.opener?.location?.reload();
+    location.reload();
 }
 

@@ -53,13 +53,13 @@ UserConfig.getUserConfigLocation('buff', defaultOptions, () => {
         btn2.id = "settings"
         btn2.innerHTML = "设置"
         btn2.addEventListener("click", function () {
-            const regex = /\w*.html/;
-            if (!regex.exec(window.location.href)) {
-                console.error(`Unable to parse location for summary: ${window.location.href}`);
-                return;
-            }
-            const url = window.location.href.replace(regex, 'settings.html');
-            window.open(url, "_blank", "width=800,height=800")
+            // const regex = /\w*.html/;
+            // if (!regex.exec(window.location.href)) {
+            //     console.error(`Unable to parse location for summary: ${window.location.href}`);
+            //     return;
+            // }
+            // const url = window.location.href.replace(regex, 'settings.html');
+            window.open("./settings.html", "_blank", "width=800,height=800")
         })
         menuDiv.append(btn2)
 
