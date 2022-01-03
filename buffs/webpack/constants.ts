@@ -1,17 +1,17 @@
 export const cactbotModules = {
-  buff: 'buff/buff',
-  settings: 'buff/settings'
+  buff: 'Buff/buff',
+  settings: 'Buff/settings'
 };
 
 export const cactbotChunks = {};
 
 export const cactbotHtmlChunksMap = {
-  'buff/buff.html': {
+  'Buff/buff.html': {
     chunks: [
       cactbotModules.buff,
     ],
   },
-  'buff/settings.html': {
+  'Buff/settings.html': {
     chunks: [
         cactbotModules.settings,
     ]
