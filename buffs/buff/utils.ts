@@ -435,3 +435,15 @@ export const isPvPZone = (zoneId: number): boolean => {
     return true;
   return false;
 };
+
+export const getQueryVariable = (variable: string): string => {
+  const query = window.location.search.substring(1);
+
+  for (const v of query.split("&")) {
+    const pair = v.split("=")
+    if (pair[0] == variable) {
+      return pair[1]? pair[1]:'';
+    }
+  }
+  return '';
+}

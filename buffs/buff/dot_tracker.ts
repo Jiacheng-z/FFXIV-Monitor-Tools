@@ -140,7 +140,7 @@ export class DotTracker {
     gainEffectMap: { [s: string]: DotInfo[] };
     loseEffectMap: { [s: string]: DotInfo[] };
 
-    targets: string[];
+    // targets: string[];
     dots: { [s: string]: Dot };
 
     constructor(
@@ -152,7 +152,7 @@ export class DotTracker {
         this.player = player;
         this.dotListDiv = dotListDiv;
 
-        this.targets = [];
+        // this.targets = [];
         this.dots = {};
 
         this.gainEffectMap = {};
@@ -198,7 +198,7 @@ export class DotTracker {
             matches.sourceId?.toUpperCase() === this.player.idHex &&
             this.gainEffectMap[name] != null
         ) {
-            this.targets.push(matches.targetId);
+            // this.targets.push(matches.targetId);
             this.onGainEffect(this.gainEffectMap[name], matches)
         }
     }
@@ -209,7 +209,7 @@ export class DotTracker {
             matches.sourceId?.toUpperCase() === this.player.idHex &&
             this.loseEffectMap[name] != null
         ) {
-            this.targets.splice(this.targets.indexOf(matches.targetId), 1);
+            // this.targets.splice(this.targets.indexOf(matches.targetId), 1);
             this.onLoseEffect(this.loseEffectMap[name], matches)
         }
     }
@@ -260,7 +260,7 @@ export class DotTracker {
     }
 
     clear(): void {
-        this.targets = [];
+        // this.targets = [];
         Object.values(this.dots).forEach((dot) => dot.clear());
     }
 }

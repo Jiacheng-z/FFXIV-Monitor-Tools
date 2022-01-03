@@ -14,13 +14,13 @@ export interface JobsNonConfigOptions {
   LowHealthThresholdPercent: number;
   BigBuffShowCooldownSeconds: number;
 
+  Scale: number;
   PhysicalFontSize: number;
   MagicFontSize: number;
 
   BigBuffIconWidth: number;
   BigBuffIconHeight: number;
   BigBuffBarHeight: number;
-  BigBuffTextHeight: number;
   BigBuffBorderSize: number;
   BigBuffBarMaxWidth: number;
   BigBuffNoticeTTSOn: boolean;
@@ -28,7 +28,6 @@ export interface JobsNonConfigOptions {
   DotIconWidth: number;
   DotIconHeight: number;
   DotBarHeight: number;
-  DotTextHeight: number;
   DotBorderSize: number;
   DotNoticeLessThanSecond: number;
   DotNoticeTTSOn: boolean;
@@ -74,13 +73,13 @@ const defaultJobsNonConfigOptions: JobsNonConfigOptions = {
   LowHealthThresholdPercent: 0.2,
   BigBuffShowCooldownSeconds: 20,
 
+  Scale: 125, // 缩放
   PhysicalFontSize: 20,
   MagicFontSize: 20,
 
   BigBuffIconWidth: 32,
   BigBuffIconHeight: 20,
   BigBuffBarHeight: 20,
-  BigBuffTextHeight: 0,
   BigBuffBorderSize: 0,
   BigBuffBarMaxWidth: 250, // 30秒团辅进度条最大宽度
   BigBuffNoticeTTSOn: true,
@@ -88,7 +87,6 @@ const defaultJobsNonConfigOptions: JobsNonConfigOptions = {
   DotIconWidth: 32,
   DotIconHeight: 25,
   DotBarHeight: 5,
-  DotTextHeight: 0,
   DotBorderSize: 1,
   DotNoticeLessThanSecond: 7, // <0 取消提醒, >0 剩余n秒时提醒
   DotNoticeTTSOn: true,

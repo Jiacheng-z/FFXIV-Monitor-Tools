@@ -1,5 +1,5 @@
 import UserConfig from "../cactbot/resources/user_config";
-import defaultOptions from "./buff_options";
+import defaultOptions, {BuffOptions} from "./buff_options";
 import {JobsEventEmitter} from "./event_emitter";
 import {Player} from "./player";
 import PartyTracker from "../cactbot/resources/party";
@@ -8,12 +8,15 @@ import {ComponentManager} from "./components";
 
 import '../cactbot/resources/defaults.css';
 import './buff.css';
+import {getQueryVariable} from "./utils";
 
 let emit: JobsEventEmitter;
 // let play: Player;
 
 UserConfig.getUserConfigLocation('buff', defaultOptions, () => {
-    const options = {...defaultOptions};
+    let options = {...defaultOptions};
+    // 配置文件改写
+    options = rewriteOption(options)
 
     // Because Chinese/Korean regions are still on older version of FF14,
     // set this value to whether or not we should treat this as 5.x or 6.x.
@@ -49,6 +52,45 @@ UserConfig.getUserConfigLocation('buff', defaultOptions, () => {
     }
 });
 
+function rewriteOption(options: BuffOptions): BuffOptions {
+    // 缩放比例
+    const uscale = decodeURI(getQueryVariable('scaling'));
+    if (uscale != ''){
+        options.Scale = Number(uscale)
+    }
+    // tts总开关
+    const uttsOn = decodeURI(getQueryVariable('tts'));
+    if (uttsOn === '0') {
+        options.BigBuffNoticeTTSOn = false;
+        options.DotNoticeTTSOn = false;
+    }
+    // 小于多少秒提醒
+    const uDotNoticeLess = decodeURI(getQueryVariable('dotnoticeless'));
+    if (uDotNoticeLess != '') {
+        options.DotNoticeLessThanSecond = Number(uDotNoticeLess)
+    }
+    // TTS文字
+    const uDotTTS = decodeURI(getQueryVariable('dotnoticetts'));
+    if (uDotTTS != '') {
+        options.DotNoticeTTS = uDotTTS
+    }
+
+    if (options.Scale > 100) {
+        options.Scale = options.Scale / 100
+        options.PhysicalFontSize *= options.Scale
+        options.MagicFontSize *= options.Scale
+
+        options.BigBuffIconWidth *= options.Scale
+        options.BigBuffIconHeight *= options.Scale
+        options.BigBuffBarHeight *= options.Scale
+
+        options.DotIconWidth *= options.Scale
+        options.DotIconHeight *= options.Scale
+        options.DotBarHeight *= options.Scale
+    }
+    return options
+}
+
 function Test() {
     if (emit == null) {
         return
@@ -73,9 +115,8 @@ function Test() {
 
     send(11, '26|2022-01-01T20:53:08.2050000+08:00|4a1|义结金兰：攻击|15.00|1039A1D9|水貂桑|1039A1D9|水貂桑|00|135119|135119||bc8a82a5f86070b6bc9f7779c3b3dc44');
     send(12, '21|2022-01-01T21:05:39.9490000+08:00|1039A1D9|水貂桑|8D2|攻其不备|4000031F|木人|1E710103|6F5B0000|5050E|27E0000|0|0|0|0|0|0|0|0|0|0|0|0|7400000|7400000|0|10000|0|1000|-603.1267|-762.9036|25.02|2.283125|101284|101284|10000|10000|0|1000|-604.7668|-761.4396|25|2.377449|00012569|0|f3ed8ae8ed410d18480c8edddb9ef49d');
-
-    send(13, '26|2022-01-01T23:55:26.2570000+08:00|4b1|狂风蚀箭|30.00|1039A1D9|水貂桑|4000031F|木人|28|7400000|135871||634a843a26af69a2b1be9f15c63fedba');
-    send(13, '26|2022-01-01T23:55:28.7110000+08:00|4b0|烈毒咬箭|30.00|1039A1D9|水貂桑|4000031F|木人|28|7400000|135871||f186f35dad45a7f1e42b098e9e4fcef6');
+    // send(13, '26|2022-01-01T23:55:26.2570000+08:00|4b1|狂风蚀箭|30.00|1039A1D9|水貂桑|4000031F|木人|28|7400000|135871||634a843a26af69a2b1be9f15c63fedba');
+    // send(13, '26|2022-01-01T23:55:28.7110000+08:00|4b0|烈毒咬箭|30.00|1039A1D9|水貂桑|4000031F|木人|28|7400000|135871||f186f35dad45a7f1e42b098e9e4fcef6');
 
     // send(8, '26|2020-09-20T22:04:03.9440000+08:00|511|鼓励|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|05|52289|52289||140096ff8fe52cfc344ee31759a6b422');
     // send(10, '26|2020-09-20T22:04:07.9110000+08:00|511|鼓励|20.00|1039A1D9|水貂桑|1039A1D9|水貂桑|04|52289|52289||369bee40aab7cfa72bc77aacd0165e89');
