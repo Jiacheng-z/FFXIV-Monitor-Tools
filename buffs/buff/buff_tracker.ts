@@ -8,38 +8,9 @@ import Util from '../cactbot/resources/util';
 import { BuffOptions } from './buff_options';
 import {buffsCalculation, findCountBuff, makeAuraTimerIcon, updateCountBuff} from './utils';
 import {callOverlayHandler} from "../cactbot/resources/overlay_plugin_api";
-import {BuffInfoList} from "./buff_info";
+import {BuffInfo,BuffInfoList} from "./buff_info";
 import {Job} from "../cactbot/types/job";
 
-export interface BuffInfo {
-  name: string;
-  activeAbility?: string[];
-  cooldownAbility?: string[];
-  gainEffect?: string[];
-  loseEffect?: string[];
-  mobGainsEffect?: string;
-  mobLosesEffect?: string;
-  durationSeconds?: number;
-  useEffectDuration?: boolean;
-  icon: string;
-  side?: 'left' | 'right';
-  borderColor: string;
-  sortKey: number;
-  cooldown?: number;
-  sharesCooldownWith?: string[];
-  hide?: boolean;
-  stack?: number;
-  partyOnly?: boolean;
-
-  target?: 'you' | 'boss' ; // 赋给自己? true:给自己, false:给boss
-  physicalUp?: number; //物理增伤百分比
-  magicUp?: number; // 魔法增伤百分比
-  physicalUpCount?: { [s: string]: number }; //物理增伤百分比
-  magicUpCount?:  { [s: string]: number }; // 魔法增伤百分比
-  meleeUp?: number; // 近战增伤比
-  rangedUp?: number; // 远程增伤
-  tts?: string; // tts播报
-}
 
 export interface Aura {
   addCallback: () => void;
@@ -287,8 +258,6 @@ export class BuffTracker {
   loseEffectMap: { [s: string]: BuffInfo[] };
   activeAbilityMap: { [s: string]: BuffInfo[]; };
   cooldownAbilityMap: { [s: string]: BuffInfo[] };
-  mobGainsEffectMap: { [s: string]: BuffInfo[] };
-  mobLosesEffectMap: { [s: string]: BuffInfo[] };
 
   constructor(
       private options: BuffOptions,
@@ -319,16 +288,12 @@ export class BuffTracker {
     this.loseEffectMap = {};
     this.activeAbilityMap = {};
     this.cooldownAbilityMap = {};
-    this.mobGainsEffectMap = {};
-    this.mobLosesEffectMap = {};
 
     const propToMapMap = {
       gainEffect: this.gainEffectMap,
       loseEffect: this.loseEffectMap,
       activeAbility: this.activeAbilityMap,
       cooldownAbility: this.cooldownAbilityMap,
-      mobGainsEffect: this.mobGainsEffectMap,
-      mobLosesEffect: this.mobLosesEffectMap,
     } as const;
 
     for (const [key, buffOmitName] of Object.entries(this.buffInfo)) {
@@ -395,10 +360,7 @@ export class BuffTracker {
     }
   }
 
-  onGainEffect(
-    buffs: BuffInfo[] | undefined,
-    matches: Partial<NetMatches['GainsEffect']>,
-  ): void {
+  onGainEffect(buffs: BuffInfo[] | undefined, matches: Partial<NetMatches['GainsEffect']>): void {
     if (!buffs)
       return;
     for (const b of buffs) {
@@ -460,14 +422,6 @@ export class BuffTracker {
 
   onYouLoseEffect(name: string, matches: Partial<NetMatches['LosesEffect']>): void {
     this.onLoseEffect(this.loseEffectMap[name], matches);
-  }
-
-  onMobGainsEffect(name: string, matches: Partial<NetMatches['GainsEffect']>): void {
-    this.onGainEffect(this.mobGainsEffectMap[name], matches);
-  }
-
-  onMobLosesEffect(name: string, matches: Partial<NetMatches['LosesEffect']>): void {
-    this.onLoseEffect(this.mobLosesEffectMap[name], matches);
   }
 
   onBigBuff(

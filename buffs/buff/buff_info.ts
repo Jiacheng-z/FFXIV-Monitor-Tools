@@ -1,4 +1,3 @@
-import {BuffInfo} from "./buff_tracker";
 import EffectId from "../cactbot/resources/effect_id";
 
 import potionImage from "../resources/images/000000.png";
@@ -52,6 +51,36 @@ const aEffectId = {
     'RightEye': '5AD', // 巨龙右眼
     'RadiantFinale': 'B94', // 最终乐章
 } as const;
+
+export interface BuffInfo {
+    name: string;
+    activeAbility?: string[];
+    cooldownAbility?: string[];
+    gainEffect?: string[];
+    loseEffect?: string[];
+    mobGainsEffect?: string;
+    mobLosesEffect?: string;
+    durationSeconds?: number;
+    useEffectDuration?: boolean;
+    icon: string;
+    side?: 'left' | 'right';
+    borderColor: string;
+    sortKey: number;
+    cooldown?: number;
+    sharesCooldownWith?: string[];
+    hide?: boolean;
+    stack?: number;
+    partyOnly?: boolean;
+
+    target?: 'you' | 'boss' ; // 赋给自己? true:给自己, false:给boss
+    physicalUp?: number; //物理增伤百分比
+    magicUp?: number; // 魔法增伤百分比
+    physicalUpCount?: { [s: string]: number }; //物理增伤百分比
+    magicUpCount?:  { [s: string]: number }; // 魔法增伤百分比
+    meleeUp?: number; // 近战增伤比
+    rangedUp?: number; // 远程增伤
+    tts?: string; // tts播报
+}
 
 export class BuffInfoList {
     static buffInfo: { [s: string]: Omit<BuffInfo, 'name'> } = {

@@ -1,8 +1,7 @@
 import UserConfig from '../cactbot/resources/user_config';
 import { BaseOptions } from '../cactbot/types/data';
 import { Job } from '../cactbot/types/job';
-
-import { BuffInfo } from './buff_tracker';
+import {BuffInfo} from "./buff_info";
 
 export interface JobsNonConfigOptions {
   JustBuffTracker: boolean;

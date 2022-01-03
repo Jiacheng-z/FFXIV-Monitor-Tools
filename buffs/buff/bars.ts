@@ -16,7 +16,6 @@ import {
   kMPUI3Rate,
 } from './constants';
 import { JobsEventEmitter } from './event_emitter';
-import './jobs_config';
 import { BuffOptions } from './buff_options';
 import { Player } from './player';
 import { computeBackgroundColorFrom } from './utils';

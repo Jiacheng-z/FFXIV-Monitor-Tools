@@ -4,7 +4,7 @@ import Util from '../../cactbot/resources/util';
 import {Job} from '../../cactbot/types/job';
 import {Bars} from '../bars';
 import {BuffTracker} from '../buff_tracker';
-import {DotTracker, JobsEventEmitter} from '../event_emitter';
+import {JobsEventEmitter} from '../event_emitter';
 import {BuffOptions} from '../buff_options';
 import {Player} from '../player';
 import {doesJobNeedMPBar, isPvPZone, RegexesHolder} from '../utils';
@@ -30,6 +30,7 @@ import {SGEComponent} from './sge';
 import {SMN5xComponent, SMNComponent} from './smn';
 import {WARComponent} from './war';
 import {WHMComponent} from './whm';
+import {DotTracker} from "../dot_tracker";
 
 const ComponentMap: Record<Job, typeof BaseComponent> = {
     // tank
@@ -199,8 +200,12 @@ export class ComponentManager {
                 );
             }
             if (this.bars.o.dotsList) {
-                this.dotTracker = new DotTracker({emitter: this.o.emitter, player: this.player})
-                // TODO::绑定职业dot技能
+                this.dotTracker = new DotTracker({
+                    options: this.options,
+                    emitter: this.o.emitter,
+                    player: this.player,
+                    dotListDiv: this.bars.o.dotsList,
+                })
             }
         });
 
