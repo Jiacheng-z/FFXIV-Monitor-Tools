@@ -6,7 +6,6 @@ import Util from '../cactbot/resources/util';
 import WidgetList, {Toward} from './widget_list';
 import { Job } from '../cactbot/types/job';
 
-import { ShouldShow } from './components/base';
 import {
   kMPCombatRate,
   kMPNormalRate,
@@ -92,7 +91,7 @@ export class Bars {
     this.jobsContainer.dataset.inpvp = inPvP ? 'true' : 'false';
   }
 
-  _setupJobContainers(job: Job, show: ShouldShow): void {
+  _setupJobContainers(job: Job): void {
     while (this.jobsContainer.firstChild)
       this.jobsContainer.removeChild(this.jobsContainer.firstChild);
 
@@ -140,7 +139,6 @@ export class Bars {
       barHeight: this.options.DotBarHeight,
       toward: 'left down',
     });
-
   }
 
   addJobBarContainer(): HTMLElement {

@@ -15,8 +15,9 @@ import { CactbotBaseRegExp } from '../cactbot/types/net_trigger';
 
 import { kLevelMod, kMeleeWithMpJobs } from './constants';
 import { SpeedBuffs } from './player';
-import {BuffInfo} from "./buff_tracker";
+import {BuffInfo} from "./buff_info";
 import widget_list from './widget_list';
+import {DotInfo} from "./dot_info";
 
 const getLocaleRegex = (locale: string, regexes: {
   'en': RegExp;
@@ -263,6 +264,70 @@ export const buffsCalculation = (dom: widget_list) => {
   //   }
   // }
 }
+
+export const makeAuraDotTimerIcon = (
+    name: string,
+    seconds: number,
+    opacity: number,
+    iconWidth: number,
+    iconHeight: number,
+    iconText: string,
+    barHeight: number,
+    textHeight: number,
+    textColor: string,
+    borderSize: number,
+    borderColor: string,
+    barColor: string,
+    auraIcon: string,
+    info: DotInfo,
+): HTMLDivElement => {
+  const div = document.createElement('div');
+  div.style.opacity = opacity.toString();
+  div.className = 'dots'
+
+  const icon = TimerIcon.create({
+    width: iconWidth.toString(),
+    height: iconHeight.toString(),
+    bordersize: borderSize.toString(),
+    textcolor: textColor,
+  });
+  div.appendChild(icon);
+
+  const barDiv = document.createElement('div');
+  barDiv.style.position = 'relative';
+  barDiv.style.top = iconHeight.toString();
+  div.appendChild(barDiv);
+
+  if (seconds >= 0) {
+    const bar = TimerBar.create();
+    bar.width = iconWidth.toString();
+    bar.height = barHeight.toString();
+    bar.fg = barColor;
+    bar.duration = seconds;
+    barDiv.appendChild(bar);
+  }
+
+  // 根据物理计算还是魔法计算
+  if (info.attackType === 'physical') {
+    const statp = document.getElementById('damage-up-physical');
+    const v = statp?.getAttribute('value')
+    if (v !== undefined && Number(v) > 0) {
+      icon.text = v;
+    }
+  }
+  if (info.attackType === 'magic') {
+    const statm = document.getElementById('damage-up-magic');
+    const v = statm?.getAttribute('value')
+    if (v !== undefined && Number(v) > 0) {
+      icon.text = v;
+    }
+  }
+
+  icon.bordercolor = borderColor;
+  icon.icon = auraIcon;
+
+  return div;
+};
 
 export const makeAuraTimerIcon = (
   name: string,

@@ -31,6 +31,7 @@ export interface JobsNonConfigOptions {
   DotTextHeight: number;
   DotBorderSize: number;
   DotNoticeLessThanSecond: number;
+  DotNoticeTTSOn: boolean;
   DotNoticeTTS: string;
 
   GpAlarmPoint: number;
@@ -90,6 +91,7 @@ const defaultJobsNonConfigOptions: JobsNonConfigOptions = {
   DotTextHeight: 0,
   DotBorderSize: 1,
   DotNoticeLessThanSecond: 7, // <0 取消提醒, >0 剩余n秒时提醒
+  DotNoticeTTSOn: true,
   DotNoticeTTS: "续DoT", // 提醒语音
 
   GpAlarmPoint: 0,
