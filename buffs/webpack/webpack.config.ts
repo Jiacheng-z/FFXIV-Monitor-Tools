@@ -40,6 +40,7 @@ export default (
         'test',
         'timerbarTest',
         'buff',
+        'settings',
       ].includes(key)
     )
       extension = 'ts';

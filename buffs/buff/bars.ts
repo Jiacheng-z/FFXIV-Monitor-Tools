@@ -1,13 +1,11 @@
-import foodImage from '../../resources/ffxiv/status/food.png';
-import { UnreachableCode } from '../../resources/not_reached';
-import ResourceBar from '../../resources/resourcebar';
-import TimerBar from '../../resources/timerbar';
-import TimerBox from '../../resources/timerbox';
-import Util from '../../resources/util';
-import WidgetList, { Toward } from '../../resources/widget_list';
-import { Job } from '../../types/job';
+import { UnreachableCode } from '../cactbot/resources/not_reached';
+import ResourceBar from '../cactbot/resources/resourcebar';
+import TimerBar from '../cactbot/resources/timerbar';
+import TimerBox from '../cactbot/resources/timerbox';
+import Util from '../cactbot/resources/util';
+import WidgetList, {Toward} from './widget_list';
+import { Job } from '../cactbot/types/job';
 
-import { ShouldShow } from './components/base';
 import {
   kMPCombatRate,
   kMPNormalRate,
@@ -15,25 +13,27 @@ import {
   kMPUI1Rate,
   kMPUI2Rate,
   kMPUI3Rate,
-  kWellFedContentTypes,
 } from './constants';
 import { JobsEventEmitter } from './event_emitter';
-import './jobs_config';
-import { JobsOptions } from './jobs_options';
+import { BuffOptions } from './buff_options';
 import { Player } from './player';
-import { computeBackgroundColorFrom, makeAuraTimerIcon } from './utils';
+import { computeBackgroundColorFrom } from './utils';
 
-// text on the pull countdown.
-const kPullText = {
-  en: 'Pull',
-  de: 'Start',
-  fr: 'Attaque',
-  ja: 'タゲ取る',
-  cn: '开怪',
-  ko: '풀링',
-};
+// // text on the pull countdown.
+// const kPullText = {
+//   en: 'Pull',
+//   de: 'Start',
+//   fr: 'Attaque',
+//   ja: 'タゲ取る',
+//   cn: '开怪',
+//   ko: '풀링',
+// };
 
 type JobDomObjects = {
+  damageUp?: HTMLElement;
+  buffsList?: WidgetList;
+  dotsList?: WidgetList;
+
   pullCountdown?: TimerBar;
   leftBuffsList?: WidgetList;
   rightBuffsList?: WidgetList;
@@ -55,7 +55,7 @@ export class Bars {
   public ee: JobsEventEmitter;
   public readonly player: Player;
 
-  constructor(private options: JobsOptions, o: {
+  constructor(private options: BuffOptions, o: {
     emitter: JobsEventEmitter;
     player: Player;
   }) {
@@ -91,20 +91,7 @@ export class Bars {
     this.jobsContainer.dataset.inpvp = inPvP ? 'true' : 'false';
   }
 
-  _setupJobContainers(job: Job, show: ShouldShow): void {
-    const shouldShow = {
-      buffList: true,
-      pullBar: true,
-      hpBar: true,
-      mpBar: true,
-      cpBar: false,
-      gpBar: false,
-      mpTicker: false,
-      ...show,
-    };
-    // if player is in pvp zone, inherit the class
-    const inPvPZone = document.getElementById('bars')?.classList.contains('pvp') ?? false;
-
+  _setupJobContainers(job: Job): void {
     while (this.jobsContainer.firstChild)
       this.jobsContainer.removeChild(this.jobsContainer.firstChild);
 
@@ -121,78 +108,37 @@ export class Bars {
     if (role !== 'none')
       barsLayoutContainer.classList.add(role.toLowerCase());
 
-    if (shouldShow.pullBar) {
-      // add pull bar first, which would not affected by the opacity settings
-      this.o.pullCountdown = this.addPullCountdownBar();
-    }
+    // 添加增伤模块
+    const injuryContainer = document.createElement('div');
+    injuryContainer.id = 'damage-up';
+    barsLayoutContainer.appendChild(injuryContainer);
+    this.o.damageUp = this.addDamageUpBar();
 
-    const opacityContainer = document.createElement('div');
-    opacityContainer.id = 'opacity-container';
-    barsLayoutContainer.appendChild(opacityContainer);
-    // set opacity to transparent if LowerOpacityOutOfCombat is enabled
-    this._updateOpacity(this.options.LowerOpacityOutOfCombat);
+    // 添加左侧buff框
+    const buffContainer = document.createElement('div');
+    buffContainer.id = 'buffs-list';
+    buffContainer.style.position = 'absolute';
+    buffContainer.style.top = (this.options.PhysicalFontSize + this.options.MagicFontSize + 10).toString();
+    barsLayoutContainer.appendChild(buffContainer);
+    this.o.buffsList = this.addBuffsList({
+      id: 'buffs-list',
+      iconWidth: this.options.BigBuffIconWidth,
+      iconHeight: this.options.BigBuffIconHeight,
+      barHeight: this.options.BigBuffIconHeight, // 与icon一样高
+      toward: 'down right',
+    });
 
-    // Holds health/mana.
-    const barsContainer = document.createElement('div');
-    barsContainer.id = 'bars';
-    if (inPvPZone)
-      barsContainer.classList.add('pvp');
-    opacityContainer.appendChild(barsContainer);
-
-    const procsContainer = document.createElement('div');
-    procsContainer.id = 'procs-container';
-    procsContainer.classList.toggle('compact', this.options.CompactView);
-    opacityContainer.appendChild(procsContainer);
-
-    if (shouldShow.buffList) {
-      if (this.options.JustBuffTracker) {
-        // Just alias these two together so the rest of the code doesn't have
-        // to care that they're the same thing.
-        this.o.leftBuffsList = this.o.rightBuffsList = this.addBuffsList({
-          id: 'right-side-icons',
-          rowcolsize: 20,
-          maxnumber: 20,
-          toward: 'right down',
-        });
-        // Hoist the buffs up to hide everything else.
-        const buffsContainer = this.o.rightBuffsList.parentElement;
-        if (!buffsContainer)
-          throw new UnreachableCode();
-        barsLayoutContainer.appendChild(buffsContainer);
-        barsLayoutContainer.classList.add('justbuffs');
-      } else {
-        this.o.rightBuffsList = this.addBuffsList({
-          id: 'right-side-icons',
-          rowcolsize: 7,
-          maxnumber: 7,
-          toward: 'right down',
-        });
-        this.o.leftBuffsList = this.addBuffsList({
-          id: 'left-side-icons',
-          rowcolsize: 7,
-          maxnumber: 7,
-          toward: 'left down',
-        });
-      }
-    }
-
-    if (shouldShow.cpBar) {
-      this.o.cpBar = this.addCPBar();
-      // hide bars by default when you are a crafter
-      // it would show when you start crafting
-      this.jobsContainer.classList.add('hide');
-    } else if (shouldShow.gpBar) {
-      this.o.gpBar = this.addGPBar();
-    }
-
-    if (shouldShow.hpBar)
-      this.o.healthBar = this.addHPBar(this.options.ShowHPNumber.includes(job));
-
-    if (shouldShow.mpBar)
-      this.o.manaBar = this.addMPBar(this.options.ShowMPNumber.includes(job));
-
-    if (shouldShow.mpTicker)
-      this.o.mpTicker = this.addMPTicker();
+    // 添加右侧dot框
+    const dotContainer = document.createElement('div');
+    dotContainer.id = 'dots-list';
+    barsLayoutContainer.appendChild(dotContainer);
+    this.o.dotsList = this.addDotsList({
+      id: 'dots-list',
+      iconWidth: this.options.DotIconWidth,
+      iconHeight: this.options.DotIconHeight,
+      barHeight: this.options.DotBarHeight,
+      toward: 'left down',
+    });
   }
 
   addJobBarContainer(): HTMLElement {
@@ -342,38 +288,72 @@ export class Bars {
     return bar;
   }
 
-  addPullCountdownBar(): TimerBar {
-    const barsLayoutContainer = document.getElementById('jobs');
-    if (!barsLayoutContainer)
-      throw new UnreachableCode();
+    addDamageUpBar(): HTMLElement {
+      let barsContainer = document.getElementById('damage-up');
+      if (!barsContainer) {
+        barsContainer = document.createElement('div');
+        barsContainer.id = 'damage-up';
+      }
 
-    const pullCountdownContainer = document.createElement('div');
-    pullCountdownContainer.id = 'pull-bar';
-    // Pull counter not affected by opacity option.
-    barsLayoutContainer.appendChild(pullCountdownContainer);
-    const pullCountdown = TimerBar.create({
-      righttext: 'remain',
-      // FIXME: create function check parameters with `if (param)` so when
-      // we using 0 here, it will just ignore it.
-      // should be fixed in the future.
-      // hideafter: 0,
-      fg: 'rgb(255, 120, 120)',
-      lefttext: kPullText[this.options.DisplayLanguage] || kPullText['en'],
-    });
-    pullCountdown.hideafter = 0;
-    pullCountdownContainer.appendChild(pullCountdown);
-    pullCountdown.width = window.getComputedStyle(pullCountdownContainer).width;
-    pullCountdown.height = window.getComputedStyle(pullCountdownContainer).height;
-    pullCountdown.classList.add('lang-' + this.options.DisplayLanguage);
+      // 物理增伤
+      const physicalContainer = document.createElement('div');
+      physicalContainer.id = 'damage-up-physical';
+      physicalContainer.style.color = '#ff8129';
+      physicalContainer.style.fontSize = this.options.PhysicalFontSize.toString();
+      physicalContainer.setAttribute('value', String(0));
+      // physicalContainer.innerText = '物: 10%';
+      barsContainer.appendChild(physicalContainer);
 
-    // reset pull bar when in combat (game)
-    this.ee.on('battle/in-combat', (ev) => {
-      if (ev.game)
-        this._setPullCountdown(0);
-    });
+      // 魔法增伤
+      const magicContainer = document.createElement('div');
+      magicContainer.id = 'damage-up-magic';
+      magicContainer.style.color = '#07d5ee';
+      magicContainer.style.fontSize = this.options.MagicFontSize.toString();
+      magicContainer.style.top = this.options.PhysicalFontSize.toString();
+      magicContainer.setAttribute('value', String(0));
+      // magicContainer.innerText = '魔: 20%';
+      barsContainer.appendChild(magicContainer);
 
-    return pullCountdown;
-  }
+      // 在团辅出现时更新
+      // this.player.on('cp', (data) => {
+      //     this._updateCp(data);
+      // });
+
+      return barsContainer
+    }
+
+  // addPullCountdownBar(): TimerBar {
+  //   const barsLayoutContainer = document.getElementById('jobs');
+  //   if (!barsLayoutContainer)
+  //     throw new UnreachableCode();
+  //
+  //   const pullCountdownContainer = document.createElement('div');
+  //   pullCountdownContainer.id = 'pull-bar';
+  //   // Pull counter not affected by opacity option.
+  //   barsLayoutContainer.appendChild(pullCountdownContainer);
+  //   const pullCountdown = TimerBar.create({
+  //     righttext: 'remain',
+  //     // FIXME: create function check parameters with `if (param)` so when
+  //     // we using 0 here, it will just ignore it.
+  //     // should be fixed in the future.
+  //     // hideafter: 0,
+  //     fg: 'rgb(255, 120, 120)',
+  //     lefttext: kPullText[this.options.DisplayLanguage] || kPullText['en'],
+  //   });
+  //   pullCountdown.hideafter = 0;
+  //   pullCountdownContainer.appendChild(pullCountdown);
+  //   pullCountdown.width = window.getComputedStyle(pullCountdownContainer).width;
+  //   pullCountdown.height = window.getComputedStyle(pullCountdownContainer).height;
+  //   pullCountdown.classList.add('lang-' + this.options.DisplayLanguage);
+  //
+  //   // reset pull bar when in combat (game)
+  //   this.ee.on('battle/in-combat', (ev) => {
+  //     if (ev.game)
+  //       this._setPullCountdown(0);
+  //   });
+  //
+  //   return pullCountdown;
+  // }
 
   addCPBar(): ResourceBar {
     const barsContainer = document.getElementById('bars');
@@ -510,25 +490,46 @@ export class Bars {
 
   addBuffsList(o: {
     id: string;
-    rowcolsize: number;
-    maxnumber: number;
+    iconWidth: number;
+    iconHeight: number;
+    barHeight: number;
     toward: Toward;
   }): WidgetList {
-    const barsContainer = document.getElementById('bars');
+    const barsContainer = document.getElementById(o.id);
     if (!barsContainer)
       throw new UnreachableCode();
 
-    const rightBuffsContainer = document.createElement('div');
-    rightBuffsContainer.id = o.id;
-    barsContainer.appendChild(rightBuffsContainer);
+    const buffsList = WidgetList.create({
+      rowcolsize: 20,
+      maxnumber: 20,
+      toward: o.toward,
+      // elementwidth: (o.iconWidth + 2).toString(),
+      elementheight: (o.iconHeight + 1).toString(),
+    });
+    barsContainer.appendChild(buffsList);
+
+    return buffsList;
+  }
+
+  addDotsList(o: {
+    id: string;
+    iconWidth: number;
+    iconHeight: number;
+    barHeight: number;
+    toward: Toward;
+  }): WidgetList {
+    const barsContainer = document.getElementById(o.id);
+    if (!barsContainer)
+      throw new UnreachableCode();
 
     const buffsList = WidgetList.create({
-      rowcolsize: o.rowcolsize,
-      maxnumber: o.maxnumber,
+      rowcolsize: 1,
+      maxnumber: 20,
       toward: o.toward,
-      elementwidth: (this.options.BigBuffIconWidth + 2).toString(),
+      elementwidth: (o.iconWidth + 2).toString(),
+      elementheight: (o.iconHeight + o.barHeight).toString(),
     });
-    rightBuffsContainer.appendChild(buffsList);
+    barsContainer.appendChild(buffsList);
 
     return buffsList;
   }
@@ -694,63 +695,6 @@ export class Bars {
     opacityContainer.style.opacity = transparent
       ? this.options.OpacityOutOfCombat.toString()
       : '1.0';
-  }
-
-  _updateFoodBuff(o: {
-    inCombat: boolean;
-    contentType?: number;
-    foodBuffExpiresTimeMs: number;
-    foodBuffTimer: number;
-  }): number | undefined {
-    // Non-combat jobs don't set up the left buffs list.
-    if (!this.o.leftBuffsList)
-      return;
-
-    const CanShowWellFedWarning = () => {
-      if (!this.options.HideWellFedAboveSeconds)
-        return false;
-      if (o.inCombat)
-        return false;
-      if (o.contentType === undefined)
-        return false;
-      return kWellFedContentTypes.includes(o.contentType);
-    };
-
-    // Returns the number of ms until it should be shown. If <= 0, show it.
-    const TimeToShowWellFedWarning = () => {
-      const nowMs = Date.now();
-      const showAtMs = o.foodBuffExpiresTimeMs - (this.options.HideWellFedAboveSeconds * 1000);
-      return showAtMs - nowMs;
-    };
-
-    window.clearTimeout(o.foodBuffTimer);
-    o.foodBuffTimer = 0;
-
-    const canShow = CanShowWellFedWarning();
-    const showAfterMs = TimeToShowWellFedWarning();
-
-    if (!canShow || showAfterMs > 0) {
-      this.o.leftBuffsList.removeElement('foodbuff');
-      if (canShow)
-        return window.setTimeout(this._updateFoodBuff.bind(this), showAfterMs);
-    } else {
-      const div = makeAuraTimerIcon(
-        'foodbuff',
-        -1,
-        1,
-        this.options.BigBuffIconWidth,
-        this.options.BigBuffIconHeight,
-        '',
-        this.options.BigBuffBarHeight,
-        this.options.BigBuffTextHeight,
-        'white',
-        this.options.BigBuffBorderSize,
-        'yellow',
-        'yellow',
-        foodImage,
-      );
-      this.o.leftBuffsList.addElement('foodbuff', div, -1);
-    }
   }
 
   _setPullCountdown(seconds: number): void {

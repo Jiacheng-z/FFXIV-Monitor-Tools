@@ -5,6 +5,9 @@ import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
 import { TriggerSet } from '../../../../../types/trigger';
 
+// TODO: Intemperance calls out a 4th time; should only call out three
+// TODO: Right/Left + Fire/Light happen at the same time later; collect these together
+
 export type Data = RaidbossData;
 
 const triggerSet: TriggerSet<Data> = {
@@ -84,11 +87,13 @@ const triggerSet: TriggerSet<Data> = {
           en: 'Get hit by red',
           de: 'Von Rot treffen lassen',
           fr: 'Faites-vous toucher par le rouge',
+          ko: '빨간색 맞기',
         },
         blue: {
           en: 'Get hit by blue',
           de: 'Von Blau treffen lassen',
           fr: 'Faites-vous toucher par le bleu',
+          ko: '파란색 맞기',
         },
       },
     },
@@ -116,12 +121,101 @@ const triggerSet: TriggerSet<Data> = {
           en: 'Stand on fire',
           de: 'Auf der Feuerfläche stehen',
           fr: 'Placez-vous sur le feu',
+          ko: '빨간색 바닥 위에 서기',
         },
         light: {
           en: 'Stand on light',
           de: 'Auf der Lichtfläche stehen',
           fr: 'Placez-vous sur la lumière',
+          ko: '흰색 바닥 위에 서기',
         },
+      },
+    },
+  ],
+  timelineReplace: [
+    {
+      'locale': 'en',
+      'replaceText': {
+        'Gaoler\'s Flail Left/Gaoler\'s Flail Right': 'Gaoler\'s Flail Left/Right',
+        'Gaoler\'s Flail Right/Gaoler\'s Flail Left': 'Gaoler\'s Flail Right/Left',
+        'Hot Spell/Cold Spell': 'Hot/Cold Spell',
+        'Powerful Fire/Powerful Light': 'Powerful Fire/Light',
+        'Aetherflail Left/Aetherflail Right': 'Aetherflail Left/Right',
+        'Aetherflail Right/Aetherflail Left': 'Aetherflail Right/Left',
+      },
+    },
+    {
+      'locale': 'de',
+      'replaceSync': {
+        'Erichthonios': 'Erichthonios',
+      },
+      'replaceText': {
+        '--knockback stack--': '--Rückstoß sammeln--',
+        'Aetherchain': 'Berstende Ketten',
+        'Aetherflail': 'Apodiktische Zucht',
+        'Cold Spell': 'Entfesselter Frost',
+        'Gaoler\'s Flail': 'Eiserne Zucht',
+        'Heavy Hand': 'Marter',
+        'Hot Spell': 'Entfesseltes Feuer',
+        'Intemperance': 'Zehrende Elemente',
+        'Intemperate Torment': 'Zehrende Vollstreckung',
+        'Left': 'Links',
+        'Pitiless Flail': 'Zucht und Ordnung',
+        'Powerful Fire': 'Entladenes Feuer',
+        'Powerful Light': 'Entladenes Licht',
+        'Right': 'Rechts',
+        'Shining Cells': 'Ätherzwinger',
+        'Slam Shut': 'Freigang',
+        'True Holy': 'Vollkommenes Sanctus',
+        'Warder\'s Wrath': 'Kettenmagie',
+      },
+    },
+    {
+      'locale': 'fr',
+      'missingTranslations': true,
+      'replaceSync': {
+        'Erichthonios': 'Érichthonios',
+      },
+      'replaceText': {
+        'Aetherchain': 'Chaînes explosives',
+        'Aetherflail': 'Chaîne de rétribution',
+        'Cold Spell': 'Déchaînement de glace',
+        'Gaoler\'s Flail': 'Chaîne punitive',
+        'Heavy Hand': 'Chaîne de supplice',
+        'Hot Spell': 'Déchaînement de feu',
+        'Intemperance': 'Corrosion élémentaire',
+        'Intemperate Torment': 'Exécution corrosive',
+        'Pitiless Flail': 'Chaîne transperçante',
+        'Powerful Fire': 'Explosion infernale',
+        'Powerful Light': 'Explosion sacrée',
+        'Shining Cells': 'Geôle limbique',
+        'Slam Shut': 'Occlusion terminale',
+        'True Holy': 'Miracle véritable',
+        'Warder\'s Wrath': 'Chaînes torrentielles',
+      },
+    },
+    {
+      'locale': 'ja',
+      'missingTranslations': true,
+      'replaceSync': {
+        'Erichthonios': 'エリクトニオス',
+      },
+      'replaceText': {
+        'Aetherchain': '爆鎖',
+        'Aetherflail': '懲罰爆鎖',
+        'Cold Spell': '魔力解放・氷',
+        'Gaoler\'s Flail': '懲罰撃',
+        'Heavy Hand': '痛撃',
+        'Hot Spell': '魔力解放・火',
+        'Intemperance': '氷火の侵食',
+        'Intemperate Torment': '侵食執行',
+        'Pitiless Flail': '懲罰連撃',
+        'Powerful Fire': '炎爆',
+        'Powerful Light': '光爆',
+        'Shining Cells': '光炎監獄',
+        'Slam Shut': '監獄閉塞',
+        'True Holy': 'トゥルー・ホーリー',
+        'Warder\'s Wrath': '魔鎖乱流',
       },
     },
   ],

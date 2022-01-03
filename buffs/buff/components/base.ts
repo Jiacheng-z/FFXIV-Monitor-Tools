@@ -4,7 +4,7 @@ import { Bars } from '../bars';
 import { ComboTracker } from '../combo_tracker';
 import { kComboDelay, kComboDelay5x } from '../constants';
 import { JobsEventEmitter, PartialFieldMatches } from '../event_emitter';
-import { JobsOptions } from '../jobs_options';
+import { BuffOptions } from '../buff_options';
 import { Player } from '../player';
 
 export type ShouldShow = {
@@ -20,7 +20,7 @@ export type ShouldShow = {
 export interface ComponentInterface {
   bars: Bars;
   emitter: JobsEventEmitter;
-  options: JobsOptions;
+  options: BuffOptions;
   partyTracker: PartyTracker;
   player: Player;
   is5x: boolean;
@@ -29,7 +29,7 @@ export interface ComponentInterface {
 export class BaseComponent implements ComponentInterface {
   bars: Bars;
   emitter: JobsEventEmitter;
-  options: JobsOptions;
+  options: BuffOptions;
   partyTracker: PartyTracker;
   player: Player;
   is5x: boolean;

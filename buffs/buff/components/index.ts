@@ -1,298 +1,144 @@
-import EffectId from '../../cactbot/resources/effect_id';
 import PartyTracker from '../../cactbot/resources/party';
 import Util from '../../cactbot/resources/util';
-import { Job } from '../../cactbot/types/job';
-import { Bars } from '../bars';
-import { BuffTracker } from '../buff_tracker';
-import { JobsEventEmitter } from '../event_emitter';
-import { JobsOptions } from '../jobs_options';
-import { Player } from '../player';
-import { doesJobNeedMPBar, isPvPZone, RegexesHolder } from '../utils';
+import {Bars} from '../bars';
+import {BuffTracker} from '../buff_tracker';
+import {DotTracker} from "../dot_tracker";
+import {JobsEventEmitter} from '../event_emitter';
+import {BuffOptions} from '../buff_options';
+import {Player} from '../player';
+import {isPvPZone, RegexesHolder} from '../utils';
 
-import { ASTComponent } from './ast';
-import { BaseComponent, ComponentInterface, ShouldShow } from './base';
-import { BLMComponent } from './blm';
-import { BLUComponent } from './blu';
-import { BRDComponent } from './brd';
-import { DNCComponent } from './dnc';
-import { DRGComponent } from './drg';
-import { DRKComponent } from './drk';
-import { GNBComponent } from './gnb';
-import { MCHComponent } from './mch';
-import { MNKComponent } from './mnk';
-import { NINComponent } from './nin';
-import { PLDComponent } from './pld';
-import { RDMComponent } from './rdm';
-import { RPRComponent } from './rpr';
-import { SAMComponent } from './sam';
-import { SCHComponent } from './sch';
-import { SGEComponent } from './sge';
-import { SMN5xComponent, SMNComponent } from './smn';
-import { WARComponent } from './war';
-import { WHMComponent } from './whm';
-
-const ComponentMap: Record<Job, typeof BaseComponent> = {
-  // tank
-  GLA: PLDComponent,
-  PLD: PLDComponent,
-  MRD: WARComponent,
-  WAR: WARComponent,
-  DRK: DRKComponent,
-  GNB: GNBComponent,
-  // healer
-  CNJ: WHMComponent,
-  WHM: WHMComponent,
-  SCH: SCHComponent,
-  AST: ASTComponent,
-  SGE: SGEComponent,
-  // melee dps
-  PGL: MNKComponent,
-  MNK: MNKComponent,
-  LNC: BaseComponent,
-  DRG: DRGComponent,
-  ROG: NINComponent,
-  NIN: NINComponent,
-  SAM: SAMComponent,
-  RPR: RPRComponent,
-  // ranged dps
-  ARC: BRDComponent,
-  BRD: BRDComponent,
-  MCH: MCHComponent,
-  DNC: DNCComponent,
-  // magic dps
-  ACN: SMNComponent,
-  SMN: SMNComponent,
-  THM: BLMComponent,
-  BLM: BLMComponent,
-  RDM: RDMComponent,
-  BLU: BLUComponent,
-  // crafter & gatherer
-  CRP: BaseComponent,
-  BSM: BaseComponent,
-  ARM: BaseComponent,
-  GSM: BaseComponent,
-  LTW: BaseComponent,
-  WVR: BaseComponent,
-  ALC: BaseComponent,
-  CUL: BaseComponent,
-  MIN: BaseComponent,
-  BTN: BaseComponent,
-  FSH: BaseComponent,
-  NONE: BaseComponent,
-};
+import {BaseComponent, ComponentInterface} from './base';
 
 export class ComponentManager {
-  bars: Bars;
-  buffTracker?: BuffTracker;
-  ee: JobsEventEmitter;
-  options: JobsOptions;
-  partyTracker: PartyTracker;
-  is5x: boolean;
-  player: Player;
-  regexes?: RegexesHolder;
-  component?: BaseComponent;
+    options: BuffOptions;
+    ee: JobsEventEmitter;
 
-  // misc variables
-  shouldShow: ShouldShow;
-  contentType?: number;
-  inPvPZone?: boolean;
-  // food buffs
-  foodBuffExpiresTimeMs: number;
-  foodBuffTimer: number;
-  // gp potions
-  gpAlarmReady: boolean;
-  gpPotion: boolean;
-  // true if player is too far away from their target
-  far?: boolean;
+    player: Player;
+    partyTracker: PartyTracker;
 
-  constructor(private o: ComponentInterface) {
-    this.bars = o.bars;
-    this.ee = o.emitter;
-    this.options = o.options;
-    this.partyTracker = o.partyTracker;
-    this.player = o.player;
-    this.is5x = o.is5x;
+    bars: Bars;
+    buffTracker?: BuffTracker;
+    dotTracker?: DotTracker;
 
-    this.shouldShow = {};
-    this.contentType = undefined;
+    regexes?: RegexesHolder;
 
-    this.foodBuffExpiresTimeMs = 0;
-    this.foodBuffTimer = 0;
-    this.gpAlarmReady = false;
-    this.gpPotion = false;
+    // misc variables
+    contentType?: number;
+    inPvPZone?: boolean;
+    is5x: boolean;
 
-    this.far = undefined;
+    component?: BaseComponent;
 
-    this.setupListeners();
-  }
+    constructor(private o: ComponentInterface) {
+        this.o.is5x;
 
-  getJobComponents(job: Job): BaseComponent {
-    // For CN/KR that is still in 5.x
-    if (this.o.is5x) {
-      if (job === 'SMN')
-        return new SMN5xComponent(this.o);
+        this.bars = o.bars;
+        this.ee = o.emitter;
+        this.options = o.options;
+        this.partyTracker = o.partyTracker;
+        this.player = o.player;
+        this.is5x = o.is5x;
+        this.contentType = undefined;
+
+        this.setupListeners();
     }
 
-    const Component = ComponentMap[job];
-    if (!Component)
-      return new BaseComponent(this.o);
+    setupListeners(): void {
+        this.ee.registerOverlayListeners();
 
-    return new Component(this.o);
-  }
+        // bind party changed event
+        this.ee.on('party', (party) => {
+            this.partyTracker.onPartyChanged({party})
+        });
 
-  setupListeners(): void {
-    this.ee.registerOverlayListeners();
+        this.player.on('job', (job) => {
+            this.dotTracker?.clear();
 
-    // bind party changed event
-    this.ee.on('party', (party) => {
-      this.partyTracker.onPartyChanged({ party })
-      // TODO::设置小队正则
-    });
+            this.bars._setupJobContainers(job);
 
-    this.player.on('job', (job) => {
-      this.gpAlarmReady = false;
+            // hide container html element if the player is a crafter
+            this.bars.setJobsContainerVisibility(!Util.isCraftingJob(job));
 
-      this.bars._setupJobContainers(job, {
-        buffList: this.shouldShow.buffList ?? true,
-        pullBar: this.shouldShow.pullBar ?? true,
-        hpBar: this.shouldShow.hpBar ?? (!Util.isCraftingJob(job) && !Util.isGatheringJob(job)),
-        mpBar: this.shouldShow.mpBar ??
-          (!Util.isCraftingJob(job) && !Util.isGatheringJob(job) && doesJobNeedMPBar(job)),
-        cpBar: this.shouldShow.cpBar ?? Util.isCraftingJob(job),
-        gpBar: this.shouldShow.gpBar ?? Util.isGatheringJob(job),
-        mpTicker: this.shouldShow.mpTicker ?? this.options.ShowMPTicker.includes(job),
-      });
+            // As you cannot change jobs in combat, we can assume that
+            // it is always false here.
+            this.bars._updateProcBoxNotifyState(false);
 
-      // hide container html element if the player is a crafter
-      this.bars.setJobsContainerVisibility(!Util.isCraftingJob(job));
+            // Set up the buff tracker after the job bars are created.
+            if (this.bars.o.buffsList) {
+                this.buffTracker = new BuffTracker(
+                    this.options,
+                    this.player.name,
+                    this.player.job,
+                    this.bars.o.buffsList,
+                    this.partyTracker,
+                    this.is5x,
+                );
+            }
+            if (this.bars.o.dotsList) {
+                this.dotTracker = new DotTracker(this.options, this.player, this.bars.o.dotsList)
+            }
+        });
 
-      // initialize components
-      this.component = this.getJobComponents(job);
+        // update RegexesHolder when the player name changes
+        this.player.on('player', ({name}) => {
+            this.regexes = new RegexesHolder(this.options.ParserLanguage, name);
+        });
 
-      // add food buff trigger
-      this.player.onYouGainEffect((id, matches) => {
-        if (id === EffectId.WellFed) {
-          // const seconds = parseFloat(matches.duration ?? '0');
-          // const now = Date.now(); // This is in ms.
-          // this.foodBuffExpiresTimeMs = now + (seconds * 1000);
-          // this.bars._updateFoodBuff({
-          //   inCombat: this.component?.inCombat ?? false,
-          //   foodBuffExpiresTimeMs: this.foodBuffExpiresTimeMs,
-          //   foodBuffTimer: this.foodBuffTimer,
-          //   contentType: this.contentType,
-          // });
-        }
-      });
-      // As you cannot change jobs in combat, we can assume that
-      // it is always false here.
-      this.bars._updateProcBoxNotifyState(false);
+        this.ee.on('battle/wipe', () => {
+            this._onPartyWipe();
+        });
 
-      // TODO: this is always created by _updateJob, so maybe this.o needs be optional?
-      if (this.bars.o.leftBuffsList && this.bars.o.rightBuffsList) {
-        // Set up the buff tracker after the job bars are created.
-        this.buffTracker = new BuffTracker(
-          this.options,
-          this.player.name,
-          this.bars.o.leftBuffsList,
-          this.bars.o.rightBuffsList,
-          this.partyTracker,
-          this.is5x,
+        // 自己放的能力技
+        this.player.on('action/you', (id, matches) => {
+            this.buffTracker?.onUseAbility(id, matches);
+        });
+        this.player.on('action/party', (id, matches) => {
+            this.buffTracker?.onUseAbility(id, matches)
+        });
+
+        // 获得的buff (自己)
+        this.player.on( // 给自己添加的
+            'effect/gain/you',
+            (id, matches) => {
+                this.buffTracker?.onYouGainEffect(id, matches)
+            },
         );
-      }
-    });
+        this.player.on(
+            'effect/lose/you',
+            (id, matches) => {
+                this.buffTracker?.onYouLoseEffect(id, matches)
+            },
+        );
 
-    // update RegexesHolder when the player name changes
-    this.player.on('player', ({ name }) => {
-      this.regexes = new RegexesHolder(this.options.ParserLanguage, name);
-    });
+        // 使用的技能
+        this.player.on('effect/gain', (id, matches) => {
+            // mob id starts with '4'
+            if (matches.targetId?.startsWith('4'))
+                this.dotTracker?.onYouGainEffect(id, matches);
+        });
+        this.player.on('effect/lose', (id, matches) => {
+            // mob id starts with '4'
+            if (matches.targetId?.startsWith('4'))
+                this.dotTracker?.onYouLoseEffect(id, matches);
+        });
 
-    this.ee.on('battle/wipe', () => {
-      this._onPartyWipe();
-    });
+        this.ee.on('zone/change', (id, _name, info) => {
+            this.inPvPZone = isPvPZone(id);
+            this.contentType = info?.contentType;
 
-    this.player.on('action/you', (id, matches) => {
-      if (this.regexes?.cordialRegex.test(id)) {
-        this.gpPotion = true;
-        window.setTimeout(() => {
-          this.gpPotion = false;
-        }, 2000);
-      }
-      this.buffTracker?.onUseAbility(id, matches);
-    });
-    this.player.on('action/party', (id, matches) => this.buffTracker?.onUseAbility(id, matches));
+            this.buffTracker?.clear();
+            this.dotTracker?.clear();
 
-    // this.player.on('action/other', (id, matches) => this.buffTracker?.onUseAbility(id, matches));
+            // Hide UI except HP and MP bar if change to pvp area.
+            this.bars._updateUIVisibility(this.inPvPZone);
+        });
+    }
 
-    this.player.on(
-      'effect/gain/you',
-      (id, matches) => this.buffTracker?.onYouGainEffect(id, matches),
-    );
-
-    this.player.on('effect/gain', (id, matches) => {
-      // mob id starts with '4'
-      if (matches.targetId?.startsWith('4'))
-        this.buffTracker?.onMobGainsEffect(id, matches);
-    });
-
-    this.player.on(
-      'effect/lose/you',
-      (id, matches) => this.buffTracker?.onYouLoseEffect(id, matches),
-    );
-
-    this.player.on('effect/lose', (id, matches) => {
-      // mob id starts with '4'
-      if (matches.targetId?.startsWith('4'))
-        this.buffTracker?.onMobLosesEffect(id, matches);
-    });
-
-    this.ee.on('zone/change', (id, _name, info) => {
-      this.inPvPZone = isPvPZone(id);
-      this.contentType = info?.contentType;
-
-      this.buffTracker?.clear();
-
-      // Hide UI except HP and MP bar if change to pvp area.
-      this.bars._updateUIVisibility(this.inPvPZone);
-    });
-
-    this.ee.on('log/game', (_log, _line, rawLine) => {
-      const m = this.regexes?.countdownStartRegex.exec(rawLine);
-      if (m && m.groups?.time) {
-        const seconds = parseFloat(m.groups.time);
-        this.bars._setPullCountdown(seconds);
-      }
-      if (this.regexes?.countdownCancelRegex.test(rawLine))
-        this.bars._setPullCountdown(0);
-      if (Util.isCraftingJob(this.player.job))
-        this._onCraftingLog(rawLine);
-    });
-  }
-
-  private _onPartyWipe(): void {
-    this.buffTracker?.clear();
-    // Reset job-specific ui
-    this.component?.reset();
-  }
-
-  private _onCraftingLog(message: string): void {
-    if (!this.regexes)
-      return;
-
-    // Hide CP Bar when not crafting
-    const anyRegexMatched = (line: string, array: RegExp[]) =>
-      array.some((regex) => regex.test(line));
-
-    // if the current player is crafting, show the bars;
-    // otherwise, hide them
-    if (anyRegexMatched(message, this.regexes.craftingStartRegexes))
-      this.bars.setJobsContainerVisibility(true);
-    if (
-      anyRegexMatched(message, this.regexes.craftingStopRegexes) ||
-      this.regexes.craftingFinishRegexes.some((regex) => {
-        const m = regex.exec(message)?.groups;
-        return m && (!m.player || m.player === this.player.name);
-      })
-    )
-      this.bars.setJobsContainerVisibility(false);
-  }
+    private _onPartyWipe(): void {
+        this.buffTracker?.clear();
+        this.dotTracker?.clear();
+        // Reset job-specific ui
+        this.component?.reset();
+    }
 }
