@@ -1,6 +1,6 @@
 import {defaultUserConfig} from "./buff_options";
 
-import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 import {loadConfig, setConfig} from "./utils";
 
 // 绑定事件
@@ -34,7 +34,7 @@ if (config.DotNoticeTTSOn) {
 function save() {
     let options = defaultUserConfig;
     const scale = Number((document.getElementById("scale") as HTMLInputElement).value);
-    if (scale > 100) {
+    if (scale >= 100) {
         options.Scale = scale
     }
     options.BigBuffNoticeTTSOn = (document.getElementById("bigBuffNoticeTTSOn") as HTMLInputElement).checked;

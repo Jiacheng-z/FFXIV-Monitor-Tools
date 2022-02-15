@@ -53,13 +53,9 @@ UserConfig.getUserConfigLocation('buff', defaultOptions, () => {
         btn2.id = "settings"
         btn2.innerHTML = "设置"
         btn2.addEventListener("click", function () {
-            // const regex = /\w*.html/;
-            // if (!regex.exec(window.location.href)) {
-            //     console.error(`Unable to parse location for summary: ${window.location.href}`);
-            //     return;
-            // }
-            // const url = window.location.href.replace(regex, 'settings.html');
-            window.open("./settings.html", "_blank", "width=800,height=800")
+            let iTop = (1080 - 30 - 470) / 2;
+            let iLeft = (1920 - 10 - 670) / 2;
+            window.open("./settings.html", "_blank", "width=670,height=470,top="+iTop+",left="+iLeft)
         })
         menuDiv.append(btn2)
 
