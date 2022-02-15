@@ -1,29 +1,29 @@
 import Effect_id from "../cactbot/resources/effect_id";
 // 白魔
-const diaImage = '/resources/images/002641.png'; // 天辉
+const diaImage = '../resources/images/002641.png'; // 天辉
 // 学者
-const biolysisImage = '/resources/images/002820.png'; // 蛊毒法
+const biolysisImage = '../resources/images/002820.png'; // 蛊毒法
 // 占星
-const combustIIIImage = '/resources/images/003554.png'; // 焚灼
+const combustIIIImage = '../resources/images/003554.png'; // 焚灼
 // 贤者
-const eukrasianDosisIiiImage = '/resources/images/003682.png'; // 焚灼
+const eukrasianDosisIiiImage = '../resources/images/003682.png'; // 焚灼
 // 武僧
-const demolishIiiImage = '/resources/images/000204.png'; // 破碎拳
+const demolishIiiImage = '../resources/images/000204.png'; // 破碎拳
 // 龙骑
-const chaosThrustIiiImage = '/resources/images/000308.png'; // 樱花怒放
-const chaoticSpringImage = '/resources/images/chaotic_spring.png'; // 樱花2
+const chaosThrustIiiImage = '../resources/images/000308.png'; // 樱花怒放
+const chaoticSpringImage = '../resources/images/chaotic_spring.png'; // 樱花2
 // 武士
-const higanbanaImage = '/resources/images/003160.png'; // 彼岸花
+const higanbanaImage = '../resources/images/003160.png'; // 彼岸花
 // 钐镰客
-const deathsDesignImage = '/resources/images/003606.png';
+const deathsDesignImage = '../resources/images/003606.png';
 // 诗人
-const stormbiteImage = '/resources/images/002614.png';
-const causticBiteImage = '/resources/images/002613.png';
+const stormbiteImage = '../resources/images/002614.png';
+const causticBiteImage = '../resources/images/002613.png';
 // 黑魔
-const thunderIiiImage = '/resources/images/000459.png';
+const thunderIiiImage = '../resources/images/000459.png';
 // 召唤
-const bioIIIImage = '/resources/images/002689.png';
-const miasmaIIIImage = '/resources/images/002690.png';
+const bioIIIImage = '../resources/images/002689.png';
+const miasmaIIIImage = '../resources/images/002690.png';
 
 // https://xivapi.com/docs/Icons 图标来源
 const aEffectId = {

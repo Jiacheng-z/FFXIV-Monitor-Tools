@@ -2,48 +2,48 @@ import EffectId from "../cactbot/resources/effect_id";
 
 import {kAbility} from "./constants";
 
-const potionImage = "/resources/images/000000.png";
+const potionImage = "../resources/images/000000.png";
 // 骑士
-const fightOrFlightImage = "/resources/images/000166.png"; // 战逃反应
-const requiescatImage = "/resources/images/002513.png"; // 安魂
+const fightOrFlightImage = "../resources/images/000166.png"; // 战逃反应
+const requiescatImage = "../resources/images/002513.png"; // 安魂
 // 枪刃
-const noMercyImage = "/resources/images/003402.png"; // 无情
+const noMercyImage = "../resources/images/003402.png"; // 无情
 // 学者
-const chainStratagemImage = "/resources/images/002815.png"; // 连环计
+const chainStratagemImage = "../resources/images/002815.png"; // 连环计
 // 占星
-const divinationImage = "/resources/images/003553.png"; // 占卜
-const astrodyneImage = "/resources/images/003558.png"; // 宏图
-const theArrowImage = "/resources/images/003113.png"; // 放浪神
-const theBalanceImage = "/resources/images/003110.png"; // 太阳神
-const theBoleImage = "/resources/images/003112.png"; // 世界树
-const theEwerImage = "/resources/images/003114.png"; // 河流神
-const theSpearImage = "/resources/images/003111.png"; // 战争神
-const theSpireImage = "/resources/images/003115.png"; // 建筑神
-const ladyOfCrownsImage = "/resources/images/003146.png"; // 富贵
-const lordOfCrownsImage = "/resources/images/003147.png"; // 领主
+const divinationImage = "../resources/images/003553.png"; // 占卜
+const astrodyneImage = "../resources/images/003558.png"; // 宏图
+const theArrowImage = "../resources/images/003113.png"; // 放浪神
+const theBalanceImage = "../resources/images/003110.png"; // 太阳神
+const theBoleImage = "../resources/images/003112.png"; // 世界树
+const theEwerImage = "../resources/images/003114.png"; // 河流神
+const theSpearImage = "../resources/images/003111.png"; // 战争神
+const theSpireImage = "../resources/images/003115.png"; // 建筑神
+const ladyOfCrownsImage = "../resources/images/003146.png"; // 富贵
+const lordOfCrownsImage = "../resources/images/003147.png"; // 领主
 // 武僧
-const riddleOfFireImage = "/resources/images/002541.png"; // 红莲
-const brotherhoodImage = "/resources/images/002542.png"; // 义结金兰
+const riddleOfFireImage = "../resources/images/002541.png"; // 红莲
+const brotherhoodImage = "../resources/images/002542.png"; // 义结金兰
 // 龙骑
-const lanceChargeImage = "/resources/images/000309.png"; // 猛枪
-const battleLitanyImage = "/resources/images/002585.png"; // 战斗连祷
-const leftEyeImage = "/resources/images/002587.png"; // 左眼
+const lanceChargeImage = "../resources/images/000309.png"; // 猛枪
+const battleLitanyImage = "../resources/images/002585.png"; // 战斗连祷
+const leftEyeImage = "../resources/images/002587.png"; // 左眼
 //忍者
-const trickAttackImage = "/resources/images/000618.png"; // 背刺
+const trickAttackImage = "../resources/images/000618.png"; // 背刺
 // 钐镰客
-const arcaneCircleImage = "/resources/images/003633.png"; // 秘环
+const arcaneCircleImage = "../resources/images/003633.png"; // 秘环
 // 诗人
-const ragingStrikesImage = "/resources/images/000352.png"; // 猛者强击
-const battleVoiceImage = "/resources/images/002601.png"; // 战斗之声
-const radiantFinaleImage = "/resources/images/002622.png"; // 最终乐章
+const ragingStrikesImage = "../resources/images/000352.png"; // 猛者强击
+const battleVoiceImage = "../resources/images/002601.png"; // 战斗之声
+const radiantFinaleImage = "../resources/images/002622.png"; // 最终乐章
 // 舞娘
-const devilmentImage = "/resources/images/003471.png"; // 探戈
-const technicalFinishImage = "/resources/images/003474.png"; // 技巧舞步
+const devilmentImage = "../resources/images/003471.png"; // 探戈
+const technicalFinishImage = "../resources/images/003474.png"; // 技巧舞步
 // 召唤
-const devotionImage = "/resources/images/002688.png"; // 灵护
-const searingLightImage = "/resources/images/002752.png"; // 灼热之光
+const devotionImage = "../resources/images/002688.png"; // 灵护
+const searingLightImage = "../resources/images/002752.png"; // 灼热之光
 // 赤魔
-const emboldenImage = "/resources/images/003218.png"; // 鼓励
+const emboldenImage = "../resources/images/003218.png"; // 鼓励
 
 const aEffectId = {
     'Requiescat': '558', // 安魂祈祷
