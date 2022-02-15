@@ -3,7 +3,6 @@ import { isEqual } from 'lodash';
 
 import logDefinitions from '../cactbot/resources/netlog_defs';
 import PartyTracker from '../cactbot/resources/party';
-import ZoneInfo from '../cactbot/resources/zone_info';
 import { EventResponses as OverlayEventResponses, JobDetail } from '../cactbot/types/event';
 import { Job } from '../cactbot/types/job';
 import { NetFields } from '../cactbot/types/net_fields';
@@ -29,7 +28,6 @@ export type SpeedBuffs = {
 export type GainCallback = (id: string, matches: PartialFieldMatches<'GainsEffect'>) => void;
 export type LoseCallback = (id: string, matches: PartialFieldMatches<'LosesEffect'>) => void;
 export type AbilityCallback = (id: string, matches: PartialFieldMatches<'Ability'>) => void;
-export type ZoneChangeCallback = (id: number, name: string, info?: typeof ZoneInfo[number]) => void;
 
 export interface EventMap {
   // triggered when data of current player is updated
