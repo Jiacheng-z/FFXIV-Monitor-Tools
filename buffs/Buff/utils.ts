@@ -1,4 +1,3 @@
-import ContentType from '../cactbot/resources/content_type';
 import { Lang } from '../cactbot/resources/languages';
 import NetRegexes from '../cactbot/resources/netregexes';
 import { UnreachableCode } from '../cactbot/resources/not_reached';
@@ -6,8 +5,6 @@ import TimerBar from '../cactbot/resources/timerbar';
 import TimerIcon from '../cactbot/resources/timericon';
 import { LocaleNetRegex } from '../cactbot/resources/translations';
 import Util from '../cactbot/resources/util';
-import ZoneId from '../cactbot/resources/zone_id';
-import ZoneInfo from '../cactbot/resources/zone_info';
 import { Job } from '../cactbot/types/job';
 import { NetAnyFields } from '../cactbot/types/net_fields';
 import { ToMatches } from '../cactbot/types/net_matches';
@@ -429,12 +426,13 @@ export const normalizeLogLine = <Fields extends NetAnyFields>(
 };
 
 export const isPvPZone = (zoneId: number): boolean => {
-  const zoneInfo = ZoneInfo[zoneId];
-  if (!zoneInfo)
-    return false;
-  if (zoneInfo.contentType === ContentType.Pvp || zoneId === ZoneId.WolvesDenPier)
-    return true;
   return false;
+  // const zoneInfo = ZoneInfo[zoneId];
+  // if (!zoneInfo)
+  //   return false;
+  // if (zoneInfo.contentType === ContentType.Pvp || zoneId === ZoneId.WolvesDenPier)
+  //   return true;
+  // return false;
 };
 
 export const getQueryVariable = (variable: string): string => {

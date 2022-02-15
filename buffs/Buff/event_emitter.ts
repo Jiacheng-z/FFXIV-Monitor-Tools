@@ -2,7 +2,6 @@ import EventEmitter from 'eventemitter3';
 
 import logDefinitions from '../cactbot/resources/netlog_defs';
 import { addOverlayListener } from '../cactbot/resources/overlay_plugin_api';
-import ZoneInfo from '../cactbot/resources/zone_info';
 import { EventResponses as OverlayEventResponses, Party } from '../cactbot/types/event';
 import { NetFields } from '../cactbot/types/net_fields';
 import { ToMatches } from '../cactbot/types/net_matches';
@@ -17,7 +16,7 @@ export interface EventMap {
   // party changed
   'party': (party: Party[]) => void;
   // zone changing
-  'zone/change': (id: number, name: string, info?: typeof ZoneInfo[number]) => void;
+  'zone/change': (id: number, name: string) => void;
   // battle events
   'battle/in-combat': (info: { game: boolean; act: boolean }) => void;
   'battle/wipe': () => void;
@@ -63,7 +62,7 @@ export class JobsEventEmitter extends EventEmitter<EventMap> {
     // });
 
     addOverlayListener('ChangeZone', (ev) => {
-      this.emit('zone/change', ev.zoneID, ev.zoneName, ZoneInfo[ev.zoneID]);
+      this.emit('zone/change', ev.zoneID, ev.zoneName);
     });
 
     addOverlayListener('LogLine', (ev) => {

@@ -123,9 +123,8 @@ export class ComponentManager {
                 this.dotTracker?.onYouLoseEffect(id, matches);
         });
 
-        this.ee.on('zone/change', (id, _name, info) => {
+        this.ee.on('zone/change', (id, _name) => {
             this.inPvPZone = isPvPZone(id);
-            this.contentType = info?.contentType;
 
             this.buffTracker?.clear();
             this.dotTracker?.clear();

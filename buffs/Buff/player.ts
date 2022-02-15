@@ -234,14 +234,6 @@ export class Player extends PlayerBase {
     this.once('job', () => this.off('action/you', wrapper));
   }
 
-  onZoneChange(callback: ZoneChangeCallback): void {
-    const wrapper: ZoneChangeCallback = (id, name, info) => {
-      callback(id, name, info);
-    };
-    this.ee.on('zone/change', wrapper);
-    this.once('job', () => this.ee.off('zone/change', wrapper));
-  }
-
   onJobDetailUpdate<JobKey extends keyof JobDetail>(
     job: JobKey,
     callback: (e: JobDetail[JobKey]) => void,
