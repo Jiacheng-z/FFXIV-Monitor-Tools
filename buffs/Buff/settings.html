@@ -6,6 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <title>设置</title>
+    <style>
+        .tts{
+            width: 110px;
+            font-size: 12px;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
@@ -54,6 +60,63 @@
             <div class="col-auto">
                 <span class="form-text">触发TTS时说什么</span>
             </div>
+        </div>
+
+        <div class="row g3" style="margin-top:20px;">
+            <label class="form-label">TTS技能开关:</label>
+        </div>
+
+        <div class="form-check form-switch form-check-inline tts" style="margin-top: 10px;">
+            <input class="form-check-input" type="checkbox" role="switch" id="TTSGoringBlade">
+            <label class="form-check-label" for="TTSGoringBlade">骑士-沥血剑</label>
+        </div>
+        <div class="form-check form-switch form-check-inline tts" style="margin-top: 10px;">
+            <input class="form-check-input" type="checkbox" role="switch" id="TTSSurgingTempest">
+            <label class="form-check-label" for="TTSSurgingTempest">战士-红斩</label>
+        </div>
+        <label class="row"></label>
+        <div class="form-check form-switch form-check-inline tts" style="margin-top: 10px;">
+            <input class="form-check-input" type="checkbox" role="switch" id="TTSDia">
+            <label class="form-check-label" for="TTSDia">白魔-天辉</label>
+        </div>
+        <div class="form-check form-switch form-check-inline tts" style="margin-top: 10px;">
+            <input class="form-check-input" type="checkbox" role="switch" id="TTSBiolysis">
+            <label class="form-check-label" for="TTSBiolysis">学者-蛊毒法</label>
+        </div>
+        <div class="form-check form-switch form-check-inline tts" style="margin-top: 10px;">
+            <input class="form-check-input" type="checkbox" role="switch" id="TTSCombustIII">
+            <label class="form-check-label" for="TTSCombustIII">占星-焚灼</label>
+        </div>
+        <div class="form-check form-switch form-check-inline tts" style="margin-top: 10px;">
+            <input class="form-check-input" type="checkbox" role="switch" id="TTSEukrasianDosisIii">
+            <label class="form-check-label" for="TTSEukrasianDosisIii">贤者-均衡注药</label>
+        </div>
+        <label class="row"></label>
+        <div class="form-check form-switch form-check-inline tts" style="margin-top: 10px;">
+            <input class="form-check-input" type="checkbox" role="switch" id="TTSDemolish">
+            <label class="form-check-label" for="TTSDemolish">武僧-破碎拳</label>
+        </div>
+        <div class="form-check form-switch form-check-inline tts" style="margin-top: 10px;">
+            <input class="form-check-input" type="checkbox" role="switch" id="TTSChaoticSpring">
+            <label class="form-check-label" for="TTSChaoticSpring">龙骑-樱花</label>
+        </div>
+        <div class="form-check form-switch form-check-inline tts" style="margin-top: 10px;">
+            <input class="form-check-input" type="checkbox" role="switch" id="TTSHiganbana">
+            <label class="form-check-label" for="TTSHiganbana">武士-彼岸花</label>
+        </div>
+        <div class="form-check form-switch form-check-inline tts" style="margin-top: 10px;">
+            <input class="form-check-input" type="checkbox" role="switch" id="TTSDeathsDesign">
+            <label class="form-check-label" for="TTSDeathsDesign">镰刀-死亡之影</label>
+        </div>
+        <label class="row"></label>
+        <div class="form-check form-switch form-check-inline tts" style="margin-top: 10px;">
+            <input class="form-check-input" type="checkbox" role="switch" id="TTSStormbite">
+            <label class="form-check-label" for="TTSStormbite">诗人-狂风蚀箭</label>
+        </div>
+        <label class="row"></label>
+        <div class="form-check form-switch form-check-inline tts" style="margin-top: 10px;">
+            <input class="form-check-input" type="checkbox" role="switch" id="TTSThunderIii">
+            <label class="form-check-label" for="TTSThunderIii">黑魔-暴雷</label>
         </div>
     </form>
     <button type="submit" class="btn-sm btn-primary" id="save">保存</button>

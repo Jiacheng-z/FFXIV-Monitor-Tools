@@ -55,7 +55,7 @@ UserConfig.getUserConfigLocation('buff', defaultOptions, () => {
         btn2.addEventListener("click", function () {
             let iTop = (1080 - 30 - 470) / 2;
             let iLeft = (1920 - 10 - 670) / 2;
-            window.open("./settings.html", "_blank", "width=670,height=470,top="+iTop+",left="+iLeft)
+            window.open("./settings.html", "_blank", "width=720,height=570,top="+iTop+",left="+iLeft)
         })
         menuDiv.append(btn2)
 
@@ -70,6 +70,19 @@ function rewriteOption(options: BuffOptions): BuffOptions {
     options.DotNoticeLessThanSecond = config.DotNoticeLessThanSecond;
     options.DotNoticeTTSOn = config.DotNoticeTTSOn;
     options.DotNoticeTTS = config.DotNoticeTTS;
+
+    options.TTSGoringBlade = config.TTSGoringBlade
+    options.TTSSurgingTempest = config.TTSSurgingTempest
+    options.TTSDia = config.TTSDia
+    options.TTSBiolysis = config.TTSBiolysis
+    options.TTSCombustIII = config.TTSCombustIII
+    options.TTSEukrasianDosisIii = config.TTSEukrasianDosisIii
+    options.TTSDemolish = config.TTSDemolish
+    options.TTSChaoticSpring = config.TTSChaoticSpring
+    options.TTSHiganbana = config.TTSHiganbana
+    options.TTSDeathsDesign = config.TTSDeathsDesign
+    options.TTSStormbite = config.TTSStormbite
+    options.TTSThunderIii = config.TTSThunderIii
 
     // 缩放比例
     const uscale = decodeURI(getQueryVariable('scaling'));

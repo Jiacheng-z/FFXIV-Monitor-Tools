@@ -3,6 +3,7 @@ import ResourceBar from '../cactbot/resources/resourcebar';
 import TimerBar from '../cactbot/resources/timerbar';
 import TimerBox from '../cactbot/resources/timerbox';
 import Util from '../cactbot/resources/util';
+import {isPhysicalJob} from './utils';
 import WidgetList, {Toward} from './widget_list';
 import { Job } from '../cactbot/types/job';
 
@@ -112,13 +113,17 @@ export class Bars {
     const injuryContainer = document.createElement('div');
     injuryContainer.id = 'damage-up';
     barsLayoutContainer.appendChild(injuryContainer);
-    this.o.damageUp = this.addDamageUpBar();
+    this.o.damageUp = this.addDamageUpBar(job);
 
     // 添加左侧buff框
     const buffContainer = document.createElement('div');
     buffContainer.id = 'buffs-list';
     buffContainer.style.position = 'absolute';
-    buffContainer.style.top = (this.options.PhysicalFontSize + this.options.MagicFontSize + 10).toString();
+    if (isPhysicalJob(job)) {
+      buffContainer.style.top = (this.options.PhysicalFontSize + 10).toString();
+    } else {
+      buffContainer.style.top = (this.options.MagicFontSize + 10).toString();
+    }
     barsLayoutContainer.appendChild(buffContainer);
     this.o.buffsList = this.addBuffsList({
       id: 'buffs-list',
@@ -288,31 +293,33 @@ export class Bars {
     return bar;
   }
 
-    addDamageUpBar(): HTMLElement {
+    addDamageUpBar(job: Job): HTMLElement {
       let barsContainer = document.getElementById('damage-up');
       if (!barsContainer) {
         barsContainer = document.createElement('div');
         barsContainer.id = 'damage-up';
       }
 
-      // 物理增伤
-      const physicalContainer = document.createElement('div');
-      physicalContainer.id = 'damage-up-physical';
-      physicalContainer.style.color = '#ff8129';
-      physicalContainer.style.fontSize = this.options.PhysicalFontSize.toString();
-      physicalContainer.setAttribute('value', String(0));
-      // physicalContainer.innerText = '物: 10%';
-      barsContainer.appendChild(physicalContainer);
-
-      // 魔法增伤
-      const magicContainer = document.createElement('div');
-      magicContainer.id = 'damage-up-magic';
-      magicContainer.style.color = '#07d5ee';
-      magicContainer.style.fontSize = this.options.MagicFontSize.toString();
-      magicContainer.style.top = this.options.PhysicalFontSize.toString();
-      magicContainer.setAttribute('value', String(0));
-      // magicContainer.innerText = '魔: 20%';
-      barsContainer.appendChild(magicContainer);
+      if (isPhysicalJob(job)) {
+        // 物理增伤
+        const physicalContainer = document.createElement('div');
+        physicalContainer.id = 'damage-up-physical';
+        physicalContainer.style.color = '#ff8129';
+        physicalContainer.style.fontSize = this.options.PhysicalFontSize.toString();
+        physicalContainer.setAttribute('value', String(0));
+        // physicalContainer.innerText = '物: 10%';
+        barsContainer.appendChild(physicalContainer);
+      } else {
+        // 魔法增伤
+        const magicContainer = document.createElement('div');
+        magicContainer.id = 'damage-up-magic';
+        magicContainer.style.color = '#07d5ee';
+        magicContainer.style.fontSize = this.options.MagicFontSize.toString();
+        // magicContainer.style.top = this.options.PhysicalFontSize.toString();
+        magicContainer.setAttribute('value', String(0));
+        // magicContainer.innerText = '魔: 20%';
+        barsContainer.appendChild(magicContainer);
+      }
 
       // 在团辅出现时更新
       // this.player.on('cp', (data) => {

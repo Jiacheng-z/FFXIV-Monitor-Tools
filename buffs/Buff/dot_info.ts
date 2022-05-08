@@ -1,4 +1,8 @@
 import Effect_id from "../cactbot/resources/effect_id";
+// 战士
+const surgingTempestImage = '../resources/images/000264.png'; // 红斩
+// 骑士
+const goringBladeImage = '../resources/images/002506.png'; // 沥血剑
 // 白魔
 const diaImage = '../resources/images/002641.png'; // 天辉
 // 学者
@@ -49,6 +53,26 @@ export interface DotInfo {
 
 export class DotInfoList {
     static dotInfo: { [s: string]: Omit<DotInfo, 'name'> } = {
+        // 战士 红斩
+        surgingTempest: {
+            gainEffect: [Effect_id.SurgingTempest],
+            loseEffect: [Effect_id.SurgingTempest],
+            icon: surgingTempestImage,
+            borderColor: '#e9874a',
+            sortKey: 0,
+            attackType: 'none',
+            tts: true,
+        },
+        // 骑士 沥血剑
+        goringBlade: {
+            gainEffect: [Effect_id.GoringBlade],
+            loseEffect: [Effect_id.GoringBlade],
+            icon: goringBladeImage,
+            borderColor: '#85421a',
+            sortKey: 0,
+            attackType: 'physical',
+            tts: false,
+        },
         // 白魔
         dia: {
             gainEffect: [aEffectId.Dia],

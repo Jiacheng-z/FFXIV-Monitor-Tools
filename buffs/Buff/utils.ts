@@ -79,6 +79,9 @@ export class RegexesHolder {
   }
 }
 
+export const isPhysicalJob = (job: Job): boolean =>
+    Util.isTankJob(job) || Util.isMeleeDpsJob(job) || Util.isRangedDpsJob(job);
+
 export const doesJobNeedMPBar = (job: Job): boolean =>
     Util.isCasterDpsJob(job) || Util.isHealerJob(job) || kMeleeWithMpJobs.includes(job);
 
@@ -308,16 +311,20 @@ export const makeAuraDotTimerIcon = (
   // 根据物理计算还是魔法计算
   if (info.attackType === 'physical') {
     const statp = document.getElementById('damage-up-physical');
-    const v = statp?.getAttribute('value')
-    if (v !== undefined && Number(v) > 0) {
-      icon.text = v;
+    if (statp != null) {
+      const v = statp?.getAttribute('value')
+      if (v !== undefined && Number(v) > 0) {
+        icon.text = v;
+      }
     }
   }
   if (info.attackType === 'magic') {
     const statm = document.getElementById('damage-up-magic');
-    const v = statm?.getAttribute('value')
-    if (v !== undefined && Number(v) > 0) {
-      icon.text = v;
+    if (statm != null) {
+      const v = statm?.getAttribute('value')
+      if (v !== undefined && Number(v) > 0) {
+        icon.text = v;
+      }
     }
   }
 

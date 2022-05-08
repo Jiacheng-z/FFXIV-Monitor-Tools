@@ -101,13 +101,15 @@ export class ComponentManager {
         this.player.on( // 给自己添加的
             'effect/gain/you',
             (id, matches) => {
-                this.buffTracker?.onYouGainEffect(id, matches)
+                this.buffTracker?.onYouGainEffect(id, matches);
+                this.dotTracker?.onYouGainBuff(id, matches);
             },
         );
         this.player.on(
             'effect/lose/you',
             (id, matches) => {
-                this.buffTracker?.onYouLoseEffect(id, matches)
+                this.buffTracker?.onYouLoseEffect(id, matches);
+                this.dotTracker?.onYouLoseBuff(id, matches);
             },
         );
 

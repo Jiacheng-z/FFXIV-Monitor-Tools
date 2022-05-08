@@ -170,6 +170,46 @@ export class DotTracker {
                 name: key,
             };
 
+            switch (key) {
+                case 'goringBlade':
+                    dot.tts = this.options.TTSGoringBlade;
+                    break;
+                case 'surgingTempest':
+                    dot.tts = this.options.TTSSurgingTempest;
+                    break;
+                case 'dia':
+                    dot.tts = this.options.TTSDia;
+                    break;
+                case 'biolysis':
+                    dot.tts = this.options.TTSBiolysis;
+                    break;
+                case 'combustIII':
+                    dot.tts = this.options.TTSCombustIII;
+                    break;
+                case 'eukrasianDosisIii':
+                    dot.tts = this.options.TTSEukrasianDosisIii;
+                    break;
+                case 'demolish':
+                    dot.tts = this.options.TTSDemolish;
+                    break;
+                case 'chaoticSpring':
+                    dot.tts = this.options.TTSChaoticSpring;
+                    break;
+                case 'higanbana':
+                    dot.tts = this.options.TTSHiganbana;
+                    break;
+                case 'deathsDesign':
+                    dot.tts = this.options.TTSDeathsDesign;
+                    break;
+                case 'stormbite':
+                    dot.tts = this.options.TTSStormbite;
+                    break;
+                case 'thunderIII':
+                    dot.tts = this.options.TTSThunderIii;
+                    break;
+                default:
+                    break;
+            }
             for (const propStr in propToMapMap) {
                 const prop = propStr as keyof typeof propToMapMap;
 
@@ -189,6 +229,27 @@ export class DotTracker {
                     map[key]?.push(dot);
                 }
             }
+        }
+    }
+
+    // 获得增伤自身buff
+    onYouGainBuff(name: string, matches: Partial<NetMatches['GainsEffect']>): void {
+        if (
+            matches.sourceId?.toUpperCase() === this.player.idHex &&
+            this.gainEffectMap[name] != null
+        ) {
+            console.log("onYouGainBuff", name);
+            this.onGainEffect(this.gainEffectMap[name], matches)
+        }
+    }
+
+    onYouLoseBuff(name: string, matches: Partial<NetMatches['LosesEffect']>): void {
+        if (
+            matches.sourceId?.toUpperCase() === this.player.idHex &&
+            this.loseEffectMap[name] != null
+        ) {
+            console.log("onYouLoseBuff", name);
+            this.onLoseEffect(this.loseEffectMap[name], matches)
         }
     }
 

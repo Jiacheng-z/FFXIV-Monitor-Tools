@@ -10,6 +10,19 @@ export interface UserConfigOptions {
   DotNoticeLessThanSecond: number;
   DotNoticeTTSOn: boolean;
   DotNoticeTTS: string;
+
+  TTSGoringBlade: boolean; // 骑士-沥血剑
+  TTSSurgingTempest: boolean; // 战士-红斩
+  TTSDia: boolean; // 白魔-天辉
+  TTSBiolysis: boolean; // 学者-蛊毒法
+  TTSCombustIII: boolean; // 占星-焚灼
+  TTSEukrasianDosisIii: boolean; // 贤者-均衡注药
+  TTSDemolish: boolean; // 武僧-破碎拳
+  TTSChaoticSpring: boolean; // 龙骑-樱花
+  TTSHiganbana: boolean; // 武士-彼岸花
+  TTSDeathsDesign: boolean; // 镰刀-死亡之影
+  TTSStormbite: boolean; // 诗人-狂风蚀箭
+  TTSThunderIii: boolean; // 黑魔-暴雷
 }
 
 export const defaultUserConfig: UserConfigOptions = {
@@ -18,6 +31,19 @@ export const defaultUserConfig: UserConfigOptions = {
   DotNoticeLessThanSecond: 7,
   DotNoticeTTSOn: true,
   DotNoticeTTS: "续DoT", // 提醒语音
+
+  TTSGoringBlade: false, // 骑士-沥血剑
+  TTSSurgingTempest: true, // 战士-红斩
+  TTSDia: true, // 白魔-天辉
+  TTSBiolysis: true, // 学者-蛊毒法
+  TTSCombustIII: true, // 占星-焚灼
+  TTSEukrasianDosisIii: true, // 贤者-均衡注药
+  TTSDemolish: false, // 武僧-破碎拳
+  TTSChaoticSpring: false, // 龙骑-樱花
+  TTSHiganbana: true, // 武士-彼岸花
+  TTSDeathsDesign: true, // 镰刀-死亡之影
+  TTSStormbite: true, // 诗人-狂风蚀箭
+  TTSThunderIii: true, // 黑魔-暴雷
 }
 
 export interface JobsNonConfigOptions {
@@ -55,6 +81,19 @@ export interface JobsNonConfigOptions {
   NotifyExpiredProcsInCombat: number;
   NotifyExpiredProcsInCombatSound: 'disabled' | 'expired' | 'threshold';
   CompactView: boolean;
+
+  TTSGoringBlade: boolean; // 骑士-沥血剑
+  TTSSurgingTempest: boolean; // 战士-红斩
+  TTSDia: boolean; // 白魔-天辉
+  TTSBiolysis: boolean; // 学者-蛊毒法
+  TTSCombustIII: boolean; // 占星-焚灼
+  TTSEukrasianDosisIii: boolean; // 贤者-均衡注药
+  TTSDemolish: boolean; // 武僧-破碎拳
+  TTSChaoticSpring: boolean; // 龙骑-樱花
+  TTSHiganbana: boolean; // 武士-彼岸花
+  TTSDeathsDesign: boolean; // 镰刀-死亡之影
+  TTSStormbite: boolean; // 诗人-狂风蚀箭
+  TTSThunderIii: boolean; // 黑魔-暴雷
 }
 
 export interface JobsConfigOptions {
@@ -114,6 +153,19 @@ const defaultJobsNonConfigOptions: JobsNonConfigOptions = {
   NotifyExpiredProcsInCombat: 5,
   NotifyExpiredProcsInCombatSound: 'threshold',
   CompactView: false,
+
+  TTSGoringBlade: false, // 骑士-沥血剑
+  TTSSurgingTempest: true, // 战士-红斩
+  TTSDia: true, // 白魔-天辉
+  TTSBiolysis: true, // 学者-蛊毒法
+  TTSCombustIII: true, // 占星-焚灼
+  TTSEukrasianDosisIii: true, // 贤者-均衡注药
+  TTSDemolish: false, // 武僧-破碎拳
+  TTSChaoticSpring: false, // 龙骑-樱花
+  TTSHiganbana: true, // 武士-彼岸花
+  TTSDeathsDesign: true, // 镰刀-死亡之影
+  TTSStormbite: true, // 诗人-狂风蚀箭
+  TTSThunderIii: true, // 黑魔-暴雷
 };
 
 // See user/jobs-example.js for documentation.
