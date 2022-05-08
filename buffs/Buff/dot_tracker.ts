@@ -238,7 +238,6 @@ export class DotTracker {
             matches.sourceId?.toUpperCase() === this.player.idHex &&
             this.gainEffectMap[name] != null
         ) {
-            console.log("onYouGainBuff", name);
             this.onGainEffect(this.gainEffectMap[name], matches)
         }
     }
@@ -248,7 +247,6 @@ export class DotTracker {
             matches.sourceId?.toUpperCase() === this.player.idHex &&
             this.loseEffectMap[name] != null
         ) {
-            console.log("onYouLoseBuff", name);
             this.onLoseEffect(this.loseEffectMap[name], matches)
         }
     }
