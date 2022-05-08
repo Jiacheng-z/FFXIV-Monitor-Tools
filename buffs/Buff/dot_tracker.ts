@@ -278,6 +278,9 @@ export class DotTracker {
             return;
         for (const b of dots) {
             let seconds = parseFloat(matches?.duration ?? '0');
+            if (b.name == 'surgingTempest') { // case: 可能由于buff的计算方式不同，战士的倒计时多2秒
+                seconds += 2
+            }
             this.onBigDot(matches?.targetId, b.name, seconds, b, matches?.source);
         }
     }
