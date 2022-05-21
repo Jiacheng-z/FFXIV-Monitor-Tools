@@ -305,7 +305,9 @@ export class DotTracker {
         if (seconds <= 0)
             return;
 
-        name = target + "=>" + name // 针对对boss技能. 保证不同boss分开倒计时.
+        if (name != 'deathsDesign') { // 镰刀的dot可能会给boss上多个
+            name = target + "=>" + name // 针对对boss技能. 保证不同boss分开倒计时.
+        }
 
         let list = this.dotListDiv;
         let dot = this.dots[name];
