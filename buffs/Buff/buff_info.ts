@@ -30,6 +30,7 @@ const battleLitanyImage = "../resources/images/002585.png"; // 战斗连祷
 const leftEyeImage = "../resources/images/002587.png"; // 左眼
 //忍者
 const trickAttackImage = "../resources/images/000618.png"; // 背刺
+const mugImage = "../resources/images/000613.png"; // 夺取
 // 钐镰客
 const arcaneCircleImage = "../resources/images/003633.png"; // 秘环
 // 诗人
@@ -50,6 +51,8 @@ const aEffectId = {
     'RiddleOfFire': '49D', // 红莲极意
     'RightEye': '5AD', // 巨龙右眼
     'RadiantFinale': 'B94', // 最终乐章
+
+    'Mug':'8C8', // 夺取(能力技)
 } as const;
 
 export interface BuffInfo {
@@ -325,9 +328,21 @@ export class BuffInfoList {
             sortKey: 0,
             cooldown: 60,
             target: 'boss',
+            physicalUp: 10,
+            magicUp: 10,
+        },
+        mug: { // 背刺
+            activeAbility: [aEffectId.Mug],
+            partyOnly: true,
+            durationSeconds: 20,
+            icon: mugImage,
+            borderColor: '#e2b640',
+            sortKey: 0,
+            cooldown: 120,
+            target: 'boss',
             physicalUp: 5,
             magicUp: 5,
-            tts: '背刺',
+            tts: '夺取',
         },
         // 钐镰客
         arcaneCircle: { // 秘环
@@ -363,7 +378,7 @@ export class BuffInfoList {
             icon: battleVoiceImage,
             borderColor: '#D6371E',
             sortKey: 0,
-            cooldown: 180,
+            cooldown: 120,
             target: 'you',
             physicalUp: 4,
             magicUp: 4,
