@@ -86,7 +86,7 @@
     "mocha": "^8.2.1",
     "node-fetch": "^2.6.7",
     "postcss": "^8.3.5",
-    "proxy-agent": "^4.0.1",
+    "proxy-agent": "^5.0.0",
     "raw-loader": "^4.0.2",
     "recast": "^0.20.4",
     "style-loader": "^3.3.1",
