@@ -29,7 +29,7 @@ const lanceChargeImage = "../resources/images/000309.png"; // 猛枪
 const battleLitanyImage = "../resources/images/002585.png"; // 战斗连祷
 const leftEyeImage = "../resources/images/002587.png"; // 左眼
 //忍者
-const trickAttackImage = "../resources/images/000618.png"; // 背刺
+// const trickAttackImage = "../resources/images/000618.png"; // 背刺
 const mugImage = "../resources/images/000613.png"; // 夺取
 // 钐镰客
 const arcaneCircleImage = "../resources/images/003633.png"; // 秘环
@@ -319,19 +319,19 @@ export class BuffInfoList {
             magicUp: 10,
         },
         // 忍者
-        trick: { // 背刺
-            activeAbility: [kAbility.TrickAttack],
-            partyOnly: true,
-            durationSeconds: 15,
-            icon: trickAttackImage,
-            borderColor: '#ff8400',
-            sortKey: 0,
-            cooldown: 60,
-            target: 'boss',
-            physicalUp: 10,
-            magicUp: 10,
-        },
-        mug: { // 背刺
+        // trick: { // 背刺
+        //     activeAbility: [kAbility.TrickAttack],
+        //     partyOnly: true,
+        //     durationSeconds: 15,
+        //     icon: trickAttackImage,
+        //     borderColor: '#ff8400',
+        //     sortKey: 0,
+        //     cooldown: 60,
+        //     target: 'boss',
+        //     physicalUp: 10,
+        //     magicUp: 10,
+        // },
+        mug: { // 夺取
             activeAbility: [aEffectId.Mug],
             partyOnly: true,
             durationSeconds: 20,
