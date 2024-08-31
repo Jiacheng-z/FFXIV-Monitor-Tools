@@ -2,7 +2,7 @@ import Effect_id from "../cactbot/resources/effect_id";
 // 战士
 const surgingTempestImage = '../resources/images/000264.png'; // 红斩
 // 骑士
-const goringBladeImage = '../resources/images/002506.png'; // 沥血剑
+// const goringBladeImage = '../resources/images/002506.png'; // 沥血剑
 // 白魔
 const diaImage = '../resources/images/002641.png'; // 天辉
 // 学者
@@ -26,19 +26,10 @@ const causticBiteImage = '../resources/images/002613.png';
 // 黑魔
 const thunderIiiImage = '../resources/images/000459.png';
 // 召唤
-const bioIIIImage = '../resources/images/002689.png';
-const miasmaIIIImage = '../resources/images/002690.png';
+// const bioIIIImage = '../resources/images/002689.png';
+// const miasmaIIIImage = '../resources/images/002690.png';
 
 // https://xivapi.com/docs/Icons 图标来源
-const aEffectId = {
-    'Dia': '74F', // 白魔 天辉
-    'Biolysis': '767', // 学者 蛊毒法
-    'CombustIII': '759', // 占星 焚灼
-    'Demolish': 'F6',// 武僧 破碎拳
-    'ChaosThrust': '76', // 龙骑 樱花怒放
-    'BioIII': '4BE', // 剧毒菌
-    'MiasmaIII': '4BF', // 瘴暍
-} as const;
 
 export interface DotInfo {
     name: string;
@@ -64,19 +55,19 @@ export class DotInfoList {
             tts: true,
         },
         // 骑士 沥血剑
-        goringBlade: {
-            gainEffect: [Effect_id.GoringBlade],
-            loseEffect: [Effect_id.GoringBlade],
-            icon: goringBladeImage,
-            borderColor: '#85421a',
-            sortKey: 0,
-            attackType: 'physical',
-            tts: false,
-        },
+        // goringBlade: {
+        //     gainEffect: [Effect_id.GoringBlade],
+        //     loseEffect: [Effect_id.GoringBlade],
+        //     icon: goringBladeImage,
+        //     borderColor: '#85421a',
+        //     sortKey: 0,
+        //     attackType: 'physical',
+        //     tts: false,
+        // },
         // 白魔
         dia: {
-            gainEffect: [aEffectId.Dia],
-            loseEffect: [aEffectId.Dia],
+            gainEffect: [Effect_id.Dia_74F],
+            loseEffect: [Effect_id.Dia_74F],
             icon: diaImage,
             borderColor: '#3eb9fa',
             sortKey: 0,
@@ -85,8 +76,8 @@ export class DotInfoList {
         },
         // 学者
         biolysis: {
-            gainEffect: [aEffectId.Biolysis],
-            loseEffect: [aEffectId.Biolysis],
+            gainEffect: [Effect_id.Biolysis_767],
+            loseEffect: [Effect_id.Biolysis_767],
             icon: biolysisImage,
             borderColor: '#2e1fc4',
             sortKey: 0,
@@ -95,8 +86,8 @@ export class DotInfoList {
         },
         // 占星
         combustIII: {
-            gainEffect: [aEffectId.CombustIII],
-            loseEffect: [aEffectId.CombustIII],
+            gainEffect: [Effect_id.CombustIii_759],
+            loseEffect: [Effect_id.CombustIii_759],
             icon: combustIIIImage,
             borderColor: '#62daf8',
             sortKey: 0,
@@ -115,8 +106,8 @@ export class DotInfoList {
         },
         // 武僧
         demolish: {
-            gainEffect: [aEffectId.Demolish],
-            loseEffect: [aEffectId.Demolish],
+            gainEffect: [Effect_id.Demolish_F6],
+            loseEffect: [Effect_id.Demolish_F6],
             icon: demolishIiiImage,
             borderColor: '#f5cc19',
             sortKey: 0,
@@ -125,8 +116,8 @@ export class DotInfoList {
         },
         // 龙骑
         chaosThrust: {
-            gainEffect: [aEffectId.ChaosThrust],
-            loseEffect: [aEffectId.ChaosThrust],
+            gainEffect: [Effect_id.ChaosThrust_76],
+            loseEffect: [Effect_id.ChaosThrust_76],
             icon: chaosThrustIiiImage,
             borderColor: '#83598c',
             sortKey: 0,
@@ -192,24 +183,24 @@ export class DotInfoList {
             tts: true,
         },
         // 召唤
-        bioIII: {
-            gainEffect: [aEffectId.BioIII],
-            loseEffect: [aEffectId.BioIII],
-            icon: bioIIIImage,
-            borderColor: '#e3e02d',
-            sortKey: 0,
-            attackType: 'magic',
-            tts: true,
-        },
-        miasmaIII: {
-            gainEffect: [aEffectId.MiasmaIII],
-            loseEffect: [aEffectId.MiasmaIII],
-            icon: miasmaIIIImage,
-            borderColor: '#97abe0',
-            sortKey: 0,
-            attackType: 'magic',
-            tts: false,
-        },
+        // bioIII: {
+        //     gainEffect: [Effect_id.BioIii_4BE],
+        //     loseEffect: [Effect_id.BioIii_4BE],
+        //     icon: bioIIIImage,
+        //     borderColor: '#e3e02d',
+        //     sortKey: 0,
+        //     attackType: 'magic',
+        //     tts: true,
+        // },
+        // miasmaIII: {
+        //     gainEffect: [Effect_id.MiasmaIii_4BF],
+        //     loseEffect: [Effect_id.MiasmaIii_4BF],
+        //     icon: miasmaIIIImage,
+        //     borderColor: '#97abe0',
+        //     sortKey: 0,
+        //     attackType: 'magic',
+        //     tts: false,
+        // },
     }
 }
 
