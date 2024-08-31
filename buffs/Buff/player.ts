@@ -10,7 +10,7 @@ import { NetFields } from '../cactbot/types/net_fields';
 
 import { ComboCallback, ComboTracker } from './combo_tracker';
 import { JobsEventEmitter, PartialFieldMatches } from './event_emitter';
-import {FfxivVersion} from "../cactbot/ui/jobs/jobs";
+import {FfxivVersion} from "./buff";
 import { calcGCDFromStat, normalizeLogLine } from './utils';
 
 export type Stats = Omit<

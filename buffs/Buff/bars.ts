@@ -1,24 +1,24 @@
 import { UnreachableCode } from '../cactbot/resources/not_reached';
 import ResourceBar from '../cactbot/resources/resourcebar';
 import TimerBar from '../cactbot/resources/timerbar';
-import TimerBox from '../cactbot/resources/timerbox';
+// import TimerBox from '../cactbot/resources/timerbox';
 import Util from '../cactbot/resources/util';
 import {isPhysicalJob} from './utils';
 import WidgetList, {Toward} from './widget_list';
 import { Job } from '../cactbot/types/job';
 
-import {
-  kMPCombatRate,
-  kMPNormalRate,
-  kMPTickInterval,
-  kMPUI1Rate,
-  kMPUI2Rate,
-  kMPUI3Rate,
-} from './constants';
+// import {
+//   kMPCombatRate,
+//   kMPNormalRate,
+//   kMPTickInterval,
+//   kMPUI1Rate,
+//   kMPUI2Rate,
+//   kMPUI3Rate,
+// } from './constants';
 import { JobsEventEmitter } from './event_emitter';
 import { BuffOptions } from './buff_options';
 import { Player } from './player';
-import { computeBackgroundColorFrom } from './utils';
+// import { computeBackgroundColorFrom } from './utils';
 
 // // text on the pull countdown.
 // const kPullText = {
@@ -44,10 +44,6 @@ type JobDomObjects = {
   manaBar?: ResourceBar;
   mpTicker?: TimerBar;
 };
-
-export interface ResourceBox extends HTMLDivElement {
-  parentNode: HTMLElement;
-}
 
 export class Bars {
   private jobsContainer: HTMLElement;
@@ -146,154 +142,7 @@ export class Bars {
     });
   }
 
-  addJobBarContainer(): HTMLElement {
-    const id = this.player.job.toLowerCase() + '-bar';
-    let container = document.getElementById(id);
-    if (!container) {
-      container = document.createElement('div');
-      container.id = id;
-      document.getElementById('bars')?.appendChild(container);
-      container.classList.add('bar-container');
-    }
-    return container;
-  }
-
-  addJobBoxContainer(): HTMLElement {
-    const id = this.player.job.toLowerCase() + '-boxes';
-    let boxes = document.getElementById(id);
-    if (!boxes) {
-      boxes = document.createElement('div');
-      boxes.id = id;
-      document.getElementById('bars')?.appendChild(boxes);
-      boxes.classList.add('box-container');
-    }
-    return boxes;
-  }
-
-  addResourceBox({ classList }: { classList?: string[] }): ResourceBox {
-    const boxes = this.addJobBoxContainer();
-    const boxDiv = document.createElement('div');
-    if (classList) {
-      classList.forEach((className) => {
-        boxDiv.classList.add(className, 'resourcebox');
-      });
-    }
-    boxes.appendChild(boxDiv);
-
-    const textDiv = document.createElement('div');
-    boxDiv.appendChild(textDiv);
-    textDiv.classList.add('text');
-
-    // This asserts that textDiv has a parentNode that is an HTMLElement,
-    // which we create above.
-    return textDiv as ResourceBox;
-  }
-
-  addProcBox({
-    id,
-    fgColor,
-    threshold,
-    scale,
-    notifyWhenExpired,
-  }: {
-    id?: string;
-    fgColor?: string;
-    threshold?: number;
-    scale?: number;
-    notifyWhenExpired?: boolean;
-  }): TimerBox {
-    const elementId = this.player.job.toLowerCase() + '-procs';
-
-    let container = id ? document.getElementById(id) : undefined;
-    if (!container) {
-      container = document.createElement('div');
-      container.id = elementId;
-      document.getElementById('bars')?.appendChild(container);
-    }
-
-    document.getElementById('procs-container')?.appendChild(container);
-
-    const timerBox = TimerBox.create({
-      stylefill: 'empty',
-      bg: 'black',
-      toward: 'bottom',
-      threshold: threshold ? threshold : 0,
-      hideafter: null,
-      roundupthreshold: false,
-      valuescale: scale ? scale : 1,
-    });
-    container.appendChild(timerBox);
-    if (fgColor)
-      timerBox.fg = computeBackgroundColorFrom(timerBox, fgColor);
-    if (id) {
-      timerBox.id = id;
-      timerBox.classList.add('timer-box');
-    }
-    if (notifyWhenExpired) {
-      timerBox.classList.add('notify-when-expired');
-      if (this.options.NotifyExpiredProcsInCombatSound === 'threshold')
-        timerBox.onThresholdReached(() => this.playNotification());
-      else if (this.options.NotifyExpiredProcsInCombatSound === 'expired')
-        timerBox.onExpired(() => this.playNotification());
-    }
-    return timerBox;
-  }
-
-  addTimerBar({
-    id,
-    fgColor,
-  }: {
-    id: string;
-    fgColor: string;
-  }): TimerBar {
-    const container = this.addJobBarContainer();
-
-    const timerDiv = document.createElement('div');
-    timerDiv.id = id;
-    const timer = TimerBar.create();
-    container.appendChild(timerDiv);
-    timerDiv.appendChild(timer);
-    timer.classList.add('timer-bar');
-
-    timer.width = window.getComputedStyle(timerDiv).width;
-    timer.height = window.getComputedStyle(timerDiv).height;
-    timer.toward = 'left';
-    timer.bg = computeBackgroundColorFrom(timer, 'bar-border-color');
-    if (fgColor)
-      timer.fg = computeBackgroundColorFrom(timer, fgColor);
-
-    return timer;
-  }
-
-  addResourceBar({
-    id,
-    fgColor,
-    maxvalue,
-  }: {
-    id: string;
-    fgColor: string;
-    maxvalue: number;
-  }): ResourceBar {
-    const container = this.addJobBarContainer();
-
-    const barDiv = document.createElement('div');
-    barDiv.id = id;
-    const bar = ResourceBar.create({
-      bg: 'rgba(0, 0, 0, 0)',
-      maxvalue: maxvalue.toString(),
-    });
-    container.appendChild(barDiv);
-    barDiv.appendChild(bar);
-    bar.classList.add('resourcebar');
-
-    bar.fg = computeBackgroundColorFrom(bar, fgColor);
-    bar.width = window.getComputedStyle(barDiv).width;
-    bar.height = window.getComputedStyle(barDiv).height;
-
-    return bar;
-  }
-
-    addDamageUpBar(job: Job): HTMLElement {
+  addDamageUpBar(job: Job): HTMLElement {
       let barsContainer = document.getElementById('damage-up');
       if (!barsContainer) {
         barsContainer = document.createElement('div');
@@ -328,172 +177,6 @@ export class Bars {
 
       return barsContainer
     }
-
-  // addPullCountdownBar(): TimerBar {
-  //   const barsLayoutContainer = document.getElementById('jobs');
-  //   if (!barsLayoutContainer)
-  //     throw new UnreachableCode();
-  //
-  //   const pullCountdownContainer = document.createElement('div');
-  //   pullCountdownContainer.id = 'pull-bar';
-  //   // Pull counter not affected by opacity option.
-  //   barsLayoutContainer.appendChild(pullCountdownContainer);
-  //   const pullCountdown = TimerBar.create({
-  //     righttext: 'remain',
-  //     // FIXME: create function check parameters with `if (param)` so when
-  //     // we using 0 here, it will just ignore it.
-  //     // should be fixed in the future.
-  //     // hideafter: 0,
-  //     fg: 'rgb(255, 120, 120)',
-  //     lefttext: kPullText[this.options.DisplayLanguage] || kPullText['en'],
-  //   });
-  //   pullCountdown.hideafter = 0;
-  //   pullCountdownContainer.appendChild(pullCountdown);
-  //   pullCountdown.width = window.getComputedStyle(pullCountdownContainer).width;
-  //   pullCountdown.height = window.getComputedStyle(pullCountdownContainer).height;
-  //   pullCountdown.classList.add('lang-' + this.options.DisplayLanguage);
-  //
-  //   // reset pull bar when in combat (game)
-  //   this.ee.on('battle/in-combat', (ev) => {
-  //     if (ev.game)
-  //       this._setPullCountdown(0);
-  //   });
-  //
-  //   return pullCountdown;
-  // }
-
-  addCPBar(): ResourceBar {
-    const barsContainer = document.getElementById('bars');
-    if (!barsContainer)
-      throw new UnreachableCode();
-
-    const cpContainer = document.createElement('div');
-    cpContainer.id = 'cp-bar';
-    barsContainer.appendChild(cpContainer);
-    const cpBar = ResourceBar.create({
-      centertext: 'maxvalue',
-    });
-    cpContainer.appendChild(cpBar);
-    cpBar.width = window.getComputedStyle(cpContainer).width;
-    cpBar.height = window.getComputedStyle(cpContainer).height;
-    cpBar.bg = computeBackgroundColorFrom(cpBar, 'bar-border-color');
-    cpBar.fg = computeBackgroundColorFrom(cpBar, 'cp-color');
-    // update cp
-    this.player.on('cp', (data) => {
-      this._updateCp(data);
-    });
-
-    return cpBar;
-  }
-
-  addGPBar(): ResourceBar {
-    const barsContainer = document.getElementById('bars');
-    if (!barsContainer)
-      throw new UnreachableCode();
-
-    const gpContainer = document.createElement('div');
-    gpContainer.id = 'gp-bar';
-    barsContainer.appendChild(gpContainer);
-    const gpBar = ResourceBar.create({
-      centertext: 'maxvalue',
-    });
-    gpContainer.appendChild(gpBar);
-    gpBar.width = window.getComputedStyle(gpContainer).width;
-    gpBar.height = window.getComputedStyle(gpContainer).height;
-    gpBar.bg = computeBackgroundColorFrom(gpBar, 'bar-border-color');
-    gpBar.fg = computeBackgroundColorFrom(gpBar, 'gp-color');
-    // update gp
-    this.player.on('gp', (data) => {
-      this._updateGp(data);
-    });
-
-    return gpBar;
-  }
-
-  addHPBar(showHPNumber?: boolean): ResourceBar {
-    const barsContainer = document.getElementById('bars');
-    if (!barsContainer)
-      throw new UnreachableCode();
-
-    const healthText = showHPNumber ? 'value' : '';
-
-    const healthContainer = document.createElement('div');
-    healthContainer.id = 'hp-bar';
-    if (showHPNumber)
-      healthContainer.classList.add('show-number');
-    barsContainer.appendChild(healthContainer);
-
-    const healthBar = ResourceBar.create({
-      lefttext: healthText,
-    });
-    healthContainer.appendChild(healthBar);
-    // TODO: Let the component do this dynamically.
-    healthBar.width = window.getComputedStyle(healthContainer).width;
-    healthBar.height = window.getComputedStyle(healthContainer).height;
-    healthBar.bg = computeBackgroundColorFrom(healthBar, 'bar-border-color');
-    // update hp
-    this.player.on('hp', (data) => {
-      this._updateHealth(this.o.healthBar, data);
-    });
-
-    return healthBar;
-  }
-
-  addMPBar(showMPNumber?: boolean): ResourceBar {
-    const barsContainer = document.getElementById('bars');
-    if (!barsContainer)
-      throw new UnreachableCode();
-
-    const manaText = showMPNumber ? 'value' : '';
-    const manaContainer = document.createElement('div');
-    manaContainer.id = 'mp-bar';
-    barsContainer.appendChild(manaContainer);
-    if (showMPNumber)
-      manaContainer.classList.add('show-number');
-
-    const manaBar = ResourceBar.create({
-      lefttext: manaText,
-    });
-    manaContainer.appendChild(manaBar);
-    // TODO: Let the component do this dynamically.
-    manaBar.width = window.getComputedStyle(manaContainer).width;
-    manaBar.height = window.getComputedStyle(manaContainer).height;
-    manaBar.bg = computeBackgroundColorFrom(manaBar, 'bar-border-color');
-    // update mp
-    this.player.on('mp', (data) => {
-      this._updateMana(data);
-    });
-
-    return manaBar;
-  }
-
-  addMPTicker(): TimerBar {
-    const barsContainer = document.getElementById('bars');
-    if (!barsContainer)
-      throw new UnreachableCode();
-
-    const mpTickContainer = document.createElement('div');
-    mpTickContainer.id = 'mp-tick';
-    barsContainer.appendChild(mpTickContainer);
-
-    const mpTicker = TimerBar.create();
-    mpTickContainer.appendChild(mpTicker);
-    mpTicker.width = window.getComputedStyle(mpTickContainer).width;
-    mpTicker.height = window.getComputedStyle(mpTickContainer).height;
-    mpTicker.bg = computeBackgroundColorFrom(mpTicker, 'bar-border-color');
-    mpTicker.stylefill = 'fill';
-    mpTicker.toward = 'right';
-    mpTicker.loop = true;
-    this.ee.on('battle/in-combat', (ev) => {
-      // Hide out of combat if requested
-      if (mpTicker && !this.options.ShowMPTickerOutOfCombat && !ev.game) {
-        mpTicker.duration = 0;
-        mpTicker.stylefill = 'empty';
-      }
-    });
-
-    return mpTicker;
-  }
 
   addBuffsList(o: {
     id: string;
@@ -541,36 +224,6 @@ export class Bars {
     return buffsList;
   }
 
-  playNotification(): void {
-    const audio = new Audio('../../resources/sounds/freesound/alarm.webm');
-    audio.volume = 0.3;
-    void audio.play();
-  }
-
-  _updateHealth(
-    healthBar: ResourceBar | undefined,
-    data: {
-      hp: number;
-      maxHp: number;
-      shield: number;
-    },
-  ): void {
-    if (!healthBar)
-      return;
-    healthBar.value = data.hp.toString();
-    healthBar.maxvalue = data.maxHp.toString();
-    healthBar.extravalue = data.shield.toString();
-
-    const percent = (data.hp + data.shield) / data.maxHp;
-
-    if (data.maxHp > 0 && percent < this.options.LowHealthThresholdPercent)
-      healthBar.fg = computeBackgroundColorFrom(healthBar, 'hp-color.low');
-    else if (data.maxHp > 0 && percent < this.options.MidHealthThresholdPercent)
-      healthBar.fg = computeBackgroundColorFrom(healthBar, 'hp-color.mid');
-    else
-      healthBar.fg = computeBackgroundColorFrom(healthBar, 'hp-color');
-  }
-
   _updateProcBoxNotifyState(inCombat: boolean): void {
     if (this.options.NotifyExpiredProcsInCombat >= 0) {
       const boxes = document.getElementsByClassName('proc-box');
@@ -582,140 +235,6 @@ export class Bars {
         } else {
           box.classList.remove('in-combat');
         }
-      }
-    }
-  }
-
-  _updateMPTicker(data: {
-    mp: number;
-    maxMp: number;
-    prevMp?: number;
-    umbralStacks?: number;
-    inCombat: boolean;
-  }): void {
-    if (!this.o.mpTicker)
-      return;
-
-    const prevMp = data.prevMp ?? parseInt(this.o.manaBar?.value ?? '0');
-    const delta = data.mp - prevMp;
-
-    this.o.mpTicker.stylefill = 'fill';
-
-    const baseTick = data.inCombat ? kMPCombatRate : kMPNormalRate;
-    let umbralTick = 0;
-    data.umbralStacks ??= 0;
-    if (data.umbralStacks === -1)
-      umbralTick = kMPUI1Rate;
-    if (data.umbralStacks === -2)
-      umbralTick = kMPUI2Rate;
-    if (data.umbralStacks === -3)
-      umbralTick = kMPUI3Rate;
-
-    const mpTick = Math.floor(data.maxMp * baseTick) + Math.floor(data.maxMp * umbralTick);
-    if (delta === mpTick && data.umbralStacks <= 0) // MP ticks disabled in AF
-      this.o.mpTicker.duration = kMPTickInterval;
-
-    // Update color based on the astral fire/ice state
-    let colorTag = 'mp-tick-color';
-    if (data.umbralStacks < 0)
-      colorTag = 'mp-tick-color.ice';
-    if (data.umbralStacks > 0)
-      colorTag = 'mp-tick-color.fire';
-    this.o.mpTicker.fg = computeBackgroundColorFrom(this.o.mpTicker, colorTag);
-  }
-
-  _updateMana(data: {
-    mp: number;
-    maxMp: number;
-    prevMp: number;
-  }): void {
-    if (!this.o.manaBar)
-      return;
-    this.o.manaBar.value = data.mp.toString();
-    this.o.manaBar.maxvalue = data.maxMp.toString();
-  }
-
-  updateMpBarColor(data: {
-    mp: number;
-    far?: boolean;
-  }): void {
-    if (!this.o.manaBar)
-      return;
-
-    if (data.far) {
-      this.o.manaBar.fg = computeBackgroundColorFrom(this.o.manaBar, 'mp-color.far');
-      return;
-    }
-
-    let lowMP = -1;
-    let mediumMP = -1;
-
-    if (this.player.job === 'DRK') {
-      lowMP = this.options.DrkLowMPThreshold;
-      mediumMP = this.options.DrkMediumMPThreshold;
-    } else if (this.player.job === 'PLD') {
-      lowMP = this.options.PldLowMPThreshold;
-      mediumMP = this.options.PldMediumMPThreshold;
-    } else if (this.player.job === 'BLM') {
-      lowMP = this.options.BlmLowMPThreshold;
-      mediumMP = this.options.BlmMediumMPThreshold;
-    }
-
-    if (lowMP >= 0 && data.mp <= lowMP)
-      this.o.manaBar.fg = computeBackgroundColorFrom(this.o.manaBar, 'mp-color.low');
-    else if (mediumMP >= 0 && data.mp <= mediumMP)
-      this.o.manaBar.fg = computeBackgroundColorFrom(this.o.manaBar, 'mp-color.medium');
-    else
-      this.o.manaBar.fg = computeBackgroundColorFrom(this.o.manaBar, 'mp-color');
-  }
-
-  _updateCp(data: {
-    cp: number;
-    maxCp: number;
-  }): void {
-    if (!this.o.cpBar)
-      return;
-    this.o.cpBar.value = data.cp.toString();
-    this.o.cpBar.maxvalue = data.maxCp.toString();
-  }
-
-  _updateGp(data: {
-    gp: number;
-    maxGp: number;
-  }): void {
-    if (!this.o.gpBar)
-      return;
-    this.o.gpBar.value = data.gp.toString();
-    this.o.gpBar.maxvalue = data.maxGp.toString();
-  }
-
-  _playGpAlarm(): void {
-    const audio = new Audio('../../resources/sounds/freesound/power_up.webm');
-    audio.volume = this.options.GpAlarmSoundVolume;
-    void audio.play();
-  }
-
-  _updateOpacity(transparent: boolean): void {
-    const opacityContainer = document.getElementById('opacity-container');
-    if (!opacityContainer)
-      return;
-    opacityContainer.style.opacity = transparent
-      ? this.options.OpacityOutOfCombat.toString()
-      : '1.0';
-  }
-
-  _setPullCountdown(seconds: number): void {
-    if (!this.o.pullCountdown)
-      return;
-
-    const inCountdown = seconds > 0;
-    const showingCountdown = this.o.pullCountdown.duration ?? 0 > 0;
-    if (inCountdown !== showingCountdown) {
-      this.o.pullCountdown.duration = seconds;
-      if (inCountdown && this.options.PlayCountdownSound) {
-        const audio = new Audio('../../resources/sounds/freesound/sonar.webm');
-        audio.volume = 0.3;
-        void audio.play();
       }
     }
   }

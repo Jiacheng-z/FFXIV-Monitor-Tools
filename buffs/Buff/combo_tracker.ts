@@ -8,7 +8,7 @@ import {
   kComboDelay,
 } from './constants';
 import { PartialFieldMatches } from './event_emitter';
-import {FfxivVersion} from "../cactbot/ui/jobs/jobs";
+import {FfxivVersion} from "./buff";
 import { Player } from './player';
 
 type StartMap = {

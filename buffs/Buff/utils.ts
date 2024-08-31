@@ -12,7 +12,7 @@ import { ToMatches } from '../cactbot/types/net_matches';
 import { CactbotBaseRegExp } from '../cactbot/types/net_trigger';
 
 import { kLevelMod, kMeleeWithMpJobs } from './constants';
-import {FfxivVersion} from "../cactbot/ui/jobs/jobs";
+import {FfxivVersion} from "./buff";
 import { SpeedBuffs } from './player';
 import {BuffInfo} from "./buff_info";
 import widget_list from './widget_list';

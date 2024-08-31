@@ -3,7 +3,7 @@ import defaultOptions, {BuffOptions} from "./buff_options";
 import {JobsEventEmitter} from "./event_emitter";
 import {Player} from "./player";
 import PartyTracker from "../cactbot/resources/party";
-import { PartyTrackerOptions } from '../cactbot/resources/party';
+import { PartyTrackerOptions } from '../cactbot/types/party';
 import {Bars} from "./bars";
 import {ComponentManager} from "./components";
 
@@ -11,9 +11,9 @@ import '../cactbot/resources/defaults.css';
 import './buff.css';
 import {getQueryVariable, loadConfig} from "./utils";
 import {Lang} from "../cactbot/resources/languages";
-import {FfxivVersion} from "../cactbot/ui/jobs/jobs";
 
 let emit: JobsEventEmitter;
+export type FfxivVersion = number;
 // let play: Player;
 
 UserConfig.getUserConfigLocation('buff', defaultOptions, () => {

@@ -33,7 +33,7 @@ export default (
         'config',
         'coverage',
         'eureka',
-        'jobs',
+        // 'jobs',
         'oopsyraidsyLive',
         'oopsyraidsySummary',
         'oopsyraidsyViewer',

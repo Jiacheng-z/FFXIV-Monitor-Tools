@@ -105,8 +105,8 @@ export class DotInfoList {
         },
         // 贤者
         eukrasianDosisIii: {
-            gainEffect: [Effect_id.EukrasianDosisIii],
-            loseEffect: [Effect_id.EukrasianDosisIii],
+            gainEffect: [Effect_id.EukrasianDosisIii_A38],
+            loseEffect: [Effect_id.EukrasianDosisIii_A38],
             icon: eukrasianDosisIiiImage,
             borderColor: '#c4acf6',
             sortKey: 0,
@@ -144,8 +144,8 @@ export class DotInfoList {
         },
         // 武士
         higanbana: {
-            gainEffect: [Effect_id.Higanbana],
-            loseEffect: [Effect_id.Higanbana],
+            gainEffect: [Effect_id.Higanbana_4CC],
+            loseEffect: [Effect_id.Higanbana_4CC],
             icon: higanbanaImage,
             borderColor: '#d9542a',
             sortKey: 0,
@@ -164,8 +164,8 @@ export class DotInfoList {
         },
         // 诗人
         stormbite: {
-            gainEffect: [Effect_id.Stormbite],
-            loseEffect: [Effect_id.Stormbite],
+            gainEffect: [Effect_id.Stormbite_4B1],
+            loseEffect: [Effect_id.Stormbite_4B1],
             icon: stormbiteImage,
             borderColor: '#3df6fd',
             sortKey: 0,
@@ -173,8 +173,8 @@ export class DotInfoList {
             tts: true,
         },
         causticBite: {
-            gainEffect: [Effect_id.CausticBite],
-            loseEffect: [Effect_id.CausticBite],
+            gainEffect: [Effect_id.CausticBite_4B0],
+            loseEffect: [Effect_id.CausticBite_4B0],
             icon: causticBiteImage,
             borderColor: '#e053bb',
             sortKey: 0,

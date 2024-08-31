@@ -10,6 +10,7 @@ import {buffsCalculation, findCountBuff, makeAuraTimerIcon, updateCountBuff} fro
 import {callOverlayHandler} from "../cactbot/resources/overlay_plugin_api";
 import {BuffInfo,BuffInfoList} from "./buff_info";
 import {Job} from "../cactbot/types/job";
+import {FfxivVersion} from "./buff";
 
 
 export interface Aura {
@@ -61,7 +62,7 @@ export class Buff {
     // Remove any preexisting cooldowns with the same name in case they unexpectedly exist.
     this.cooldown[source]?.removeCallback();
 
-    const cooldownKey = 'c:' + this.name + ':' + source;
+    const cooldownKey = `c:${this.name}:${source}`;
 
     let secondsUntilShow = this.info.cooldown - this.options.BigBuffShowCooldownSeconds;
     secondsUntilShow = Math.min(Math.max(effectSeconds, secondsUntilShow, 1), this.info.cooldown);
@@ -97,7 +98,7 @@ export class Buff {
 
     const color = this.info.borderColor;
 
-    const readyKey = 'r:' + this.name + ':' + source;
+    const readyKey = `r:${this.name}:${source}`;
     this.ready[source] = this.makeAura(
       readyKey,
       this.readyList,
@@ -173,7 +174,7 @@ export class Buff {
           this.options.BigBuffIconHeight,
           txt,
           this.options.BigBuffBarHeight,
-          0,
+          this.options.BigBuffTextHeight,
           textColor,
           this.options.BigBuffBorderSize,
           this.info.borderColor,
@@ -265,7 +266,7 @@ export class BuffTracker {
       private playerJob: Job,
       private buffsListDiv: WidgetList,
       private partyTracker: PartyTracker,
-      private is5x: boolean,
+      private ffxivVersion: FfxivVersion,
   ) {
     this.options = options;
     this.playerName = playerName;
@@ -275,12 +276,11 @@ export class BuffTracker {
 
     this.partyTracker = partyTracker;
 
-    this.buffInfo = BuffInfoList.buffInfo;
-    // Abilities that are different in 5.x.
-    const v5x = BuffInfoList.buffInfoV5;
+    this.buffInfo = BuffInfoList.buffInfo; // 基础
+    const v650: { [s: string]: Omit<BuffInfo, 'name'> } = BuffInfoList.buffInfo; // 老版本特有的合并
 
-    if (this.is5x) {
-      for (const [key, entry] of Object.entries(v5x))
+    if (this.ffxivVersion < 700) {
+      for (const [key, entry] of Object.entries(v650))
         this.buffInfo[key] = entry;
     }
 
@@ -316,7 +316,7 @@ export class BuffTracker {
           continue;
         const key = buff[prop];
         if (typeof key === 'undefined') {
-          console.error('undefined value for key ' + prop + ' for buff ' + buff.name);
+          console.error(`undefined value for key ${prop} for buff ${buff.name}`);
           continue;
         }
 
@@ -352,15 +352,13 @@ export class BuffTracker {
         return;
 
       this.onBigBuff(matches?.targetId, b.name, seconds, b, matches?.source, 'active');
-
-      // if (b.durationSeconds)
-      //   seconds = b.durationSeconds + 1;
-      //
-      // this.onBigBuff(b.name, seconds, b, matches?.source, 'cooldown');
     }
   }
 
-  onGainEffect(buffs: BuffInfo[] | undefined, matches: Partial<NetMatches['GainsEffect']>): void {
+  onGainEffect(
+    buffs: BuffInfo[] | undefined,
+    matches: Partial<NetMatches['GainsEffect']>,
+  ): void {
     if (!buffs)
       return;
     for (const b of buffs) {
@@ -408,12 +406,12 @@ export class BuffTracker {
 
   onLoseEffect(
     buffs: BuffInfo[] | undefined,
-    matches: Partial<NetMatches['LosesEffect']>,
+    _matches: Partial<NetMatches['LosesEffect']>,
   ): void {
     if (!buffs)
       return;
     for (const b of buffs)
-      this.onLoseBigBuff(matches?.targetId, b.name);
+      this.onLoseBigBuff(_matches?.targetId, b.name);
   }
 
   onYouGainEffect(name: string, matches: Partial<NetMatches['GainsEffect']>): void {

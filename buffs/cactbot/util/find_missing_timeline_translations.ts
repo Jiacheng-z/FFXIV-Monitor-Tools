@@ -22,6 +22,7 @@ const isKeyOf = <T>(key: unknown, obj: T): key is keyof T => {
     return false;
   if (typeof key !== 'string')
     return false;
+  // @ts-ignore
   return (key in obj);
 };
 

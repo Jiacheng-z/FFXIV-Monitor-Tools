@@ -4,7 +4,7 @@ import { Bars } from '../bars';
 import { BuffTracker } from '../buff_tracker';
 import { DotTracker } from "../dot_tracker";
 import { JobsEventEmitter } from '../event_emitter';
-import { FfxivVersion } from "../../cactbot/ui/jobs/jobs";
+import { FfxivVersion } from "../buff";
 import { BuffOptions } from '../buff_options';
 import { Player } from '../player';
 import { isPvPZone, RegexesHolder } from '../utils';
@@ -29,6 +29,8 @@ export class ComponentManager {
 
 
     constructor(private o: ComponentInterface) {
+        this.o.ffxivVersion;
+
         this.bars = o.bars;
         this.ee = o.emitter;
         this.options = o.options;
@@ -67,7 +69,7 @@ export class ComponentManager {
                     this.player.job,
                     this.bars.o.buffsList,
                     this.partyTracker,
-                    this.is5x,
+                    this.ffxivVersion,
                 );
             }
             if (this.bars.o.dotsList) {

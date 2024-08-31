@@ -4,7 +4,7 @@ import { Bars } from '../bars';
 import { ComboTracker } from '../combo_tracker';
 import { kComboDelay } from '../constants';
 import { JobsEventEmitter, PartialFieldMatches } from '../event_emitter';
-import { FfxivVersion } from "../../cactbot/ui/jobs/jobs";
+import { FfxivVersion } from "../buff";
 import { BuffOptions } from '../buff_options';
 import { Player } from '../player';
 
