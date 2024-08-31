@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -11,6 +10,7 @@ export interface Data extends RaidbossData {
 
 // O11N - Alphascape 3.0
 const triggerSet: TriggerSet<Data> = {
+  id: 'AlphascapeV30',
   zoneId: ZoneId.AlphascapeV30,
   timelineFile: 'o11n.txt',
   timelineTriggers: [
@@ -18,7 +18,7 @@ const triggerSet: TriggerSet<Data> = {
       id: 'O11N Blaster',
       regex: /Blaster/,
       beforeSeconds: 3,
-      condition: (data) => data.role === 'tank',
+      condition: (data) => data.role === 'tank' || data.job === 'BLU',
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -36,23 +36,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O11N Atomic Ray',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3286', source: 'Omega', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3286', source: 'Omega', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3286', source: 'Oméga', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3286', source: 'オメガ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3286', source: '欧米茄', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3286', source: '오메가', capture: false }),
+      netRegex: { id: '3286', source: 'Omega', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'O11N Mustard Bomb',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3287', source: 'Omega' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3287', source: 'Omega' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3287', source: 'Oméga' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3287', source: 'オメガ' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3287', source: '欧米茄' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3287', source: '오메가' }),
+      netRegex: { id: '3287', source: 'Omega' },
       response: Responses.tankBuster('alarm'),
     },
     {
@@ -66,24 +56,14 @@ const triggerSet: TriggerSet<Data> = {
       // will at least say left/right for the second.
       id: 'O11N Cannon Cleanup',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '328[13]', source: 'Omega', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '328[13]', source: 'Omega', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '328[13]', source: 'Oméga', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '328[13]', source: 'オメガ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '328[13]', source: '欧米茄', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '328[13]', source: '오메가', capture: false }),
+      netRegex: { id: '328[13]', source: 'Omega', capture: false },
       delaySeconds: 15,
       run: (data) => delete data.lastWasStarboard,
     },
     {
       id: 'O11N Starboard Cannon 1',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '328[12]', source: 'Omega', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '328[12]', source: 'Omega', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '328[12]', source: 'Oméga', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '328[12]', source: 'オメガ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '328[12]', source: '欧米茄', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '328[12]', source: '오메가', capture: false }),
+      netRegex: { id: '328[12]', source: 'Omega', capture: false },
       condition: (data) => data.lastWasStarboard === undefined,
       response: Responses.goLeft(),
       run: (data) => data.lastWasStarboard = true,
@@ -91,12 +71,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O11N Larboard Cannon 1',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '328[34]', source: 'Omega', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '328[34]', source: 'Omega', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '328[34]', source: 'Oméga', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '328[34]', source: 'オメガ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '328[34]', source: '欧米茄', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '328[34]', source: '오메가', capture: false }),
+      netRegex: { id: '328[34]', source: 'Omega', capture: false },
       condition: (data) => data.lastWasStarboard === undefined,
       response: Responses.goRight(),
       run: (data) => data.lastWasStarboard = false,
@@ -104,12 +79,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O11N Starboard Cannon 2',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3282', source: 'Omega', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3282', source: 'Omega', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3282', source: 'Oméga', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3282', source: 'オメガ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3282', source: '欧米茄', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3282', source: '오메가', capture: false }),
+      netRegex: { id: '3282', source: 'Omega', capture: false },
       condition: (data) => data.lastWasStarboard !== undefined,
       alertText: (data, _matches, output) => {
         if (data.lastWasStarboard)
@@ -121,7 +91,7 @@ const triggerSet: TriggerSet<Data> = {
         moveLeft: {
           en: 'Move (Left)',
           de: 'Bewegen (Links)',
-          fr: 'Bougez (Gauche)',
+          fr: 'Bougez (À gauche)',
           ja: '動け (左へ)',
           cn: '去左边',
           ko: '이동 (왼쪽)',
@@ -129,7 +99,7 @@ const triggerSet: TriggerSet<Data> = {
         stayLeft: {
           en: 'Stay (Left)',
           de: 'Stehenbleiben (Links)',
-          fr: 'Restez ici (Gauche)',
+          fr: 'Restez (À gauche)',
           ja: 'そのまま (左に)',
           cn: '呆在左边',
           ko: '멈추기 (왼쪽)',
@@ -139,12 +109,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O11N Larboard Cannon 2',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3284', source: 'Omega', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3284', source: 'Omega', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3284', source: 'Oméga', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3284', source: 'オメガ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3284', source: '欧米茄', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3284', source: '오메가', capture: false }),
+      netRegex: { id: '3284', source: 'Omega', capture: false },
       condition: (data) => data.lastWasStarboard !== undefined,
       alertText: (data, _matches, output) => {
         if (data.lastWasStarboard)
@@ -156,7 +121,7 @@ const triggerSet: TriggerSet<Data> = {
         stayRight: {
           en: 'Stay (Right)',
           de: 'Stehenbleiben (Rechts)',
-          fr: 'Restez ici (Droite)',
+          fr: 'Restez (À droite)',
           ja: 'そのまま (右に)',
           cn: '呆在右边',
           ko: '멈추기 (오른쪽)',
@@ -164,7 +129,7 @@ const triggerSet: TriggerSet<Data> = {
         moveRight: {
           en: 'Move (Right)',
           de: 'Bewegen (Rechts)',
-          fr: 'Bougez (droite)',
+          fr: 'Bougez (À droite)',
           ja: '動け (右へ)',
           cn: '去右边',
           ko: '이동 (오른쪽)',
@@ -174,7 +139,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O11N Ballistic Missile',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0065' }),
+      netRegex: { id: '0065' },
       condition: Conditions.targetIsYou(),
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -190,18 +155,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O11N Electric Slide',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '003E' }),
+      netRegex: { id: '003E' },
       response: Responses.stackMarkerOn(),
     },
     {
       id: 'O11N Delta Attack',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '327B', source: 'Omega', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '327B', source: 'Omega', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '327B', source: 'Oméga', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '327B', source: 'オメガ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '327B', source: '欧米茄', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '327B', source: '오메가', capture: false }),
+      netRegex: { id: '327B', source: 'Omega', capture: false },
       delaySeconds: 3,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -222,6 +182,7 @@ const triggerSet: TriggerSet<Data> = {
         'Engaging Delta Attack protocol': 'Reinitialisiere Deltaprotokoll',
         'Level Checker': 'Monitor',
         'Omega': 'Omega',
+        'Program failure detected': '<biep> Programmfehler registriert.',
         'Rocket Punch': 'Raketenschlag',
       },
       'replaceText': {
@@ -249,9 +210,11 @@ const triggerSet: TriggerSet<Data> = {
         'Engaging Delta Attack protocol': 'Nécessité d\'utiliser l\'attaque Delta',
         'Level Checker': 'vérifiniveau',
         'Omega': 'Oméga',
+        'Program failure detected': 'Arrêt de la boucle de programme Alpha...',
         'Rocket Punch': 'Astéropoing',
       },
       'replaceText': {
+        '\\?': ' ?',
         'Atomic Ray': 'Rayon atomique',
         'Ballistic Impact': 'Impact de missile',
         'Ballistic Missile': 'Tir de missile',
@@ -272,10 +235,12 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       'locale': 'ja',
+      'missingTranslations': true,
       'replaceSync': {
         'Engaging Delta Attack protocol': 'デルタアタックの必要性を認定します',
         'Level Checker': 'レベルチェッカー',
         'Omega': 'オメガ',
+        'Program failure detected': 'サークルプログラム・アルファの失敗を確認……',
         'Rocket Punch': 'ロケットパンチ',
       },
       'replaceText': {
@@ -303,6 +268,7 @@ const triggerSet: TriggerSet<Data> = {
         'Engaging Delta Attack protocol': '认定有必要使用三角攻击。',
         'Level Checker': '等级检测仪',
         'Omega': '欧米茄',
+        'Program failure detected': '确认到循环程序·阿尔法启动失败……',
         'Rocket Punch': '火箭飞拳',
       },
       'replaceText': {
@@ -330,6 +296,7 @@ const triggerSet: TriggerSet<Data> = {
         'Engaging Delta Attack protocol': '델타 공격의 필요성을 인정합니다',
         'Level Checker': '레벨 측정기',
         'Omega': '오메가',
+        'Program failure detected': '순환 프로그램 알파 실패 확인…….',
         'Rocket Punch': '로켓 주먹',
       },
       'replaceText': {

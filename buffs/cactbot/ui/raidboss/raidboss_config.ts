@@ -1,9 +1,12 @@
 import { isLang, Lang } from '../../resources/languages';
+import { buildNetRegexForTrigger } from '../../resources/netregexes';
 import { UnreachableCode } from '../../resources/not_reached';
 import PartyTracker from '../../resources/party';
 import Regexes from '../../resources/regexes';
 import { triggerOutputFunctions } from '../../resources/responses';
+import { translateRegex, translateRegexBuildParam } from '../../resources/translations';
 import UserConfig, {
+  ConfigEntry,
   ConfigValue,
   OptionsTemplate,
   UserFileCallback,
@@ -18,7 +21,9 @@ import {
   Output,
   OutputStrings,
   RaidbossFileData,
+  TimelineField,
   TriggerAutoConfig,
+  TriggerSetAutoConfig,
 } from '../../types/trigger';
 import {
   CactbotConfigurator,
@@ -30,12 +35,20 @@ import {
 import raidbossFileData from './data/raidboss_manifest.txt';
 import { RaidbossTriggerField, RaidbossTriggerOutput } from './popup-text';
 import raidbossOptions, { RaidbossOptions } from './raidboss_options';
+import { TimelineParser } from './timeline_parser';
 
 const kOptionKeys = {
   output: 'Output',
   duration: 'Duration',
   beforeSeconds: 'BeforeSeconds',
+  delayAdjust: 'DelayAdjust',
   outputStrings: 'OutputStrings',
+  // folder for all trigger options
+  triggers: 'triggers',
+  // folder for all trigger set options
+  triggerSets: 'triggerSets',
+  // folder for options in trigger set config ui
+  triggerSetConfig: 'TriggerSetConfig',
 } as const;
 
 type TriggerSoundOption = {
@@ -61,7 +74,7 @@ const kTriggerOptions = {
       de: '🆙🔊 Text und Ton',
       fr: '🆙🔊 Texte et son',
       ja: '🆙🔊 テキストと音声',
-      cn: '🆙🔊 文字显示与提示音',
+      cn: '🆙🔊 文本显示与提示音',
       ko: '🆙🔊 텍스트와 소리',
     },
   },
@@ -71,7 +84,7 @@ const kTriggerOptions = {
       de: '🆙💬 Text und TTS',
       fr: '🆙💬 Texte et TTS',
       ja: '🆙💬 テキストとTTS',
-      cn: '🆙💬 文字显示与TTS',
+      cn: '🆙💬 文本显示与TTS',
       ko: '🆙💬 텍스트와 TTS',
     },
   },
@@ -91,7 +104,7 @@ const kTriggerOptions = {
       de: '🆙 Nur Text',
       fr: '🆙 Texte seulement',
       ja: '🆙 テキストのみ',
-      cn: '🆙 只使用文字显示',
+      cn: '🆙 只使用文本显示',
       ko: '🆙 텍스트만',
     },
   },
@@ -177,13 +190,31 @@ const kDetailKeys = {
     cls: 'condition-text',
     debugOnly: true,
   },
+  'delayAdjust': {
+    label: {
+      // Note: delay adjusting is both dangerous (delays can be functional in terms of
+      // needing to happen after/before a particular time to collect the state of the world)
+      // as well as confusing (you can adjust some but not many things negatively as
+      // delay can't go below zero). Therefore, this is a developer/debug mode only for
+      // people who know what they're doing.
+      en: 'DEBUG delay adjust (sec)',
+      de: 'DEBUG Verzögerungseinstellung (sec)',
+      fr: 'Délai d\'ajustement DEBUG (s)',
+      ja: 'DEBUGの待機調整 (秒)',
+      cn: 'DEBUG 延时调整 (秒)',
+      ko: '"디버그" 딜레이 조절 (초)',
+    },
+    cls: 'delay-adjust-text',
+    generatedManually: true,
+    debugOnly: true,
+  },
   'duration': {
     label: {
       en: 'duration (sec)',
       de: 'Dauer (Sekunden)',
       fr: 'Durée (secondes)',
       ja: '存続時間 (秒)',
-      cn: '持续时间 (秒)',
+      cn: '显示时长 (秒)',
       ko: '지속 시간 (초)',
     },
     cls: 'duration-text',
@@ -207,7 +238,7 @@ const kDetailKeys = {
       de: 'alarm',
       fr: 'alarme',
       ja: '警報',
-      cn: '警报文本',
+      cn: '致命级',
       ko: '경고',
     },
     cls: 'alarm-text',
@@ -218,7 +249,7 @@ const kDetailKeys = {
       de: 'alert',
       fr: 'alerte',
       ja: '警告',
-      cn: '警告文本',
+      cn: '严重级',
       ko: '주의',
     },
     cls: 'alert-text',
@@ -229,7 +260,7 @@ const kDetailKeys = {
       de: 'info',
       fr: 'info',
       ja: '情報',
-      cn: '信息文本',
+      cn: '一般级',
       ko: '안내',
     },
     cls: 'info-text',
@@ -267,6 +298,34 @@ const kDetailKeys = {
     },
     cls: 'run-text',
     debugOnly: true,
+  },
+} as const;
+
+// Ordered set of headers in the timeline edit table.
+const kTimelineTableHeaders = {
+  shouldDisplayText: {
+    en: 'Show',
+    de: 'Anzeigen',
+    fr: 'Afficher',
+    ja: '表示',
+    cn: '显示',
+    ko: '표시',
+  },
+  text: {
+    en: 'Timeline Text',
+    de: 'Timeline Text',
+    fr: 'Texte de la timeline',
+    ja: 'タイムラインテキスト',
+    cn: '时间轴文本',
+    ko: '타임라인 텍스트',
+  },
+  overrideText: {
+    en: 'Rename',
+    de: 'Umbenennen',
+    fr: 'Renommer',
+    ja: 'テキスト変更',
+    cn: '修改文本',
+    ko: '텍스트 변경',
   },
 } as const;
 
@@ -325,7 +384,75 @@ const kMiscTranslations = {
     fr: 'Afficher la source du Trigger',
     ja: 'トリガーのコードを表示',
     cn: '显示触发器源码',
-    ko: '트리거 출처 열기',
+    ko: '트리거 소스코드 보기',
+  },
+  // The header for the editing timeline section inside a trigger file.
+  editTimeline: {
+    en: 'Edit Timeline',
+    de: 'Timeline bearbeiten',
+    fr: 'Éditer la timeline',
+    ja: 'タイムラインを編集',
+    cn: '编辑时间轴',
+    ko: '타임라인 편집',
+  },
+  // The header inside the Edit Timeline section on top of the reference timeline text.
+  timelineListing: {
+    en: 'Reference Text (uneditable)',
+    de: 'Referenztext (nicht editierbar)',
+    fr: 'Texte de référence (non éditable)',
+    ja: '参考タイムライン (編集不可)',
+    cn: '参考文本 (不可编辑)',
+    ko: '원본 타임라인 (수정 불가능)',
+  },
+  // The header inside the Edit Timeline section on top of the add entries section.
+  addCustomTimelineEntries: {
+    en: 'Add Custom Timeline Entries',
+    de: 'Eigene Timeline Einträge hinzufügen',
+    fr: 'Ajouter une entrée de timeline personnalisée',
+    ja: 'カスタマイズタイムライン追加',
+    cn: '添加自定义时间轴条目',
+    ko: '사용자 지정 타임라인 항목 추가',
+  },
+  // The button text for the Edit Timeline add entries section.
+  addMoreRows: {
+    en: 'Add more rows',
+    de: 'Mehr Reihen hinzufügen',
+    fr: 'Ajouter une ligne',
+    ja: '行追加',
+    cn: '添加更多行',
+    ko: '행 추가',
+  },
+  customEntryTime: {
+    en: 'Time',
+    de: 'Zeit',
+    fr: 'Temps',
+    ja: '時間',
+    cn: '时间',
+    ko: '시간',
+  },
+  customEntryText: {
+    en: 'Text',
+    de: 'Text',
+    fr: 'Texte',
+    ja: 'テキスト',
+    cn: '文本',
+    ko: '텍스트',
+  },
+  customEntryDuration: {
+    en: 'Duration (seconds)',
+    de: 'Dauer (Sekunden)',
+    fr: 'Durée (s)',
+    ja: '持続時間 (秒)',
+    cn: '显示时长 (秒)',
+    ko: '지속시간 (초)',
+  },
+  customEntryRemove: {
+    en: 'Remove',
+    de: 'Entfernen',
+    fr: 'Supprimer',
+    ja: '削除',
+    cn: '移除',
+    ko: '삭제',
   },
 };
 
@@ -338,7 +465,17 @@ const validDurationOrUndefined = (valEntry?: SavedConfigEntry) => {
   return undefined;
 };
 
-const canBeConfigured = (trig: ConfigLooseTrigger) => !trig.isMissingId && !trig.overriddenByFile;
+const validDelayAdjustOrUndefined = (valEntry?: SavedConfigEntry) => {
+  if (typeof valEntry !== 'string' && typeof valEntry !== 'number')
+    return undefined;
+  const val = parseFloat(valEntry.toString());
+  if (!isNaN(val))
+    return val;
+  return undefined;
+};
+
+const canBeConfigured = (trig: ConfigLooseTrigger) =>
+  !trig.isMissingId && trig.overriddenByFile === undefined;
 
 const addTriggerDetail = (
   container: HTMLElement,
@@ -364,8 +501,8 @@ const addTriggerDetail = (
 // Unfortunately due to poor decisions in the past, PerTriggerOptions has different
 // fields here.  This should be fixed.
 const setOptionsFromOutputValue = (
-  options: BaseOptions | TriggerAutoConfig,
   value: SavedConfigEntry,
+  options: BaseOptions | TriggerAutoConfig | TriggerSetAutoConfig,
 ) => {
   if (value === 'default') {
     // Nothing.
@@ -390,6 +527,9 @@ const setOptionsFromOutputValue = (
     options.SoundAlertsEnabled = false;
     options.SpokenAlertsEnabled = false;
   } else {
+    // FIXME: handle lint error here
+    // ref: https://github.com/OverlayPlugin/cactbot/pull/274#discussion_r1692375852
+    // eslint-ignore-next-line @typescript-eslint/no-base-to-string
     console.error(`unknown output type: ${value.toString()}`);
   }
 };
@@ -399,7 +539,7 @@ const setOptionsFromOutputValue = (
 class DoNothingFuncProxy {
   constructor(outputStringsCallback: (outputStrings: OutputStrings) => void) {
     return new Proxy(this, {
-      set(target, property, value): boolean {
+      set(_target, property, value): boolean {
         if (property === 'responseOutputStrings') {
           // TODO: need some way of verifying that a value is an OutputStrings.
           outputStringsCallback(value as OutputStrings);
@@ -452,7 +592,11 @@ class RaidbossConfigurator {
       // and one section per user file.
       const expansion = info.section;
 
-      if (!info.triggers || Object.keys(info.triggers).length === 0)
+      // This isn't perfect, but skip trigger sets that are no-ops.
+      const hasTriggers = Object.keys(info.triggers ?? []).length !== 0;
+      const hasTimeline = info.triggerSet.timeline !== undefined;
+      const hasTriggerSetConfig = (info.triggerSet.config ?? []).length > 0;
+      if (!hasTriggers && !hasTimeline && !hasTriggerSetConfig)
         continue;
 
       let expansionDiv = expansionDivs[expansion];
@@ -484,7 +628,7 @@ class RaidbossConfigurator {
 
       const parts = [info.title, info.type, info.prefix];
       for (const part of parts) {
-        if (!part)
+        if (part === undefined)
           continue;
         const partDiv = document.createElement('div');
         partDiv.classList.add('trigger-file-header-part');
@@ -494,6 +638,48 @@ class RaidbossConfigurator {
       }
 
       triggerContainer.appendChild(headerDiv);
+
+      // TODO: print a warning if config exists without triggerset id??
+      if (info.triggerSet.id !== undefined) {
+        const triggerSetConfig = document.createElement('div');
+        triggerSetConfig.classList.add('overlay-options');
+        triggerContainer.appendChild(triggerSetConfig);
+
+        const triggerSetAlertOutput = {
+          ...defaultTriggerSetAlertOutput,
+          id: kOptionKeys.output,
+          default: this.base.getStringOption(
+            'raidboss',
+            defaultAlertOutput.id,
+            defaultAlertOutput.default.toString(),
+          ),
+        } as const;
+        this.base.buildConfigEntry(
+          userOptions,
+          triggerSetConfig,
+          triggerSetAlertOutput,
+          'raidboss',
+          [
+            kOptionKeys.triggerSets,
+            info.triggerSet.id,
+          ],
+        );
+
+        for (const opt of info.triggerSet.config ?? []) {
+          if (!this.base.developerOptions && opt.debugOnly)
+            continue;
+          this.base.buildConfigEntry(userOptions, triggerSetConfig, opt, 'raidboss', [
+            kOptionKeys.triggerSetConfig,
+            info.triggerSet.id,
+          ]);
+        }
+      }
+
+      // Timeline editing is tied to a single, specific zoneId per file for now.
+      // We could add more indirection (via fileKey?) and look up zoneId -> fileKey[]
+      // and fileKey -> timeline edits if needed.
+      if (info.triggerSet.timeline !== undefined && typeof info.zoneId === 'number')
+        this.buildTimelineUIContainer(info.zoneId, info.triggerSet, triggerContainer, userOptions);
 
       const triggerOptions = document.createElement('div');
       triggerOptions.classList.add('trigger-file-options');
@@ -511,11 +697,25 @@ class RaidbossConfigurator {
         if (!hasOutputFunc && !this.base.developerOptions)
           continue;
 
-        // Build the trigger label.
         const triggerDiv = document.createElement('div');
-        triggerDiv.innerHTML = trig.isMissingId ? '(???)' : trigId;
-
         triggerDiv.classList.add('trigger');
+
+        // Build the trigger label.
+        const triggerId = document.createElement('div');
+        triggerId.classList.add('trigger-id');
+        triggerId.innerHTML = trig.isMissingId ? '(???)' : trigId;
+        triggerId.classList.add('trigger-id');
+        triggerDiv.appendChild(triggerId);
+
+        // Build the trigger comment
+        if (trig.comment) {
+          const trigComment = trig.comment[this.base.lang] ?? trig.comment?.en ?? '';
+          const triggerCommentDiv = document.createElement('div');
+          triggerCommentDiv.innerHTML = trigComment;
+          triggerCommentDiv.classList.add('comment');
+          triggerDiv.appendChild(triggerCommentDiv);
+        }
+
         triggerOptions.appendChild(triggerDiv);
 
         // Container for the right side ui (select boxes, all of the info).
@@ -533,7 +733,7 @@ class RaidbossConfigurator {
             this.base.translate(kMiscTranslations.missingId),
           );
         }
-        if (trig.overriddenByFile) {
+        if (trig.overriddenByFile !== undefined) {
           const baseText = this.base.translate(kMiscTranslations.overriddenByFile);
           const detailText = baseText.replace('${file}', trig.overriddenByFile);
           addTriggerDetail(
@@ -554,17 +754,18 @@ class RaidbossConfigurator {
             continue;
           const trigOutput = trig.configOutput?.[detailKey];
           const trigFunc = trig[detailKey];
-          if (!trigFunc)
+          if (trigFunc === undefined || trigFunc === null)
             continue;
 
           const detailCls = [opt.cls];
           let detailText: string | undefined;
-          if (trigOutput) {
+          if (trigOutput !== undefined) {
             detailText = trigOutput;
           } else if (typeof trigFunc === 'function') {
             detailText = this.base.translate(kMiscTranslations.valueIsFunction);
             detailCls.push('function-text');
           } else {
+            // eslint-disable-next-line @typescript-eslint/no-base-to-string
             detailText = trigFunc.toString();
           }
 
@@ -605,10 +806,47 @@ class RaidbossConfigurator {
             defaultValue = trig.beforeSeconds.toString();
 
           input.placeholder = defaultValue;
-          input.value = this.base.getStringOption('raidboss', ['triggers', trigId, optionKey], '');
+          input.value = this.base.getStringOption('raidboss', [
+            kOptionKeys.triggers,
+            trigId,
+            optionKey,
+          ], '');
           const setFunc = () => {
             const val = validDurationOrUndefined(input.value) || '';
-            this.base.setOption('raidboss', ['triggers', trigId, optionKey], val);
+            this.base.setOption('raidboss', [kOptionKeys.triggers, trigId, optionKey], val);
+          };
+          input.onchange = setFunc;
+          input.oninput = setFunc;
+
+          triggerDetails.appendChild(div);
+        }
+
+        // Add delay adjust manually, as this isn't a trigger field.
+        if (this.base.developerOptions) {
+          const detailKey = 'delayAdjust';
+          const optionKey = kOptionKeys.delayAdjust;
+
+          const label = document.createElement('div');
+          label.innerText = this.base.translate(kDetailKeys[detailKey].label);
+          label.classList.add('trigger-label');
+          triggerDetails.appendChild(label);
+
+          const div = document.createElement('div');
+          div.classList.add('option-input-container', 'trigger-delay-adjust');
+
+          const input = document.createElement('input');
+          div.appendChild(input);
+          input.type = 'text';
+          input.step = 'any';
+          input.placeholder = `0`;
+          input.value = this.base.getStringOption('raidboss', [
+            kOptionKeys.triggers,
+            trigId,
+            optionKey,
+          ], '');
+          const setFunc = () => {
+            const val = validDelayAdjustOrUndefined(input.value) || '';
+            this.base.setOption('raidboss', [kOptionKeys.triggers, trigId, optionKey], val);
           };
           input.onchange = setFunc;
           input.oninput = setFunc;
@@ -637,10 +875,14 @@ class RaidbossConfigurator {
             input.placeholder = `${trig.durationSeconds}`;
           else
             input.placeholder = this.base.translate(kMiscTranslations.valueDefault);
-          input.value = this.base.getStringOption('raidboss', ['triggers', trigId, optionKey], '');
+          input.value = this.base.getStringOption('raidboss', [
+            kOptionKeys.triggers,
+            trigId,
+            optionKey,
+          ], '');
           const setFunc = () => {
             const val = validDurationOrUndefined(input.value) || '';
-            this.base.setOption('raidboss', ['triggers', trigId, optionKey], val);
+            this.base.setOption('raidboss', [kOptionKeys.triggers, trigId, optionKey], val);
           };
           input.onchange = setFunc;
           input.oninput = setFunc;
@@ -671,11 +913,15 @@ class RaidbossConfigurator {
           input.placeholder = template;
           input.value = this.base.getStringOption(
             'raidboss',
-            ['triggers', trigId, optionKey, key],
+            [kOptionKeys.triggers, trigId, optionKey, key],
             '',
           );
           const setFunc = () =>
-            this.base.setOption('raidboss', ['triggers', trigId, optionKey, key], input.value);
+            this.base.setOption(
+              'raidboss',
+              [kOptionKeys.triggers, trigId, optionKey, key],
+              input.value,
+            );
           input.onchange = setFunc;
           input.oninput = setFunc;
 
@@ -690,7 +936,7 @@ class RaidbossConfigurator {
         if (p0 !== undefined && p1 !== undefined && p2 !== undefined) {
           const div = document.createElement('div');
           div.classList.add('option-input-container', 'trigger-source');
-          const baseUrl = 'https://github.com/quisquous/cactbot/blob/triggers';
+          const baseUrl = 'https://github.com/OverlayPlugin/cactbot/blob/triggers';
           let urlFilepath;
           if (path.length === 3) {
             // 00-misc/general.js
@@ -712,6 +958,272 @@ class RaidbossConfigurator {
     }
   }
 
+  // Build the top level timeline editing expandable container.
+  buildTimelineUIContainer(
+    zoneId: number,
+    set: ConfigLooseTriggerSet,
+    parent: HTMLElement,
+    options: RaidbossOptions,
+  ): void {
+    const container = document.createElement('div');
+    container.classList.add('timeline-edit-container', 'collapsed');
+    parent.appendChild(container);
+
+    let hasEverBeenExpanded = false;
+
+    const headerDiv = document.createElement('div');
+    headerDiv.classList.add('timeline-edit-header');
+    headerDiv.onclick = () => {
+      container.classList.toggle('collapsed');
+      // Build the rest of this UI on demand lazily.
+      if (!hasEverBeenExpanded) {
+        const text = this.timelineTextFromSet(set);
+        const timeline = new TimelineParser(text, set.timelineReplace ?? [], [], [], options);
+        this.buildTimelineListingUI(timeline, text, container);
+        this.buildTimelineAddUI(zoneId, container);
+        this.buildTimelineTextUI(zoneId, timeline, container);
+      }
+      hasEverBeenExpanded = true;
+    };
+    headerDiv.innerText = this.base.translate(kMiscTranslations.editTimeline);
+    container.appendChild(headerDiv);
+  }
+
+  timelineTextFromSet(set: ConfigLooseTriggerSet): string {
+    let text = '';
+
+    // Recursively turn the timeline array into a string.
+    const addTimeline = (obj?: TimelineField) => {
+      if (obj === undefined)
+        return;
+      if (Array.isArray(obj)) {
+        for (const objVal of obj)
+          addTimeline(objVal);
+      } else if (typeof obj === 'function') {
+        // Hack, pass blank data in, as we don't have a real data here.
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        const blankData: RaidbossData = {} as RaidbossData;
+        try {
+          addTimeline(obj(blankData));
+        } catch (e) {
+          // Do nothing if this fails.
+          // Functions are pretty uncommon in built-in timelines.
+          // If user functions do funky things, those extra lines will be skipped.
+        }
+      } else if (typeof obj === 'string') {
+        text = `${text}\n${obj}`;
+      }
+    };
+    addTimeline(set.timeline);
+    return text;
+  }
+
+  buildTimelineListingUI(
+    timeline: TimelineParser,
+    timelineText: string,
+    parent: HTMLElement,
+  ): void {
+    const header = document.createElement('div');
+    header.classList.add('timeline-listing-header');
+    header.innerText = this.base.translate(kMiscTranslations.timelineListing);
+    parent.appendChild(header);
+
+    // Add timeline text itself
+    const scroller = document.createElement('div');
+    scroller.classList.add('timeline-scroller');
+    parent.appendChild(scroller);
+
+    const timelineContents = document.createElement('pre');
+    scroller.classList.add('timeline-scroller-contents');
+    scroller.appendChild(timelineContents);
+
+    const translated = TimelineParser.Translate(timeline, timelineText);
+    timelineContents.innerText = translated.join('\n');
+  }
+
+  buildTimelineAddUI(
+    zoneId: number,
+    parent: HTMLElement,
+  ): void {
+    const addId = ['timeline', zoneId.toString(), 'add'];
+
+    const header = document.createElement('div');
+    header.classList.add('timeline-add-header');
+    header.innerText = this.base.translate(kMiscTranslations.addCustomTimelineEntries);
+    parent.appendChild(header);
+
+    const container = document.createElement('div');
+    container.classList.add('timeline-add-container');
+    parent.appendChild(container);
+
+    const headerTime = document.createElement('div');
+    headerTime.innerText = this.base.translate(kMiscTranslations.customEntryTime);
+    container.appendChild(headerTime);
+
+    const headerText = document.createElement('div');
+    headerText.innerText = this.base.translate(kMiscTranslations.customEntryText);
+    container.appendChild(headerText);
+
+    const headerDuration = document.createElement('div');
+    headerDuration.innerText = this.base.translate(kMiscTranslations.customEntryDuration);
+    container.appendChild(headerDuration);
+
+    // Spacer div in the grid for Remove, which needs no header.
+    container.appendChild(document.createElement('div'));
+
+    // Get the current SavedConfigEntry for these saved entries.
+    // We will modify `rows` in place and then store it back as needed.
+    const defaultRow = { time: '', text: '' };
+    const defaultValue: SavedConfigEntry = [defaultRow];
+    const rowsOrObj = this.base.getJsonOption('raidboss', addId, defaultValue);
+    const rows = Array.isArray(rowsOrObj) ? rowsOrObj : defaultValue;
+
+    const storeRows = () => this.base.setJsonOption('raidboss', addId, rows);
+
+    const addRow = (obj: { [name: string]: SavedConfigEntry }): void => {
+      const setFunc = () => {
+        obj.time = timeInput.value;
+        obj.text = textInput.value;
+        obj.duration = durationInput.value;
+        storeRows();
+      };
+
+      const timeInput = document.createElement('input');
+      timeInput.type = 'text';
+      if (typeof obj.time === 'string')
+        timeInput.value = obj.time;
+      timeInput.classList.add('timeline-add-row-time');
+      timeInput.onchange = setFunc;
+      timeInput.oninput = setFunc;
+      container.appendChild(timeInput);
+
+      const textInput = document.createElement('input');
+      textInput.type = 'text';
+      if (typeof obj.text === 'string')
+        textInput.value = obj.text;
+      textInput.classList.add('timeline-add-row-text');
+      textInput.onchange = setFunc;
+      textInput.oninput = setFunc;
+      container.appendChild(textInput);
+
+      const durationInput = document.createElement('input');
+      durationInput.type = 'text';
+      if (typeof obj.duration === 'string')
+        durationInput.value = obj.duration;
+      durationInput.classList.add('timeline-add-row-duration');
+      durationInput.onchange = setFunc;
+      durationInput.oninput = setFunc;
+      container.appendChild(durationInput);
+
+      const remove = document.createElement('button');
+      remove.classList.add('timeline-add-row-remove');
+      remove.innerText = this.base.translate(kMiscTranslations.customEntryRemove);
+      container.appendChild(remove);
+
+      remove.addEventListener('click', () => {
+        container.removeChild(timeInput);
+        container.removeChild(textInput);
+        container.removeChild(durationInput);
+        container.removeChild(remove);
+
+        // Update rows in place, as it has been captured by a closure above.
+        const idx = rows.indexOf(obj);
+        if (idx === -1) {
+          console.error(`Failed to remove row`);
+          return;
+        }
+        rows.splice(idx, 1);
+
+        storeRows();
+      });
+    };
+
+    const addMoreRows = document.createElement('button');
+    addMoreRows.classList.add('timeline-add-button');
+    addMoreRows.innerText = this.base.translate(kMiscTranslations.addMoreRows);
+    addMoreRows.addEventListener('click', () => {
+      // No need to call storeRows here.  Blank rows will only get saved
+      // if somebody makes other changes.
+      const obj = { ...defaultRow };
+      rows.push(obj);
+      addRow(obj);
+    });
+    parent.appendChild(addMoreRows);
+
+    for (const row of rows) {
+      if (typeof row !== 'object' || Array.isArray(row))
+        continue;
+      addRow(row);
+    }
+  }
+
+  buildTimelineTextUI(
+    zoneId: number,
+    timeline: TimelineParser,
+    parent: HTMLElement,
+  ): void {
+    const container = document.createElement('div');
+    container.classList.add('timeline-text-container');
+    parent.appendChild(container);
+
+    for (const header of Object.values(kTimelineTableHeaders)) {
+      const div = document.createElement('div');
+      div.innerText = this.base.translate(header);
+      container.appendChild(div);
+    }
+
+    const uniqEvents: { [key: string]: string } = {};
+
+    for (const event of timeline.events) {
+      if (event.name in uniqEvents)
+        continue;
+      if (event.name in timeline.ignores)
+        continue;
+      // name = original timeline text
+      // text = replaced text in current language
+      uniqEvents[event.name] = event.text;
+    }
+
+    const keys = Object.keys(uniqEvents).sort();
+    for (const key of keys) {
+      const event = uniqEvents[key];
+      if (event === undefined)
+        continue;
+
+      const checkInput = document.createElement('input');
+      checkInput.classList.add('timeline-text-enable');
+      checkInput.type = 'checkbox';
+      container.appendChild(checkInput);
+
+      // Enable/disable here behaves identically to `hideall "key"`, where this text will
+      // not be shown, but timeline triggers related to it will still fire.
+      const enableId = ['timeline', zoneId.toString(), 'enable', key];
+      const defaultValue = true;
+      checkInput.checked = this.base.getBooleanOption('raidboss', enableId, defaultValue);
+      checkInput.onchange = () => this.base.setOption('raidboss', enableId, checkInput.checked);
+
+      const timelineText = document.createElement('div');
+      timelineText.classList.add('timeline-text-text');
+      timelineText.innerHTML = event;
+      container.appendChild(timelineText);
+
+      const textInput = document.createElement('input');
+      textInput.type = 'text';
+      textInput.classList.add('timeline-text-edit');
+      textInput.placeholder = event;
+
+      // Any changes are tied to the original timeline text (key), but the config ui will
+      // display the current language's text with replacements (event) as the placeholder above.
+      const textId = ['timeline', zoneId.toString(), 'globalReplace', key];
+      textInput.value = this.base.getStringOption('raidboss', textId, '');
+      const setFunc = () => this.base.setOption('raidboss', textId, textInput.value);
+      textInput.onchange = setFunc;
+      textInput.oninput = setFunc;
+
+      container.appendChild(textInput);
+    }
+  }
+
   // This duplicates the raidboss function of the same name.
   valueOrFunction(
     f: RaidbossTriggerField,
@@ -719,21 +1231,21 @@ class RaidbossConfigurator {
     matches: Matches,
     output: Output,
   ): RaidbossTriggerOutput {
-    const result = (typeof f === 'function') ? f(data, matches, output) : f;
+    const result = typeof f === 'function' ? f(data, matches, output) : f;
     if (result !== Object(result))
       return result;
     if (typeof result !== 'object' || result === null)
       return result;
-    if (result[this.alertsLang])
+    if (result[this.alertsLang] !== undefined)
       return this.valueOrFunction(result[this.alertsLang], data, matches, output);
-    if (result[this.timelineLang])
+    if (result[this.timelineLang] !== undefined)
       return this.valueOrFunction(result[this.timelineLang], data, matches, output);
     // For partially localized results where this localization doesn't
     // exist, prefer English over nothing.
     return this.valueOrFunction(result['en'], data, matches, output);
   }
 
-  processTrigger(trig: ConfigLooseTrigger): ConfigLooseTrigger {
+  processTrigger(trig: ConfigLooseTrigger, set: ConfigLooseTriggerSet): ConfigLooseTrigger {
     // TODO: with some hackiness (e.g. regexes?) we could figure out which
     // output string came from which alert type (alarm, alert, info, tts).
     // See `makeOutput` comments for why this needs a type assertion to be an Output.
@@ -746,10 +1258,12 @@ class RaidbossConfigurator {
       me: '',
       job: 'NONE',
       role: 'none',
-      party: new PartyTracker(),
+      party: new PartyTracker(raidbossOptions),
       lang: this.base.lang,
       currentHP: 1000,
       options: this.base.configOptions,
+      inCombat: true,
+      triggerSetConfig: {},
       ShortName: (x?: string) => x ?? '???',
       StopCombat: () => {/* noop */},
       ParseLocaleFloat: parseFloat,
@@ -832,10 +1346,11 @@ class RaidbossConfigurator {
     const evalTrigger = (trig: LooseTrigger, key: OutputKey, data: RaidbossData) => {
       try {
         const result = this.valueOrFunction(trig[key], data, kFakeMatches, fakeOutputProxy);
-        if (!result)
+        if (result === null || result === undefined)
           return false;
 
-        // Super hack:
+        // FIXME: Super hack:
+        // eslint-disable-next-line @typescript-eslint/no-base-to-string
         const resultStr = result.toString();
         if (resultStr.includes('undefined') || resultStr.includes('NaN'))
           return false;
@@ -891,39 +1406,41 @@ class RaidbossConfigurator {
 
     trig.configOutput = output;
 
+    // TODO: this shows the regexes in the display language.
+    // Should we show them in the parser language instead?
     const lang = this.base.lang;
 
-    const langSpecificRegexes = [
-      'netRegexDe',
-      'netRegexFr',
-      'netRegexJa',
-      'netRegexCn',
-      'netRegexKo',
-      'regexDe',
-      'regexFr',
-      'regexJa',
-      'regexCn',
-      'regexKo',
-    ] as const;
-    const getRegex = (baseField: 'regex' | 'netRegex') => {
-      const shortLanguage = lang.charAt(0).toUpperCase() + lang.slice(1);
-      const concatStr = langSpecificRegexes.find((x) => x === `${baseField}${shortLanguage}`);
-      if (!concatStr)
+    const getRegex = () => {
+      const regex = trig.regex;
+      if (regex === undefined)
         return;
-      const langSpecificRegex = trig[concatStr] ?? trig[baseField];
-      if (!langSpecificRegex)
+      return Regexes.parse(translateRegex(regex, lang, set.timelineReplace));
+    };
+
+    const getNetRegex = () => {
+      const regex = trig.netRegex;
+      if (regex === undefined)
         return;
-      const baseRegex = Regexes.parse(langSpecificRegex);
-      if (!baseRegex)
+
+      if (regex instanceof RegExp)
+        return Regexes.parse(translateRegex(regex, lang, set.timelineReplace));
+
+      if (trig.type === undefined)
         return;
-      return Regexes.parse(baseRegex);
+
+      return Regexes.parse(
+        buildNetRegexForTrigger(
+          trig.type,
+          translateRegexBuildParam(regex, lang, set.timelineReplace).params,
+        ),
+      );
     };
 
     if (trig.isTimelineTrigger) {
-      trig.timelineRegex = getRegex('regex');
+      trig.timelineRegex = getRegex();
     } else {
-      trig.triggerRegex = getRegex('regex');
-      trig.triggerNetRegex = getRegex('netRegex');
+      trig.triggerRegex = getRegex();
+      trig.triggerNetRegex = getNetRegex();
     }
 
     return trig;
@@ -936,10 +1453,12 @@ class RaidbossConfigurator {
     // `files` is map of filename => triggerSet (for trigger files)
     // `map` is a sorted map of shortened zone key => { various fields, triggerSet }
     const triggerFiles: { [filename: string]: ConfigLooseTriggerSet } = {};
+    const timelineFiles: { [filename: string]: string } = {};
     for (const [filename, triggerSetOrString] of Object.entries(files)) {
       if (typeof triggerSetOrString === 'string')
-        continue;
-      triggerFiles[filename] = triggerSetOrString;
+        timelineFiles[filename] = triggerSetOrString;
+      else
+        triggerFiles[filename] = triggerSetOrString;
     }
 
     const map = this.base.processFiles<ConfigLooseTriggerSet>(triggerFiles, userOptions.Triggers);
@@ -962,12 +1481,15 @@ class RaidbossConfigurator {
       if (triggerSet.timelineTriggers)
         rawTriggers.timeline.push(...triggerSet.timelineTriggers);
 
+      if (!triggerSet.isUserTriggerSet && triggerSet.filename !== undefined)
+        flattenTimeline(triggerSet, triggerSet.filename, timelineFiles);
+
       item.triggers = {};
       for (const [key, triggerArr] of Object.entries(rawTriggers)) {
         for (const baseTrig of triggerArr) {
           const trig: ConfigLooseTrigger = baseTrig;
           triggerIdx++;
-          if (!trig.id) {
+          if (trig.id === undefined) {
             // Give triggers with no id some "unique" string so that they can
             // still be added to the set and show up in the ui.
             trig.id = `!!NoIdTrigger${triggerIdx}`;
@@ -983,7 +1505,7 @@ class RaidbossConfigurator {
           trig.isTimelineTrigger = key === 'timeline';
           // Also, if a user has two of the same id in the same triggerSet (?!)
           // then only the second trigger will show up.
-          item.triggers[trig.id] = this.processTrigger(trig);
+          item.triggers[trig.id] = this.processTrigger(trig, triggerSet);
         }
       }
     }
@@ -993,7 +1515,7 @@ class RaidbossConfigurator {
   buildTriggerOptions(trig: LooseTrigger, labelDiv: HTMLElement) {
     // This shouldn't happen, as all triggers should be processed with a unique id.
     const trigId = trig.id;
-    if (!trigId)
+    if (trigId === undefined)
       throw new UnreachableCode();
 
     const optionKey = kOptionKeys.output;
@@ -1012,7 +1534,7 @@ class RaidbossConfigurator {
 
     const selectValue = this.base.getOption(
       'raidboss',
-      ['triggers', trigId, optionKey],
+      [kOptionKeys.triggers, trigId, optionKey],
       'default',
     );
 
@@ -1035,7 +1557,7 @@ class RaidbossConfigurator {
         let value = input.value;
         if (value.includes('default'))
           value = 'default';
-        this.base.setOption('raidboss', ['triggers', trigId, optionKey], input.value);
+        this.base.setOption('raidboss', [kOptionKeys.triggers, trigId, optionKey], input.value);
       };
     }
 
@@ -1043,21 +1565,44 @@ class RaidbossConfigurator {
   }
 }
 
+const flattenTimeline = (
+  set: ConfigLooseTriggerSet,
+  filename: string,
+  files: { [filename: string]: string },
+) => {
+  // Convert set.timelineFile to set.timeline.
+  if (set.timelineFile === undefined)
+    return;
+  const lastIndex = Math.max(filename.lastIndexOf('/'), filename.lastIndexOf('\\'));
+  // If lastIndex === -1, truncate name to the empty string.
+  // if lastIndex > -1, truncate name after the final slash.
+  const dir = filename.slice(0, Math.max(0, lastIndex + 1));
+
+  const timelineFile = `${dir}${set.timelineFile}`;
+  delete set.timelineFile;
+
+  if (!(timelineFile in files)) {
+    console.log(`ERROR: '${filename}' specifies non-existent timeline file '${timelineFile}'.`);
+    return;
+  }
+
+  // set.timeline is processed recursively.
+  set.timeline = [set.timeline, files[timelineFile]];
+};
+
 // Raidboss needs to do some extra processing of user files.
 const userFileHandler: UserFileCallback = (
   name: string,
   files: { [filename: string]: string },
-  baseOptions: BaseOptions,
+  baseOptions: BaseOptions & Partial<RaidbossOptions>,
   basePath: string,
 ) => {
   // TODO: Rewrite user_config to be templated on option type so that this function knows
   // what type of options it is using.
-  const options = baseOptions as RaidbossOptions;
-
-  if (!options.Triggers)
+  if (!baseOptions.Triggers)
     return;
 
-  for (const baseTriggerSet of options.Triggers) {
+  for (const baseTriggerSet of baseOptions.Triggers) {
     const set: ConfigLooseTriggerSet = baseTriggerSet;
 
     // Annotate triggers with where they came from.  Note, options is passed in repeatedly
@@ -1070,26 +1615,262 @@ const userFileHandler: UserFileCallback = (
     set.filename = `${basePath}${name}`;
     set.isUserTriggerSet = true;
 
-    // Convert set.timelineFile to set.timeline.
-    if (set.timelineFile) {
-      const lastIndex = Math.max(name.lastIndexOf('/'), name.lastIndexOf('\\'));
-      // If lastIndex === -1, truncate name to the empty string.
-      // if lastIndex > -1, truncate name after the final slash.
-      const dir = name.substring(0, lastIndex + 1);
+    flattenTimeline(set, name, files);
+  }
+};
 
-      const timelineFile = `${dir}${set.timelineFile}`;
-      delete set.timelineFile;
+const processPerTriggerAutoConfig = (options: RaidbossOptions, savedConfig: SavedConfigEntry) => {
+  // raidboss will look up this.options.PerTriggerAutoConfig to find these values.
+  const optionName = 'PerTriggerAutoConfig';
 
-      if (!(timelineFile in files)) {
-        console.log(`ERROR: '${name}' specifies non-existent timeline file '${timelineFile}'.`);
-        continue;
+  const perTriggerAutoConfig = options[optionName] ??= {};
+  if (typeof savedConfig !== 'object' || Array.isArray(savedConfig))
+    return;
+  const triggers = savedConfig[kOptionKeys.triggers];
+  if (typeof triggers !== 'object' || Array.isArray(triggers))
+    return;
+
+  const outputObjs: { [key: string]: TriggerAutoConfig } = {};
+  const keys = Object.keys(kTriggerOptions);
+  for (const key of keys) {
+    const obj = outputObjs[key] = {};
+    setOptionsFromOutputValue(key, obj);
+  }
+
+  for (const [id, entry] of Object.entries(triggers)) {
+    if (typeof entry !== 'object' || Array.isArray(entry))
+      return;
+
+    const autoConfig: TriggerAutoConfig = {};
+
+    const output = entry[kOptionKeys.output];
+    if (typeof output === 'string')
+      Object.assign(autoConfig, outputObjs[output]);
+
+    const duration = validDurationOrUndefined(entry[kOptionKeys.duration]);
+    if (duration)
+      autoConfig[kOptionKeys.duration] = duration;
+
+    const beforeSeconds = validDurationOrUndefined(entry[kOptionKeys.beforeSeconds]);
+    if (beforeSeconds)
+      autoConfig[kOptionKeys.beforeSeconds] = beforeSeconds;
+
+    const delayAdjustSeconds = validDelayAdjustOrUndefined(entry[kOptionKeys.delayAdjust]);
+    if (delayAdjustSeconds)
+      autoConfig[kOptionKeys.delayAdjust] = delayAdjustSeconds;
+
+    const outputStrings = entry[kOptionKeys.outputStrings];
+    // Validate that the SavedConfigEntry is an an object with string values,
+    // which is a subset of the OutputStrings type.
+    if (
+      ((entry?: SavedConfigEntry): entry is { [key: string]: string } => {
+        if (typeof entry !== 'object' || Array.isArray(entry))
+          return false;
+        for (const value of Object.values(entry)) {
+          if (typeof value !== 'string')
+            return false;
+        }
+        return true;
+      })(outputStrings)
+    )
+      autoConfig[kOptionKeys.outputStrings] = outputStrings;
+
+    if (typeof output === 'string' || duration || outputStrings !== undefined)
+      perTriggerAutoConfig[id] = autoConfig;
+  }
+};
+
+const processPerTriggerSetAutoConfig = (
+  options: RaidbossOptions,
+  savedConfig: SavedConfigEntry,
+) => {
+  // raidboss will look up this.options.PerTriggerSetAutoConfig to find these values.
+  const optionName = 'PerTriggerSetAutoConfig';
+
+  const perTriggerSetAutoConfig = options[optionName] ??= {};
+  if (typeof savedConfig !== 'object' || Array.isArray(savedConfig))
+    return;
+  const triggerSets = savedConfig[kOptionKeys.triggerSets];
+  if (typeof triggerSets !== 'object' || Array.isArray(triggerSets))
+    return;
+
+  const outputObjs: { [key: string]: TriggerSetAutoConfig } = {};
+  const keys = Object.keys(kTriggerOptions);
+  for (const key of keys) {
+    const obj = outputObjs[key] = {};
+    setOptionsFromOutputValue(key, obj);
+  }
+
+  for (const [id, entry] of Object.entries(triggerSets)) {
+    if (typeof entry !== 'object' || Array.isArray(entry))
+      return;
+
+    const output = entry[kOptionKeys.output];
+    if (typeof output === 'string')
+      perTriggerSetAutoConfig[id] = { ...outputObjs[output] };
+  }
+};
+
+const processPerZoneTimelineConfig = (options: RaidbossOptions, savedConfig: SavedConfigEntry) => {
+  const optionName = 'PerZoneTimelineConfig';
+  // SavedConfig uses this key structure:
+  // * 'timeline', zoneId (as string), 'enable', text, boolean
+  // * 'timeline', zoneId (as string), 'globalReplace', text, string
+  // ...and this function transforms it into a `PerZoneTimelineConfig`.
+
+  const perZoneTimelineConfig = options[optionName] ??= {};
+  if (typeof savedConfig !== 'object' || Array.isArray(savedConfig))
+    return;
+  const timeline = savedConfig['timeline'];
+  if (typeof timeline !== 'object' || Array.isArray(timeline))
+    return;
+
+  for (const [zoneKey, zoneEntry] of Object.entries(timeline)) {
+    const zoneId = parseInt(zoneKey);
+    if (!zoneId)
+      continue;
+    const timelineConfig = perZoneTimelineConfig[zoneId] ??= {};
+
+    if (typeof zoneEntry !== 'object' || Array.isArray(zoneEntry))
+      continue;
+
+    const enableEntry = zoneEntry['enable'];
+    const replaceEntry = zoneEntry['globalReplace'];
+    const addEntry = zoneEntry['add'];
+
+    if (typeof enableEntry === 'object' && !Array.isArray(enableEntry)) {
+      for (const [key, value] of Object.entries(enableEntry)) {
+        if (typeof value === 'boolean' && !value)
+          (timelineConfig.Ignore ??= []).push(key);
       }
+    }
 
-      // set.timeline is processed recursively.
-      set.timeline = [set.timeline, files[timelineFile]];
+    if (typeof replaceEntry === 'object' && !Array.isArray(replaceEntry)) {
+      for (const [key, value] of Object.entries(replaceEntry)) {
+        if (typeof value === 'string')
+          (timelineConfig.Rename ??= {})[key] = value;
+      }
+    }
+
+    if (addEntry !== undefined && typeof addEntry === 'object' && Array.isArray(addEntry)) {
+      for (const row of addEntry) {
+        if (typeof row !== 'object' || Array.isArray(row))
+          continue;
+        const time = typeof row.time === 'string' ? parseFloat(row.time) : NaN;
+        const text = typeof row.text === 'string' ? row.text : '';
+        const durationOrNaN = typeof row.duration === 'string' ? parseFloat(row.duration) : NaN;
+        const duration = isNaN(durationOrNaN) ? undefined : durationOrNaN;
+
+        if (text.trim() === '' || isNaN(time))
+          continue;
+
+        (timelineConfig.Add ??= []).push({ time, text, duration });
+      }
     }
   }
 };
+
+const processTriggerSetConfig = (options: RaidbossOptions, savedConfig: SavedConfigEntry) => {
+  // Note: this function is just for providing the raw values for TriggerSetConfig.
+  // popuptext handles the loading of triggersets at runtime (maybe this should be merged?)
+  // and so it has to do the work of using this info to set defaults, apply overrides, and
+  // run setter functions via `processOptions`.
+  const optionName = 'TriggerSetConfig';
+  const outputTriggerSetConfig = options[optionName] ??= {};
+  if (typeof savedConfig !== 'object' || Array.isArray(savedConfig))
+    return;
+
+  // raidboss > TriggerSetConfig > [triggerSetId] > [key] > [leaf ConfigValue]
+  const triggerSetConfig = savedConfig[kOptionKeys.triggerSetConfig];
+  if (
+    triggerSetConfig === undefined || typeof triggerSetConfig !== 'object' ||
+    Array.isArray(triggerSetConfig)
+  )
+    return;
+
+  for (const [triggerSetId, configDict] of Object.entries(triggerSetConfig)) {
+    if (typeof configDict !== 'object' || Array.isArray(configDict))
+      continue;
+
+    for (const [key, value] of Object.entries(configDict)) {
+      if (typeof value !== 'boolean' && typeof value !== 'string' && typeof value !== 'number')
+        continue;
+      (outputTriggerSetConfig[triggerSetId] ??= {})[key] = value;
+    }
+  }
+};
+
+// Reused for both top level UI and trigger set config UI.
+const defaultAlertOutput: ConfigEntry = {
+  id: 'DefaultAlertOutput',
+  name: {
+    en: 'Default alert output',
+    de: 'Standard Alert Ausgabe',
+    fr: 'Alerte par défaut',
+    ja: '警告情報出力既定値',
+    cn: '默认触发器提示输出模式',
+    ko: '기본 알람 출력 방식',
+  },
+  type: 'select',
+  options: {
+    en: {
+      '🆙🔊 Text and Sound': 'textAndSound',
+      '🆙💬 Text and TTS': 'ttsAndText',
+      '💬 TTS Only': 'ttsOnly',
+      '🆙 Text Only': 'textOnly',
+      '❌ Disabled': 'disabled',
+    },
+    de: {
+      '🆙🔊 Text und Ton': 'textAndSound',
+      '🆙💬 Text und TTS': 'ttsAndText',
+      '💬 Nur TTS': 'ttsOnly',
+      '🆙 Nur Text': 'textOnly',
+      '❌ Deaktiviert': 'disabled',
+    },
+    fr: {
+      '🆙🔊 Texte et son': 'textAndSound',
+      '🆙💬 Texte et TTS': 'ttsAndText',
+      '💬 TTS seulement': 'ttsOnly',
+      '🆙 Texte seulement': 'textOnly',
+      '❌ Désactivé': 'disabled',
+    },
+    ja: {
+      '🆙🔊 テキストと音声': 'textAndSound',
+      '🆙💬 テキストとTTS': 'ttsAndText',
+      '💬 TTSのみ': 'ttsOnly',
+      '🆙 テキストのみ': 'textOnly',
+      '❌ 無効': 'disabled',
+    },
+    cn: {
+      '🆙🔊 文本显示与提示音': 'textAndSound',
+      '🆙💬 文本显示与TTS': 'ttsAndText',
+      '💬 只使用TTS': 'ttsOnly',
+      '🆙 只使用文本显示': 'textOnly',
+      '❌ 禁用': 'disabled',
+    },
+    ko: {
+      '🆙🔊 텍스트와 소리': 'textAndSound',
+      '🆙💬 텍스트와 TTS': 'ttsAndText',
+      '💬 TTS만': 'ttsOnly',
+      '🆙 텍스트만': 'textOnly',
+      '❌ 비활성화': 'disabled',
+    },
+  },
+  default: 'textAndSound',
+  setterFunc: setOptionsFromOutputValue,
+} as const;
+
+const defaultTriggerSetAlertOutput = {
+  ...defaultAlertOutput,
+  name: {
+    en: 'Default trigger set alert output',
+    de: 'Standard trigger-Set Alert Ausgabe',
+    fr: 'Sortie par défaut des déclencheurs',
+    ja: '基本トリガーセットの通知方法',
+    cn: '默认触发器集合提示输出模式',
+    ko: '기본 트리거 세트 알람 출력 방식',
+  },
+} as const;
 
 const templateOptions: OptionsTemplate = {
   buildExtraUI: (base, container) => {
@@ -1097,67 +1878,17 @@ const templateOptions: OptionsTemplate = {
     const userOptions = { ...raidbossOptions };
     UserConfig.loadUserFiles('raidboss', userOptions, () => {
       builder.buildUI(container, raidbossFileData, userOptions);
-    });
+    }, false);
   },
   processExtraOptions: (baseOptions, savedConfig) => {
-    // raidboss will look up this.options.PerTriggerAutoConfig to find these values.
-    const optionName = 'PerTriggerAutoConfig';
-
     // TODO: Rewrite user_config to be templated on option type so that this function knows
     // what type of options it is using.  Without this, perTriggerAutoConfig is unknown.
     const options = baseOptions as RaidbossOptions;
 
-    const perTriggerAutoConfig = options[optionName] ??= {};
-    if (typeof savedConfig !== 'object' || Array.isArray(savedConfig))
-      return;
-    const triggers = savedConfig['triggers'];
-    if (!triggers || typeof triggers !== 'object' || Array.isArray(triggers))
-      return;
-
-    const outputObjs: { [key: string]: TriggerAutoConfig } = {};
-    const keys = Object.keys(kTriggerOptions);
-    for (const key of keys) {
-      const obj = outputObjs[key] = {};
-      setOptionsFromOutputValue(obj, key);
-    }
-
-    for (const [id, entry] of Object.entries(triggers)) {
-      if (typeof entry !== 'object' || Array.isArray(entry))
-        return;
-
-      const autoConfig: TriggerAutoConfig = {};
-
-      const output = entry[kOptionKeys.output]?.toString();
-      if (output)
-        Object.assign(autoConfig, outputObjs[output]);
-
-      const duration = validDurationOrUndefined(entry[kOptionKeys.duration]);
-      if (duration)
-        autoConfig[kOptionKeys.duration] = duration;
-
-      const beforeSeconds = validDurationOrUndefined(entry[kOptionKeys.beforeSeconds]);
-      if (beforeSeconds)
-        autoConfig[kOptionKeys.beforeSeconds] = beforeSeconds;
-
-      const outputStrings = entry[kOptionKeys.outputStrings];
-      // Validate that the SavedConfigEntry is an an object with string values,
-      // which is a subset of the OutputStrings type.
-      if (
-        ((entry?: SavedConfigEntry): entry is { [key: string]: string } => {
-          if (typeof entry !== 'object' || Array.isArray(entry))
-            return false;
-          for (const value of Object.values(entry)) {
-            if (typeof value !== 'string')
-              return false;
-          }
-          return true;
-        })(outputStrings)
-      )
-        autoConfig[kOptionKeys.outputStrings] = outputStrings;
-
-      if (output || duration || outputStrings)
-        perTriggerAutoConfig[id] = autoConfig;
-    }
+    processPerTriggerAutoConfig(options, savedConfig);
+    processPerTriggerSetAutoConfig(options, savedConfig);
+    processPerZoneTimelineConfig(options, savedConfig);
+    processTriggerSetConfig(options, savedConfig);
   },
   options: [
     {
@@ -1173,14 +1904,16 @@ const templateOptions: OptionsTemplate = {
       type: 'html',
       html: {
         // TODO: it'd be nice if OverlayPlugin could open links on the system outside of ACT.
-        en: makeLink('https://quisquous.github.io/cactbot/util/coverage/coverage.html?lang=en'),
-        de: makeLink('https://quisquous.github.io/cactbot/util/coverage/coverage.html?lang=de'),
-        fr: makeLink('https://quisquous.github.io/cactbot/util/coverage/coverage.html?lang=fr'),
-        ja: makeLink('https://quisquous.github.io/cactbot/util/coverage/coverage.html?lang=ja'),
-        cn: makeLink('https://quisquous.github.io/cactbot/util/coverage/coverage.html?lang=cn'),
-        ko: makeLink('https://quisquous.github.io/cactbot/util/coverage/coverage.html?lang=ko'),
+        en: makeLink('https://overlayplugin.github.io/cactbot/util/coverage/coverage.html?lang=en'),
+        de: makeLink('https://overlayplugin.github.io/cactbot/util/coverage/coverage.html?lang=de'),
+        fr: makeLink('https://overlayplugin.github.io/cactbot/util/coverage/coverage.html?lang=fr'),
+        ja: makeLink('https://overlayplugin.github.io/cactbot/util/coverage/coverage.html?lang=ja'),
+        cn: makeLink('https://overlayplugin.github.io/cactbot/util/coverage/coverage.html?lang=cn'),
+        ko: makeLink('https://overlayplugin.github.io/cactbot/util/coverage/coverage.html?lang=ko'),
       },
-      default: makeLink('https://quisquous.github.io/cactbot/util/coverage/coverage.html?lang=en'),
+      default: makeLink(
+        'https://overlayplugin.github.io/cactbot/util/coverage/coverage.html?lang=en',
+      ),
     },
     {
       id: 'Debug',
@@ -1196,64 +1929,7 @@ const templateOptions: OptionsTemplate = {
       debugOnly: true,
       default: false,
     },
-    {
-      id: 'DefaultAlertOutput',
-      name: {
-        en: 'Default alert output',
-        de: 'Standard Alert Ausgabe',
-        fr: 'Alerte par défaut',
-        ja: '警告情報出力既定値',
-        cn: '默认警报提示信息输出方式',
-        ko: '기본 알람 출력 방식',
-      },
-      type: 'select',
-      options: {
-        en: {
-          '🆙🔊 Text and Sound': 'textAndSound',
-          '🆙💬 Text and TTS': 'ttsAndText',
-          '💬 TTS Only': 'ttsOnly',
-          '🆙 Text Only': 'textOnly',
-          '❌ Disabled': 'disabled',
-        },
-        de: {
-          '🆙🔊 Text und Ton': 'textAndSound',
-          '🆙💬 Text und TTS': 'ttsAndText',
-          '💬 Nur TTS': 'ttsOnly',
-          '🆙 Nur Text': 'textOnly',
-          '❌ Deaktiviert': 'disabled',
-        },
-        fr: {
-          '🆙🔊 Texte et son': 'textAndSound',
-          '🆙💬 Texte et TTS': 'ttsAndText',
-          '💬 TTS seulement': 'ttsOnly',
-          '🆙 Texte seulement': 'textOnly',
-          '❌ Désactivé': 'disabled',
-        },
-        ja: {
-          '🆙🔊 テキストと音声': 'textAndSound',
-          '🆙💬 テキストとTTS': 'ttsAndText',
-          '💬 TTSのみ': 'ttsOnly',
-          '🆙 テキストのみ': 'textOnly',
-          '❌ 無効': 'disabled',
-        },
-        cn: {
-          '🆙🔊 文字显示与提示音': 'textAndSound',
-          '🆙💬 文字显示与TTS': 'ttsAndText',
-          '💬 只使用TTS': 'ttsOnly',
-          '🆙 只使用文字显示': 'textOnly',
-          '❌ 禁用': 'disabled',
-        },
-        ko: {
-          '🆙🔊 텍스트와 소리': 'textAndSound',
-          '🆙💬 텍스트와 TTS': 'ttsAndText',
-          '💬 TTS만': 'ttsOnly',
-          '🆙 텍스트만': 'textOnly',
-          '❌ 비활성화': 'disabled',
-        },
-      },
-      default: 'textAndSound',
-      setterFunc: setOptionsFromOutputValue,
-    },
+    defaultAlertOutput,
     {
       id: 'AlertsLanguage',
       name: {
@@ -1261,7 +1937,7 @@ const templateOptions: OptionsTemplate = {
         de: 'Alert Sprache',
         fr: 'Langue des alertes',
         ja: '警告情報の言語',
-        cn: '警报提示文字的语言',
+        cn: '触发器提示语言',
         ko: '알람 언어',
       },
       type: 'select',
@@ -1295,12 +1971,12 @@ const templateOptions: OptionsTemplate = {
         },
         cn: {
           '使用显示语言': 'default',
-          '英语 (en)': 'en',
-          '汉语 (cn)': 'cn',
-          '德语 (de)': 'de',
-          '法语 (fr)': 'fr',
-          '日语 (ja)': 'ja',
-          '韩语 (ko)': 'ko',
+          '英文 (en)': 'en',
+          '中文 (cn)': 'cn',
+          '德文 (de)': 'de',
+          '法文 (fr)': 'fr',
+          '日文 (ja)': 'ja',
+          '韩文 (ko)': 'ko',
         },
         ko: {
           '주 사용 언어 사용': 'default',
@@ -1314,10 +1990,12 @@ const templateOptions: OptionsTemplate = {
       },
       default: 'default',
       debug: true,
-      setterFunc: (options, value) => {
+      setterFunc: (value) => {
+        if (typeof value !== 'string')
+          return;
         if (value === 'default')
           return;
-        options['AlertsLanguage'] = value;
+        return value;
       },
     },
     {
@@ -1370,12 +2048,12 @@ const templateOptions: OptionsTemplate = {
         },
         cn: {
           '使用最终幻想XIV解析插件设置的语言': 'default',
-          '英语 (en)': 'en',
-          '汉语 (cn)': 'cn',
-          '德语 (de)': 'de',
-          '法语 (fr)': 'fr',
-          '日语 (ja)': 'ja',
-          '韩语 (ko)': 'ko',
+          '英文 (en)': 'en',
+          '中文 (cn)': 'cn',
+          '德文 (de)': 'de',
+          '法文 (fr)': 'fr',
+          '日文 (ja)': 'ja',
+          '韩文 (ko)': 'ko',
         },
         ko: {
           'FFXIV Plugin 언어 사용': 'default',
@@ -1389,10 +2067,12 @@ const templateOptions: OptionsTemplate = {
       },
       default: 'default',
       debug: true,
-      setterFunc: (options, value) => {
+      setterFunc: (value) => {
+        if (typeof value !== 'string')
+          return;
         if (value === 'default')
           return;
-        options['TimelineLanguage'] = value;
+        return value;
       },
     },
     {
@@ -1410,26 +2090,38 @@ const templateOptions: OptionsTemplate = {
         en: {
           'Default': 'default',
           'lippe': 'lippe',
+          'jwidea': 'jwidea',
+          'dorgrin': 'dorgrin',
         },
         de: {
           'Default': 'default',
           'lippe': 'lippe',
+          'jwidea': 'jwidea',
+          'dorgrin': 'dorgrin',
         },
         fr: {
           'Défaut': 'default',
           'lippe': 'lippe',
+          'jwidea': 'jwidea',
+          'dorgrin': 'dorgrin',
         },
         ja: {
           '初期設定': 'default',
           'lippe': 'lippe',
+          'jwidea': 'jwidea',
+          'dorgrin': 'dorgrin',
         },
         cn: {
           '默认': 'default',
           'lippe': 'lippe',
+          'jwidea': 'jwidea',
+          'dorgrin': 'dorgrin',
         },
         ko: {
           '기본': 'default',
           'lippe': 'lippe',
+          'jwidea': 'jwidea',
+          'dorgrin': 'dorgrin',
         },
       },
       default: 'default',
@@ -1454,11 +2146,106 @@ const templateOptions: OptionsTemplate = {
         de: 'Alerts aktiviert',
         fr: 'Alertes activées',
         ja: '警告情報を有効にする',
-        cn: '启用提示文本显示',
+        cn: '启用触发器提示',
         ko: '알람 활성화',
       },
       type: 'checkbox',
       default: true,
+    },
+    {
+      id: 'ReverseTimeline',
+      name: {
+        en: 'Reverse timeline order (bottom-to-top)',
+        de: 'Umgekehrte Timeline Reihenfolge (unten-nach-oben)',
+        fr: 'Timeline inversée (de bas en haut)',
+        ja: 'タイムラインを下から表示',
+        cn: '反转时间轴顺序 (从下到上)',
+        ko: '타임라인 순서 반전 (아래에서 위)',
+      },
+      type: 'checkbox',
+      default: false,
+    },
+    {
+      id: 'DefaultPlayerLabel',
+      comment: {
+        en: `The default way to specify players in trigger output. By default, it will use
+             nicknames/first names. This can be used to print out player jobs instead.
+             If you are not in a party or players are out of a party (or there are bugs),
+             it will default to the player's nickname if there's no other information.`,
+        de: `Die Standardmethode zur Angabe von Spielern in der Triggerausgabe. Standardmäßig werden
+             Spitznamen/Vornamen verwendet. Dies kann verwendet werden, um stattdessen Spieler-Jobs darzustellen.
+             Wenn Sie nicht in einer Gruppe sind oder Spieler nicht in einer Gruppe sind (oder es Fehler gibt),
+             wird standardmäßig der Spitzname des Spielers verwendet, wenn es keine anderen Informationen gibt.`,
+        fr: `Méthode par défaut pour afficher les joueurs lors des annonces. Par défaut,
+             on utilise surnom/prénom. Vous pouvez afficher les jobs à la place.
+             Si vous n'êtes pas dans une équipe ou si des joueurs sont déconnectés (ou s'il y a des bugs),
+             on bascule l'affichage sur le surnom s'il n'y a pas d'autres informations.`,
+        ja: `トリガーでプレイヤーの名前を表示する方法です。基本であだ名・ファストネームをつかいます。
+             あなたがパティに入ってない場合とパティ以外のプレイヤーはあだ名とファストネームが表示されます。`,
+        cn: `在触发器输出中指定玩家的默认方式。默认选项为输出昵称/名字。
+             使用此选项可将输出方式更改为玩家的职能名或职业名。
+             若你不在小队中或玩家离开小队 (或出现错误时), 将默认输出玩家昵称。
+             (注：国服对于昵称和全名不做区分)`,
+        ko: `트리거 출력에서 플레이어를 언급하는 방법입니다. 기본값으로 닉네임/이름을 사용합니다.
+             이 옵션은 이름 대신 플레이어의 직업이나 역할을 출력하고 싶을 때 사용할 수 있습니다.
+             당신이 파티에 있지 않거나 파티 밖에 있는 플레이어에 대해서는
+             기본값인 플레이어의 닉네임이 사용됩니다.
+             (한국 서버에서 '이름 전체' 옵션은 '닉네임'과 같습니다.)`,
+      },
+      name: {
+        en: 'Default Player Label',
+        de: 'Standard Spieler Label',
+        fr: 'Affichage par défaut des joueurs',
+        ja: '基本プレイヤーラベル',
+        cn: '默认玩家代称',
+        ko: '플레이어를 언급하는 기본 방법',
+      },
+      type: 'select',
+      options: {
+        en: {
+          'Nickname (Tini)': 'nick',
+          'Role (Tank)': 'role',
+          'Job (WAR)': 'job',
+          'Full Job (Warrior)': 'jobFull',
+          'Full Name (Tini Poutini)': 'name',
+        },
+        de: {
+          'Spitzname (Tini)': 'nick',
+          'Rolle (Tank)': 'role',
+          'Job (WAR)': 'job',
+          'Job ausgeschrieben (Warrior)': 'jobFull',
+          'Kompletter Name (Tini Poutini)': 'name',
+        },
+        fr: {
+          'Surnom (Tini)': 'nick',
+          'Rôle (Tank)': 'role',
+          'Job (WAR)': 'job',
+          'Job complet (Warrior)': 'jobFull',
+          'Nom complet (Tini Poutini)': 'name',
+        },
+        ja: {
+          'あだ名 (Tini)': 'nick',
+          'ロール (ヒーラー)': 'role',
+          '簡略ジョブ (白魔)': 'job',
+          'ジョブ (白魔導士)': 'jobFull',
+          '名前 (Tini Poutini)': 'name',
+        },
+        cn: {
+          '昵称 (弗雷)': 'nick',
+          '职能 (坦克)': 'role',
+          '职业简称 (暗骑)': 'job',
+          '职业全称 (暗黑骑士)': 'jobFull',
+          '全名 (弗雷)': 'name',
+        },
+        ko: {
+          '닉네임 (Tini)': 'nick',
+          '역할 (탱커)': 'role',
+          '직업 (암기)': 'job',
+          '직업 전체 (암흑기사)': 'jobFull',
+          '이름 전체 (Tini Poutini)': 'name',
+        },
+      },
+      default: 'nick',
     },
     {
       id: 'ShowTimerBarsAtSeconds',
@@ -1480,7 +2267,7 @@ const templateOptions: OptionsTemplate = {
         de: 'Behalte abgelaufene Timer-Bar (in Sekunden)',
         fr: 'Garder la barre de temps expirée (secondes)',
         ja: '終了したタイムバーが消えるまでの待ち時間 (秒)',
-        cn: '已失效的计时条的淡出时间 (秒)',
+        cn: '归零计时条滞留时长 (秒)',
         ko: '만료된 타임라인이 사라지기까지의 시간 (초)',
       },
       type: 'float',
@@ -1519,7 +2306,7 @@ const templateOptions: OptionsTemplate = {
         de: 'Alarm-Text Anzeigedauer (in Sekunden)',
         fr: 'Durée d\'affichage du texte d\'alarme (secondes)',
         ja: '警報テキスト表示時間の長さ (秒)',
-        cn: '警报文字显示持续时间 (秒)',
+        cn: '致命级提示文本显示时长 (秒)',
         ko: '경고 텍스트를 표시할 시간 (초)',
       },
       type: 'float',
@@ -1532,7 +2319,7 @@ const templateOptions: OptionsTemplate = {
         de: 'Alert-Text Anzeigedauer (in Sekunden)',
         fr: 'Durée d\'affichage du texte d\'alerte (secondes)',
         ja: '警告テキスト表示時間の長さ (秒)',
-        cn: '警告文字显示持续时间 (秒)',
+        cn: '严重级提示文本显示时长 (秒)',
         ko: '주의 텍스트를 표시할 시간 (초)',
       },
       type: 'float',
@@ -1545,7 +2332,7 @@ const templateOptions: OptionsTemplate = {
         de: 'Info-Text Anzeigedauer (in Sekunden)',
         fr: 'Durée d\'affichage du texte d\'information (secondes)',
         ja: '情報テキスト表示時間の長さ (秒)',
-        cn: '信息文字显示持续时间 (秒)',
+        cn: '一般级提示文本显示时长 (秒)',
         ko: '안내 텍스트를 표시할 시간 (초)',
       },
       type: 'float',
@@ -1558,7 +2345,7 @@ const templateOptions: OptionsTemplate = {
         de: 'Alarm Lautstärke (0-1)',
         fr: 'Volume de l\'alarme (0-1)',
         ja: '警報音声の音量 (0-1)',
-        cn: '警报提示音的音量 (0-1)',
+        cn: '致命级提示音量 (0-1)',
         ko: '경고 소리 크기 (0-1)',
       },
       type: 'float',
@@ -1571,7 +2358,7 @@ const templateOptions: OptionsTemplate = {
         de: 'Alert Lautstärke (0-1)',
         fr: 'Volume de l\'alerte (0-1)',
         ja: '警告音声の音量 (0-1)',
-        cn: '警告提示音的音量 (0-1)',
+        cn: '严重级提示音量 (0-1)',
         ko: '주의 소리 크기 (0-1)',
       },
       type: 'float',
@@ -1584,7 +2371,7 @@ const templateOptions: OptionsTemplate = {
         de: 'Info Lautstärke (0-1)',
         fr: 'Volume de l\'info (0-1)',
         ja: '情報音声の音量 (0-1)',
-        cn: '信息提示音的音量 (0-1)',
+        cn: '一般级提示音量 (0-1)',
         ko: '안내 소리 크기 (0-1)',
       },
       type: 'float',
@@ -1597,7 +2384,7 @@ const templateOptions: OptionsTemplate = {
         de: 'Langer Ton Lautstärke (0-1)',
         fr: 'Volume du son long (0-1)',
         ja: '長い音声の音量 (0-1)',
-        cn: '长提示音的音量 (0-1)',
+        cn: '长提示音量 (0-1)',
         ko: '긴 소리 크기 (0-1)',
       },
       type: 'float',
@@ -1610,39 +2397,141 @@ const templateOptions: OptionsTemplate = {
         de: 'Pull Lautstärke (0-1)',
         fr: 'Volume du son de pull (0-1)',
         ja: 'タゲ取る効果音の音量 (0-1)',
-        cn: '开怪提示音的音量 (0-1)',
+        cn: '开怪提示音量 (0-1)',
         ko: '풀링 소리 크기 (0-1)',
       },
       type: 'float',
       default: 1,
     },
     {
-      id: 'cactbotWormholeStrat',
-      // TODO: maybe need some way to group these kinds of
-      // options if we end up having a lot?
+      id: 'RumbleEnabled',
       name: {
-        en: 'Alex Ultimate: enable cactbot Wormhole strat',
-        de: 'Alex Ultimate: aktiviere cactbot Wormhole Strategie',
-        fr: 'Alex fatal : activer cactbot pour la strat Wormhole',
-        ja: '絶アレキサンダー討滅戦：cactbot「次元断絶のマーチ」ギミック',
-        cn: '亚历山大绝境战：cactbot灵泉辅助功能',
-        ko: '절 알렉: cactbot 웜홀 공략방식 활성화',
+        en: 'Enable gamepad rumble for triggers',
+        de: 'Gamepad-Vibration für Trigger aktivieren',
+        fr: 'Activer la vibration de la manette de jeu pour les triggers',
+        ja: 'トリガーによるゲームパッド振動を有効にする',
+        cn: '触发器活动时使手柄振动',
+        ko: '트리거에 대해 게임패드 진동 활성화',
       },
       type: 'checkbox',
       default: false,
     },
     {
-      id: 'cactbote8sUptimeKnockbackStrat',
+      id: 'InfoRumbleDuration',
       name: {
-        en: 'e8s: enable cactbot Uptime Knockback strat',
-        de: 'e8s: aktiviere cactbot Uptime Knockback Strategie',
-        fr: 'e8s : activer cactbot pour la strat Uptime Knockback',
-        ja: 'エデン零式共鳴編４層：cactbot「ヘヴンリーストライク (ノックバック)」ギミック',
-        cn: 'E8S: 启用cactbot的击退提示功能',
-        ko: '공명 영웅 4층: cactbot 정확한 타이밍 넉백방지 공략 활성화',
+        en: 'Duration (milliseconds) of rumble for info triggers',
+        de: 'Zeit (in Millisekunden) der Vibration bei info trigger',
+        fr: 'Durée (millisecondes) de la vibration pour les triggers d\'informations',
+        ja: '情報トリガーによる振動の長さ (ミリ秒)',
+        cn: '一般级触发器振动时长 (毫秒)',
+        ko: '안내 트리거의 진동 지속 시간 (밀리초)',
       },
-      type: 'checkbox',
-      default: false,
+      type: 'float',
+      default: 400,
+    },
+    {
+      id: 'InfoRumbleWeak',
+      name: {
+        en: 'Magnitude (0-1) of weak rumble for info triggers',
+        de: 'Stärke (0-1) der leichten Vibration bei info trigger',
+        fr: 'Intensité de la vibration faible pour les triggers d\'informations (0-1)',
+        ja: '情報トリガーによる振動にモーターの弱い方の強さ (0-1)',
+        cn: '一般级触发器弱电机振动强度 (0-1)',
+        ko: '안내 트리거의 약한 진동 세기 (0-1)',
+      },
+      type: 'float',
+      default: 0.5,
+    },
+    {
+      id: 'InfoRumbleStrong',
+      name: {
+        en: 'Magnitude (0-1) of strong rumble for info triggers',
+        de: 'Stärke (0-1) der starken Vibration bei info trigger',
+        fr: 'Intensité de la vibration forte pour les triggers d\'informations (0-1)',
+        ja: '情報トリガーによる振動にモーターの強い方の強さ (0-1)',
+        cn: '一般级触发器强电机振动强度 (0-1)',
+        ko: '안내 트리거의 강한 진동 세기 (0-1)',
+      },
+      type: 'float',
+      default: 0,
+    },
+    {
+      id: 'AlertRumbleDuration',
+      name: {
+        en: 'Duration (milliseconds) of rumble for alert triggers',
+        de: 'Zeit (in Millisekunden) der Vibration bei alert trigger',
+        fr: 'Durée (millisecondes) de la vibration pour les triggers d\'alertes',
+        ja: '警告トリガーによる振動の長さ (ミリ秒)',
+        cn: '严重级触发器振动时长 (毫秒)',
+        ko: '주의 트리거의 진동 지속 시간 (밀리초)',
+      },
+      type: 'float',
+      default: 500,
+    },
+    {
+      id: 'AlertRumbleWeak',
+      name: {
+        en: 'Magnitude (0-1) of weak rumble for alert triggers',
+        de: 'Stärke (0-1) der leichten Vibration bei alert trigger',
+        fr: 'Intensité de la vibration faible pour les triggers d\'alertes (0-1)',
+        ja: '警告トリガーによる振動にモーターの弱い方の強さ (0-1)',
+        cn: '严重级触发器弱电机振动强度 (0-1)',
+        ko: '주의 트리거의 약한 진동 세기 (0-1)',
+      },
+      type: 'float',
+      default: 0,
+    },
+    {
+      id: 'AlertRumbleStrong',
+      name: {
+        en: 'Magnitude (0-1) of strong rumble for alert triggers',
+        de: 'Stärke (0-1) der starken Vibration bei alert trigger',
+        fr: 'Intensité de la vibration forte pour les triggers d\'alertes (0-1)',
+        ja: '警告トリガーによる振動にモーターの強い方の強さ (0-1)',
+        cn: '严重级触发器强电机振动强度 (0-1)',
+        ko: '주의 트리거의 강한 진동 세기 (0-1)',
+      },
+      type: 'float',
+      default: 0.5,
+    },
+    {
+      id: 'AlarmRumbleDuration',
+      name: {
+        en: 'Duration (milliseconds) of rumble for alarm triggers',
+        de: 'Zeit (in Millisekunden) der Vibration bei alarm trigger',
+        fr: 'Durée (millisecondes) de la vibration pour les triggers d\'alarmes',
+        ja: '警報トリガーによる振動の長さ (ミリ秒)',
+        cn: '致命级触发器振动时长 (毫秒)',
+        ko: '경고 트리거의 진동 지속 시간 (밀리초)',
+      },
+      type: 'float',
+      default: 750,
+    },
+    {
+      id: 'AlarmRumbleWeak',
+      name: {
+        en: 'Magnitude (0-1) of weak rumble for alarm triggers',
+        de: 'Stärke (0-1) der leichten Vibration bei alarm trigger',
+        fr: 'Intensité de la vibration faible pour les triggers d\'alarmes (0-1)',
+        ja: '警報トリガーによる振動にモーターの弱い方の強さ (0-1)',
+        cn: '致命级触发器弱电机振动强度 (0-1)',
+        ko: '경고 트리거의 약한 진동 세기 (0-1)',
+      },
+      type: 'float',
+      default: 0.75,
+    },
+    {
+      id: 'AlarmRumbleStrong',
+      name: {
+        en: 'Magnitude (0-1) of strong rumble for alarm triggers',
+        de: 'Stärke (0-1) der starken Vibration bei alarm trigger',
+        fr: 'Intensité de la vibration forte pour les triggers d\'alarmes (0-1)',
+        ja: '警報トリガーによる振動にモーターの強い方の強さ (0-1)',
+        cn: '致命级触发器强电机振动强度 (0-1)',
+        ko: '경고 트리거의 강한 진동 세기 (0-1)',
+      },
+      type: 'float',
+      default: 0.75,
     },
   ],
 };

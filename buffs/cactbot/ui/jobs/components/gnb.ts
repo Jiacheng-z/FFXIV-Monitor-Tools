@@ -4,7 +4,7 @@ import { JobDetail } from '../../../types/event';
 import { ResourceBox } from '../bars';
 import { ComboTracker } from '../combo_tracker';
 import { kAbility } from '../constants';
-import { computeBackgroundColorFrom } from '../utils';
+import { computeBackgroundColorFrom, showDuration } from '../utils';
 
 import { BaseComponent, ComponentInterface } from './base';
 
@@ -49,28 +49,26 @@ export class GNBComponent extends BaseComponent {
     this.reset();
   }
   override onStatChange({ gcdSkill }: { gcdSkill: number }): void {
-    this.gnashingFangBox.valuescale = gcdSkill;
-    this.gnashingFangBox.threshold = gcdSkill * 3;
-    this.noMercyBox.valuescale = gcdSkill;
-    this.bloodfestBox.valuescale = gcdSkill;
-    this.bloodfestBox.threshold = gcdSkill * 2 + 1;
+    this.gnashingFangBox.threshold = gcdSkill * 3 + 1;
+    this.bloodfestBox.threshold = gcdSkill * 3 + 1;
   }
 
   override onUseAbility(id: string): void {
     switch (id) {
       case kAbility.NoMercy: {
-        this.noMercyBox.duration = 20;
-        this.noMercyBox.threshold = 1000;
-        this.noMercyBox.fg = computeBackgroundColorFrom(this.noMercyBox, 'gnb-color-nomercy.active');
-        this.tid1 = window.setTimeout(() => {
-          this.noMercyBox.duration = 40;
-          this.noMercyBox.threshold = this.player.gcdSkill + 1;
-          this.noMercyBox.fg = computeBackgroundColorFrom(this.noMercyBox, 'gnb-color-nomercy');
-        }, 20000);
+        this.tid1 = showDuration({
+          tid: this.tid1,
+          timerbox: this.noMercyBox,
+          duration: 20,
+          cooldown: 60,
+          threshold: this.player.gcdSkill + 1,
+          activecolor: 'gnb-color-nomercy.active',
+          deactivecolor: 'gnb-color-nomercy',
+        });
         break;
       }
       case kAbility.Bloodfest:
-        this.bloodfestBox.duration = 90;
+        this.bloodfestBox.duration = 120;
         break;
       case kAbility.GnashingFang:
         this.gnashingFangBox.duration = this.bars.player.getActionCooldown(30000, 'skill');
@@ -78,10 +76,13 @@ export class GNBComponent extends BaseComponent {
         this.cartridgeComboTimer.duration = this.comboDuration;
         break;
       case kAbility.SavageClaw:
+      case kAbility.ReignOfBeasts:
+      case kAbility.NobleBlood:
         this.cartridgeComboTimer.duration = 0;
         this.cartridgeComboTimer.duration = this.comboDuration;
         break;
       case kAbility.WickedTalon:
+      case kAbility.LionHeart:
         this.cartridgeComboTimer.duration = 0;
         break;
     }

@@ -2,6 +2,7 @@ import { Lang } from '../cactbot/resources/languages';
 import NetRegexes from '../cactbot/resources/netregexes';
 import { UnreachableCode } from '../cactbot/resources/not_reached';
 import TimerBar from '../cactbot/resources/timerbar';
+import TimerBox from '../cactbot/resources/timerbox';
 import TimerIcon from '../cactbot/resources/timericon';
 import { LocaleNetRegex } from '../cactbot/resources/translations';
 import Util from '../cactbot/resources/util';
@@ -11,6 +12,7 @@ import { ToMatches } from '../cactbot/types/net_matches';
 import { CactbotBaseRegExp } from '../cactbot/types/net_trigger';
 
 import { kLevelMod, kMeleeWithMpJobs } from './constants';
+import {FfxivVersion} from "../cactbot/ui/jobs/jobs";
 import { SpeedBuffs } from './player';
 import {BuffInfo} from "./buff_info";
 import widget_list from './widget_list';
@@ -42,12 +44,12 @@ export class RegexesHolder {
   constructor(lang: Lang, playerName: string) {
     this.StatsRegex = NetRegexes.statChange();
 
-    this.YouGainEffectRegex = NetRegexes.gainsEffect({target: playerName});
-    this.YouLoseEffectRegex = NetRegexes.losesEffect({target: playerName});
-    this.YouUseAbilityRegex = NetRegexes.ability({source: playerName});
+    this.YouGainEffectRegex = NetRegexes.gainsEffect({ target: playerName });
+    this.YouLoseEffectRegex = NetRegexes.losesEffect({ target: playerName });
+    this.YouUseAbilityRegex = NetRegexes.ability({ source: playerName });
     this.AnybodyAbilityRegex = NetRegexes.ability();
-    this.MobGainsEffectRegex = NetRegexes.gainsEffect({targetId: '4.{7}'});
-    this.MobLosesEffectRegex = NetRegexes.losesEffect({targetId: '4.{7}'});
+    this.MobGainsEffectRegex = NetRegexes.gainsEffect({ targetId: '4.{7}' });
+    this.MobLosesEffectRegex = NetRegexes.losesEffect({ targetId: '4.{7}' });
     this.MobGainsEffectFromYouRegex = NetRegexes.gainsEffect({
       targetId: '4.{7}',
       source: playerName,
@@ -83,11 +85,11 @@ export const isPhysicalJob = (job: Job): boolean =>
     Util.isTankJob(job) || Util.isMeleeDpsJob(job) || Util.isRangedDpsJob(job);
 
 export const doesJobNeedMPBar = (job: Job): boolean =>
-    Util.isCasterDpsJob(job) || Util.isHealerJob(job) || kMeleeWithMpJobs.includes(job);
+  Util.isCasterDpsJob(job) || Util.isHealerJob(job) || kMeleeWithMpJobs.includes(job);
 
 /** compute greased lightning stacks by player's level */
 const getLightningStacksByLevel = (level: number): number =>
-    level < 20 ? 1 : level < 40 ? 2 : level < 76 ? 3 : 4;
+  level < 20 ? 1 : level < 40 ? 2 : level < 76 ? 3 : 4;
 
 type PlayerLike = {
   job: Job;
@@ -96,11 +98,12 @@ type PlayerLike = {
 };
 
 // Source: http://theoryjerks.akhmorning.com/guide/speed/
-export const calcGCDFromStat = (player: PlayerLike, stat: number, actionDelay = 2500): number => {
-  // If stats haven't been updated, use a reasonable default value.
-  if (stat === 0)
-    return actionDelay / 1000;
-
+export const calcGCDFromStat = (
+  player: PlayerLike,
+  stat: number,
+  ffxivVersion: FfxivVersion,
+  actionDelay = 2500,
+): number => {
   let type1Buffs = 0;
   let type2Buffs = 0;
   if (player.job === 'BLM') {
@@ -114,10 +117,16 @@ export const calcGCDFromStat = (player: PlayerLike, stat: number, actionDelay = 
       else
         type1Buffs += 10;
     }
+  } else if (player.job === 'VPR') {
+    // FIXME: not sure whether it is type1
+    type1Buffs += player.speedBuffs.swiftscaled ? 15 : 0;
   }
 
   if (player.job === 'NIN') {
-    type2Buffs += player.speedBuffs.huton ? 15 : 0;
+    if (ffxivVersion < 700)
+      type2Buffs += player.speedBuffs.huton ? 15 : 0;
+    else
+      type2Buffs += player.level >= 45 ? 15 : 0;
   } else if (player.job === 'MNK') {
     type2Buffs += 5 * getLightningStacksByLevel(player.level);
   } else if (player.job === 'BRD') {
@@ -140,13 +149,17 @@ export const calcGCDFromStat = (player: PlayerLike, stat: number, actionDelay = 
   // TODO: this probably isn't useful to track
   const astralUmbralMod = 100;
 
-  const mod = kLevelMod[player.level];
-  if (!mod)
-    throw new UnreachableCode();
-  const gcdMs = Math.floor(1000 - Math.floor(130 * (stat - mod[0]) / mod[1])) * actionDelay / 1000;
+  // If stats haven't been updated, use a reasonable default value.
+  let gcdMs = actionDelay;
+  if (stat !== 0 && player.level > 0) {
+    const mod = kLevelMod[player.level];
+    if (!mod)
+      throw new UnreachableCode();
+    gcdMs = Math.floor(1000 - Math.floor(130 * (stat - mod[0]) / mod[1])) * actionDelay / 1000;
+  }
   const a = (100 - type1Buffs) / 100;
   const b = (100 - type2Buffs) / 100;
-  const gcdC = Math.floor(Math.floor((a * b) * gcdMs / 10) * astralUmbralMod / 100);
+  const gcdC = Math.floor(Math.floor(a * b * gcdMs / 10) * astralUmbralMod / 100);
   return gcdC / 100;
 };
 
@@ -466,3 +479,23 @@ export const loadConfig = (): UserConfigOptions => {
 export const setConfig = (obj: UserConfigOptions) =>{
   localStorage.setItem(configNameSpace, JSON.stringify(obj));
 }
+
+export const showDuration = (o: {
+  tid: number;
+  timerbox: TimerBox;
+  duration: number;
+  cooldown: number;
+  threshold: number;
+  activecolor: string;
+  deactivecolor: string;
+}): number => {
+  o.timerbox.duration = o.duration;
+  o.timerbox.threshold = o.duration;
+  o.timerbox.fg = computeBackgroundColorFrom(o.timerbox, o.activecolor);
+  o.tid = window.setTimeout(() => {
+    o.timerbox.duration = o.cooldown - o.duration;
+    o.timerbox.threshold = o.threshold;
+    o.timerbox.fg = computeBackgroundColorFrom(o.timerbox, o.deactivecolor);
+  }, o.duration * 1000);
+  return o.tid;
+};

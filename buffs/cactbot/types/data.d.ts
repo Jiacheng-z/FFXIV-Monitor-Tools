@@ -1,6 +1,9 @@
 import { Lang } from '../resources/languages';
 import PartyTracker from '../resources/party';
+import { ConfigValue } from '../resources/user_config';
+import { OopsyOptions } from '../ui/oopsyraidsy/oopsy_options';
 
+import { SystemInfo } from './event';
 import { Job, Role } from './job';
 import { NetMatches } from './net_matches';
 
@@ -13,8 +16,9 @@ export interface BaseOptions {
   SpokenAlertsEnabled: boolean;
   GroupSpokenAlertsEnabled: boolean;
   Skin?: string;
+  SystemInfo: SystemInfo;
+  Debug: boolean;
   [key: string]: unknown;
-  // todo: complete this type
 }
 
 export interface RaidbossData {
@@ -27,6 +31,9 @@ export interface RaidbossData {
   displayLang: Lang;
   currentHP: number;
   options: BaseOptions;
+  inCombat: boolean;
+  triggerSetConfig: { [key: string]: ConfigValue };
+  /** @deprecated Use data.party.member instead */
   ShortName: (x?: string) => string;
   StopCombat: () => void;
   /** @deprecated Use parseFloat instead */
@@ -45,10 +52,12 @@ export interface OopsyData {
   role: Role;
   party: PartyTracker;
   inCombat: boolean;
+  IsImmune: (x?: string) => boolean;
+  /** @deprecated Use data.party.member instead */
   ShortName: (x?: string) => string;
   IsPlayerId: (x?: string) => boolean;
   DamageFromMatches: (matches: NetMatches['Ability']) => number;
-  options: BaseOptions;
+  options: OopsyOptions;
 
   /** @deprecated Use parseFloat instead */
   ParseLocaleFloat: (string: string) => number;

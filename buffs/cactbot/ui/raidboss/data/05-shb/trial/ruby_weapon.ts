@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -10,6 +9,7 @@ export interface Data extends RaidbossData {
 }
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'CinderDrift',
   zoneId: ZoneId.CinderDrift,
   timelineFile: 'ruby_weapon.txt',
   timelineTriggers: [
@@ -50,40 +50,25 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Ruby Optimized Ultima',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'The Ruby Weapon', id: '4AA8', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Rubin-Waffe', id: '4AA8', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Arme Rubis', id: '4AA8', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ルビーウェポン', id: '4AA8', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '红宝石神兵', id: '4AA8', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '루비 웨폰', id: '4AA8', capture: false }),
+      netRegex: { source: 'The Ruby Weapon', id: '4AA8', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Ruby Stamp',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'The Ruby Weapon', id: '4AC7' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Rubin-Waffe', id: '4AC7' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Arme Rubis', id: '4AC7' }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ルビーウェポン', id: '4AC7' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '红宝石神兵', id: '4AC7' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '루비 웨폰', id: '4AC7' }),
+      netRegex: { source: 'The Ruby Weapon', id: '4AC7' },
       response: Responses.tankBuster(),
     },
     {
       id: 'Ruby Undermine',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'The Ruby Weapon', id: '4A97', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Rubin-Waffe', id: '4A97', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Arme Rubis', id: '4A97', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ルビーウェポン', id: '4A97', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '红宝石神兵', id: '4A97', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '루비 웨폰', id: '4A97', capture: false }),
+      netRegex: { source: 'The Ruby Weapon', id: '4A97', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'Away from Lines',
           de: 'Weg von den Linien',
-          fr: 'En dehors des sillons',
+          fr: 'Éloignez-vous des sillons',
           ja: '線から離れる',
           cn: '远离线',
           ko: '선 피하기',
@@ -93,18 +78,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Ruby Liquefaction',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'The Ruby Weapon', id: '4A96', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Rubin-Waffe', id: '4A96', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Arme Rubis', id: '4A96', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ルビーウェポン', id: '4A96', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '红宝石神兵', id: '4A96', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '루비 웨폰', id: '4A96', capture: false }),
+      netRegex: { source: 'The Ruby Weapon', id: '4A96', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'Get On Lines',
           de: 'Auf die Linien gehen',
-          fr: 'Sur les sillons',
+          fr: 'Allez sur les sillons',
           ja: '線の上へ',
           cn: '靠近线',
           ko: '선 위로 올라가기',
@@ -114,35 +94,20 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Ruby Ruby Ray',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'The Ruby Weapon', id: '4AC6', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Rubin-Waffe', id: '4AC6', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Arme Rubis', id: '4AC6', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ルビーウェポン', id: '4AC6', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '红宝石神兵', id: '4AC6', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '루비 웨폰', id: '4AC6', capture: false }),
+      netRegex: { source: 'The Ruby Weapon', id: '4AC6', capture: false },
       response: Responses.awayFromFront(),
     },
     {
       id: 'Ruby High-Powered Homing Lasers You',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'The Ruby Weapon', id: '4AC5' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Rubin-Waffe', id: '4AC5' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Arme Rubis', id: '4AC5' }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ルビーウェポン', id: '4AC5' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '红宝石神兵', id: '4AC5' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '루비 웨폰', id: '4AC5' }),
+      netRegex: { source: 'The Ruby Weapon', id: '4AC5' },
       condition: Conditions.targetIsYou(),
       response: Responses.stackMarkerOn(),
     },
     {
       id: 'Ruby High-Powered Homing Lasers',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'The Ruby Weapon', id: '4AC5' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Rubin-Waffe', id: '4AC5' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Arme Rubis', id: '4AC5' }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ルビーウェポン', id: '4AC5' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '红宝石神兵', id: '4AC5' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '루비 웨폰', id: '4AC5' }),
+      netRegex: { source: 'The Ruby Weapon', id: '4AC5' },
       condition: Conditions.targetIsNotYou(),
       suppressSeconds: 1,
       response: Responses.stackMarker('info'),
@@ -150,18 +115,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Ruby Dynamics',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'The Ruby Weapon', id: '4AA0', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Rubin-Waffe', id: '4AA0', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Arme Rubis', id: '4AA0', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ルビーウェポン', id: '4AA0', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '红宝石神兵', id: '4AA0', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '루비 웨폰', id: '4AA0', capture: false }),
+      netRegex: { source: 'The Ruby Weapon', id: '4AA0', capture: false },
       response: Responses.getUnder(),
     },
     {
       id: 'Ruby Homing Laser',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '008B' }),
+      netRegex: { id: '008B' },
       condition: Conditions.targetIsYou(),
       response: Responses.spread(),
     },
@@ -170,12 +130,7 @@ const triggerSet: TriggerSet<Data> = {
       // Give a friendly reminder to pop LB3 if you haven't already
       id: 'Ruby Optimized Ultima Enrage',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'The Ruby Weapon', id: '4AA9', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Rubin-Waffe', id: '4AA9', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Arme Rubis', id: '4AA9', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ルビーウェポン', id: '4AA9', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '红宝石神兵', id: '4AA9', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '루비 웨폰', id: '4AA9', capture: false }),
+      netRegex: { source: 'The Ruby Weapon', id: '4AA9', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -191,21 +146,16 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Ruby Meteor Stream',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '00E0' }),
+      netRegex: { id: '00E0' },
       condition: Conditions.targetIsYou(),
       response: Responses.spread(),
     },
     {
       id: 'Ruby Ruby Claw',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Raven\'s Image', id: '4ABF' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Naels Trugbild', id: '4ABF' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Spectre De Nael', id: '4ABF' }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ネールの幻影', id: '4ABF' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '奈尔的幻影', id: '4ABF' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '넬의 환영', id: '4ABF' }),
+      netRegex: { source: 'Raven\'s Image', id: '4ABF' },
       condition: (data, matches) => {
-        if (data.role !== 'healer' && data.role !== 'tank')
+        if (data.role === 'dps' && data.job !== 'BLU')
           return false;
         const myColor = data.colors?.[data.me];
         return myColor !== undefined && myColor === data.colors?.[matches.target];
@@ -216,7 +166,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Ruby Bradamante',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0017' }),
+      netRegex: { id: '0017' },
       condition: Conditions.targetIsYou(),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -233,12 +183,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Ruby Outrage',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'The Ruby Weapon', id: '4AC8', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Rubin-Waffe', id: '4AC8', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Arme Rubis', id: '4AC8', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ルビーウェポン', id: '4AC8', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '红宝石神兵', id: '4AC8', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '루비 웨폰', id: '4AC8', capture: false }),
+      netRegex: { source: 'The Ruby Weapon', id: '4AC8', capture: false },
       response: Responses.aoe(),
     },
   ],

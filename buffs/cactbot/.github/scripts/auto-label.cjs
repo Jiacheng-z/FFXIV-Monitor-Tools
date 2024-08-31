@@ -1,7 +1,7 @@
 /**
  * This Script can be tested locally with
  *
- * export GH_TOKEN=**** GITHUB_REPOSITORY=quisquous/cactbot PR_NUMBER=$NUM
+ * export GH_TOKEN=**** GITHUB_REPOSITORY=OverlayPlugin/cactbot PR_NUMBER=$NUM
  * node ./.github/scripts/auto-label.cjs
  */
 'use strict';
@@ -31,8 +31,7 @@ const regexLabelMap = {
   '^\\.mocharc.cjs$': ['test'],
   '^eslint/': ['style'],
   '^\\.eslintrc\\.js$': ['style'],
-  '^\\.github/workflows/': ['ci'],
-  '^\\.github/scripts/': ['ci'],
+  '^\\.github/': ['ci'],
   '^plugin/': ['plugin'],
   '^ui/config/': ['config'],
   '^ui/eureka/eureka_config': ['config', 'eureka'],
@@ -42,7 +41,6 @@ const regexLabelMap = {
   '^ui/raidboss/raidboss_config': ['config', 'raidboss'],
   '^ui/dps/': ['dps'],
   '^ui/eureka/': ['eureka'],
-  '^ui/fisher/': ['fishing🎣'],
   '^ui/jobs/': ['jobs'],
   '^ui/oopsyraidsy/': ['oopsy'],
   '^ui/pullcounter/': ['pullcounter'],
@@ -67,7 +65,7 @@ const regexLabelMap = {
  * @param {string} owner
  * @param {string} repo
  * @param {number} pullNumber
- * @returns {string[]}
+ * @returns {Promise<string[]>}
  */
 const getLabels = async (github, owner, repo, pullNumber) => {
   /**
@@ -99,17 +97,15 @@ const getLabels = async (github, owner, repo, pullNumber) => {
    * @type {ChangedFileContent[]}
    */
   const changedFilesContent = await Promise.all(
-    changedFiles.map((f) =>
-      async () => {
-        const from = await httpClient.get(rawUrl(owner, repo, fromSha, f.filename));
-        const to = await httpClient.get(rawUrl(owner, repo, toSha, f.filename));
-        return {
-          filename: f.filename,
-          from: await readBody(from),
-          to: await readBody(to),
-        };
-      }
-    ).map((f) => f()),
+    changedFiles.map((f) => async () => {
+      const from = await httpClient.get(rawUrl(owner, repo, fromSha, f.filename));
+      const to = await httpClient.get(rawUrl(owner, repo, toSha, f.filename));
+      return {
+        filename: f.filename,
+        from: await readBody(from),
+        to: await readBody(to),
+      };
+    }).map((f) => f()),
   );
 
   const changedLang = getTimelineReplaceChanges(changedFilesContent);
@@ -130,7 +126,58 @@ const getLabels = async (github, owner, repo, pullNumber) => {
     }
   })));
 
-  return [...changedModule, ...changedLang.map((v) => langToLabel(v))];
+  // since this script clobbers all PR labels, we need to capture
+  // existing PR labels that are unrelated to scope and preserve them.
+  /**
+   * @typedef {{ name: string }} Label
+   * @type {Label[]}
+   */
+  const prLabels = pullRequest.labels;
+  const scopeLabelsAll = nonNullUnique(lodash.flatten(Object.values(regexLabelMap)));
+  const prNonScopeLabels = prLabels
+    .map((label) => label.name)
+    .filter((label) => !scopeLabelsAll.includes(label));
+
+  // Determine if there is an approving review from a reviewer with write access;
+  // if not (and it's not a draft PR), add the 'needs-review' label.
+  const isApproved = await isPRApproved(github, prIdentifier);
+  if (!isApproved && !pullRequest.draft)
+    prNonScopeLabels.push('needs-review');
+
+  return [
+    ...prNonScopeLabels,
+    ...changedModule,
+    ...changedLang.map((v) => langToLabel(v)),
+  ];
+};
+
+/**
+ * @param {GitHub} github
+ * @param {identifier} prIdentifier
+ * @returns {Promise<boolean>}
+ */
+const isPRApproved = async (github, prIdentifier) => {
+  /**
+   * @typedef {{ state: string, author_association: string }} Review
+   * @type {{ [data: string]: Review[] }};
+   */
+  const { data: reviews } = await github.rest.pulls.listReviews(prIdentifier);
+  if (reviews === undefined || reviews.length === 0) {
+    return false;
+  }
+  for (const review of reviews) {
+    if (review.state === 'APPROVED' && isReviewer(review.author_association))
+      return true;
+  }
+  return false;
+};
+
+/**
+ * @param {string} association
+ * @returns {boolean}
+ */
+const isReviewer = (association) => {
+  return association === 'COLLABORATOR' || association === 'OWNER';
 };
 
 /**
@@ -163,7 +210,7 @@ const parseChangedLang = (patch) => {
     return [];
   const set = new Set();
   for (const lang of validLanguages) {
-    const pattern = new RegExp(String.raw `^\+\s*(?:${lang}|'${lang}'): `);
+    const pattern = new RegExp(String.raw`^\+\s*(?:${lang}|'${lang}'): `);
     for (const line of patch.split('\n')) {
       if (pattern.test(line)) {
         // TODO: it'd be nice to add the file/line number here.

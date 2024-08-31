@@ -1,7 +1,13 @@
 import { UnreachableCode } from '../../resources/not_reached';
-import UserConfig from '../../resources/user_config';
+import UserConfig, { OptionsTemplate, UserFileCallback } from '../../resources/user_config';
+import { BaseOptions } from '../../types/data';
 import { LooseOopsyTriggerSet, OopsyFileData } from '../../types/oopsy';
-import { CactbotConfigurator, ConfigProcessedFile, ConfigProcessedFileMap } from '../config/config';
+import {
+  CactbotConfigurator,
+  ConfigLooseOopsyTriggerSet,
+  ConfigProcessedFile,
+  ConfigProcessedFileMap,
+} from '../config/config';
 
 import { generateBuffTriggerIds } from './buff_map';
 import oopsyFileData from './data/oopsy_manifest.txt';
@@ -89,7 +95,7 @@ class OopsyConfigurator {
 
       const parts = [info.title, info.type, expansion];
       for (const part of parts) {
-        if (!part)
+        if (part === undefined)
           continue;
         const partDiv = document.createElement('div');
         partDiv.classList.add('trigger-file-header-part');
@@ -109,6 +115,16 @@ class OopsyConfigurator {
         triggerDiv.innerHTML = id;
         triggerDiv.classList.add('trigger');
         triggerOptions.appendChild(triggerDiv);
+
+        // Build the trigger comment
+        const comment = info.triggers[id]?.comment;
+        if (comment) {
+          const trigComment = comment[this.base.lang] ?? comment?.en ?? '';
+          const triggerComment = document.createElement('div');
+          triggerComment.innerHTML = trigComment;
+          triggerComment.classList.add('comment');
+          triggerDiv.appendChild(triggerComment);
+        }
 
         // Container for the right side ui (select boxes, all of the info).
         const triggerDetails = document.createElement('div');
@@ -189,9 +205,9 @@ class OopsyConfigurator {
       item.triggers = {};
       const triggerSet = item.triggerSet;
       for (const prop of oopsyHelpers) {
-        if (triggerSet[prop])
-          continue;
         const obj = triggerSet[prop];
+        if (obj === undefined || obj === null)
+          continue;
         if (typeof obj === 'object') {
           for (const id in obj)
             item.triggers[id] = { id: id };
@@ -214,7 +230,7 @@ class OopsyConfigurator {
   }
 }
 
-UserConfig.registerOptions('oopsyraidsy', {
+const templateOptions: OptionsTemplate = {
   buildExtraUI: (base, container) => {
     const builder = new OopsyConfigurator(base);
     builder.buildUI(container, oopsyFileData);
@@ -229,14 +245,14 @@ UserConfig.registerOptions('oopsyraidsy', {
       return;
     const triggers = savedConfig['triggers'];
 
-    if (!triggers || typeof triggers !== 'object' || Array.isArray(triggers))
+    if (typeof triggers !== 'object' || Array.isArray(triggers))
       return;
 
     for (const [id, entry] of Object.entries(triggers)) {
       if (typeof entry !== 'object' || Array.isArray(entry))
         continue;
       const output = entry['Output'];
-      if (!output)
+      if (output === undefined)
         continue;
 
       perTriggerAutoConfig[id] = {
@@ -258,6 +274,56 @@ UserConfig.registerOptions('oopsyraidsy', {
       type: 'checkbox',
       debugOnly: true,
       default: false,
+    },
+    {
+      id: 'DefaultPlayerLabel',
+      name: {
+        en: 'Default Player Label',
+        de: 'Standard Spieler Label',
+        fr: 'Label par défaut du joueur',
+        ja: '基本プレイヤーラベル',
+        cn: '默认玩家代称',
+        ko: '플레이어를 언급하는 기본 방법',
+      },
+      type: 'select',
+      options: {
+        en: {
+          'Nickname (Tini)': 'nick',
+          'Role (Tank)': 'role',
+          'Job (WAR)': 'job',
+          'Full Job (Warrior)': 'jobFull',
+          'Full Name (Tini Poutini)': 'name',
+        },
+        fr: {
+          'Pseudo (Tini)': 'nick',
+          'Role (Tank)': 'role',
+          'Job (GUE)': 'job',
+          'Job complet (Guerrier)': 'jobFull',
+          'Nom complet (Tini Poutini)': 'name',
+        },
+        ja: {
+          'あだ名 (Tini)': 'nick',
+          'ロール (ヒーラー)': 'role',
+          '簡略ジョブ (白魔)': 'job',
+          'ジョブ (白魔導士)': 'jobFull',
+          '名前 (Tini Poutini)': 'name',
+        },
+        cn: {
+          '昵称 (弗雷)': 'nick',
+          '职能 (坦克)': 'role',
+          '职业简称 (暗骑)': 'job',
+          '职业全称 (暗黑骑士)': 'jobFull',
+          '全名 (弗雷)': 'name',
+        },
+        ko: {
+          '닉네임 (Tini)': 'nick',
+          '역할 (탱커)': 'role',
+          '직업 (암기)': 'job',
+          '직업 전체 (암흑기사)': 'jobFull',
+          '이름 전체 (Tini Poutini)': 'name',
+        },
+      },
+      default: 'nick',
     },
     {
       id: 'NumLiveListItemsInCombat',
@@ -297,7 +363,7 @@ UserConfig.registerOptions('oopsyraidsy', {
       },
       type: 'float',
       default: 4,
-      setterFunc: (options, value) => {
+      setterFunc: (value, options) => {
         let seconds;
         if (typeof value === 'string')
           seconds = parseFloat(value);
@@ -305,6 +371,8 @@ UserConfig.registerOptions('oopsyraidsy', {
           seconds = value;
         else
           return;
+
+        // Store in a separate variable with a different unit.
         options['TimeToShowDeathReportMs'] = seconds * 1000;
       },
     },
@@ -353,5 +421,46 @@ UserConfig.registerOptions('oopsyraidsy', {
       },
       default: 'left',
     },
+    {
+      id: 'MinimumTimeForOverwrittenMit',
+      name: {
+        en: 'Minimum time to show overwritten mit (seconds)',
+        de: 'Minimum Zeit überschriebene Mitigation anzuzeigen (Sekunden)',
+        fr: 'Temps minimum pour afficher l\'écrasement des mitigation (s)',
+        ja: 'バフの上書き通知を表示する時間 (秒)',
+        cn: '显示被顶减伤最小时间 (秒)',
+        ko: '파티 생존기 덮어씀 경고를 표시할 기준 시간 (초)',
+      },
+      type: 'float',
+      default: 2,
+    },
   ],
-});
+};
+
+const userFileHandler: UserFileCallback = (
+  name: string,
+  _files: { [filename: string]: string },
+  baseOptions: BaseOptions & Partial<OopsyOptions>,
+  basePath: string,
+) => {
+  // TODO: Rewrite user_config to be templated on option type so that this function knows
+  // what type of options it is using.
+  if (!baseOptions.Triggers)
+    return;
+
+  for (const baseTriggerSet of baseOptions.Triggers) {
+    const set: ConfigLooseOopsyTriggerSet = baseTriggerSet;
+
+    // Annotate triggers with where they came from.  Note, options is passed in repeatedly
+    // as multiple sets of user files add triggers, so only process each file once.
+    if (set.isUserTriggerSet)
+      continue;
+
+    // `filename` here is just cosmetic for better debug printing to make it more clear
+    // where a trigger or an override is coming from.
+    set.filename = `${basePath}${name}`;
+    set.isUserTriggerSet = true;
+  }
+};
+
+UserConfig.registerOptions('oopsyraidsy', templateOptions, userFileHandler);

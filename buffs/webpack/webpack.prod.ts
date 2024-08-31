@@ -1,6 +1,5 @@
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import TerserPlugin from "terser-webpack-plugin";
 import { mergeWithRules } from 'webpack-merge';
 
 import * as constants from './constants';
@@ -14,10 +13,7 @@ const optimizationOverride = {
     minimizer: [
       // Apply option overrides to Webpack v5's native TerserPlugin
       () => ({
-        extractComments: true,
-      }),
-      new TerserPlugin({
-        extractComments: true,
+        extractComments: false,
       }),
       new CssMinimizerPlugin(),
     ],

@@ -1,44 +1,40 @@
 import PartyTracker from '../../cactbot/resources/party';
 import Util from '../../cactbot/resources/util';
-import {Bars} from '../bars';
-import {BuffTracker} from '../buff_tracker';
-import {DotTracker} from "../dot_tracker";
-import {JobsEventEmitter} from '../event_emitter';
-import {BuffOptions} from '../buff_options';
-import {Player} from '../player';
-import {isPvPZone, RegexesHolder} from '../utils';
+import { Bars } from '../bars';
+import { BuffTracker } from '../buff_tracker';
+import { DotTracker } from "../dot_tracker";
+import { JobsEventEmitter } from '../event_emitter';
+import { FfxivVersion } from "../../cactbot/ui/jobs/jobs";
+import { BuffOptions } from '../buff_options';
+import { Player } from '../player';
+import { isPvPZone, RegexesHolder } from '../utils';
 
-import {BaseComponent, ComponentInterface} from './base';
+import { BaseComponent, ComponentInterface } from './base';
 
 export class ComponentManager {
-    options: BuffOptions;
-    ee: JobsEventEmitter;
-
-    player: Player;
-    partyTracker: PartyTracker;
-
     bars: Bars;
     buffTracker?: BuffTracker;
     dotTracker?: DotTracker;
-
+    ee: JobsEventEmitter;
+    options: BuffOptions;
+    partyTracker: PartyTracker;
+    ffxivVersion: FfxivVersion;
+    player: Player;
     regexes?: RegexesHolder;
+    component?: BaseComponent;
 
     // misc variables
     contentType?: number;
     inPvPZone?: boolean;
-    is5x: boolean;
 
-    component?: BaseComponent;
 
     constructor(private o: ComponentInterface) {
-        this.o.is5x;
-
         this.bars = o.bars;
         this.ee = o.emitter;
         this.options = o.options;
         this.partyTracker = o.partyTracker;
         this.player = o.player;
-        this.is5x = o.is5x;
+        this.ffxivVersion = o.ffxivVersion;
         this.contentType = undefined;
 
         this.setupListeners();
@@ -48,9 +44,8 @@ export class ComponentManager {
         this.ee.registerOverlayListeners();
 
         // bind party changed event
-        this.ee.on('party', (party) => {
-            this.partyTracker.onPartyChanged({party})
-        });
+        this.ee.on('party', (party) => this.partyTracker.onPartyChanged({ party }));
+
 
         this.player.on('job', (job) => {
             this.dotTracker?.clear();
@@ -96,6 +91,8 @@ export class ComponentManager {
         this.player.on('action/party', (id, matches) => {
             this.buffTracker?.onUseAbility(id, matches)
         });
+        // this.player.on('action/other', (id, matches) => this.buffTracker?.onUseAbility(id, matches));
+
 
         // 获得的buff (自己)
         this.player.on( // 给自己添加的
@@ -125,8 +122,9 @@ export class ComponentManager {
                 this.dotTracker?.onYouLoseEffect(id, matches);
         });
 
-        this.ee.on('zone/change', (id, _name) => {
+        this.ee.on('zone/change', (id, _name, info) => {
             this.inPvPZone = isPvPZone(id);
+            this.contentType = info?.contentType;
 
             this.buffTracker?.clear();
             this.dotTracker?.clear();

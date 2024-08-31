@@ -1,0 +1,176 @@
+### P1S: Asphodelos: The First Circle (Savage)
+#
+# -p 6629:14.1
+# -ii 6612 6628 6622 6623 6624 6613 65F6 65F7 65F8 65F9 65FA 65FB 65FC 65FD 65FE 65FF 6600 6601 6602 6603 6606 6607 6608 6609 660A 660B 660C 660D
+
+# Notes:
+# * Chain Pain both 6627/6628, but only sync on one.
+# * Hot Spell/Cold Spell are renamed First/Second/Third Element
+# * Hot Spell/Cold Spell happen at the same time, so only sync on one.
+# * Gaoler's Flail has many different ids, 6F56-6601 and 6DA6-6DAD.
+#   6DA6-6DAD appear to be the damage, so consistently use this everywhere and ignore the casts,
+#   some of which are for the animation and (maybe?) the weapons dropping which can hit people
+#   but doesn't seem to do damage??
+# * Aetherflail is 6602 6603 6606 6607 6608 6609 660A 660B 660C 660D and also is paired with
+#   Gaoler's Flail 6DA6-6DAD for damage, so for timing consistency skip these as well and use damage.
+
+hideall "--Reset--"
+hideall "--sync--"
+
+0.0 "--Reset--" ActorControl { command: "4000000F" } window 0,100000 jump 0
+
+# First flail set
+0.0 "--sync--" InCombat { inGameCombat: "1" } window 0,1
+9.4 "--sync--" StartsUsing { id: "6629", source: "Erichthonios" } window 11,9
+14.1 "Heavy Hand" Ability { id: "6629", source: "Erichthonios" }
+18.2 "--sync--" Ability { id: "65F5", source: "Erichthonios" }
+22.8 "Aetherial Shackles" Ability { id: "6625", source: "Erichthonios" }
+31.9 "Warder's Wrath" Ability { id: "662A", source: "Erichthonios" }
+41.7 "Chain Pain" Ability { id: "6627", source: "Erichthonios" }
+58.5 "Gaoler's Flail" Ability { id: "6DA[2-9A-D]", source: "Erichthonios" } window 3,2
+61.3 "Gaoler's Flail" Ability { id: "6DA[2-9A-D]", source: "Erichthonios" } window 2,3
+
+# First tank mechanic
+72.1 "Pitiless Flail of Grace/Pitiless Flail of Purgation" Ability { id: "660[EF]", source: "Erichthonios" }
+75.5 "True Flare/True Holy" Ability { id: "661[01]", source: "Erichthonios" }
+
+# Second flail set
+91.9 "Gaoler's Flail" Ability { id: "6DA[2-9A-D]", source: "Erichthonios" } window 3,2
+94.7 "Gaoler's Flail" Ability { id: "6DA[2-9A-D]", source: "Erichthonios" } window 2,3
+105.3 "Warder's Wrath" Ability { id: "662A", source: "Erichthonios" }
+
+# Tiles 1
+118.5 "Intemperance" Ability { id: "661E", source: "Erichthonios" }
+122.6 "--sync--" Ability { id: "65F5", source: "Erichthonios" }
+134.4 "Intemperate Torment" Ability { id: ["661F", "6620"], source: "Erichthonios" }
+135.3 "First Element" Ability { id: "6621", source: "Erichthonios" }
+141.4 "Warder's Wrath" Ability { id: "662A", source: "Erichthonios" }
+146.4 "Second Element" Ability { id: "6621", source: "Erichthonios" }
+151.6 "Warder's Wrath" Ability { id: "662A", source: "Erichthonios" }
+157.3 "Third Element" Ability { id: "6621", source: "Erichthonios" }
+
+# Second tank mechanic
+167.9 "Pitiless Flail of Grace/Pitiless Flail of Purgation" Ability { id: "660[EF]", source: "Erichthonios" }
+171.1 "True Flare/True Holy" Ability { id: "661[01]", source: "Erichthonios" }
+
+# Cells 1
+188.2 "Shining Cells" Ability { id: "6616", source: "Erichthonios" }
+194.5 "--sync--" Ability { id: "65F5", source: "Erichthonios" }
+208.6 "Powerful Fire/Powerful Light" Ability { id: "661[AB]", source: "Erichthonios" }
+208.6 "Gaoler's Flail" Ability { id: "6DA[2-9A-D]", source: "Erichthonios" }
+211.4 "Powerful Fire/Powerful Light" Ability { id: "661[AB]", source: "Erichthonios" }
+211.4 "Gaoler's Flail" Ability { id: "6DA[2-9A-D]", source: "Erichthonios" }
+224.2 "Pitiless Flail of Grace/Pitiless Flail of Purgation" Ability { id: "660[EF]", source: "Erichthonios" }
+227.6 "True Flare/True Holy" Ability { id: "661[01]", source: "Erichthonios" }
+229.7 "--sync--" Ability { id: "65F5", source: "Erichthonios" }
+243.7 "Powerful Fire/Powerful Light" Ability { id: "661[AB]", source: "Erichthonios" }
+243.7 "Gaoler's Flail" Ability { id: "6DA[2-9A-D]", source: "Erichthonios" }
+246.5 "Powerful Fire/Powerful Light" Ability { id: "661[AB]", source: "Erichthonios" }
+246.5 "Gaoler's Flail" Ability { id: "6DA[2-9A-D]", source: "Erichthonios" }
+255.1 "Shackles of Time" Ability { id: "661C", source: "Erichthonios" }
+265.3 "Heavy Hand" Ability { id: "6629", source: "Erichthonios" }
+270.0 "Inevitable Flame/Inevitable Light" Ability { id: "6EC[12]", source: "Erichthonios" }
+278.4 "Slam Shut" Ability { id: "6617", source: "Erichthonios" }
+289.6 "--sync--" Ability { id: "65F5", source: "Erichthonios" }
+
+# Fourfold Shackles
+294.2 "Fourfold Shackles" Ability { id: "6626", source: "Erichthonios" }
+303.2 "Chain Pain #1" Ability { id: "6627", source: "Erichthonios" }
+308.2 "Chain Pain #2" Ability { id: "6627", source: "Erichthonios" }
+313.2 "Chain Pain #3" Ability { id: "6627", source: "Erichthonios" }
+318.2 "Chain Pain #4" Ability { id: "6627", source: "Erichthonios" }
+328.4 "Warder's Wrath" Ability { id: "662A", source: "Erichthonios" }
+
+# Tiles 2
+341.6 "Intemperance" Ability { id: "661E", source: "Erichthonios" }
+345.7 "--sync--" Ability { id: "65F5", source: "Erichthonios" }
+357.4 "Intemperate Torment" Ability { id: ["661F", "6620"], source: "Erichthonios" }
+358.6 "First Element" Ability { id: "6621", source: "Erichthonios" }
+369.6 "Second Element" Ability { id: "6621", source: "Erichthonios" }
+374.0 "Gaoler's Flail In/Out" Ability { id: "6DA[2-9A-D]", source: "Erichthonios" } window 3,2
+376.8 "Gaoler's Flail Out/In" Ability { id: "6DA[2-9A-D]", source: "Erichthonios" } window 2,3
+380.6 "Third Element" Ability { id: "6621", source: "Erichthonios" }
+389.4 "Warder's Wrath" Ability { id: "662A", source: "Erichthonios" }
+
+
+# Cells 2 -> branch
+407.6 "Shining Cells" Ability { id: "6616", source: "Erichthonios" }
+
+#cactbot-timeline-lint-disable-sync-order
+# -> Shackles of Time first?
+417.8 "Shackles of Time?" Ability { id: "661C", source: "Erichthonios" } window 20,20 jump 617.8
+425.1 "Pitiless Flail of Grace/Pitiless Flail of Purgation?" #Ability { id: "660[EF]", source: "Erichthonios" }
+428.4 "True Flare/True Holy?" #Ability { id: "661[01]", source: "Erichthonios" }
+432.8 "Inevitable Flame/Inevitable Light?" #Ability { id: "6EC[12]", source: "Erichthonios" }
+441.9 "Warder's Wrath?" #Ability { id: "662A", source: "Erichthonios" }
+
+# -> Aetherial Shackles first?
+417.8 "Aetherial Shackles?" Ability { id: "6625", source: "Erichthonios" } window 20,20 jump 1010.8
+428.9 "Aetherchain?" #Ability { id: "6619", source: "Erichthonios" }
+429.8 "Powerful Fire/Powerful Light?" #Ability { id: "661[AB]", source: "Erichthonios" }
+436.7 "Chain Pain?" #Ability { id: "6627", source: "Erichthonios" }
+438.0 "Powerful Fire/Powerful Light?" #Ability { id: "661[AB]", source: "Erichthonios" }
+447.3 "Warder's Wrath?" #Ability { id: "662A", source: "Erichthonios" }
+#cactbot-timeline-lint-enable-sync-order
+
+# Cells 2, Shackles of Time first
+617.8 "Shackles of Time" Ability { id: "661C", source: "Erichthonios" }
+625.1 "Pitiless Flail of Grace/Pitiless Flail of Purgation" Ability { id: "660[EF]", source: "Erichthonios" }
+628.4 "True Flare/True Holy" Ability { id: "661[01]", source: "Erichthonios" }
+632.8 "Inevitable Flame/Inevitable Light" Ability { id: "6EC[12]", source: "Erichthonios" }
+641.9 "Warder's Wrath" Ability { id: "662A", source: "Erichthonios" }
+649.1 "--sync--" Ability { id: "65F5", source: "Erichthonios" }
+653.9 "Aetherial Shackles" Ability { id: "6625", source: "Erichthonios" }
+665.1 "Aetherchain" Ability { id: "6619", source: "Erichthonios" }
+666.0 "Powerful Fire/Powerful Light" Ability { id: "661[AB]", source: "Erichthonios" }
+672.9 "Chain Pain" Ability { id: "6627", source: "Erichthonios" }
+674.2 "Powerful Fire/Powerful Light" Ability { id: "661[AB]", source: "Erichthonios" }
+
+685.5 "Warder's Wrath" Ability { id: "662A", source: "Erichthonios" } jump 1077.3
+692.7 "--sync--" #Ability { id: "65F5", source: "Erichthonios" }
+706.8 "Powerful Fire/Powerful Light" #Ability { id: "661[AB]", source: "Erichthonios" }
+706.8 "Gaoler's Flail" #Ability { id: "6DA[2-9A-D]", source: "Erichthonios" }
+709.6 "Powerful Fire/Powerful Light" #Ability { id: "661[AB]", source: "Erichthonios" }
+709.6 "Gaoler's Flail" #Ability { id: "6DA[2-9A-D]", source: "Erichthonios" }
+
+
+# Cells 2, Aetherial Shackles first
+1010.8 "Aetherial Shackles" Ability { id: "6625", source: "Erichthonios" }
+1021.9 "Aetherchain" Ability { id: "6619", source: "Erichthonios" }
+1022.8 "Powerful Fire/Powerful Light" Ability { id: "661[AB]", source: "Erichthonios" }
+1029.7 "Chain Pain" Ability { id: "6627", source: "Erichthonios" }
+1031.0 "Powerful Fire/Powerful Light" Ability { id: "661[AB]", source: "Erichthonios" }
+1040.3 "Warder's Wrath" Ability { id: "662A", source: "Erichthonios" }
+1051.5 "Shackles of Time" Ability { id: "661C", source: "Erichthonios" }
+1058.9 "Pitiless Flail of Grace/Pitiless Flail of Purgation" Ability { id: "660[EF]", source: "Erichthonios" }
+1062.1 "True Flare/True Holy" Ability { id: "661[01]", source: "Erichthonios" }
+1066.4 "Inevitable Flame/Inevitable Light" Ability { id: "6EC[12]", source: "Erichthonios" }
+
+
+# Final section
+1077.3 "Warder's Wrath" Ability { id: "662A", source: "Erichthonios" }
+1084.5 "--sync--" Ability { id: "65F5", source: "Erichthonios" }
+
+# Seems to be E/W+In/Out for first two, and last one swaps between In/Out
+1098.6 "Powerful Fire/Powerful Light" Ability { id: "661[AB]", source: "Erichthonios" }
+1098.6 "Gaoler's Flail" Ability { id: "6DA[2-9A-D]", source: "Erichthonios" }
+1101.4 "Powerful Fire/Powerful Light" Ability { id: "661[AB]", source: "Erichthonios" }
+1101.4 "Gaoler's Flail" Ability { id: "6DA[2-9A-D]", source: "Erichthonios" }
+
+1115.7 "Powerful Fire/Powerful Light" Ability { id: "661[AB]", source: "Erichthonios" }
+1115.7 "Gaoler's Flail" Ability { id: "6DA[2-9A-D]", source: "Erichthonios" }
+1119.5 "Powerful Fire/Powerful Light" Ability { id: "661[AB]", source: "Erichthonios" }
+1119.5 "Gaoler's Flail" Ability { id: "6DA[2-9A-D]", source: "Erichthonios" }
+
+1134.2 "Powerful Fire/Powerful Light" Ability { id: "661[AB]", source: "Erichthonios" }
+1134.2 "Gaoler's Flail" Ability { id: "6DA[2-9A-D]", source: "Erichthonios" }
+1137.3 "Powerful Fire/Powerful Light" Ability { id: "661[AB]", source: "Erichthonios" }
+1137.3 "Gaoler's Flail" Ability { id: "6DA[2-9A-D]", source: "Erichthonios" }
+
+# Soft enrage
+1152.7 "Warder's Wrath" Ability { id: "662A", source: "Erichthonios" }
+1161.9 "Warder's Wrath" Ability { id: "662A", source: "Erichthonios" }
+1171.1 "Warder's Wrath" Ability { id: "662A", source: "Erichthonios" }
+
+1177.0 "--sync--" Ability { id: "65F5", source: "Erichthonios" }
+1190.6 "Lethe (enrage)" Ability { id: "6618", source: "Erichthonios" }

@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import Outputs from '../../../../../resources/outputs';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
@@ -12,6 +11,7 @@ export interface Data extends RaidbossData {
 
 // Seiryu Normal
 const triggerSet: TriggerSet<Data> = {
+  id: 'TheWreathOfSnakes',
   zoneId: ZoneId.TheWreathOfSnakes,
   timelineFile: 'seiryu.txt',
   timelineTriggers: [
@@ -37,56 +37,31 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Seiryu Fifth Element',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Seiryu', id: '37FE', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Seiryu', id: '37FE', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Seiryû', id: '37FE', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: '青龍', id: '37FE', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '青龙', id: '37FE', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '청룡', id: '37FE', capture: false }),
+      netRegex: { source: 'Seiryu', id: '37FE', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Seiryu Serpent-Eye Sigil',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Seiryu', id: '3A08', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Seiryu', id: '3A08', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Seiryû', id: '3A08', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: '青龍', id: '3A08', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '青龙', id: '3A08', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '청룡', id: '3A08', capture: false }),
+      netRegex: { source: 'Seiryu', id: '3A08', capture: false },
       response: Responses.getIn(),
     },
     {
       id: 'Seiryu Onmyo Sigil',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Seiryu', id: '3A07', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Seiryu', id: '3A07', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Seiryû', id: '3A07', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: '青龍', id: '3A07', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '青龙', id: '3A07', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '청룡', id: '3A07', capture: false }),
+      netRegex: { source: 'Seiryu', id: '3A07', capture: false },
       response: Responses.getOut(),
     },
     {
       id: 'Seiryu Infirm Soul',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Seiryu', id: '37FD' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Seiryu', id: '37FD' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Seiryû', id: '37FD' }),
-      netRegexJa: NetRegexes.startsUsing({ source: '青龍', id: '37FD' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '青龙', id: '37FD' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '청룡', id: '37FD' }),
+      netRegex: { source: 'Seiryu', id: '37FD' },
       response: Responses.tankBuster(),
     },
     {
       id: 'Seiryu Serpent Ascending Towers',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Seiryu', id: '3C25', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Seiryu', id: '3C25', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Seiryû', id: '3C25', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: '青龍', id: '3C25', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '青龙', id: '3C25', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '청룡', id: '3C25', capture: false }),
+      netRegex: { source: 'Seiryu', id: '3C25', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -102,26 +77,21 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Seiryu Serpent Descending',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '00A9' }),
+      netRegex: { id: '00A9' },
       condition: Conditions.targetIsYou(),
       response: Responses.spread(),
     },
     {
       id: 'Seiryu Blue Bolt',
       type: 'Tether',
-      netRegex: NetRegexes.tether({ source: 'Ao-No-Shiki', id: '0011' }),
-      netRegexDe: NetRegexes.tether({ source: 'Ao No Shiki', id: '0011' }),
-      netRegexFr: NetRegexes.tether({ source: 'Shiki Céruléen', id: '0011' }),
-      netRegexJa: NetRegexes.tether({ source: '蒼の式鬼', id: '0011' }),
-      netRegexCn: NetRegexes.tether({ source: '苍之式鬼', id: '0011' }),
-      netRegexKo: NetRegexes.tether({ source: '푸른 사역귀', id: '0011' }),
+      netRegex: { source: 'Ao-No-Shiki', id: '0011' },
       delaySeconds: 0.5,
       infoText: (data, matches, output) => {
         if (data.redRush?.includes(data.me))
           return;
         if (matches.target === data.me)
           return output.stackOnYou!();
-        return output.stackOnPlayer!({ player: data.ShortName(matches.target) });
+        return output.stackOnPlayer!({ player: data.party.member(matches.target) });
       },
       run: (data) => delete data.redRush,
       outputStrings: {
@@ -132,12 +102,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Seiryu Red Rush',
       type: 'Tether',
-      netRegex: NetRegexes.tether({ source: 'Aka-No-Shiki', id: '0011' }),
-      netRegexDe: NetRegexes.tether({ source: 'Aka No Shiki', id: '0011' }),
-      netRegexFr: NetRegexes.tether({ source: 'Shiki Écarlate', id: '0011' }),
-      netRegexJa: NetRegexes.tether({ source: '紅の式鬼', id: '0011' }),
-      netRegexCn: NetRegexes.tether({ source: '红之式鬼', id: '0011' }),
-      netRegexKo: NetRegexes.tether({ source: '붉은 사역귀', id: '0011' }),
+      netRegex: { source: 'Aka-No-Shiki', id: '0011' },
       alertText: (data, matches, output) => {
         // If targeted by two, skip.
         if (data.redRush?.includes(data.me))
@@ -159,12 +124,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Seiryu Kanabo',
       type: 'Tether',
-      netRegex: NetRegexes.tether({ source: 'Iwa-No-Shiki', id: '0011' }),
-      netRegexDe: NetRegexes.tether({ source: 'Iwa No Shiki', id: '0011' }),
-      netRegexFr: NetRegexes.tether({ source: 'Shiki Rocailleux', id: '0011' }),
-      netRegexJa: NetRegexes.tether({ source: '岩の式鬼', id: '0011' }),
-      netRegexCn: NetRegexes.tether({ source: '岩之式鬼', id: '0011' }),
-      netRegexKo: NetRegexes.tether({ source: '바위 사역귀', id: '0011' }),
+      netRegex: { source: 'Iwa-No-Shiki', id: '0011' },
       condition: Conditions.targetIsYou(),
       suppressSeconds: 1,
       alarmText: (_data, _matches, output) => output.text!(),
@@ -181,23 +141,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Seiryu Handprint East',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Yama-No-Shiki', id: '37E5', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Yama No Shiki', id: '37E5', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Shiki Montagneux', id: '37E5', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: '山の式鬼', id: '37E5', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '山之式鬼', id: '37E5', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '산 사역귀', id: '37E5', capture: false }),
+      netRegex: { source: 'Yama-No-Shiki', id: '37E5', capture: false },
       response: Responses.goEast(),
     },
     {
       id: 'Seiryu Handprint West',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Yama-No-Shiki', id: '37E6', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Yama No Shiki', id: '37E6', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Shiki Montagneux', id: '37E6', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: '山の式鬼', id: '37E6', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '山之式鬼', id: '37E6', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '산 사역귀', id: '37E6', capture: false }),
+      netRegex: { source: 'Yama-No-Shiki', id: '37E6', capture: false },
       response: Responses.goWest(),
     },
   ],

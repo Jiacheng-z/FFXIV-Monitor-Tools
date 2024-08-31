@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { UnreachableCode } from '../../../../../resources/not_reached';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
@@ -12,8 +11,12 @@ export interface Data extends RaidbossData {
   mathBaseValue?: number;
 }
 
-const mathDirection = (mathBaseValue: number | undefined, correctMath: number[], output: Output) => {
-  if (!correctMath || mathBaseValue === undefined)
+const mathDirection = (
+  mathBaseValue: number | undefined,
+  correctMath: number[],
+  output: Output,
+) => {
+  if (mathBaseValue === undefined)
     return;
   if (mathBaseValue < 1 || mathBaseValue > 9) {
     console.error(`Bad math: ${mathBaseValue}`);
@@ -37,7 +40,7 @@ const mathOutputStrings = {
   stayOut: {
     en: 'Stay out',
     de: 'Draußen stehen',
-    fr: 'Restez dehors',
+    fr: 'Restez à l\'extérieur',
     ja: '入らない',
     cn: '远离',
     ko: '바깥에 있기',
@@ -45,7 +48,7 @@ const mathOutputStrings = {
   standIn1: {
     en: 'Stand in 1',
     de: 'In 1 stehen',
-    fr: 'Allez sur le 1',
+    fr: 'Placez-vous sur le 1',
     ja: '１を踏む',
     cn: '站在 1',
     ko: '답: 1',
@@ -53,7 +56,7 @@ const mathOutputStrings = {
   standIn2: {
     en: 'Stand in 2',
     de: 'In 2 stehen',
-    fr: 'Allez sur le 2',
+    fr: 'Placez-vous sur le 2',
     ja: '２を踏む',
     cn: '站在 2',
     ko: '답: 2',
@@ -61,7 +64,7 @@ const mathOutputStrings = {
   standIn3: {
     en: 'Stand in 3',
     de: 'In 3 stehen',
-    fr: 'Allez sur le 3',
+    fr: 'Placez-vous sur le 3',
     ja: '３を踏む',
     cn: '站在 3',
     ko: '답: 3',
@@ -69,7 +72,7 @@ const mathOutputStrings = {
   standIn4: {
     en: 'Stand in 4',
     de: 'In 4 stehen',
-    fr: 'Allez sur le 4',
+    fr: 'Placez-vous sur le 4',
     ja: '４を踏む',
     cn: '站在 4',
     ko: '답: 4',
@@ -77,6 +80,7 @@ const mathOutputStrings = {
 };
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'TheRidoranaLighthouse',
   zoneId: ZoneId.TheRidoranaLighthouse,
   timelineFile: 'ridorana_lighthouse.txt',
   timelineTriggers: [
@@ -91,30 +95,20 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Ridorana Famfrit Tide Pode',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2C3E', source: 'Famfrit, The Darkening Cloud' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2C3E', source: 'Dunkelfürst Famfrit' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2C3E', source: 'Famfrit Le Nuage Ténébreux' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2C3E', source: '暗黒の雲ファムフリート' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2C3E', source: '暗黑之云法姆弗里特' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2C3E', source: '암흑의 구름 팜프리트' }),
+      netRegex: { id: '2C3E', source: 'Famfrit, The Darkening Cloud' },
       response: Responses.tankBuster(),
     },
     {
       id: 'Ridorana Famfrit Tsunami 1',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2C50', source: 'Famfrit, The Darkening Cloud', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2C50', source: 'Dunkelfürst Famfrit', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2C50', source: 'Famfrit Le Nuage Ténébreux', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2C50', source: '暗黒の雲ファムフリート', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2C50', source: '暗黑之云法姆弗里特', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2C50', source: '암흑의 구름 팜프리트', capture: false }),
+      netRegex: { id: '2C50', source: 'Famfrit, The Darkening Cloud', capture: false },
       delaySeconds: 4.5,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'Look for Tsunami',
           de: 'Auf Krug achten',
-          fr: 'Attention Tsunami',
+          fr: 'Repérez le Tsunami',
           ja: '水瓶が向いてる方向から離れる',
           cn: '离开水瓶口方向',
           ko: '대해일 확인',
@@ -124,19 +118,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Ridorana Famfrit Tsunami 2',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2C50', source: 'Famfrit, The Darkening Cloud', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2C50', source: 'Dunkelfürst Famfrit', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2C50', source: 'Famfrit Le Nuage Ténébreux', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2C50', source: '暗黒の雲ファムフリート', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2C50', source: '暗黑之云法姆弗里特', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2C50', source: '암흑의 구름 팜프리트', capture: false }),
+      netRegex: { id: '2C50', source: 'Famfrit, The Darkening Cloud', capture: false },
       delaySeconds: 16.5,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'Look for Tsunami',
           de: 'Auf Krug achten',
-          fr: 'Attention Tsunami',
+          fr: 'Repérez le Tsunami',
           ja: '水瓶が向いてる方向から離れる',
           cn: '离开水瓶口方向',
           ko: '대해일 확인',
@@ -146,19 +135,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Ridorana Famfrit Tsunami 3',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2C50', source: 'Famfrit, The Darkening Cloud', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2C50', source: 'Dunkelfürst Famfrit', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2C50', source: 'Famfrit Le Nuage Ténébreux', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2C50', source: '暗黒の雲ファムフリート', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2C50', source: '暗黑之云法姆弗里特', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2C50', source: '암흑의 구름 팜프리트', capture: false }),
+      netRegex: { id: '2C50', source: 'Famfrit, The Darkening Cloud', capture: false },
       delaySeconds: 28.5,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'Look for Tsunami',
           de: 'Auf Krug achten',
-          fr: 'Attention Tsunami',
+          fr: 'Repérez le Tsunami',
           ja: '水瓶が向いてる方向から離れる',
           cn: '离开水瓶口方向',
           ko: '대해일 확인',
@@ -168,49 +152,34 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Ridorana Famfrit Dark Cannonade',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0037' }),
+      netRegex: { id: '0037' },
       condition: Conditions.targetIsYou(),
       response: Responses.doritoStack(),
     },
     {
       id: 'Ridorana Famfrit Briny Cannonade',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '008B' }),
+      netRegex: { id: '008B' },
       condition: Conditions.targetIsYou(),
       response: Responses.spread(),
     },
     {
       id: 'Ridorana Famfrit Dark Rain',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatant({ name: 'Dark Rain', capture: false }),
-      netRegexDe: NetRegexes.addedCombatant({ name: 'Dunkler Regen', capture: false }),
-      netRegexFr: NetRegexes.addedCombatant({ name: 'Sphère D\'Eau Ténébreuse', capture: false }),
-      netRegexJa: NetRegexes.addedCombatant({ name: '暗黒の雨水', capture: false }),
-      netRegexCn: NetRegexes.addedCombatant({ name: '暗黑雨水', capture: false }),
-      netRegexKo: NetRegexes.addedCombatant({ name: '암흑의 빗물', capture: false }),
+      netRegex: { name: 'Dark Rain', capture: false },
       suppressSeconds: 10,
       response: Responses.killAdds(),
     },
     {
       id: 'Ridorana Belias Fire',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2CDB', source: 'Belias, The Gigas' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2CDB', source: 'Dämonid Belias' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2CDB', source: 'Bélias Le Titan' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2CDB', source: '魔人ベリアス' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2CDB', source: '魔人贝利亚斯' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2CDB', source: '마인 벨리아스' }),
+      netRegex: { id: '2CDB', source: 'Belias, The Gigas' },
       response: Responses.tankBuster(),
     },
     {
       id: 'Ridorana Belias Time Eruption',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2CDE', source: 'Belias, The Gigas', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2CDE', source: 'Dämonid Belias', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2CDE', source: 'Bélias Le Titan', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2CDE', source: '魔人ベリアス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2CDE', source: '魔人贝利亚斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2CDE', source: '마인 벨리아스', capture: false }),
+      netRegex: { id: '2CDE', source: 'Belias, The Gigas', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -227,14 +196,14 @@ const triggerSet: TriggerSet<Data> = {
       // Burns effect.
       id: 'Ridorana Belias Hand of Time',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '212' }),
+      netRegex: { effectId: '212' },
       condition: Conditions.targetIsYou(),
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'Stretch Tether Outside',
           de: 'Verbindung nach außen strecken',
-          fr: 'Lien vers l\'exterieur',
+          fr: 'Étirez le lien vers l\'exterieur',
           ja: '線を伸ばして外に向ける',
           cn: '将连线朝外远离人群',
           ko: '줄 바깥으로 늘이기',
@@ -244,18 +213,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Ridorana Belias Time Bomb',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2CE6', source: 'Belias, The Gigas', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2CE6', source: 'Dämonid Belias', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2CE6', source: 'Bélias Le Titan', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2CE6', source: '魔人ベリアス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2CE6', source: '魔人贝利亚斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2CE6', source: '마인 벨리아스', capture: false }),
+      netRegex: { id: '2CE6', source: 'Belias, The Gigas', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'Stop Clocks',
           de: 'Uhrzeiger nach außen',
-          fr: 'Arrêtez horloge',
+          fr: 'Arrêtez les horloges',
           ja: '針を外に向ける',
           cn: '定时炸弹',
           ko: '시간 폭탄',
@@ -265,30 +229,20 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Ridorana Belias Gigas',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatant({ name: 'Gigas', capture: false }),
-      netRegexDe: NetRegexes.addedCombatant({ name: 'Diener Von Belias', capture: false }),
-      netRegexFr: NetRegexes.addedCombatant({ name: 'Serviteur De Bélias', capture: false }),
-      netRegexJa: NetRegexes.addedCombatant({ name: '魔人兵', capture: false }),
-      netRegexCn: NetRegexes.addedCombatant({ name: '魔人兵', capture: false }),
-      netRegexKo: NetRegexes.addedCombatant({ name: '마인병', capture: false }),
+      netRegex: { name: 'Gigas', capture: false },
       suppressSeconds: 10,
       response: Responses.killAdds(),
     },
     {
       id: 'Ridorana Construct Destroy',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['2C5A', '2C71'], source: 'Construct 7' }),
-      netRegexDe: NetRegexes.startsUsing({ id: ['2C5A', '2C71'], source: 'Automat Nr\\. 7' }),
-      netRegexFr: NetRegexes.startsUsing({ id: ['2C5A', '2C71'], source: 'Bâtisseur N°7' }),
-      netRegexJa: NetRegexes.startsUsing({ id: ['2C5A', '2C71'], source: '労働七号' }),
-      netRegexCn: NetRegexes.startsUsing({ id: ['2C5A', '2C71'], source: '劳动七号' }),
-      netRegexKo: NetRegexes.startsUsing({ id: ['2C5A', '2C71'], source: '노동 7호' }),
+      netRegex: { id: ['2C5A', '2C71'], source: 'Construct 7' },
       response: Responses.tankBuster(),
     },
     {
       id: 'Ridorana Construct Accelerate Spread',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '008A' }),
+      netRegex: { id: '008A' },
       condition: Conditions.targetIsYou(),
       preRun: (data) => data.accelerateSpreadOnMe = true,
       response: Responses.spread(),
@@ -296,37 +250,27 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Ridorana Construct Accelerate Stack',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0064' }),
+      netRegex: { id: '0064' },
       condition: (data) => !data.accelerateSpreadOnMe,
       response: Responses.stackMarkerOn(),
     },
     {
       id: 'Ridorana Construct Accelerate Cleanup',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2C65', source: 'Construct 7', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2C65', source: 'Automat Nr\\. 7', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2C65', source: 'Bâtisseur N°7', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2C65', source: '労働七号', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2C65', source: '劳动七号', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2C65', source: '노동 7호', capture: false }),
+      netRegex: { id: '2C65', source: 'Construct 7', capture: false },
       run: (data) => delete data.accelerateSpreadOnMe,
     },
     {
       id: 'Ridorana Construct Math Setup',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2C6C', source: 'Construct 7', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2C6C', source: 'Automat Nr\\. 7', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2C6C', source: 'Bâtisseur N°7', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2C6C', source: '労働七号', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2C6C', source: '劳动七号', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2C6C', source: '노동 7호', capture: false }),
+      netRegex: { id: '2C6C', source: 'Construct 7', capture: false },
       run: (data) => data.mathBaseValue = 0,
     },
     {
       // Hp Penalty effect.
       id: 'Ridorana Construct Math HP Check 1',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '615' }),
+      netRegex: { effectId: '615' },
       condition: Conditions.targetIsYou(),
       preRun: (data) => {
         if (!data.mathBaseValue && data.currentHP > 0 && data.currentHP < 10)
@@ -340,7 +284,7 @@ const triggerSet: TriggerSet<Data> = {
       // overwriting any results from t=0 if that was valid.
       id: 'Ridorana Construct Math HP Check 2',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '615' }),
+      netRegex: { effectId: '615' },
       condition: Conditions.targetIsYou(),
       preRun: (data) => {
         if (!data.mathBaseValue && data.currentHP > 0 && data.currentHP < 10)
@@ -351,12 +295,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Ridorana Construct Divide By Five',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2CCD', source: 'Construct 7', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2CCD', source: 'Automat Nr\\. 7', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2CCD', source: 'Bâtisseur N°7', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2CCD', source: '労働七号', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2CCD', source: '劳动七号', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2CCD', source: '노동 7호', capture: false }),
+      netRegex: { id: '2CCD', source: 'Construct 7', capture: false },
       alertText: (data, _matches, output) => {
         const correctMath = [-1, 4, 3, 2, 1, 0, 4, 3, 2, 1];
         return mathDirection(data.mathBaseValue, correctMath, output);
@@ -366,12 +305,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Ridorana Construct Divide By Four',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2CCC', source: 'Construct 7', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2CCC', source: 'Automat Nr\\. 7', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2CCC', source: 'Bâtisseur N°7', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2CCC', source: '労働七号', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2CCC', source: '劳动七号', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2CCC', source: '노동 7호', capture: false }),
+      netRegex: { id: '2CCC', source: 'Construct 7', capture: false },
       alertText: (data, _matches, output) => {
         const correctMath = [-1, 3, 2, 1, 0, 3, 2, 1, 0, 3];
         return mathDirection(data.mathBaseValue, correctMath, output);
@@ -381,12 +315,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Ridorana Construct Divide By Three',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2CCA', source: 'Construct 7', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2CCA', source: 'Automat Nr\\. 7', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2CCA', source: 'Bâtisseur N°7', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2CCA', source: '労働七号', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2CCA', source: '劳动七号', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2CCA', source: '노동 7호', capture: false }),
+      netRegex: { id: '2CCA', source: 'Construct 7', capture: false },
       alertText: (data, _matches, output) => {
         const correctMath = [-1, 2, 1, 0, 2, 1, 0, 2, 1, 0];
         return mathDirection(data.mathBaseValue, correctMath, output);
@@ -396,12 +325,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Ridorana Construct Indivisible',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2CCE', source: 'Construct 7', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2CCE', source: 'Automat Nr\\. 7', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2CCE', source: 'Bâtisseur N°7', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2CCE', source: '労働七号', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2CCE', source: '劳动七号', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2CCE', source: '노동 7호', capture: false }),
+      netRegex: { id: '2CCE', source: 'Construct 7', capture: false },
       alertText: (data, _matches, output) => {
         const correctMath = [-1, 1, 0, 0, 1, 0, 1, 0, 3, 2];
         return mathDirection(data.mathBaseValue, correctMath, output);
@@ -411,30 +335,20 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Ridorana Construct Pulverize',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2C61', source: 'Construct 7', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2C61', source: 'Automat Nr\\. 7', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2C61', source: 'Bâtisseur N°7', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2C61', source: '労働七号', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2C61', source: '劳动七号', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2C61', source: '노동 7호', capture: false }),
+      netRegex: { id: '2C61', source: 'Construct 7', capture: false },
       // 16 yalms
       response: Responses.getOut(),
     },
     {
       id: 'Ridorana Construct Dispose',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['2C5F', '2CE9'], source: 'Construct 7', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: ['2C5F', '2CE9'], source: 'Automat Nr\\. 7', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: ['2C5F', '2CE9'], source: 'Bâtisseur N°7', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: ['2C5F', '2CE9'], source: '労働七号', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: ['2C5F', '2CE9'], source: '劳动七号', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: ['2C5F', '2CE9'], source: '노동 7호', capture: false }),
+      netRegex: { id: ['2C5F', '2CE9'], source: 'Construct 7', capture: false },
       response: Responses.getBehind(),
     },
     {
       id: 'Ridorana Construct Acceleration Bomb',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '568' }),
+      netRegex: { effectId: '568' },
       condition: Conditions.targetIsYou(),
       delaySeconds: 2,
       response: Responses.stopEverything(),
@@ -442,47 +356,32 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Ridorana Yiazmat Rake Buster',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2D4E', source: 'Yiazmat' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2D4E', source: 'Yiasmat' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2D4E', source: 'Yiazmat' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2D4E', source: '鬼龍ヤズマット' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2D4E', source: '鬼龙雅兹玛特' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2D4E', source: '귀룡 야즈마트' }),
+      netRegex: { id: '2D4E', source: 'Yiazmat' },
       response: Responses.tankBuster(),
     },
     {
       id: 'Ridorana Yiazmat Rake Charge',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2E32', source: 'Yiazmat', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2E32', source: 'Yiasmat', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2E32', source: 'Yiazmat', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2E32', source: '鬼龍ヤズマット', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2E32', source: '鬼龙雅兹玛特', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2E32', source: '귀룡 야즈마트', capture: false }),
+      netRegex: { id: '2E32', source: 'Yiazmat', capture: false },
       response: Responses.awayFromFront(),
     },
     {
       id: 'Ridorana Yiazmat White Breath',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2C31', source: 'Yiazmat', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2C31', source: 'Yiasmat', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2C31', source: 'Yiazmat', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2C31', source: '鬼龍ヤズマット', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2C31', source: '鬼龙雅兹玛特', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2C31', source: '귀룡 야즈마트', capture: false }),
+      netRegex: { id: '2C31', source: 'Yiazmat', capture: false },
       response: Responses.getUnder(),
     },
     {
       id: 'Ridorana Yiazmat Magnetic Negative',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '60F' }),
+      netRegex: { effectId: '60F' },
       condition: Conditions.targetIsYou(),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'Move to Positive',
           de: 'Ins Positive laufen',
-          fr: 'Allez sur le plus',
+          fr: 'Allez sur le positif',
           ja: 'プラス（＋）へ',
           cn: '移动到正极',
           ko: '+전하 쪽으로',
@@ -492,14 +391,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Ridorana Yiazmat Magnetic Positive',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '60E' }),
+      netRegex: { effectId: '60E' },
       condition: Conditions.targetIsYou(),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'Move to Negative',
           de: 'Ins Negative laufen',
-          fr: 'Allez sur le moins',
+          fr: 'Allez sur le négatif',
           ja: 'マイナス（－）へ',
           cn: '移动到负极',
           ko: '-전하 쪽으로',
@@ -509,24 +408,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Ridorana Yiazmat Archaeodemon',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatant({ name: 'Archaeodemon', capture: false }),
-      netRegexDe: NetRegexes.addedCombatant({ name: 'Archaeodämon', capture: false }),
-      netRegexFr: NetRegexes.addedCombatant({ name: 'Archéodémon', capture: false }),
-      netRegexJa: NetRegexes.addedCombatant({ name: 'アルケオデーモン', capture: false }),
-      netRegexCn: NetRegexes.addedCombatant({ name: '古恶魔', capture: false }),
-      netRegexKo: NetRegexes.addedCombatant({ name: '원시 악마', capture: false }),
+      netRegex: { name: 'Archaeodemon', capture: false },
       suppressSeconds: 10,
       response: Responses.killAdds(),
     },
     {
       id: 'Ridorana Yiazmat Heart',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatant({ name: 'Heart Of The Dragon', capture: false }),
-      netRegexDe: NetRegexes.addedCombatant({ name: 'Herz Des Drachen', capture: false }),
-      netRegexFr: NetRegexes.addedCombatant({ name: 'Cœur De Yiazmat', capture: false }),
-      netRegexJa: NetRegexes.addedCombatant({ name: 'ヤズマットの心核', capture: false }),
-      netRegexCn: NetRegexes.addedCombatant({ name: '鬼龙的核心', capture: false }),
-      netRegexKo: NetRegexes.addedCombatant({ name: '야즈마트의 심핵', capture: false }),
+      netRegex: { name: 'Heart Of The Dragon', capture: false },
       suppressSeconds: 10,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -624,7 +513,7 @@ const triggerSet: TriggerSet<Data> = {
         'Archaeodemon': 'archéodémon',
         'Belias, The Gigas': 'Bélias le Titan',
         'Construct 7': 'Bâtisseur n°7',
-        'Dark Rain': 'Trombe d\'eau',
+        'Dark Rain': 'sphère d\'eau ténébreuse',
         'Echoes from Time\'s Garden': 'Jardin d\'un autre temps',
         'Famfrit, The Darkening Cloud': 'Famfrit le Nuage Ténébreux',
         '(?<! )Gigas': 'serviteur de Bélias',
@@ -635,6 +524,10 @@ const triggerSet: TriggerSet<Data> = {
         'Yiazmat': 'Yiazmat',
       },
       'replaceText': {
+        '\\(close\\)': '(proche)',
+        '\\(combo\\)': '(combo)',
+        '\\(far\\)': '(loin)',
+        '\\(single\\)': '(unique)',
         'Accelerate': 'Aplatir',
         'Annihilation Mode': 'Module Exterminator',
         'Archaeodemon spawn': 'Apparition des Archéodémons',
@@ -694,7 +587,7 @@ const triggerSet: TriggerSet<Data> = {
         'Archaeodemon': 'アルケオデーモン',
         'Belias, The Gigas': '魔人ベリアス',
         'Construct 7': '労働七号',
-        'Dark Rain': '暗雲の雨水',
+        'Dark Rain': '暗黒の雨水',
         'Echoes from Time\'s Garden': 'はるかなる時の庭',
         'Famfrit, The Darkening Cloud': '暗黒の雲ファムフリート',
         '(?<! )Gigas': '魔人兵',
@@ -856,6 +749,12 @@ const triggerSet: TriggerSet<Data> = {
         'Yiazmat': '귀룡 야즈마트',
       },
       'replaceText': {
+        '\\(close\\)': '(가까이)',
+        '\\(cross\\)': '(X)',
+        '\\(combo\\)': '(콤보)',
+        '\\(far\\)': '(멀리)',
+        '\\(orbit\\)': '(떠있음)',
+        '\\(single\\)': '(1회)',
         'Accelerate': '관통',
         'Annihilation Mode': '제노사이드 칩',
         'Archaeodemon spawn': '원시 악마 생성',
@@ -907,11 +806,6 @@ const triggerSet: TriggerSet<Data> = {
         'Ventilate': '냉각',
         'Water IV': '워터쟈',
         'White Breath': '하얀 숨결',
-        'orbit': '떠있음',
-        'close': '가까이',
-        'far': '멀리',
-        'combo': '콤보',
-        'single': '1회',
       },
     },
   ],

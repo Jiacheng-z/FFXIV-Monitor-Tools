@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -8,19 +7,21 @@ import { TriggerSet } from '../../../../../types/trigger';
 export type Data = RaidbossData;
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'ShisuiOfTheVioletTides',
   zoneId: ZoneId.ShisuiOfTheVioletTides,
   timelineFile: 'shisui_of_the_violet_tides.txt',
   triggers: [
     {
       id: 'Shisui Amikiri Kamikiri Add',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatantFull({ npcNameId: '6238' }),
+      netRegex: { npcNameId: '6238' },
       alertText: (_data, matches, output) => output.kill!({ name: matches.name }),
       outputStrings: {
         kill: {
           en: 'Kill ${name}',
           de: 'Besiege ${name}',
           fr: 'Tuez ${name}',
+          ja: '${name}を倒す',
           cn: '击杀 ${name}',
           ko: '${name} 처치',
         },
@@ -29,27 +30,23 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Shisui Amikiri Digestive Fluid',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '000E' }),
+      netRegex: { id: '000E' },
       condition: Conditions.targetIsYou(),
       response: Responses.spread(),
     },
     {
       id: 'Shisui Ruby Princess Seduce',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Ruby Princess', id: '1F7A', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Rubinprinzessin', id: '1F7A', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Princesse De Rubis', id: '1F7A', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: '紅玉姫', id: '1F7A', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '红玉公主', id: '1F7A', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '홍옥 공주', id: '1F7A', capture: false }),
+      netRegex: { source: 'Ruby Princess', id: '1F7A', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'Get In Box',
           de: 'Geh in die Box',
           fr: 'Allez dans la boîte',
+          ja: '箱に入る',
           cn: '进盒子',
-          ko: '박스에 접근',
+          ko: '상자에 들어가기',
         },
       },
     },
@@ -57,7 +54,7 @@ const triggerSet: TriggerSet<Data> = {
       // This is what it's called!
       id: 'Shisui Ruby Princess Geothermal Flatulence',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0001' }),
+      netRegex: { id: '0001' },
       condition: Conditions.targetIsYou(),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -65,6 +62,7 @@ const triggerSet: TriggerSet<Data> = {
           en: 'Chasing AOE on YOU',
           de: 'Verfolgende AoE auf DIR',
           fr: 'Ruée sur VOUS',
+          ja: '追跡AOE',
           cn: '追踪AOE点名',
           ko: '연속장판 대상자',
         },
@@ -73,18 +71,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Shisui Shisui Yohi Naishi-No-Kami',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatantFull({ npcNameId: '6244', capture: false }),
+      netRegex: { npcNameId: '6244', capture: false },
       response: Responses.killAdds(),
     },
     {
       id: 'Shisui Shisui Yohi Mad Stare',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Shisui Yohi', id: '1F82', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Shisui Yohi', id: '1F82', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Shisui Yohi', id: '1F82', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: '紫水妖妃', id: '1F82', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '紫水妖妃', id: '1F82', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '시스이 요비', id: '1F82', capture: false }),
+      netRegex: { source: 'Shisui Yohi', id: '1F82', capture: false },
       response: Responses.lookAway(),
     },
   ],
@@ -120,7 +113,6 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       'locale': 'fr',
-      'missingTranslations': true,
       'replaceSync': {
         'Amikiri': 'Amikiri',
         'Naishi-No-Kami': 'Naishi no Kami',
@@ -131,6 +123,9 @@ const triggerSet: TriggerSet<Data> = {
         'The Harutsuge Gate': 'Porte de Harutsuge',
       },
       'replaceText': {
+        '\\?': ' ?',
+        '--add--': '--add--',
+        '--adds--': '--adds--',
         'Abyssal Volcano': 'Volcan abyssal',
         'Black Tide': 'Marée noire',
         'Coriolis Kick': 'Coup de pied Coriolis',

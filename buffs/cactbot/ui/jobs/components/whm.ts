@@ -7,18 +7,17 @@ import { kAbility } from '../constants';
 import { BaseComponent, ComponentInterface } from './base';
 
 export class WHMComponent extends BaseComponent {
-  lilyBox: ResourceBox;
   lilysecondBox: ResourceBox;
   diaBox: TimerBox;
   assizeBox: TimerBox;
+  pomBox: TimerBox;
   lucidBox: TimerBox;
-    bloodlilyStacks: HTMLElement[] = [];
+  lilyStacks: HTMLDivElement[];
+  bloodlilyStacks: HTMLDivElement[];
 
   constructor(o: ComponentInterface) {
     super(o);
-    this.lilyBox = this.bars.addResourceBox({
-      classList: ['whm-color-lily'],
-    });
+
     this.lilysecondBox = this.bars.addResourceBox({
       classList: ['whm-color-lilysecond'],
     });
@@ -32,6 +31,10 @@ export class WHMComponent extends BaseComponent {
       id: 'whm-procs-assize',
       fgColor: 'whm-color-assize',
     });
+    this.pomBox = this.bars.addProcBox({
+      id: 'whm-procs-pom',
+      fgColor: 'whm-color-pom',
+    });
     this.lucidBox = this.bars.addProcBox({
       id: 'whm-procs-lucid',
       fgColor: 'whm-color-lucid',
@@ -42,56 +45,60 @@ export class WHMComponent extends BaseComponent {
     stacksContainer.id = 'whm-stacks';
     stacksContainer.classList.add('stacks');
     this.bars.addJobBarContainer().appendChild(stacksContainer);
-    const bloodlilyContainer = document.createElement('div');
-    bloodlilyContainer.id = 'whm-stacks-bloodlily';
-    stacksContainer.appendChild(bloodlilyContainer);
 
-    for (let i = 0; i < 3; ++i) {
-      const d = document.createElement('div');
-      bloodlilyContainer.appendChild(d);
-      this.bloodlilyStacks.push(d);
+    const lilyStacksConstainer = document.createElement('div');
+    lilyStacksConstainer.id = 'whm-stacks-lily';
+    stacksContainer.appendChild(lilyStacksConstainer);
+
+    const bloodlilyStacksConstainer = document.createElement('div');
+    bloodlilyStacksConstainer.id = 'whm-stacks-bloodlily';
+    stacksContainer.appendChild(bloodlilyStacksConstainer);
+
+    this.lilyStacks = [];
+    this.bloodlilyStacks = [];
+
+    for (let i = 0; i < 3; i++) {
+      const lilyStack = document.createElement('div');
+      const bloodlilyStack = document.createElement('div');
+      lilyStacksConstainer.appendChild(lilyStack);
+      bloodlilyStacksConstainer.appendChild(bloodlilyStack);
+      this.lilyStacks.push(lilyStack);
+      this.bloodlilyStacks.push(bloodlilyStack);
     }
 
     this.reset();
+  }
+
+  private _addActiveOnStacks(elements: HTMLDivElement[], stacks: number) {
+    for (let i = 0; i < elements.length; i++)
+      elements[i]?.classList.toggle('active', i < stacks);
   }
 
   override onJobDetailUpdate(jobDetail: JobDetail['WHM']): void {
     const lily = jobDetail.lilyStacks;
     // bars milliseconds is countup, so use floor instead of ceil.
     const lilysecond = Math.floor(jobDetail.lilyMilliseconds / 1000);
-
-    this.lilyBox.innerText = lily.toString();
-    if (lily === 3)
-      this.lilysecondBox.innerText = '';
-    else
-      this.lilysecondBox.innerText = (30 - lilysecond).toString();
-
-    const bloodlilys = jobDetail.bloodlilyStacks;
-    for (let i = 0; i < 3; ++i) {
-      if (bloodlilys > i)
-        this.bloodlilyStacks[i]?.classList.add('active');
-      else
-        this.bloodlilyStacks[i]?.classList.remove('active');
-    }
-
-    const l = this.lilysecondBox.parentNode;
-    if ((lily === 2 && 30 - lilysecond <= 5) || lily === 3)
-      l.classList.add('full');
-    else
-      l.classList.remove('full');
+    this.lilysecondBox.innerText = lily === 3 ? '' : (20 - lilysecond).toString();
+    this.lilysecondBox.parentNode.classList.toggle(
+      'full',
+      lily === 2 && 20 - lilysecond <= 5 || lily === 3,
+    );
+    this._addActiveOnStacks(this.lilyStacks, jobDetail.lilyStacks);
+    this._addActiveOnStacks(this.bloodlilyStacks, jobDetail.bloodlilyStacks);
   }
 
   override onUseAbility(id: string): void {
     switch (id) {
       case kAbility.Aero:
       case kAbility.Aero2:
-        this.diaBox.duration = 18 + 1;
-        break;
       case kAbility.Dia:
-        this.diaBox.duration = 30;
+        this.diaBox.duration = 30 + 1;
         break;
       case kAbility.Assize:
-        this.assizeBox.duration = 45;
+        this.assizeBox.duration = 40;
+        break;
+      case kAbility.PresenceOfMind:
+        this.pomBox.duration = 120;
         break;
       case kAbility.LucidDreaming:
         this.lucidBox.duration = 60;
@@ -109,17 +116,16 @@ export class WHMComponent extends BaseComponent {
   }
 
   override onStatChange({ gcdSpell }: { gcdSpell: number }): void {
-    this.diaBox.valuescale = gcdSpell;
     this.diaBox.threshold = gcdSpell + 1;
-    this.assizeBox.valuescale = gcdSpell;
     this.assizeBox.threshold = gcdSpell + 1;
-    this.lucidBox.valuescale = gcdSpell;
+    this.pomBox.threshold = gcdSpell + 1;
     this.lucidBox.threshold = gcdSpell + 1;
   }
 
   override reset(): void {
     this.diaBox.duration = 0;
     this.assizeBox.duration = 0;
+    this.pomBox.duration = 0;
     this.lucidBox.duration = 0;
   }
 }

@@ -1,70 +1,135 @@
 import path from 'path';
 
-import fetch from 'node-fetch';
-
-import { CoinachWriter } from './coinach';
+import { ConsoleLogger, LogLevelKey } from './console_logger';
 import { getCnTable, getKoTable } from './csv_util';
+import { OutputFileAttributes, XivApi } from './xivapi';
 
-const _OUTPUT_FILE = 'pet_names.ts';
-
-const keys = ['Name'];
-const localeKeys = [...keys, 'Name_de', 'Name_fr', 'Name_ja'];
-
-type XivapiResult = {
-  Results: {
-    [key: number]: Record<'Name' | 'Name_de' | 'Name_fr' | 'Name_ja', string>;
-  };
-};
-
-const fetchXivapi = async () => {
-  const url = 'https://xivapi.com/Pet?columns=' + localeKeys.join(',');
-  const response = await fetch(url);
-  const json = (await response.json()) as XivapiResult;
-  return json.Results;
-};
-
-const normalize = (
-  content: XivapiResult['Results'],
-): Record<'en' | 'de' | 'fr' | 'ja', string[]> => {
-  const result: Record<'en' | 'de' | 'fr' | 'ja', string[]> = {
-    en: [],
-    de: [],
-    fr: [],
-    ja: [],
-  };
-  for (const [, data] of Object.entries(content)) {
-    // skip empty names and duplicates
-    if (data.Name === '' || result.en.includes(data.Name))
-      continue;
-
-    result.en.push(data.Name);
-    result.de.push(data.Name_de);
-    result.fr.push(data.Name_fr);
-    result.ja.push(data.Name_ja);
-  }
-  return result;
-};
-
-export default async (): Promise<void> => {
-  const tables = {
-    ...normalize(await fetchXivapi()),
-    cn: Object.keys(await getCnTable('Pet', keys)).filter((k) => k !== ''),
-    ko: Object.keys(await getKoTable('Pet', keys)).filter((k) => k !== ''),
-  };
-
-  const writer = new CoinachWriter(null, true);
-  const header = `import { Lang } from './languages';
+const _PET_NAMES: OutputFileAttributes = {
+  outputFile: 'resources/pet_names.ts',
+  type: 'PetData',
+  header: `import { Lang } from './languages';
 
 type PetData = {
   [name in Lang]: readonly string[];
 };
-`;
-  await writer.writeTypeScript(
-    path.join('resources', _OUTPUT_FILE),
-    'gen_pet_names.ts',
-    header,
-    'PetData',
-    false,
-    tables,
+`,
+  asConst: false,
+};
+
+const _SHEET = 'Pet';
+
+const _FIELDS = [
+  'Name',
+  'Name@de',
+  'Name@fr',
+  'Name@ja',
+];
+
+const _LOCALE_TABLE = 'Pet';
+const _LOCALE_COLUMNS = ['Name'];
+
+type ResultPet = {
+  row_id: number;
+  fields: {
+    Name?: string;
+    'Name@de'?: string;
+    'Name@fr'?: string;
+    'Name@ja'?: string;
+  };
+};
+
+type XivApiPet = ResultPet[];
+
+type OutputPetNames = {
+  cn: string[];
+  de: string[];
+  en: string[];
+  fr: string[];
+  ja: string[];
+  ko: string[];
+};
+
+const _SCRIPT_NAME = path.basename(import.meta.url);
+const log = new ConsoleLogger();
+log.setLogLevel('alert');
+
+const fetchLocaleCsvTables = async () => {
+  log.debug(`Table: ${_LOCALE_TABLE} | Query columns: [${_LOCALE_COLUMNS.toString()}]`);
+  log.debug('Fetching \'cn\' table...');
+  const cnPet = await getCnTable(_LOCALE_TABLE, _LOCALE_COLUMNS);
+  log.debug('Fetching \'ko\' table...');
+  const koPet = await getKoTable(_LOCALE_TABLE, _LOCALE_COLUMNS);
+  return {
+    cn: cnPet,
+    ko: koPet,
+  };
+};
+
+const assembleData = async (apiData: XivApiPet): Promise<OutputPetNames> => {
+  log.debug('Processing & assembling data...');
+  // This isn't really a locale object, and ordering is alpha in the current file, so:
+  // eslint-disable-next-line rulesdir/cactbot-locale-order
+  const formattedData: OutputPetNames = {
+    cn: [],
+    de: [],
+    en: [],
+    fr: [],
+    ja: [],
+    ko: [],
+  };
+
+  for (const pet of apiData) {
+    const nameEn = pet.fields.Name ?? '';
+    const nameDe = pet.fields['Name@de'];
+    const nameFr = pet.fields['Name@fr'];
+    const nameJa = pet.fields['Name@ja'];
+
+    // If no en name (or if duplicate), skip processing
+    if (nameEn === '' || formattedData.en.includes(nameEn))
+      continue;
+    formattedData.en.push(nameEn);
+
+    if (nameDe !== undefined)
+      formattedData.de.push(nameDe);
+    if (nameFr !== undefined)
+      formattedData.fr.push(nameFr);
+    if (nameJa !== undefined)
+      formattedData.ja.push(nameJa);
+    log.debug(`Collected base pet data for ${nameEn} (ID: ${pet.row_id})`);
+  }
+
+  log.info('Fetching locale CSV tables...');
+  const localeCsvTables = await fetchLocaleCsvTables();
+  for (const name of Object.keys(localeCsvTables.cn).filter((k) => k !== '')) {
+    formattedData.cn.push(name);
+    log.debug(`Collected 'cn' pet data for ${name}`);
+  }
+  for (const name of Object.keys(localeCsvTables.ko).filter((k) => k !== '')) {
+    formattedData.ko.push(name);
+    log.debug(`Collected 'ko' pet data for ${name}`);
+  }
+  log.debug('Data assembly/formatting complete.');
+  return formattedData;
+};
+
+export default async (logLevel: LogLevelKey): Promise<void> => {
+  log.setLogLevel(logLevel);
+  log.info(`Starting processing for ${_SCRIPT_NAME}`);
+
+  const api = new XivApi(null, log);
+
+  const apiData = await api.queryApi(
+    _SHEET,
+    _FIELDS,
+  ) as XivApiPet;
+
+  const outputData = await assembleData(apiData);
+
+  await api.writeFile(
+    _SCRIPT_NAME,
+    _PET_NAMES,
+    outputData,
   );
+
+  log.successDone(`Completed processing for ${_SCRIPT_NAME}`);
 };

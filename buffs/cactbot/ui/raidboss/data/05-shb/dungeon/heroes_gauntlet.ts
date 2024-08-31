@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import Outputs from '../../../../../resources/outputs';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
@@ -11,43 +10,34 @@ export interface Data extends RaidbossData {
 }
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'TheHeroesGauntlet',
   zoneId: ZoneId.TheHeroesGauntlet,
   timelineFile: 'heroes_gauntlet.txt',
   triggers: [
     {
       id: 'Heroes Gauntlet Spectral Dream',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '4FCB', source: 'Spectral Thief' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '4FCB', source: 'Phantom-Dieb' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '4FCB', source: 'Voleur Spectral' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '4FCB', source: '幻光のシーフ' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '4FCB', source: '幻光盗贼' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '4FCB', source: '환상빛의 도적' }),
+      netRegex: { id: '4FCB', source: 'Spectral Thief' },
       response: Responses.tankBuster(),
     },
     {
       id: 'Heroes Gauntlet Spectral Gust',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '00A9' }),
+      netRegex: { id: '00A9' },
       condition: Conditions.targetIsYou(),
       response: Responses.spread(),
     },
     {
       id: 'Heroes Gauntlet Spectral Whirlwind',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '4FCC', source: 'Spectral Thief', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '4FCC', source: 'Phantom-Dieb', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '4FCC', source: 'Voleur Spectral', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '4FCC', source: '幻光のシーフ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '4FCC', source: '幻光盗贼', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '4FCC', source: '환상빛의 도적', capture: false }),
+      netRegex: { id: '4FCC', source: 'Spectral Thief', capture: false },
       response: Responses.aoe(),
     },
     {
       // Spectral Thief tethers to the locations where it will attack.
       id: 'Heroes Gauntlet Spectral Tether',
       type: 'Tether',
-      netRegex: NetRegexes.tether({ id: '000C', capture: false }),
+      netRegex: { id: '000C', capture: false },
       suppressSeconds: 5,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -64,76 +54,46 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Heroes Gauntlet Spectral White Mage Absolute Protect',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '524D', source: 'Spectral White Mage' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '524D', source: 'Phantom-Weißmagierin' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '524D', source: 'Mage Blanc Spectral' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '524D', source: '幻光の白魔道士' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '524D', source: '幻光白魔法师' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '524D', source: '환상빛의 백마도사' }),
+      netRegex: { id: '524D', source: 'Spectral White Mage' },
       condition: (data) => data.CanSilence(),
       response: Responses.interrupt(),
     },
     {
       id: 'Heroes Gauntlet Large Zombie Tether',
       type: 'Tether',
-      netRegex: NetRegexes.tether({ id: '004F' }),
+      netRegex: { id: '004F' },
       condition: Conditions.targetIsYou(),
       response: Responses.spread(),
     },
     {
       id: 'Heroes Gauntlet Twisted Touch',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '4F5E', source: 'Spectral Necromancer' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '4F5E', source: 'Phantom-Nekromantin' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '4F5E', source: 'Nécromancienne Spectrale' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '4F5E', source: '幻光のネクロマンサー' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '4F5E', source: '幻光亡灵法师' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '4F5E', source: '환상빛의 강령술사' }),
+      netRegex: { id: '4F5E', source: 'Spectral Necromancer' },
       response: Responses.tankBuster(),
     },
     {
       id: 'Heroes Gauntlet Chaos Storm',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '4F60', source: 'Spectral Necromancer', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '4F60', source: 'Phantom-Nekromantin', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '4F60', source: 'Nécromancienne Spectrale', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '4F60', source: '幻光のネクロマンサー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '4F60', source: '幻光亡灵法师', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '4F60', source: '환상빛의 강령술사', capture: false }),
+      netRegex: { id: '4F60', source: 'Spectral Necromancer', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Heroes Gauntlet Beastly Fury',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '520C', source: 'Spectral Berserker', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '520C', source: 'Phantom-Berserker', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '520C', source: 'Berserker Spectral', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '520C', source: '幻光のバーサーカー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '520C', source: '幻光狂战士', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '520C', source: '환상빛의 광전사', capture: false }),
+      netRegex: { id: '520C', source: 'Spectral Berserker', capture: false },
       response: Responses.aoe(),
     },
     {
       // Both two and three uses of Slice can happen.
       id: 'Heroes Gauntlet Raging Slice',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['520A', '520B'], source: 'Spectral Berserker', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: ['520A', '520B'], source: 'Phantom-Berserker', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: ['520A', '520B'], source: 'Berserker Spectral', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: ['520A', '520B'], source: '幻光のバーサーカー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: ['520A', '520B'], source: '幻光狂战士', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: ['520A', '520B'], source: '환상빛의 광전사', capture: false }),
+      netRegex: { id: ['520A', '520B'], source: 'Spectral Berserker', capture: false },
       response: Responses.awayFromFront(),
     },
     {
       id: 'Heroes Gauntlet Wild Rampage',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5206', source: 'Spectral Berserker', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5206', source: 'Phantom-Berserker', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5206', source: 'Berserker Spectral', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5206', source: '幻光のバーサーカー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5206', source: '幻光狂战士', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5206', source: '환상빛의 광전사', capture: false }),
+      netRegex: { id: '5206', source: 'Spectral Berserker', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -149,12 +109,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Heroes Gauntlet Wild Rage',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['5202', '5203', '5204'], source: 'Spectral Berserker', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: ['5202', '5203', '5204'], source: 'Phantom-Berserker', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: ['5202', '5203', '5204'], source: 'Berserker Spectral', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: ['5202', '5203', '5204'], source: '幻光のバーサーカー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: ['5202', '5203', '5204'], source: '幻光狂战士', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: ['5202', '5203', '5204'], source: '환상빛의 광전사', capture: false }),
+      netRegex: { id: ['5202', '5203', '5204'], source: 'Spectral Berserker', capture: false },
       suppressSeconds: 5,
       response: Responses.knockback(),
     },
@@ -164,7 +119,7 @@ const triggerSet: TriggerSet<Data> = {
       // Otherwise they stack on the rock they drop.
       id: 'Heroes Gauntlet Wild Anguish Collect',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '005D' }),
+      netRegex: { id: '005D' },
       run: (data, matches) => {
         data.anguish ??= [];
         data.anguish.push(matches.target);
@@ -173,7 +128,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Heroes Gauntlet Wild Anguish Resolve',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '005D' }),
+      netRegex: { id: '005D' },
       delaySeconds: 1,
       suppressSeconds: 5,
       alertText: (data, matches, output) => {
@@ -183,7 +138,7 @@ const triggerSet: TriggerSet<Data> = {
         if (matches.target === data.me)
           return output.stackOnYou!();
 
-        return output.stackOn!({ player: data.ShortName(matches.target) });
+        return output.stackOn!({ player: data.party.member(matches.target) });
       },
       run: (data) => delete data.anguish,
       outputStrings: {
@@ -202,7 +157,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Heroes Gauntlet Wild Anguish Spread',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '005E' }),
+      netRegex: { id: '005E' },
       condition: Conditions.targetIsYou(),
       response: Responses.spread(),
     },

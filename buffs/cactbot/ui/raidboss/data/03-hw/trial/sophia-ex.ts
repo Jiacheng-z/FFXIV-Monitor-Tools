@@ -1,5 +1,3 @@
-import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { UnreachableCode } from '../../../../../resources/not_reached';
 import Outputs from '../../../../../resources/outputs';
 import { Responses } from '../../../../../resources/responses';
@@ -11,8 +9,7 @@ export interface Data extends RaidbossData {
   cloneSpots?: { [id: string]: string };
   scaleSophias?: string[];
   quasarTethers?: string[];
-  aeroClones?: string[];
-  thunderClones?: string[];
+  isQuadrantSafe: { [id: string]: boolean };
   seenThunder?: boolean;
   clonesActive?: boolean;
   sadTethers?: boolean; // :C
@@ -84,8 +81,14 @@ const tiltOutputStrings = {
 };
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'ContainmentBayP1T6Extreme',
   zoneId: ZoneId.ContainmentBayP1T6Extreme,
   timelineFile: 'sophia-ex.txt',
+  initData: () => {
+    return {
+      isQuadrantSafe: { NW: true, NE: true, SW: true, SE: true },
+    };
+  },
   timelineTriggers: [
     {
       // Gnosis does in fact have a cast time, but it's only 2.7 seconds.
@@ -106,9 +109,9 @@ const triggerSet: TriggerSet<Data> = {
           en: 'Avoid Dash Attack',
           de: 'Ansturm-Angriff ausweichen',
           fr: 'Évitez l\'attaque Charge',
-          ja: '突進に避け',
+          ja: '突進回避',
           cn: '躲避击飞',
-          ko: '대쉬 공격 피하기',
+          ko: '돌진 공격 피하기',
         },
       },
     },
@@ -155,34 +158,19 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'SophiaEX Tank Buster',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '19C4', source: 'Sophia' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '19C4', source: 'Sophia' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '19C4', source: 'Sophia' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '19C4', source: 'ソフィア' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '19C4', source: '索菲娅' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '19C4', source: '소피아' }),
+      netRegex: { id: '19C4', source: 'Sophia' },
       response: Responses.tankBusterSwap(),
     },
     {
       id: 'SophiaEX Thunder 2',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '19B0', source: 'Sophia', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '19B0', source: 'Sophia', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '19B0', source: 'Sophia', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '19B0', source: 'ソフィア', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '19B0', source: '索菲娅', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '19B0', source: '소피아', capture: false }),
+      netRegex: { id: '19B0', source: 'Sophia', capture: false },
       response: Responses.awayFromFront(),
     },
     {
       id: 'SophiaEX Thunder 3',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '19AC', source: 'Sophia', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '19AC', source: 'Sophia', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '19AC', source: 'Sophia', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '19AC', source: 'ソフィア', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '19AC', source: '索菲娅', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '19AC', source: '소피아', capture: false }),
+      netRegex: { id: '19AC', source: 'Sophia', capture: false },
       response: Responses.getUnder(),
     },
     {
@@ -190,34 +178,19 @@ const triggerSet: TriggerSet<Data> = {
       // to have Thunder 3 with popup text and this one not.
       id: 'SophiaEX Aero 3',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '19AE', source: 'Sophia', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '19AE', source: 'Sophia', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '19AE', source: 'Sophia', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '19AE', source: 'ソフィア', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '19AE', source: '索菲娅', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '19AE', source: '소피아', capture: false }),
+      netRegex: { id: '19AE', source: 'Sophia', capture: false },
       response: Responses.getOut(),
     },
     {
       id: 'SophiaEX Divine Spark',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '19B6', source: 'The Second Demiurge', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '19B6', source: 'Zweit(?:e|er|es|en) Demiurg', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '19B6', source: 'Second Démiurge', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '19B6', source: '二の従者', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '19B6', source: '信徒其二', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '19B6', source: '제2신도', capture: false }),
-      response: Responses.lookAway(),
+      netRegex: { id: '19B6', source: 'The Second Demiurge' },
+      response: Responses.lookAwayFromSource(),
     },
     {
       id: 'SophiaEX Gnostic Rant',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '19B8', source: 'The Third Demiurge', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '19B8', source: 'Dritt(?:e|er|es|en) Demiurg', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '19B8', source: 'Troisième Démiurge', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '19B8', source: '三の従者', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '19B8', source: '信徒其三', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '19B8', source: '제3신도', capture: false }),
+      netRegex: { id: '19B8', source: 'The Third Demiurge', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -233,17 +206,12 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'SophiaEX Infusion',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1988', source: 'The First Demiurge' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1988', source: 'Erst(?:e|er|es|en) Demiurg' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1988', source: 'Premier Démiurge' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1988', source: '一の従者' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1988', source: '信徒其一' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1988', source: '제1신도' }),
+      netRegex: { id: '1988', source: 'The First Demiurge' },
       infoText: (data, matches, output) => {
-        if (Conditions.targetIsYou())
+        if (data.me === matches.target)
           return output.infusionOnYou!();
 
-        return output.infusionOn!({ player: data.ShortName(matches.target) });
+        return output.infusionOn!({ player: data.party.member(matches.target) });
       },
       outputStrings: {
         infusionOnYou: {
@@ -293,12 +261,7 @@ const triggerSet: TriggerSet<Data> = {
       // 9. Clones disappear
       id: 'SophiaEX Clone Collect',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatantFull({ name: 'Aion Teleos' }),
-      netRegexDe: NetRegexes.addedCombatantFull({ name: 'Aion Teleos' }),
-      netRegexFr: NetRegexes.addedCombatantFull({ name: 'Aion Teleos' }),
-      netRegexJa: NetRegexes.addedCombatantFull({ name: 'アイオーン・ソフィア' }),
-      netRegexCn: NetRegexes.addedCombatantFull({ name: '移涌' }),
-      netRegexKo: NetRegexes.addedCombatantFull({ name: '아이온 소피아' }),
+      netRegex: { name: 'Aion Teleos' },
       run: (data, matches) => {
         data.cloneSpots ??= {};
         const x = parseFloat(matches.x);
@@ -320,30 +283,25 @@ const triggerSet: TriggerSet<Data> = {
       // we have to separate out the "seen Thunder" logic.
       id: 'SophiaEX Duplicate Collect',
       type: 'Tether',
-      netRegex: NetRegexes.tether({ id: '002D' }),
+      netRegex: { id: '002D' },
       run: (data, matches) => {
         const spot = data.cloneSpots?.[matches.sourceId];
-        if (!spot)
+        if (spot === undefined)
           throw new UnreachableCode();
+        // Only Thunder 2 is ever used on centerline clones,
+        // so center clones will never affect quadrant safety.
+        if (spot === 'N' || spot === 'S') {
+          return;
+        }
         if (data.seenThunder) {
-          data.aeroClones ??= [];
-          data.aeroClones.push(spot);
-        } else {
-          data.thunderClones ??= [];
-          data.thunderClones.push(spot);
+          data.isQuadrantSafe[spot] = false;
         }
       },
     },
     {
-      // The ability here is Duplicate. The first Duplicate is always used alongside Thunder 2/3.
       id: 'SophiaEX Thunder Seen',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '19AB', source: 'Aion Teleos', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '19AB', source: 'Aion Teleos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '19AB', source: 'Aion Teleos', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '19AB', source: 'アイオーン・ソフィア', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '19AB', source: '移涌', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '19AB', source: '아이온 소피아', capture: false }),
+      netRegex: { id: '19AB', source: 'Aion Teleos', capture: false },
       delaySeconds: 1,
       suppressSeconds: 5,
       run: (data) => data.seenThunder = true,
@@ -355,12 +313,7 @@ const triggerSet: TriggerSet<Data> = {
       // our best way to call the mechanic is to check whether clones are active.
       id: 'SophiaEX Clones Active',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatant({ name: 'Aion Teleos', capture: false }),
-      netRegexDe: NetRegexes.addedCombatant({ name: 'Aion Teleos', capture: false }),
-      netRegexFr: NetRegexes.addedCombatant({ name: 'Aion Teleos', capture: false }),
-      netRegexJa: NetRegexes.addedCombatant({ name: 'アイオーン・ソフィア', capture: false }),
-      netRegexCn: NetRegexes.addedCombatant({ name: '移涌', capture: false }),
-      netRegexKo: NetRegexes.addedCombatant({ name: '아이온 소피아', capture: false }),
+      netRegex: { name: 'Aion Teleos', capture: false },
       run: (data) => data.clonesActive = true,
     },
     {
@@ -370,12 +323,7 @@ const triggerSet: TriggerSet<Data> = {
       // Instead, we warn the user when Barbelo separates from Sophia, which is 1983.
       id: 'SophiaEX Light Dew',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '1983', source: 'Sophia', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: '1983', source: 'Sophia', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: '1983', source: 'Sophia', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: '1983', source: 'ソフィア', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: '1983', source: '索菲娅', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: '1983', source: '소피아', capture: false }),
+      netRegex: { id: '1983', source: 'Sophia', capture: false },
       condition: (data) => data.clonesActive,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -383,7 +331,7 @@ const triggerSet: TriggerSet<Data> = {
           en: 'Avoid head laser',
           de: 'Kopflaser ausweichen',
           fr: 'Évitez le laser de la tête',
-          ja: 'レーザーを避ける',
+          ja: '頭レーザー回避',
           cn: '躲避人头炮',
           ko: '머리 레이저 피하기',
         },
@@ -392,43 +340,33 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'SophiaEX Execute',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '19AA', source: 'Sophia' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '19AA', source: 'Sophia' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '19AA', source: 'Sophia' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '19AA', source: 'ソフィア' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '19AA', source: '索菲娅' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '19AA', source: '소피아' }),
+      netRegex: { id: '19AA', source: 'Sophia' },
       durationSeconds: (_data, matches) => parseFloat(matches.castTime),
       alertText: (data, _matches, output) => {
-        if (!data.thunderClones)
-          return;
         const localeCompass: { [dir: string]: string } = {
-          'N': output.north!(),
-          'S': output.south!(),
           'NW': output.northwest!(),
           'NE': output.northeast!(),
           'SW': output.southwest!(),
           'SE': output.southeast!(),
         };
-        const firstClone = data.thunderClones[0];
-        const secondClone = data.thunderClones[1];
-
-        if (firstClone && secondClone) {
-          return output.multiple!({
-            dir1: localeCompass[firstClone],
-            dir2: localeCompass[secondClone],
-          });
-        } else if (firstClone) {
-          return localeCompass[firstClone];
+        const safeSpots = [];
+        for (const dir of Object.keys(data.isQuadrantSafe)) {
+          if (data.isQuadrantSafe[dir])
+            safeSpots.push(localeCompass[dir]);
         }
+        if (safeSpots.length === 1) {
+          return safeSpots[0];
+        }
+        return output.multiple!({
+          dir1: safeSpots[0],
+          dir2: safeSpots[1],
+        });
       },
       outputStrings: {
-        north: Outputs.dirN,
-        south: Outputs.dirS,
-        northwest: Outputs.dirNW,
-        northeast: Outputs.dirNE,
-        southwest: Outputs.dirSW,
-        southeast: Outputs.dirSE,
+        northwest: Outputs.northwest,
+        northeast: Outputs.northeast,
+        southwest: Outputs.southwest,
+        southeast: Outputs.southeast,
         multiple: {
           en: '${dir1} / ${dir2}',
           de: '${dir1} / ${dir2}',
@@ -442,19 +380,12 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'SophiaEX Clone Cleanup',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '19AA', source: 'Sophia', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: '19AA', source: 'Sophia', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: '19AA', source: 'Sophia', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: '19AA', source: 'ソフィア', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: '19AA', source: '索菲娅', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: '19AA', source: '소피아', capture: false }),
+      netRegex: { id: '19AA', source: 'Sophia', capture: false },
       delaySeconds: 5,
       run: (data) => {
-        delete data.aeroClones;
         delete data.clonesActive;
-        delete data.cloneSpots;
-        delete data.thunderClones;
         delete data.seenThunder;
+        data.isQuadrantSafe = { NW: true, NE: true, SW: true, SE: true };
       },
     },
     {
@@ -474,7 +405,7 @@ const triggerSet: TriggerSet<Data> = {
       // Because of this, we need only see one entity use a 21 log line and we can find the rest.
       id: 'SophiaEX Quasar Setup',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '19A[89]' }),
+      netRegex: { id: ['19A8', '19A9'] },
       condition: (data) => !data.scaleSophias,
       // We *really* shouldn't have to suppress this...
       suppressSeconds: 5,
@@ -518,7 +449,7 @@ const triggerSet: TriggerSet<Data> = {
       // There will always be exactly one blue Quasar, unless the split is 4/2.
       id: 'SophiaEX Quasar Tether Collect',
       type: 'Tether',
-      netRegex: NetRegexes.tether({ id: '0011' }),
+      netRegex: { id: '0011' },
       condition: (data) => {
         // We shouldn't run this while Aion Teleos mechanics are active.
         return !data.clonesActive;
@@ -531,7 +462,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'SophiaEX Tilt Via Tether',
       type: 'Tether',
-      netRegex: NetRegexes.tether({ id: '0011', capture: false }),
+      netRegex: { id: '0011', capture: false },
       condition: (data) => {
         // No platform tilts if clones are up.
         return !data.clonesActive;
@@ -567,12 +498,7 @@ const triggerSet: TriggerSet<Data> = {
       // so anytime one of these entities casts, we know where it is.
       id: 'SophiaEX Tilt Via Cast',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '19A9', source: 'Sophia' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '19A9', source: 'Sophia' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '19A9', source: 'Sophia' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '19A9', source: 'ソフィア' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '19A9', source: '索菲娅' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '19A9', source: '소피아' }),
+      netRegex: { id: '19A9', source: 'Sophia' },
       condition: (data) => data.sadTethers,
       durationSeconds: 10,
       suppressSeconds: 5,
@@ -594,7 +520,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'SophiaEX Quasar Cleanup',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '19A9', capture: false }),
+      netRegex: { id: '19A9', capture: false },
       run: (data) => {
         delete data.quasarTethers;
         delete data.sadTethers;

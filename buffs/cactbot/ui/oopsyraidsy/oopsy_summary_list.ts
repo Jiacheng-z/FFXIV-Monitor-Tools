@@ -1,8 +1,9 @@
+import PartyTracker from '../../resources/party';
 import { OopsyMistake } from '../../types/oopsy';
 
 import { DeathReport } from './death_report';
 import { MistakeObserver, ViewEvent } from './mistake_observer';
-import { GetFormattedTime, ShortNamify, Translate } from './oopsy_common';
+import { GetFormattedTime, Translate } from './oopsy_common';
 import { OopsyOptions } from './oopsy_options';
 
 type TableEntry = {
@@ -26,7 +27,10 @@ export class OopsySummaryTable implements MistakeObserver {
   private sortCol = 'death';
   private sortAsc = false;
 
-  constructor(private options: OopsyOptions, private table: HTMLElement) {
+  constructor(
+    private table: HTMLElement,
+    private partyTracker: PartyTracker,
+  ) {
     // this.table has one column for name, and then one for each of the types.
     document.documentElement.style.setProperty('--table-cols', (this.types.length + 1).toString());
   }
@@ -82,9 +86,9 @@ export class OopsySummaryTable implements MistakeObserver {
 
   OnMistakeObj(m: OopsyMistake): void {
     const longName = m.name ?? m.blame;
-    if (!longName || !m.text)
+    if (longName === undefined)
       return;
-    const name = ShortNamify(longName, this.options.PlayerNicks);
+    const name = this.partyTracker.member(longName).toString();
 
     // Don't create a player row if the summary doesn't care about this type of mistake.
     if (!this.types.includes(m.type))
@@ -153,7 +157,11 @@ export class OopsySummaryList implements MistakeObserver {
   private currentDiv: HTMLElement | null = null;
   private baseTime?: number;
 
-  constructor(private options: OopsyOptions, private container: HTMLElement) {
+  constructor(
+    private options: OopsyOptions,
+    private container: HTMLElement,
+    private partyTracker: PartyTracker,
+  ) {
     this.container.classList.remove('hide');
   }
 
@@ -194,7 +202,7 @@ export class OopsySummaryList implements MistakeObserver {
     pullDiv.innerText = `Pull ${this.pullIdx}`;
     headerDiv.appendChild(pullDiv);
     const zoneDiv = document.createElement('div');
-    if (this.zoneName)
+    if (this.zoneName !== undefined)
       zoneDiv.innerText = `(${this.zoneName})`;
     headerDiv.appendChild(zoneDiv);
     const timeDiv = document.createElement('div');
@@ -216,9 +224,11 @@ export class OopsySummaryList implements MistakeObserver {
   OnMistakeObj(timestamp: number, m: OopsyMistake): void {
     const iconClass = m.type;
     const blame = m.name ?? m.blame;
-    const blameText = blame ? `${ShortNamify(blame, this.options.PlayerNicks)}: ` : '';
+    const blameText = blame !== undefined
+      ? `${this.partyTracker.member(blame).toString()}: `
+      : '';
     const text = Translate(this.options.DisplayLanguage, m.text);
-    if (!text)
+    if (text === undefined)
       return;
     this.AddLine(m, iconClass, `${blameText} ${text}`, GetFormattedTime(this.baseTime, timestamp));
   }
@@ -277,7 +287,7 @@ export class OopsySummaryList implements MistakeObserver {
 
       const damageElem = document.createElement('div');
       damageElem.classList.add('death-row-amount');
-      if (event.amountClass)
+      if (event.amountClass !== undefined)
         damageElem.classList.add(event.amountClass);
       if (event.amountStr !== undefined)
         damageElem.innerText = event.amountStr;

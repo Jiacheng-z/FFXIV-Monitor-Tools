@@ -1,21 +1,27 @@
 // This test loads an individual trigger file and makes validates
 // the format and regex calls made.
 
-// TODO: Remove ` ?` before each hex value once global prefix `^.{14} ` is added.
 // JavaScript doesn't allow for possessive operators in regular expressions.
 
 import fs from 'fs';
 import path from 'path';
 
-import chai from 'chai';
+import { assert } from 'chai';
 
+import NetRegexes, { buildNetRegexForTrigger } from '../../resources/netregexes';
 import { UnreachableCode } from '../../resources/not_reached';
+import PartyTracker from '../../resources/party';
 import Regexes from '../../resources/regexes';
 import {
   builtInResponseStr,
   triggerFunctions,
   triggerTextOutputFunctions,
 } from '../../resources/responses';
+import {
+  AnonNetRegexParams,
+  translateRegexBuildParamAnon,
+  translateWithReplacements,
+} from '../../resources/translations';
 import { RaidbossData } from '../../types/data';
 import { Matches } from '../../types/net_matches';
 import {
@@ -24,139 +30,112 @@ import {
   LooseTriggerSet,
   Output,
   OutputStrings,
+  ResponseFunc,
   TriggerFunc,
 } from '../../types/trigger';
+import raidbossOptions from '../../ui/raidboss/raidboss_options';
 
-const { assert } = chai;
+const emptyPartyTracker = new PartyTracker(raidbossOptions);
 
-const regexLanguages: (keyof LooseTrigger)[] = [
-  'regex',
-  'regexCn',
-  'regexDe',
-  'regexFr',
-  'regexJa',
-  'regexKo',
-];
-
-const netRegexLanguages: (keyof LooseTrigger)[] = [
-  'netRegex',
-  'netRegexCn',
-  'netRegexDe',
-  'netRegexFr',
-  'netRegexJa',
-  'netRegexKo',
-];
-
-const isKeyInTriggerFunctions = (arr: string[], key: string): boolean => arr.includes(key);
-
-const createTriggerRegexString = (str: string): RegExp => {
-  return new RegExp(`(?:regex|triggerRegex)(?:|\\w{2}): \/${str}\/`, 'g');
+const getFakeRaidbossData = (triggerSet?: LooseTriggerSet): RaidbossData => {
+  return {
+    me: '',
+    job: 'NONE',
+    role: 'none',
+    party: emptyPartyTracker,
+    lang: 'en',
+    parserLang: 'en',
+    displayLang: 'en',
+    currentHP: 0,
+    options: raidbossOptions,
+    inCombat: true,
+    triggerSetConfig: {},
+    ShortName: (x: string | undefined) => x ?? '',
+    StopCombat: (): void => {/* noop */},
+    ParseLocaleFloat: () => 0,
+    CanStun: () => false,
+    CanSilence: () => false,
+    CanSleep: () => false,
+    CanCleanse: () => false,
+    CanFeint: () => false,
+    CanAddle: () => false,
+    ...triggerSet?.initData?.() ?? {},
+  };
 };
 
-const testTriggerFile = (file: string) => {
+const isResponseFunc = (func: unknown): func is ResponseFunc<RaidbossData, Matches> => {
+  return typeof func === 'function';
+};
+
+const testTriggerFile = (file: string, info: TriggerSetInfo) => {
   let contents: string;
   let triggerSet: LooseTriggerSet;
 
   before(async () => {
     contents = fs.readFileSync(file).toString();
     // Normalize path
-    const importPath = '../../' + path.relative(process.cwd(), file).replace('.ts', '.js');
+    const importPath = `../../${path.relative(process.cwd(), file).replace('.ts', '.js')}`;
+
+    // Set a global flag to mark regexes for NetRegexes.doesNetRegexNeedTranslation.
+    // See details in that function for more information.
+    NetRegexes.setFlagTranslationsNeeded(true);
 
     // Dynamic imports don't have a type, so add type assertion.
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     triggerSet = (await import(importPath)).default as LooseTriggerSet;
   });
 
+  after(() => {
+    NetRegexes.setFlagTranslationsNeeded(false);
+  });
+
   // Dummy test so that failures in before show up with better text.
   it('should load properly', () => {/* noop */});
 
-  it('has valid trigger regex language', () => {
-    const unsupportedRegexLanguage = /(?:regex|triggerRegex)(?!:|Cn|De|Fr|Ko|Ja)\w*\s*:/g;
-    const results = unsupportedRegexLanguage.exec(contents);
+  it('should have a unique set id', () => {
+    const id = triggerSet.id;
+    if (id === undefined) {
+      assert.fail('has an undefined id somehow');
+      return;
+    }
+    const prevFile = info.triggerSetId[id];
+    if (prevFile === undefined) {
+      info.triggerSetId[id] = file;
+      return;
+    }
+    assert.fail(`triggerset id conflict: ${id} already used by ${prevFile}`);
+  });
+
+  it('should not use Regexes', () => {
+    const regexes = /(?:(?:regex)(?:|Cn|De|Fr|Ko|Ja)\w*\s*:\w*\s*Regexes\.)/g;
+    const results = regexes.exec(contents);
     if (results && results.length > 0) {
       for (const result of results)
-        assert.fail(`invalid regex language '${result}'`);
+        assert.fail(`using Regexes: '${result}'`);
     }
   });
 
-  it('has well-formed new combatant trigger regex', () => {
-    // Escape the escapes so they can escape the escape in the parsed regex.
-    const newCombatantRegex = createTriggerRegexString(
-      '(?! ?03:\\\\y{ObjectId}:)(.*:)?Added new combatant.*',
-    );
-    const results = newCombatantRegex.exec(contents);
-    if (results) {
-      for (const result of results) {
-        assert.fail(
-          `'Added new combatant' regex should begin with '03:\\y{ObjectId}:', found '${result}'`,
-        );
-      }
+  it('should not use non-network triggers', () => {
+    const regexesProps = ['regex', 'regexCn', 'regexDe', 'regexFr', 'regexKo', 'regexJa'];
+    for (const [index, trigger] of triggerSet.triggers?.entries() ?? []) {
+      const id = trigger.id ?? `triggers[${index}]`;
+
+      for (const prop of regexesProps)
+        assert.isFalse(prop in trigger, `trigger ${id} has prop ${prop}`);
     }
   });
 
-  it('has well-formed starts using trigger', () => {
-    const startsUsingRegex = createTriggerRegexString('(?! ?14:)(.* )?starts using.*');
-    const results = startsUsingRegex.exec(contents);
-    if (results) {
+  it('should always use NetRegexes', () => {
+    const regexes = /(?:(?:netRegex)(?:|Cn|De|Fr|Ko|Ja)\w*\s*:\w*\s*\/)[^,]+/g;
+    const results = regexes.exec(contents);
+    if (results && results.length > 0) {
       for (const result of results)
-        assert.fail(`'starts using' regex should begin with '14:', found '${result}'`);
-    }
-  });
-
-  it('has well-formed gains effect trigger', () => {
-    // There are some weird Eureka "gains effect" messages with 00:332e.
-    // But everything else is 1A.
-    const gainsEffectRegex = createTriggerRegexString(
-      '(?! (?:1A:\\\\y{ObjectId}|00:332e):)(.* )?gains the effect of.*',
-    );
-    const results = gainsEffectRegex.exec(contents);
-    if (results) {
-      for (const result of results) {
-        assert.fail(
-          `'gains the effect of' regex should begin with '1A:\\y{ObjectId}:', found '${result}'`,
-        );
-      }
-    }
-  });
-
-  it('has well-formed loses effect trigger', () => {
-    const losesEffectRegex = createTriggerRegexString(
-      '(?! ?1E:\\\\y{ObjectId}:)(.* )?loses the effect of.*',
-    );
-    const results = losesEffectRegex.exec(contents);
-    if (results) {
-      for (const result of results) {
-        assert.fail(
-          `'loses the effect of' regex should begin with '1E:\\y{ObjectId}:', found '${result}'`,
-        );
-      }
-    }
-  });
-
-  it('has no bad catch-all regex', () => {
-    // Matches 3, 5, 6, 7, or 9 (or more) consecutive '.' operators
-    const badCatchAllRegex = createTriggerRegexString('.*:(\\.{3}(\\.{2,4})?|\\.{9,}):.*');
-    const results = badCatchAllRegex.exec(contents);
-    if (results) {
-      for (const result of results)
-        assert.fail(`Invalid number of '.' operators, found '${result}'`);
-    }
-  });
-
-  it('should use ObjectId instead of literal periods', () => {
-    const objectIdRegex = createTriggerRegexString('.*:\\.{8}:.*');
-    const results = objectIdRegex.exec(contents);
-    if (results) {
-      for (const result of results) {
-        assert.fail(
-          `${file}: ObjectId should be used in favor of literal '........', found '${result}'`,
-        );
-      }
+        assert.fail(`using raw regex: '${result}'`);
     }
   });
 
   it('should not use an unnecessary group regex', () => {
-    const unnecessaryGroupRegex = createTriggerRegexString('.*\\(\\?:.\\|.\\).*');
+    const unnecessaryGroupRegex = /\(\?:.(?:\|.)+\)/g;
     const results = unnecessaryGroupRegex.exec(contents);
     if (results) {
       for (const result of results) {
@@ -181,14 +160,16 @@ const testTriggerFile = (file: string) => {
   };
 
   it('has valid matches and output parameters', () => {
-    for (const currentTrigger of triggerSet.triggers ?? []) {
+    for (const [index, currentTrigger] of triggerSet.triggers?.entries() ?? []) {
+      const id = currentTrigger.id ?? `triggers[${index}]`;
+
       let containsMatches = false;
       let containsMatchesParam = false;
 
       const verifyTrigger = (trigger: LooseTrigger) => {
         for (const func of triggerFunctions) {
           const currentTriggerFunction = trigger[func];
-          if (!currentTriggerFunction)
+          if (currentTriggerFunction === undefined)
             continue;
           if (func === 'response' && typeof currentTriggerFunction === 'object') {
             // Hack: treat a literal response object as a trigger.  FIXME.
@@ -200,32 +181,33 @@ const testTriggerFile = (file: string) => {
           const funcStr = currentTriggerFunction.toString();
 
           const containsOutput = /\boutput\.(\w*)\(/.test(funcStr);
-          const containsOutputParam = getParamNames(funcStr).includes('output');
+          const paramNames = getParamNames(funcStr);
+          const containsOutputParam = paramNames.includes('output');
           // TODO: should we error when there is an unused output param? that seems a bit much.
           if (containsOutput && !containsOutputParam)
-            assert.fail(`Missing 'output' param for '${currentTrigger.id}'.`);
+            assert.fail(`Missing 'output' param for '${id}'.`);
 
           containsMatches = containsMatches || /(?<!_)matches/.test(funcStr);
-          for (const paramName of getParamNames(funcStr))
+          for (const paramName of paramNames)
             containsMatchesParam = containsMatchesParam || /(?<!_)matches/.test(paramName);
 
           const builtInResponse = 'cactbot-builtin-response';
           if (funcStr.includes(builtInResponse)) {
             if (typeof currentTriggerFunction !== 'function') {
               assert.fail(
-                `${currentTrigger.id} field '${func}' has ${builtInResponse} but is not a function.`,
+                `${id} field '${func}' has ${builtInResponse} but is not a function.`,
               );
               continue;
             }
             if (func !== 'response') {
               assert.fail(
-                `${currentTrigger.id} field '${func}' has ${builtInResponse} but is not a response.`,
+                `${id} field '${func}' has ${builtInResponse} but is not a response.`,
               );
               continue;
             }
             // Built-in response functions can be safely called once.
             const output = new TestOutputProxy(trigger, {}) as Output;
-            const data = (triggerSet.initData?.() ?? {}) as RaidbossData;
+            const data: RaidbossData = getFakeRaidbossData(triggerSet);
             const triggerFunc: TriggerFunc<RaidbossData, Matches, unknown> = currentTriggerFunction;
 
             const result = triggerFunc(data, {}, output);
@@ -238,74 +220,45 @@ const testTriggerFile = (file: string) => {
       };
       verifyTrigger(currentTrigger);
 
-      let captures = -1;
+      let captures = 0;
+      const currentNetRegex = currentTrigger.netRegex;
 
-      // Check for inconsistencies between languages in regexes.
-      for (const regexLang of regexLanguages) {
-        const currentRegex = currentTrigger[regexLang];
-        if (currentRegex) {
-          const capture = new RegExp(`(?:${currentRegex.toString()})?`).exec('');
-          if (!capture)
-            throw new UnreachableCode();
-          const currentCaptures = capture.length - 1;
-          // Ignore first pass
-          if (captures !== -1 && captures !== currentCaptures) {
-            assert.fail(
-              `Found inconsistent capturing groups between languages for trigger id '${currentTrigger.id}'.`,
-            );
-            break;
-          }
-          captures = Math.max(captures, currentCaptures);
-        }
-      }
+      if (currentNetRegex !== undefined && currentNetRegex !== null) {
+        let netRegexRegex: RegExp;
 
-      // Check for inconsistencies between languages in netRegexes.
-      for (const netRegexLang of netRegexLanguages) {
-        const currentRegex = currentTrigger[netRegexLang];
-        if (currentRegex) {
-          const capture = new RegExp(`(?:${currentRegex.toString()})?`).exec('');
-          if (!capture)
-            throw new UnreachableCode();
-          const currentCaptures = capture.length - 1;
-          // Ignore first pass
-          if (captures !== -1 && captures !== currentCaptures) {
+        if (currentNetRegex instanceof RegExp) {
+          netRegexRegex = currentNetRegex;
+        } else {
+          if (currentTrigger.type === undefined) {
             assert.fail(
-              `Found inconsistent capturing groups between languages for trigger id '${currentTrigger.id}'.`,
+              `netTrigger "${id}" without type and non-regex netRegex property`,
             );
-            break;
+            continue;
           }
-          captures = Math.max(captures, currentCaptures);
+          // TODO: we can check it from keys of `currentNetRegex`.
+          netRegexRegex = buildNetRegexForTrigger(currentTrigger.type, currentNetRegex);
         }
+
+        const capture = new RegExp(`(?:${netRegexRegex.toString()})?`).exec('');
+        if (!capture)
+          throw new UnreachableCode();
+        captures = capture.length - 1;
       }
 
       if (captures > 0) {
         if (!containsMatches) {
           assert.fail(
-            `Found unnecessary regex capturing group for trigger id '${currentTrigger.id}'.`,
+            `Found unnecessary regex capturing group for trigger id '${id}'.`,
           );
         } else if (!containsMatchesParam) {
-          assert.fail(`Missing matches param for '${currentTrigger.id}'.`);
+          assert.fail(`Missing matches param for '${id}'.`);
         }
       } else {
         if (containsMatches) {
           assert.fail(
-            `Found 'matches' as a function parameter without regex capturing group for trigger id '${currentTrigger.id}'.`,
+            `Found 'matches' as a function parameter without regex capturing group for trigger id '${id}'.`,
           );
         }
-      }
-    }
-  });
-
-  it('has valid trigger fields', () => {
-    for (const currentTrigger of triggerSet.triggers ?? []) {
-      for (const key in currentTrigger) {
-        if (isKeyInTriggerFunctions(triggerFunctions, key))
-          continue;
-        if (isKeyInTriggerFunctions(regexLanguages, key))
-          continue;
-        if (isKeyInTriggerFunctions(netRegexLanguages, key))
-          continue;
-        assert.fail(`${file}: Found unknown key '${key}' in trigger id '${currentTrigger.id}'.`);
       }
     }
   });
@@ -320,7 +273,7 @@ const testTriggerFile = (file: string) => {
       if (!set)
         continue;
       for (const trigger of set) {
-        if (!trigger.id) {
+        if (trigger.id === undefined) {
           assert.fail(`Missing id field in trigger ${trigger.regex?.source ?? '???'}`);
           continue;
         }
@@ -352,7 +305,7 @@ const testTriggerFile = (file: string) => {
           brokenPrefixes = true;
           continue;
         }
-        prefix = prefix.substr(0, idx);
+        prefix = prefix.slice(0, idx);
       }
     }
 
@@ -361,12 +314,32 @@ const testTriggerFile = (file: string) => {
     // you cannot have two triggers like "O4N Thing 1" and "O4S Thing 2",
     // as the prefix "O4" is not a full word (and have a space after it,
     // as "Prefix " does.  This is a bit rigid, but prevents many typos.
-    if (ids.size > 1 && !brokenPrefixes && prefix && prefix.length > 0) {
+    if (ids.size > 1 && !brokenPrefixes && prefix !== null && prefix.length > 0) {
       // if prefix includes more than one word, just remove latter letters.
       if (prefix.includes(' '))
-        prefix = prefix.substr(0, prefix.lastIndexOf(' ') + 1);
-      if (prefix[prefix.length - 1] !== ' ')
+        prefix = prefix.slice(0, prefix.lastIndexOf(' ') + 1);
+      if (!prefix.endsWith(' '))
         assert.fail(`id prefix '${prefix}' is not a full word, must end in a space`);
+    }
+  });
+
+  it('has globally unique trigger ids', () => {
+    for (const set of [triggerSet.triggers, triggerSet.timelineTriggers]) {
+      if (!set)
+        continue;
+      for (const trigger of set) {
+        // warned elsewhere
+        const id = trigger.id;
+        if (id === undefined)
+          continue;
+
+        const prevFile = info.triggerId[id];
+        if (prevFile === undefined) {
+          info.triggerId[id] = file;
+          continue;
+        }
+        assert.fail(`trigger id conflict: ${id} already used by ${prevFile}`);
+      }
     }
   });
 
@@ -378,15 +351,21 @@ const testTriggerFile = (file: string) => {
       'tts',
     ];
 
-    for (const set of [triggerSet.triggers, triggerSet.timelineTriggers]) {
+    for (
+      const { name, set } of [
+        { name: 'triggers', set: triggerSet.triggers },
+        { name: 'timelineTriggers', set: triggerSet.timelineTriggers },
+      ]
+    ) {
       if (!set)
         continue;
-      for (const trigger of set) {
+      for (const [index, trigger] of set.entries()) {
+        const id = trigger.id ?? `${name}[${index}]`;
         if (!trigger.response)
           continue;
         for (const item of bannedItems) {
           if (item in trigger)
-            assert.fail(`${trigger.id} cannot have both 'response' and '${item}'`);
+            assert.fail(`${id} cannot have both 'response' and '${item}'`);
         }
       }
     }
@@ -396,6 +375,7 @@ const testTriggerFile = (file: string) => {
     // This is the order in which they are run.
     const triggerOrder: (keyof LooseTrigger | keyof LooseTimelineTrigger)[] = [
       'id',
+      'comment',
       'type',
       'disabled',
       'netRegex',
@@ -422,10 +402,17 @@ const testTriggerFile = (file: string) => {
       'outputStrings',
     ];
 
-    for (const set of [triggerSet.triggers, triggerSet.timelineTriggers]) {
+    for (
+      const { name, set } of [
+        { name: 'triggers', set: triggerSet.triggers },
+        { name: 'timelineTriggers', set: triggerSet.timelineTriggers },
+      ]
+    ) {
       if (!set)
         continue;
-      for (const trigger of set) {
+      for (const [index, trigger] of set.entries()) {
+        const id = trigger.id ?? `${name}[${index}]`;
+
         let lastIdx = -1;
 
         const keys = Object.keys(trigger);
@@ -439,8 +426,9 @@ const testTriggerFile = (file: string) => {
             continue;
           if (thisIdx <= lastIdx) {
             assert.fail(
-              `in ${trigger.id}, field '${keys[lastIdx] ?? '???'}' must precede '${keys[thisIdx] ??
-                '???'}'`,
+              `in ${id}, field '${keys[lastIdx] ?? '???'}' must precede '${
+                keys[thisIdx] ?? '???'
+              }'`,
             );
           }
 
@@ -454,16 +442,14 @@ const testTriggerFile = (file: string) => {
     if (!triggerSet.timelineTriggers)
       return;
 
-    for (const trigger of triggerSet.timelineTriggers) {
+    for (const [index, trigger] of triggerSet.timelineTriggers.entries()) {
+      const id = trigger.id ?? `timelineTriggers[${index}]`;
       for (const key in trigger) {
         // regex is the only valid regular expression field on a timeline trigger.
         if (key === 'regex')
           continue;
-        if (
-          isKeyInTriggerFunctions(regexLanguages, key) ||
-          isKeyInTriggerFunctions(netRegexLanguages, key)
-        )
-          assert.fail(`in ${trigger.id}, invalid field '${key}' in timelineTrigger`);
+        if (key === 'netRegex')
+          assert.fail(`in ${id}, invalid field '${key}' in timelineTrigger`);
       }
     }
   });
@@ -486,7 +472,7 @@ const testTriggerFile = (file: string) => {
           // so always succeed here and we'll validate later.
           return () => '';
         },
-        set(target, property: string, value): boolean {
+        set(_target, property: string, value): boolean {
           if (property === 'responseOutputStrings') {
             // The normal output proxy assigns here, but we want to keep the same
             // object so we can inspect it outside the proxy.
@@ -508,14 +494,16 @@ const testTriggerFile = (file: string) => {
     for (const set of [triggerSet.triggers, triggerSet.timelineTriggers]) {
       if (!set)
         continue;
-      for (const trigger of set) {
+      for (const [index, trigger] of set.entries()) {
+        const id = trigger.id ?? `triggers[${index}]`;
+
         let outputStrings: OutputStrings = {};
         let response = {};
         if (trigger.response) {
           // Triggers using responses should include the outputStrings in the
           // response func itself, via `output.responseOutputStrings = {};`
           if (trigger.outputStrings) {
-            assert.fail(`found both 'response' and 'outputStrings in '${trigger.id}'.`);
+            assert.fail(`found both 'response' and 'outputStrings in '${id}'.`);
             continue;
           }
           if (typeof trigger.response !== 'function')
@@ -523,28 +511,32 @@ const testTriggerFile = (file: string) => {
           const funcStr = trigger.response.toString();
           if (!funcStr.includes(builtInResponseStr)) {
             assert.fail(
-              `'${trigger.id}' built-in response does not include "${builtInResponseStr}".`,
+              `'${id}' built-in response does not include "${builtInResponseStr}".`,
             );
             continue;
           }
-          const output = new TestOutputProxy(trigger, outputStrings) as Output;
-          // Call the function to get the outputStrings.
-          const data = (triggerSet.initData?.() ?? {}) as RaidbossData;
-          response = trigger.response(data, {}, output) ?? {};
 
-          if (typeof outputStrings !== 'object') {
-            assert.fail(`'${trigger.id}' built-in response did not set outputStrings.`);
-            continue;
+          const output = new TestOutputProxy(trigger, outputStrings) as Output;
+          const responseFunc = trigger.response;
+          if (isResponseFunc(responseFunc)) {
+            // Call the function to get the outputStrings.
+            const data = getFakeRaidbossData(triggerSet);
+            response = responseFunc(data, {}, output) ?? {};
+
+            if (typeof outputStrings !== 'object') {
+              assert.fail(`'${id}' built-in response did not set outputStrings.`);
+              continue;
+            }
           }
         } else {
           if (trigger.outputStrings && typeof outputStrings !== 'object') {
-            assert.fail(`'${trigger.id}' outputStrings must be an object.`);
+            assert.fail(`'${id}' outputStrings must be an object.`);
             continue;
           }
           if (typeof trigger.outputStrings !== 'object') {
             for (const func of triggerTextOutputFunctions) {
               if (func in trigger) {
-                assert.fail(`'${trigger.id}' missing field outputStrings.`);
+                assert.fail(`'${id}' missing field outputStrings.`);
                 break;
               }
             }
@@ -573,7 +565,7 @@ const testTriggerFile = (file: string) => {
             templateObj = { en: templateObj };
           }
           if (typeof templateObj !== 'object') {
-            assert.fail(`'${key}' in '${trigger.id}' outputStrings is not a translatable object`);
+            assert.fail(`'${key}' in '${id}' outputStrings is not a translatable object`);
             continue;
           }
 
@@ -581,7 +573,7 @@ const testTriggerFile = (file: string) => {
           for (const [lang, template] of Object.entries(templateObj)) {
             if (typeof template !== 'string') {
               assert.fail(
-                `'${key}' in '${trigger.id}' outputStrings for lang ${lang} is not a string`,
+                `'${key}' in '${id}' outputStrings for lang ${lang} is not a string`,
               );
               continue;
             }
@@ -603,7 +595,7 @@ const testTriggerFile = (file: string) => {
 
               if (!ok) {
                 assert.fail(
-                  `'${key}' in '${trigger.id}' outputStrings has inconsistent params among languages`,
+                  `'${key}' in '${id}' outputStrings has inconsistent params among languages`,
                 );
                 continue;
               }
@@ -613,9 +605,8 @@ const testTriggerFile = (file: string) => {
             // Verify that there's no dangling ${
             if (/\${/.test(template.replace(paramRegex, ''))) {
               assert.fail(
-                `'${key}' in '${trigger.id}' outputStrings has an open \${ without a closing }`,
+                `'${key}' in '${id}' outputStrings has an open \${ without a closing }`,
               );
-              continue;
             }
           }
         }
@@ -636,12 +627,13 @@ const testTriggerFile = (file: string) => {
           const funcStr = func.toString();
           const keys: string[] = [];
 
-          dynamicOutputStringAccess = dynamicOutputStringAccess || /\boutput\[/.test(funcStr);
+          dynamicOutputStringAccess = dynamicOutputStringAccess ||
+            /(?:\boutput\[|\boutput[^.\r\n])/.test(funcStr);
 
           // Validate that any calls to output.word() have a corresponding outputStrings entry.
           funcStr.replace(/\boutput\.(\w*)\(/g, (fullMatch: string, key: string) => {
-            if (!outputStrings[key]) {
-              assert.fail(`missing key '${key}' in '${trigger.id}' outputStrings`);
+            if (outputStrings[key] === undefined) {
+              assert.fail(`missing key '${key}' in '${id}' outputStrings`);
               return fullMatch;
             }
             usedOutputStringEntries.add(key);
@@ -651,9 +643,18 @@ const testTriggerFile = (file: string) => {
 
           for (const key of keys) {
             for (const param of outputStringsParams[key] ?? []) {
-              if (!Regexes.parse(`\\b${param}\\s*:`).exec(funcStr)) {
+              // Only allow one level of prop specification, e.g. `obj.key`
+              // Do not allow `obj.key.subkey`
+              const paramParts = param.split('.');
+              if (paramParts.length > 2) {
                 assert.fail(
-                  `'${trigger.id}' does not define param '${param}' for outputStrings entry '${key}'`,
+                  `'${id}' specifies an object key ('${param}') with too many parts`,
+                );
+              }
+              const trimmedParam = paramParts[0] ?? param;
+              if (!Regexes.parse(`\\b${trimmedParam}\\s*:`).exec(funcStr)) {
+                assert.fail(
+                  `'${id}' does not define param '${param}' for outputStrings entry '${key}'`,
                 );
               }
             }
@@ -662,21 +663,113 @@ const testTriggerFile = (file: string) => {
 
         // Responses can have unused output strings in some cases, such as ones
         // that work with and without matching.
-        if (!response && !dynamicOutputStringAccess) {
+        if (!dynamicOutputStringAccess) {
           for (const key in outputStrings) {
             if (!usedOutputStringEntries.has(key))
-              assert.fail(`'${trigger.id}' has unused outputStrings entry '${key}'`);
+              assert.fail(`'${id}' has unused outputStrings entry '${key}'`);
           }
         }
       }
     }
   });
+
+  it('has valid timeline file', () => {
+    if (triggerSet.timelineFile !== undefined) {
+      const timelineFile = path.join(path.dirname(file), triggerSet.timelineFile);
+      assert.isTrue(fs.existsSync(timelineFile), `${triggerSet.timelineFile} does not exist`);
+    }
+  });
+
+  it('should not have missing regex translations', () => {
+    const translations = triggerSet.timelineReplace;
+    if (!translations)
+      return;
+
+    for (const trans of translations) {
+      const locale = trans.locale;
+      if (!locale)
+        continue;
+      // English cannot be missing translations and is always a "partial" translation.
+      if (locale === 'en')
+        continue;
+
+      if (trans.missingTranslations)
+        continue;
+
+      for (const [index, trigger] of triggerSet.triggers?.entries() ?? []) {
+        const id = trigger.id ?? `triggers[${index}]`;
+
+        if (trigger.netRegex === undefined)
+          continue;
+
+        if (trigger.type === undefined) {
+          if (!(trigger.netRegex instanceof RegExp)) {
+            assert.fail(
+              `${id} doesn't have 'type' property and doesn't have a RegExp netRegex`,
+            );
+          }
+          continue;
+        }
+
+        if (!(trigger.netRegex instanceof RegExp)) {
+          // plain object netRegex
+          if (trigger.disabled)
+            continue;
+
+          const result = translateRegexBuildParamAnon(trigger.netRegex ?? {}, locale, translations);
+          if (result.wasTranslated)
+            continue;
+
+          const anonParams: AnonNetRegexParams = trigger.netRegex;
+          for (const field of result.missingFields ?? []) {
+            const fieldValueStr = JSON.stringify(anonParams[field]);
+            assert.fail(
+              `${id}:locale ${locale}:missing timelineReplace replaceSync for field "${field}" with value ${fieldValueStr}`,
+            );
+          }
+
+          continue;
+        }
+
+        const origRegex = trigger.netRegex?.source?.toLowerCase();
+        if (origRegex === undefined)
+          continue;
+
+        if (!NetRegexes.doesNetRegexNeedTranslation(origRegex))
+          continue;
+
+        const wasTranslated = translateWithReplacements(
+          origRegex,
+          'replaceSync',
+          locale,
+          translations,
+        ).wasTranslated;
+
+        assert.isTrue(
+          wasTranslated,
+          `${id}:locale ${locale}:missing timelineReplace replaceSync for regex '${origRegex}'`,
+        );
+      }
+    }
+  });
+};
+
+type TriggerSetInfo = {
+  // id -> filename map
+  triggerSetId: { [id: string]: string };
+  // id -> filename map
+  triggerId: { [id: string]: string };
 };
 
 const testTriggerFiles = (triggerFiles: string[]): void => {
+  const info: TriggerSetInfo = {
+    triggerSetId: {},
+    triggerId: {},
+  };
   describe('trigger test', () => {
-    for (const file of triggerFiles)
-      describe(`${file}`, () => testTriggerFile(file));
+    for (const file of triggerFiles) {
+      describe(`${file}`, () => testTriggerFile(file, info));
+    }
   });
 };
 

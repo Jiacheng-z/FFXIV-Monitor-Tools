@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -13,18 +12,14 @@ export interface Data extends RaidbossData {
 
 // Shinryu Extreme
 const triggerSet: TriggerSet<Data> = {
+  id: 'TheMinstrelsBalladShinryusDomain',
   zoneId: ZoneId.TheMinstrelsBalladShinryusDomain,
   timelineFile: 'shinryu-ex.txt',
   triggers: [
     {
       id: 'ShinryuEx Heart Cleanup',
       type: 'RemovedCombatant',
-      netRegex: NetRegexes.removingCombatant({ name: 'Shinryu', capture: false }),
-      netRegexDe: NetRegexes.removingCombatant({ name: 'Shinryu', capture: false }),
-      netRegexFr: NetRegexes.removingCombatant({ name: 'Shinryu', capture: false }),
-      netRegexJa: NetRegexes.removingCombatant({ name: '神龍', capture: false }),
-      netRegexCn: NetRegexes.removingCombatant({ name: '神龙', capture: false }),
-      netRegexKo: NetRegexes.removingCombatant({ name: '신룡', capture: false }),
+      netRegex: { name: 'Shinryu', capture: false },
       run: (data) => {
         // Explicitly clear so ugly heart message doesn't appear after wipe.
         delete data.phase;
@@ -33,61 +28,36 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'ShinryuEx Phase 1',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '25DE', source: 'Shinryu', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '25DE', source: 'Shinryu', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '25DE', source: 'Shinryu', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '25DE', source: '神龍', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '25DE', source: '神龙', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '25DE', source: '신룡', capture: false }),
+      netRegex: { id: '25DE', source: 'Shinryu', capture: false },
       run: (data) => data.phase = 1,
     },
     {
       id: 'ShinryuEx Phase 2',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '25E7', source: 'Shinryu', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '25E7', source: 'Shinryu', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '25E7', source: 'Shinryu', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '25E7', source: '神龍', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '25E7', source: '神龙', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '25E7', source: '신룡', capture: false }),
+      netRegex: { id: '25E7', source: 'Shinryu', capture: false },
       run: (data) => data.phase = 2,
     },
     {
       id: 'ShinryuEx Phase 3',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '25E4', source: 'Shinryu', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '25E4', source: 'Shinryu', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '25E4', source: 'Shinryu', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '25E4', source: '神龍', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '25E4', source: '神龙', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '25E4', source: '신룡', capture: false }),
+      netRegex: { id: '25E4', source: 'Shinryu', capture: false },
       run: (data) => data.phase = 3,
     },
     {
       id: 'ShinryuEx Phase 4',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '264E', source: 'Shinryu', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '264E', source: 'Shinryu', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '264E', source: 'Shinryu', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '264E', source: '神龍', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '264E', source: '神龙', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '264E', source: '신룡', capture: false }),
+      netRegex: { id: '264E', source: 'Shinryu', capture: false },
       run: (data) => data.phase = 4,
     },
     {
       id: 'ShinryuEx Akh Morn',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '25F3', source: 'Shinryu' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '25F3', source: 'Shinryu' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '25F3', source: 'Shinryu' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '25F3', source: '神龍' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '25F3', source: '神龙' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '25F3', source: '신룡' }),
+      netRegex: { id: '25F3', source: 'Shinryu' },
       alertText: (data, matches, output) => {
         if (matches.target === data.me)
           return output.akhMornOnYou!();
         else if (data.role === 'tank')
-          return output.akhMornOn!({ player: data.ShortName(matches.target) });
+          return output.akhMornOn!({ player: data.party.member(matches.target) });
       },
       infoText: (data, matches, output) => {
         if (matches.target === data.me || data.role === 'tank')
@@ -125,12 +95,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'ShinryuEx Diamond Dust',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '25DD', source: 'Shinryu', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '25DD', source: 'Shinryu', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '25DD', source: 'Shinryu', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '25DD', source: '神龍', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '25DD', source: '神龙', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '25DD', source: '신룡', capture: false }),
+      netRegex: { id: '25DD', source: 'Shinryu', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -146,12 +111,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'ShinryuEx Dragonfist',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2611', source: 'Shinryu', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2611', source: 'Shinryu', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2611', source: 'Shinryu', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2611', source: '神龍', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2611', source: '神龙', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2611', source: '신룡', capture: false }),
+      netRegex: { id: '2611', source: 'Shinryu', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -167,12 +127,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'ShinryuEx Hellfire',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '25DB', source: 'Shinryu', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '25DB', source: 'Shinryu', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '25DB', source: 'Shinryu', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '25DB', source: '神龍', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '25DB', source: '神龙', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '25DB', source: '신룡', capture: false }),
+      netRegex: { id: '25DB', source: 'Shinryu', capture: false },
       durationSeconds: 7,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -191,12 +146,7 @@ const triggerSet: TriggerSet<Data> = {
       // Probably the phase conditional could get removed if it did.
       id: 'ShinryuEx Hypernova',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['271F', '25E8'], source: 'Right Wing', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: ['271F', '25E8'], source: 'Recht(?:e|er|es|en) Schwinge', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: ['271F', '25E8'], source: 'Aile Droite', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: ['271F', '25E8'], source: 'ライトウィング', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: ['271F', '25E8'], source: '右翼', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: ['271F', '25E8'], source: '오른쪽 날개', capture: false }),
+      netRegex: { id: ['271F', '25E8'], source: 'Right Wing', capture: false },
       durationSeconds: 7,
       alertText: (data, _matches, output) => {
         if (data.phase === 3)
@@ -226,12 +176,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'ShinryuEx Judgement Bolt',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '25DC', source: 'Shinryu', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '25DC', source: 'Shinryu', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '25DC', source: 'Shinryu', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '25DC', source: '神龍', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '25DC', source: '神龙', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '25DC', source: '신룡', capture: false }),
+      netRegex: { id: '25DC', source: 'Shinryu', capture: false },
       durationSeconds: 7,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -248,12 +193,12 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'ShinryuEx Levinbolt',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['25EA', '2720', '2725'], source: 'Right Wing', target: 'Right Wing', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: ['25EA', '2720', '2725'], source: 'Recht(?:e|er|es|en) Schwinge', target: 'Recht(?:e|er|es|en) Schwinge', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: ['25EA', '2720', '2725'], source: 'Aile Droite', target: 'Aile Droite', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: ['25EA', '2720', '2725'], source: 'ライトウィング', target: 'ライトウィング', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: ['25EA', '2720', '2725'], source: '右翼', target: '右翼', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: ['25EA', '2720', '2725'], source: '오른쪽 날개', target: '오른쪽 날개', capture: false }),
+      netRegex: {
+        id: ['25EA', '2720', '2725'],
+        source: 'Right Wing',
+        target: 'Right Wing',
+        capture: false,
+      },
       durationSeconds: 7,
       alertText: (data, _matches, output) => {
         if (data.phase === 3)
@@ -283,12 +228,12 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'ShinryuEx Levinbolt Phase 3',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['25EA', '2720', '2725'], source: 'Right Wing', target: 'Right Wing', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: ['25EA', '2720', '2725'], source: 'Recht(?:e|er|es|en) Schwinge', target: 'Recht(?:e|er|es|en) Schwinge', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: ['25EA', '2720', '2725'], source: 'Aile Droite', target: 'Aile Droite', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: ['25EA', '2720', '2725'], source: 'ライトウィング', target: 'ライトウィング', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: ['25EA', '2720', '2725'], source: '右翼', target: '右翼', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: ['25EA', '2720', '2725'], source: '오른쪽 날개', target: '오른쪽 날개', capture: false }),
+      netRegex: {
+        id: ['25EA', '2720', '2725'],
+        source: 'Right Wing',
+        target: 'Right Wing',
+        capture: false,
+      },
       condition: (data) => data.phase === 3,
       delaySeconds: 9.5,
       alarmText: (_data, _matches, output) => output.text!(),
@@ -306,12 +251,11 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'ShinryuEx Icicle Left',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '25EF', source: 'Icicle', x: '-29\\.99', y: '-15', capture: false }),
-      netRegexDe: NetRegexes.abilityFull({ id: '25EF', source: 'Eiszapfen', x: '-29\\.99', y: '-15', capture: false }),
-      netRegexFr: NetRegexes.abilityFull({ id: '25EF', source: 'Stalactite', x: '-29\\.99', y: '-15', capture: false }),
-      netRegexJa: NetRegexes.abilityFull({ id: '25EF', source: 'アイシクル', x: '-29\\.99', y: '-15', capture: false }),
-      netRegexCn: NetRegexes.abilityFull({ id: '25EF', source: '冰柱', x: '-29\\.99', y: '-15', capture: false }),
-      netRegexKo: NetRegexes.abilityFull({ id: '25EF', source: '고드름', x: '-29\\.99', y: '-15', capture: false }),
+      netRegex: { id: '25EF', source: 'Icicle' },
+      condition: (_data, matches) => {
+        return Math.round(parseFloat(matches.x)) === -30 &&
+          Math.round(parseFloat(matches.y)) === -15;
+      },
       alarmText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -327,12 +271,11 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'ShinryuEx Icicle Right',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '25EF', source: 'Icicle', x: '-29\\.99', y: '-25', capture: false }),
-      netRegexDe: NetRegexes.abilityFull({ id: '25EF', source: 'Eiszapfen', x: '-29\\.99', y: '-25', capture: false }),
-      netRegexFr: NetRegexes.abilityFull({ id: '25EF', source: 'Stalactite', x: '-29\\.99', y: '-25', capture: false }),
-      netRegexJa: NetRegexes.abilityFull({ id: '25EF', source: 'アイシクル', x: '-29\\.99', y: '-25', capture: false }),
-      netRegexCn: NetRegexes.abilityFull({ id: '25EF', source: '冰柱', x: '-29\\.99', y: '-25', capture: false }),
-      netRegexKo: NetRegexes.abilityFull({ id: '25EF', source: '고드름', x: '-29\\.99', y: '-25', capture: false }),
+      netRegex: { id: '25EF', source: 'Icicle' },
+      condition: (_data, matches) => {
+        return Math.round(parseFloat(matches.x)) === -30 &&
+          Math.round(parseFloat(matches.y)) === -25;
+      },
       alarmText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -348,12 +291,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'ShinryuEx Tidal Wave',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '25DA', source: 'Shinryu', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '25DA', source: 'Shinryu', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '25DA', source: 'Shinryu', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '25DA', source: '神龍', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '25DA', source: '神龙', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '25DA', source: '신룡', capture: false }),
+      netRegex: { id: '25DA', source: 'Shinryu', capture: false },
       delaySeconds: 3,
       durationSeconds: 5,
       infoText: (_data, _matches, output) => output.text!(),
@@ -371,12 +309,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'ShinryuEx Final Tidal Wave',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '264E', source: 'Shinryu', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '264E', source: 'Shinryu', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '264E', source: 'Shinryu', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '264E', source: '神龍', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '264E', source: '神龙', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '264E', source: '신룡', capture: false }),
+      netRegex: { id: '264E', source: 'Shinryu', capture: false },
       condition: (data) => data.role === 'healer',
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -393,12 +326,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'ShinryuEx Tail Slap',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '25E2', source: 'Tail', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '25E2', source: 'Schwanz', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '25E2', source: 'Queue', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '25E2', source: '神龍の尾', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '25E2', source: '龙尾', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '25E2', source: '신룡의 꼬리', capture: false }),
+      netRegex: { id: '25E2', source: 'Tail', capture: false },
       delaySeconds: 2,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -415,12 +343,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'ShinryuEx Heart',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatant({ name: 'The Worm\'s Heart', capture: false }),
-      netRegexDe: NetRegexes.addedCombatant({ name: 'Shinryus Herz', capture: false }),
-      netRegexFr: NetRegexes.addedCombatant({ name: 'Cœur Du Dragon', capture: false }),
-      netRegexJa: NetRegexes.addedCombatant({ name: '神龍の心核', capture: false }),
-      netRegexCn: NetRegexes.addedCombatant({ name: '神龙的核心', capture: false }),
-      netRegexKo: NetRegexes.addedCombatant({ name: '신룡의 심핵', capture: false }),
+      netRegex: { name: 'The Worm\'s Heart', capture: false },
       condition: (data) => {
         // Prevent ugly heart message on wipe.
         return data.phase === 1;
@@ -442,12 +365,7 @@ const triggerSet: TriggerSet<Data> = {
       // TODO: can't find the id of this, so using all of them.
       id: 'ShinryuEx Divebomb',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['1FA8', '1FF4', '2603'], source: 'Shinryu', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: ['1FA8', '1FF4', '2603'], source: 'Shinryu', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: ['1FA8', '1FF4', '2603'], source: 'Shinryu', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: ['1FA8', '1FF4', '2603'], source: '神龍', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: ['1FA8', '1FF4', '2603'], source: '神龙', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: ['1FA8', '1FF4', '2603'], source: '신룡', capture: false }),
+      netRegex: { id: ['1FA8', '1FF4', '2603'], source: 'Shinryu', capture: false },
       alarmText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -463,21 +381,16 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'ShinryuEx Death Sentence',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '260A', source: 'Hakkinryu' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '260A', source: 'Hakkinryu' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '260A', source: 'Hakkinryu' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '260A', source: '白金龍' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '260A', source: '白金龙' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '260A', source: '백금룡' }),
+      netRegex: { id: '260A', source: 'Hakkinryu' },
       alertText: (data, matches, output) => {
         if (matches.target === data.me)
           return output.deathSentenceOnYou!();
         else if (data.role === 'healer')
-          return output.deathSentenceOn!({ player: data.ShortName(matches.target) });
+          return output.deathSentenceOn!({ player: data.party.member(matches.target) });
       },
       infoText: (data, matches, output) => {
         if (matches.target !== data.me && data.role !== 'healer')
-          return output.deathSentenceOn!({ player: data.ShortName(matches.target) });
+          return output.deathSentenceOn!({ player: data.party.member(matches.target) });
       },
       outputStrings: {
         deathSentenceOn: {
@@ -501,34 +414,19 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'ShinryuEx Tera Slash',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '264B', source: 'Shinryu' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '264B', source: 'Shinryu' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '264B', source: 'Shinryu' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '264B', source: '神龍' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '264B', source: '神龙' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '264B', source: '신룡' }),
+      netRegex: { id: '264B', source: 'Shinryu' },
       response: Responses.tankBusterSwap(),
     },
     {
       id: 'ShinryuEx Wormwail',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2648', source: 'Shinryu', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2648', source: 'Shinryu', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2648', source: 'Shinryu', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2648', source: '神龍', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2648', source: '神龙', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2648', source: '신룡', capture: false }),
+      netRegex: { id: '2648', source: 'Shinryu', capture: false },
       response: Responses.getUnder(),
     },
     {
       id: 'ShinryuEx Breath',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '264A', source: 'Shinryu', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '264A', source: 'Shinryu', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '264A', source: 'Shinryu', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '264A', source: '神龍', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '264A', source: '神龙', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '264A', source: '신룡', capture: false }),
+      netRegex: { id: '264A', source: 'Shinryu', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -544,12 +442,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'ShinryuEx Final Left Wing',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2718', source: 'Left Wing', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2718', source: 'Link(?:e|er|es|en) Schwinge', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2718', source: 'Aile Gauche', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2718', source: 'レフトウィング', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2718', source: '左翼', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2718', source: '왼쪽 날개', capture: false }),
+      netRegex: { id: '2718', source: 'Left Wing', capture: false },
       condition: (data) => !data.finalWing,
       alertText: (_data, _matches, output) => output.text!(),
       run: (data) => data.finalWing = true,
@@ -567,12 +460,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'ShinryuEx Final Right Wing',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2719', source: 'Right Wing', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2719', source: 'Recht(?:e|er|es|en) Schwinge', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2719', source: 'Aile Droite', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2719', source: 'ライトウィング', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2719', source: '右翼', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2719', source: '오른쪽 날개', capture: false }),
+      netRegex: { id: '2719', source: 'Right Wing', capture: false },
       condition: (data) => !data.finalWing,
       alertText: (_data, _matches, output) => output.text!(),
       run: (data) => data.finalWing = true,
@@ -590,7 +478,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'ShinryuEx Tethers',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0061' }),
+      netRegex: { id: '0061' },
       condition: Conditions.targetIsYou(),
       delaySeconds: 3.8,
       infoText: (data, _matches, output) => {
@@ -605,7 +493,7 @@ const triggerSet: TriggerSet<Data> = {
           de: 'Kette zerreissen, dann stack',
           fr: 'Cassez les liens, puis packez-vous',
           ja: '鎖を引き、集合',
-          cn: '拉断锁链然后攻击',
+          cn: '拉断连线然后分摊',
           ko: '선 끊고 모이기',
         },
         breakTethers: {
@@ -613,7 +501,7 @@ const triggerSet: TriggerSet<Data> = {
           de: 'Ketten zerreissen',
           fr: 'Cassez les liens',
           ja: '鎖',
-          cn: '拉断锁链',
+          cn: '拉断连线',
           ko: '선 끊기',
         },
       },
@@ -621,7 +509,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'ShinryuEx Tail Marker',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '007E' }),
+      netRegex: { id: '007E' },
       condition: Conditions.targetIsYou(),
       alarmText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -638,7 +526,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'ShinryuEx Shakers',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0028' }),
+      netRegex: { id: '0028' },
       condition: (data, matches) => {
         data.shakerTargets ??= [];
         data.shakerTargets.push(matches.target);
@@ -675,7 +563,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'ShinryuEx Cocoon Marker',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0039' }),
+      netRegex: { id: '0039' },
       condition: Conditions.targetIsYou(),
       response: Responses.spread(),
     },
@@ -684,6 +572,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       'locale': 'de',
       'replaceSync': {
+        'Hakkinryu': 'Hakkinryu',
         'Left Wing': 'link(?:e|er|es|en) Schwinge',
         'Right Wing': 'recht(?:e|er|es|en) Schwinge',
         'Shinryu': 'Shinryu',
@@ -735,8 +624,8 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       'locale': 'fr',
-      'missingTranslations': true,
       'replaceSync': {
+        'Hakkinryu': 'Hakkinryu',
         'Icicle': 'stalactite',
         'Left Wing': 'aile gauche',
         'Right Wing': 'aile droite',
@@ -747,6 +636,7 @@ const triggerSet: TriggerSet<Data> = {
       },
       'replaceText': {
         '--Phase': '--Phase',
+        '--Reiryu Adds--': '--Adds Reiryu--',
         'Aerial Blast': 'Rafale aérienne',
         'Atomic Ray': 'Rayon atomique',
         'Cocoon Markers': 'Marqueurs Cocon',
@@ -796,6 +686,7 @@ const triggerSet: TriggerSet<Data> = {
         'The Worm\'s Heart': '神龍の心核',
         'Icicle': 'アイシクル',
         'Cocoon': '光の繭',
+        'Hakkinryu': '白金龍',
       },
       'replaceText': {
         'Aerial Blast': 'エリアルブラスト',
@@ -847,6 +738,7 @@ const triggerSet: TriggerSet<Data> = {
         'Shinryu': '神龙',
         'Tail': '龙尾',
         'The Worm\'s Heart': '神龙的核心',
+        'Hakkinryu': '白金龙',
       },
       'replaceText': {
         'Aerial Blast': '大气爆发',

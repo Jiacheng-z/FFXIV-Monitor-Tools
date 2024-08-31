@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -11,39 +10,30 @@ export type Data = RaidbossData;
 
 // O6N - Sigmascape 2.0 Normal
 const triggerSet: TriggerSet<Data> = {
+  id: 'SigmascapeV20',
   zoneId: ZoneId.SigmascapeV20,
   timelineFile: 'o6n.txt',
   triggers: [
     {
       id: 'O6N Demonic Howl',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '282C', source: 'Demon Chadarnook', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '282C', source: 'Gefallen(?:e|er|es|en) Chadarnook', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '282C', source: 'Démon Chadarnouk', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '282C', source: 'チャダルヌーク・デーモン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '282C', source: '恶魔查达奴克', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '282C', source: '차다르누크 악령', capture: false }),
+      netRegex: { id: '282C', source: 'Demon Chadarnook', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'O6N Demonic Shear',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '282A', source: 'Demon Chadarnook' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '282A', source: 'Gefallen(?:e|er|es|en) Chadarnook' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '282A', source: 'Démon Chadarnouk' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '282A', source: 'チャダルヌーク・デーモン' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '282A', source: '恶魔查达奴克' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '282A', source: '차다르누크 악령' }),
+      netRegex: { id: '282A', source: 'Demon Chadarnook' },
       response: Responses.tankBuster(),
     },
     {
       id: 'O6N Demonic Pain',
       type: 'Tether',
       // 0001 = far enough, 0039 = too close
-      netRegex: NetRegexes.tether({ id: ['0001', '0039'] }),
+      netRegex: { id: ['0001', '0039'] },
       condition: (data, matches) => data.me === matches.target || data.me === matches.source,
       suppressSeconds: 10,
-      alertText: (data, matches, output) => output.text!(),
+      alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'Away From Boss',
@@ -57,14 +47,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O6N Demonic Stone',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0001' }),
+      netRegex: { id: '0001' },
       condition: Conditions.targetIsYou(),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'Drop Chasing AOE Away',
           de: 'AoEs weglocken',
-          fr: 'Posez les AoE au loin',
+          fr: 'Déposez les AoEs au loin',
           ja: '離れてAoEを置く', // FIXME
           cn: '远离放置追踪AOE',
           ko: '연속장판 멀리빼기',
@@ -103,11 +93,11 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       'locale': 'fr',
-      'missingTranslations': true,
       'replaceSync': {
         'Demon Chadarnook': 'démon Chadarnouk',
         'Easterly': 'rafale ultime',
         'Haunt': 'Cauchemar corporel',
+        'I have claimed the girl in the picture!': 'Héhéhé... La fille du tableau m\'appartient.',
         'Portrayal of Earth': 'peinture de la terre',
         'Portrayal of Fire': 'peinture du feu',
         'Portrayal of Water': 'peinture de l\'eau',

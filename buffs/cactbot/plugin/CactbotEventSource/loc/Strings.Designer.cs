@@ -19,7 +19,7 @@ namespace CactbotEventSource.loc {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Strings {
@@ -70,20 +70,32 @@ namespace CactbotEventSource.loc {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Bait signature found {0} matches.
-        /// </summary>
-        internal static string BaitSignatureFoundMultipleMatchesErrorMessage {
-            get {
-                return ResourceManager.GetString("BaitSignatureFoundMultipleMatchesErrorMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to cactbot: {0} {1} (dir: {2}).
         /// </summary>
         internal static string CactbotBaseInfo {
             get {
                 return ResourceManager.GetString("CactbotBaseInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to These overlay(s) appear to be using an out of date cactbot path and likely are no longer receiving updates and working with new content: {0}
+        ///
+        ///
+        ///To fix this, you should remove and then re-add all of your cactbot overlays listed above.  To remove an overlay, go to ACT -&gt;Plugins -&gt; OverlayPlugin.dll -&gt; (overlay name).  Select the overlay, and click the Remove button.  Once removed, click the New button, select cactbot overlay type, and re-add it..
+        /// </summary>
+        internal static string CactbotPathWarning {
+            get {
+                return ResourceManager.GetString("CactbotPathWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Broken Cactbot Overlay Paths.
+        /// </summary>
+        internal static string CactbotPathWarningTitle {
+            get {
+                return ResourceManager.GetString("CactbotPathWarningTitle", resourceCulture);
             }
         }
         
@@ -165,6 +177,24 @@ namespace CactbotEventSource.loc {
         internal static string FoundDX9FFXIVErrorMessage {
             get {
                 return ResourceManager.GetString("FoundDX9FFXIVErrorMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error in GetCurrentProcess: {0}.
+        /// </summary>
+        internal static string GetCurrentProcessErrorMessage {
+            get {
+                return ResourceManager.GetString("GetCurrentProcessErrorMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exception in GetGameRegion: {0}.
+        /// </summary>
+        internal static string GetGameRegionException {
+            get {
+                return ResourceManager.GetString("GetGameRegionException", resourceCulture);
             }
         }
         
@@ -277,15 +307,6 @@ namespace CactbotEventSource.loc {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Fisher.
-        /// </summary>
-        internal static string PresetFisher {
-            get {
-                return ResourceManager.GetString("PresetFisher", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Jobs.
         /// </summary>
         internal static string PresetJobs {
@@ -381,6 +402,15 @@ namespace CactbotEventSource.loc {
         internal static string PresetZeffUI {
             get {
                 return ResourceManager.GetString("PresetZeffUI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error while registering process changed handler: {0}.
+        /// </summary>
+        internal static string RegisteringProcessErrorMessage {
+            get {
+                return ResourceManager.GetString("RegisteringProcessErrorMessage", resourceCulture);
             }
         }
         

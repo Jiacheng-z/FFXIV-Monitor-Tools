@@ -1,0 +1,217 @@
+### P9N: Anabaseios: The Ninth Circle
+#
+# List of all ability IDs seen at the bottom of the file
+#
+# Autos
+# -ii 811C 8115 8127 8140
+# Cast resolutions
+# -ii 8117 8130 8142 813E
+
+hideall "--Reset--"
+hideall "--sync--"
+
+0.0 "--Reset--" ActorControl { command: "4000000F" } window 0,100000 jump 0
+
+0.0 "--sync--" InCombat { inGameCombat: "1" } window 0,1
+7.0 "--sync--" Ability { id: "8115", source: "Kokytos" } window 10,10
+18.2 "Gluttony's Augur" Ability { id: "8116", source: "Kokytos" } window 15,15
+
+
+
+# Mage Phase 1
+26.4 "Ravening (Mage)" Ability { id: "8118", source: "Kokytos" }
+41.7 "--sync--" Ability { id: "8144", source: "Kokytos" }
+48.4 "Fire III (cast)" Ability { id: "814E", source: "Kokytos" }
+51.7 "--sync--" Ability { id: "8122", source: "Kokytos" }
+56.3 "Fire III (resolve)" Ability { id: "8120", source: "Kokytos" }
+68.1 "Blizzard III (cast)" Ability { id: "814F", source: "Kokytos" }
+71.4 "--sync--" Ability { id: "8123", source: "Kokytos" }
+76.0 "Blizzard III (resolve)" Ability { id: "8121", source: "Kokytos" }
+82.6 "Dualspell" Ability { id: "811D", source: "Kokytos" }
+85.9 "--sync--" Ability { id: "812[23]", source: "Kokytos" }
+90.3 "Fire III" Ability { id: ["8120", "811E"], source: "Kokytos" }
+90.3 "Blizzard III" Ability { id: ["811F", "8121"], source: "Kokytos" }
+99.8 "Global Spell" Ability { id: "8141", source: "Kokytos" }
+103.0 "Disgorge" Ability { id: "8124", source: "Kokytos" }
+
+
+
+# Fighter phase 1
+115.2 "Ravening (Fighter)" Ability { id: "8119", source: "Kokytos" }
+136.6 "Archaic Rockbreaker" Ability { id: "8128", source: "Kokytos" }
+138.2 "Shockwave" Ability { id: "8129", source: "Kokytos" }
+145.1 "Archaic Rockbreaker 1" Ability { id: "812A", source: "Kokytos" }
+150.1 "Archaic Rockbreaker 2" Ability { id: "812A", source: "Kokytos" }
+156.7 "Archaic Demolish" Ability { id: "812F", source: "Kokytos" }
+163.8 "Gluttony's Augur" Ability { id: "8116", source: "Kokytos" }
+170.9 "Ascendant Fist" Ability { id: "8131", source: "Kokytos" }
+183.2 "Front Combination/Rear Combination" Ability { id: "814[8A]", source: "Kokytos" }
+183.4 "Outside Roundhouse" Ability { id: "812C", source: "Kokytos" }
+186.4 "Swinging Kick" Ability { id: "812[DE]", source: "Kokytos" }
+190.5 "Disgorge" Ability { id: "8125", source: "Kokytos" }
+198.8 "--sync--" Ability { id: "8144", source: "Kokytos" }
+
+
+
+# Behemoth phase 1
+203.5 "Ravening (Behemoth)" Ability { id: "811A", source: "Kokytos" }
+220.8 "Charybdis" Ability { id: "8132", source: "Kokytos" }
+221.8 "--sync--" Ability { id: "8133", source: "Kokytos" }
+226.9 "Beastly Roar" Ability { id: "8138", source: "Kokytos" }
+229.0 "Beastly Bile" Ability { id: "813D", source: "Kokytos" }
+238.1 "Pulverizing Pounce" Ability { id: "813F", source: "Kokytos" }
+253.4 "Gluttonous Rampage" Ability { id: "8139", source: "Kokytos" }
+253.6 "Ravenous Bite 1" #Ability { id: "813A", source: "Kokytos" }
+255.7 "Ravenous Bite 2" #Ability { id: "813A", source: "Kokytos" }
+257.9 "Touchdown" Ability { id: "8137", source: "Kokytos" }
+258.1 "--sync--" Ability { id: "8146", source: "Kokytos" }
+268.8 "Comet" Ability { id: "8134", source: "Kokytos" }
+269.8 "--sync--" Ability { id: "8135", source: "Comet" }
+277.8 "--sync--" Ability { id: "813B", source: "Kokytos" }
+278.8 "--sync--" Ability { id: "813C", source: "Kokytos" }
+279.8 "Ecliptic Meteor" Ability { id: "8188", source: "Kokytos" }
+279.9 "--sync--" Ability { id: "8143", source: "Comet" }
+285.9 "Burst" Ability { id: "8136", source: "Comet" }
+286.0 "Pulverizing Pounce" Ability { id: "813F", source: "Kokytos" }
+288.8 "Disgorge" Ability { id: "8126", source: "Kokytos" }
+
+
+
+# Mage phase 2
+304.3 "Ravening (Mage)" Ability { id: "8118", source: "Kokytos" }
+318.6 "--sync--" Ability { id: "8144", source: "Kokytos" }
+325.2 "Iceflame Summoning" Ability { id: "86E1", source: "Kokytos" }
+330.1 "--sync--" Ability { id: "812[23]", source: "Kokytos" }
+336.1 "--sync--" Ability { id: "872[9A]", source: "Ice Sphere" }
+336.1 "--sync--" Ability { id: "872[78]", source: "Fire Sphere" }
+336.1 "Sphere Shatter" Ability { id: "86E[45]", source: "Ice Sphere" }
+336.1 "Explosion" Ability { id: "86E[23]", source: "Fire Sphere" }
+340.7 "Iceflame Summoning" Ability { id: "86E1", source: "Kokytos" }
+345.6 "--sync--" Ability { id: "812[23]", source: "Kokytos" }
+351.6 "--sync--" Ability { id: "872[9A]", source: "Ice Sphere" }
+351.6 "--sync--" Ability { id: "872[78]", source: "Fire Sphere" }
+351.6 "Sphere Shatter" Ability { id: "86E[45]", source: "Ice Sphere" }
+351.6 "Explosion" Ability { id: "86E[23]", source: "Fire Sphere" }
+356.0 "Dualspell" Ability { id: "811D", source: "Kokytos" }
+359.3 "--sync--" Ability { id: "812[23]", source: "Kokytos" }
+363.8 "Blizzard III" Ability { id: ["811F", "8121"], source: "Kokytos" }
+363.8 "Fire III" Ability { id: ["811E", "8120"], source: "Kokytos" }
+370.5 "Global Spell" Ability { id: "8141", source: "Kokytos" }
+372.7 "Disgorge" Ability { id: "8124", source: "Kokytos" }
+
+
+
+# Fighter phase 2
+385.0 "Ravening (Fighter)" Ability { id: "8119", source: "Kokytos" }
+403.2 "Archaic Rockbreaker" Ability { id: "8128", source: "Kokytos" }
+404.8 "Shockwave" Ability { id: "8129", source: "Kokytos" }
+411.7 "Archaic Rockbreaker 1" Ability { id: "812A", source: "Kokytos" }
+416.7 "Archaic Rockbreaker 2" Ability { id: "812A", source: "Kokytos" }
+421.8 "Front Combination/Rear Combination" Ability { id: "814[789A]", source: "Kokytos" }
+422.0 "Inside Roundhouse/Outside Roundhouse" Ability { id: "812[BC]", source: "Kokytos" }
+425.0 "Swinging Kick" Ability { id: "812[DE]", source: "Kokytos" }
+433.1 "Gluttony's Augur" Ability { id: "8116", source: "Kokytos" }
+445.4 "Ascendant Fist" Ability { id: "8131", source: "Kokytos" }
+447.5 "Disgorge" Ability { id: "8125", source: "Kokytos" }
+457.9 "--sync--" Ability { id: "8144", source: "Kokytos" }
+
+
+
+# Behemoth phase 2
+462.5 "Ravening (Behemoth)" Ability { id: "811A", source: "Kokytos" }
+486.1 "Comet" Ability { id: "8134", source: "Kokytos" }
+487.1 "--sync--" Ability { id: "8135", source: "Comet" }
+495.1 "--sync--" Ability { id: "813B", source: "Kokytos" }
+496.1 "--sync--" Ability { id: "813C", source: "Kokytos" }
+497.1 "Ecliptic Meteor" Ability { id: "8188", source: "Kokytos" }
+497.2 "--sync--" Ability { id: "8143", source: "Comet" }
+501.2 "Beastly Bile" Ability { id: "813D", source: "Kokytos" }
+503.1 "Burst" Ability { id: "8136", source: "Comet" }
+510.3 "Pulverizing Pounce" Ability { id: "813F", source: "Kokytos" }
+523.7 "Gluttonous Rampage" Ability { id: "8139", source: "Kokytos" }
+523.9 "Ravenous Bite 1" #Ability { id: "813A", source: "Kokytos" }
+526.1 "Ravenous Bite 2" #Ability { id: "813A", source: "Kokytos" }
+528.1 "Touchdown" Ability { id: "8137", source: "Kokytos" }
+528.5 "--sync--" Ability { id: "8146", source: "Kokytos" }
+531.3 "Disgorge" Ability { id: "8126", source: "Kokytos" }
+
+
+
+# Mage phase 3, loops back to mage phase 2
+549.8 "Ravening (Mage)" Ability { id: "8118", source: "Kokytos" } window 50,50 jump 304.3
+570.7 "Iceflame Summoning" #Ability { id: "86E1", source: "Kokytos" }
+581.6 "Sphere Shatter" #Ability { id: "86E[45]", source: "Ice Sphere" }
+581.6 "Explosion" #Ability { id: "86E[23]", source: "Fire Sphere" }
+586.2 "Iceflame Summoning" #Ability { id: "86E1", source: "Kokytos" }
+
+# Ability IDs that appear in this instance:
+# UMFB = Unaspected, Mage, Fighter, Behemoth
+# "Unaspected" being the state the boss is in before the first Ravening, and between Disgorge and Ravening
+#
+# Ability ID   | UMFB | Description
+# Kokytos:8115 | U    | Auto-attack (unaspected)
+# Kokytos:8116 | U F  | Gluttony's Augur - cast bar
+# Kokytos:8117 | U F  | Gluttony's Augur - damage
+# Kokytos:8118 | U  B | Ravening - move to mage phase
+# Kokytos:8119 |  M   | Ravening - move to fighter phase
+# Kokytos:811A |   F  | Ravening - move to Behemoth phase
+# Kokytos:811C |  M   | Auto-attack (magical, mage)
+# Kokytos:811D |  M   | Dualspell
+# Kokytos:811E |  M   | Fire III (small, static)
+# Kokytos:811F |  M   | Blizzard III (large, static)
+# Kokytos:8120 |  M   | Fire III (large, growing)
+# Kokytos:8121 |  M   | Blizzard III (small, shrinking)
+# Kokytos:8122 |  M   | Fire VFX flash
+# Kokytos:8123 |  M   | Ice VFX flash
+# Kokytos:8124 |  M   | Disgorge (end of mage phase)
+# Kokytos:8125 |   F  | Disgorge (end of fighter phase)
+# Kokytos:8126 |    B | Disgorge (end of Behemoth phase)
+# Kokytos:8127 |   F  | Auto-attack (physical, fighter)
+# Kokytos:8128 |   F  | Archaic Rockbreaker (cast)
+# Kokytos:8129 |   F  | Shockwave
+# Kokytos:812A |   F  | Archaic Rockbreaker (AoE explosion)
+# Kokytos:812B |   F  | Inside Roundhouse
+# Kokytos:812C |   F  | Outside Roundhouse
+# Kokytos:812D |   F  | Swinging Kick (Front Combination)
+# Kokytos:812E |   F  | Swinging Kick (Rear Combination)
+# Kokytos:812F |   F  | Archaic Demolish (cast)
+# Kokytos:8130 |   F  | Archaic Demolish (damage)
+# Kokytos:8131 |   F  | Ascendant Fist
+# Kokytos:8132 |    B | Charybdis (cast, self-targeted)
+# Kokytos:8133 |    B | Charybdis (damage, targets 4 players)
+# Kokytos:8134 |    B | Comet
+# Kokytos:8135 |    B | Comet Impact
+#   Comet:8136 |      | Burst
+# Kokytos:8137 |    B | Touchdown
+# Kokytos:8138 |    B | Beastly Roar
+# Kokytos:8139 |    B | Gluttonous Rampage
+# Kokytos:813A |    B | Ravenous Bite (tankbuster)
+# Kokytos:813B |    B | Ecliptic Meteor
+# Kokytos:813C |    B | Ecliptic Meteor
+# Kokytos:813D |    B | Beastly Bile (cast)
+# Kokytos:813E |    B | Beastly Bile (damage)
+# Kokytos:813F |    B | Pulverizing Pounce
+# Kokytos:8140 |    B | Auto-attack (physical, behemoth)
+# Kokytos:8141 |  M   | Global Spell (cast)
+# Kokytos:8142 |  M   | Global Spell (damage)
+#   Comet:8143 |      | Burst
+# Kokytos:8144 | UM   | ???
+# Kokytos:8146 |    B | ???
+# Kokytos:8147 |   F  | Front Combination (second phase)
+# Kokytos:8148 |   F  | Front Combination (first phase)
+# Kokytos:8149 |   F  | Rear Combination (second phase)
+# Kokytos:814A |   F  | Rear Combination (first phase)
+# Kokytos:814E |  M   | Fire III - Cast
+# Kokytos:814F |  M   | Blizzard III - Cast
+# Kokytos:8188 |    B | Ecliptic Meteor
+# Kokytos:86E1 |  M   | Iceflame Summoning
+#
+# Ice Sphere:86E4 | Sphere Shatter (small)
+# Ice Sphere:86E5 | Sphere Shatter (large)
+# Ice Sphere:872A | Large omen
+# Ice Sphere:8729 | Small omen
+#
+# Fire Sphere:86E2 | Explosion (small)
+# Fire Sphere:86E3 | Explosion (large)
+# Fire Sphere:8727 | Small omen
+# Fire Sphere:8728 | Large omen

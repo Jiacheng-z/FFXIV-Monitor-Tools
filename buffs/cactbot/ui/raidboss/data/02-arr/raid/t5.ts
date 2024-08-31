@@ -1,4 +1,3 @@
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import Util from '../../../../../resources/util';
 import ZoneId from '../../../../../resources/zone_id';
@@ -12,6 +11,7 @@ export interface Data extends RaidbossData {
 }
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'TheBindingCoilOfBahamutTurn5',
   zoneId: ZoneId.TheBindingCoilOfBahamutTurn5,
   timelineFile: 't5.txt',
   initData: () => {
@@ -25,12 +25,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'T5 Twintania Phase Change Watcher',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Twintania' }),
-      netRegexDe: NetRegexes.ability({ source: 'Twintania' }),
-      netRegexFr: NetRegexes.ability({ source: 'Gémellia' }),
-      netRegexJa: NetRegexes.ability({ source: 'ツインタニア' }),
-      netRegexCn: NetRegexes.ability({ source: '双塔尼亚' }),
-      netRegexKo: NetRegexes.ability({ source: '트윈타니아' }),
+      netRegex: { source: 'Twintania' },
       condition: (data) => !data.monitoringHP && data.hpThresholds[data.currentPhase] !== undefined,
       preRun: (data) => data.monitoringHP = true,
       promise: (data, matches) =>
@@ -52,23 +47,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'T5 Death Sentence',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Twintania', id: '5B2' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Twintania', id: '5B2' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Gémellia', id: '5B2' }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ツインタニア', id: '5B2' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '双塔尼亚', id: '5B2' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '트윈타니아', id: '5B2' }),
+      netRegex: { source: 'Twintania', id: '5B2' },
       response: Responses.tankBuster(),
     },
     {
       id: 'T5 Death Sentence Warning',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Twintania', id: '5B2', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Twintania', id: '5B2', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Gémellia', id: '5B2', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ツインタニア', id: '5B2', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '双塔尼亚', id: '5B2', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '트윈타니아', id: '5B2', capture: false }),
+      netRegex: { source: 'Twintania', id: '5B2', capture: false },
       delaySeconds: 30,
       suppressSeconds: 5,
       infoText: (_data, _matches, output) => output.text!(),
@@ -86,12 +71,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'T5 Liquid Hell',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'The Scourge Of Meracydia', id: '4DB', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Fackel Von Meracydia', id: '4DB', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Fléau De Méracydia', id: '4DB', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'メラシディアン・ワイバーン', id: '4DB', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '美拉西迪亚祸龙', id: '4DB', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '메라시디아 와이번', id: '4DB', capture: false }),
+      netRegex: { source: 'The Scourge Of Meracydia', id: '4DB', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -107,19 +87,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'T5 Fireball',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Twintania', id: '5AC' }),
-      netRegexDe: NetRegexes.ability({ source: 'Twintania', id: '5AC' }),
-      netRegexFr: NetRegexes.ability({ source: 'Gémellia', id: '5AC' }),
-      netRegexJa: NetRegexes.ability({ source: 'ツインタニア', id: '5AC' }),
-      netRegexCn: NetRegexes.ability({ source: '双塔尼亚', id: '5AC' }),
-      netRegexKo: NetRegexes.ability({ source: '트윈타니아', id: '5AC' }),
+      netRegex: { source: 'Twintania', id: '5AC' },
       alertText: (data, matches, output) => {
         if (data.me === matches.target)
           return output.fireballOnYou!();
       },
       infoText: (data, matches, output) => {
         if (data.me !== matches.target)
-          return output.fireballOn!({ player: data.ShortName(matches.target) });
+          return output.fireballOn!({ player: data.party.member(matches.target) });
       },
       outputStrings: {
         fireballOn: {
@@ -143,19 +118,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'T5 Conflagration',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Twintania', id: '5AB' }),
-      netRegexDe: NetRegexes.ability({ source: 'Twintania', id: '5AB' }),
-      netRegexFr: NetRegexes.ability({ source: 'Gémellia', id: '5AB' }),
-      netRegexJa: NetRegexes.ability({ source: 'ツインタニア', id: '5AB' }),
-      netRegexCn: NetRegexes.ability({ source: '双塔尼亚', id: '5AB' }),
-      netRegexKo: NetRegexes.ability({ source: '트윈타니아', id: '5AB' }),
+      netRegex: { source: 'Twintania', id: '5AB' },
       alarmText: (data, matches, output) => {
         if (data.me === matches.target)
           return output.conflagOnYou!();
       },
       infoText: (data, matches, output) => {
         if (data.me !== matches.target)
-          return output.conflagOn!({ player: data.ShortName(matches.target) });
+          return output.conflagOn!({ player: data.party.member(matches.target) });
       },
       outputStrings: {
         conflagOn: {
@@ -179,12 +149,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'T5 Divebomb',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Twintania', id: '5B0', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Twintania', id: '5B0', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Gémellia', id: '5B0', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: 'ツインタニア', id: '5B0', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '双塔尼亚', id: '5B0', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '트윈타니아', id: '5B0', capture: false }),
+      netRegex: { source: 'Twintania', id: '5B0', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -200,12 +165,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'T5 Divebomb Set Two',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Twintania', id: '5B0', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Twintania', id: '5B0', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Gémellia', id: '5B0', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: 'ツインタニア', id: '5B0', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '双塔尼亚', id: '5B0', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '트윈타니아', id: '5B0', capture: false }),
+      netRegex: { source: 'Twintania', id: '5B0', capture: false },
       delaySeconds: 60,
       suppressSeconds: 5000,
       infoText: (_data, _matches, output) => output.text!(),
@@ -224,17 +184,12 @@ const triggerSet: TriggerSet<Data> = {
       // Unwoven Will
       id: 'T5 Dreadknight',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Twintania', id: '4E3' }),
-      netRegexDe: NetRegexes.ability({ source: 'Twintania', id: '4E3' }),
-      netRegexFr: NetRegexes.ability({ source: 'Gémellia', id: '4E3' }),
-      netRegexJa: NetRegexes.ability({ source: 'ツインタニア', id: '4E3' }),
-      netRegexCn: NetRegexes.ability({ source: '双塔尼亚', id: '4E3' }),
-      netRegexKo: NetRegexes.ability({ source: '트윈타니아', id: '4E3' }),
+      netRegex: { source: 'Twintania', id: '4E3' },
       infoText: (data, matches, output) => {
         if (data.me === matches.target)
           return output.knightOnYou!();
 
-        return output.knightOn!({ player: data.ShortName(matches.target) });
+        return output.knightOn!({ player: data.party.member(matches.target) });
       },
       outputStrings: {
         knightOnYou: {
@@ -258,12 +213,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'T5 Twister',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Twintania', id: '4E1', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Twintania', id: '4E1', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Gémellia', id: '4E1', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ツインタニア', id: '4E1', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '双塔尼亚', id: '4E1', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '트윈타니아', id: '4E1', capture: false }),
+      netRegex: { source: 'Twintania', id: '4E1', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -279,19 +229,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'T5 Hatch',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Twintania', id: '5AD' }),
-      netRegexDe: NetRegexes.ability({ source: 'Twintania', id: '5AD' }),
-      netRegexFr: NetRegexes.ability({ source: 'Gémellia', id: '5AD' }),
-      netRegexJa: NetRegexes.ability({ source: 'ツインタニア', id: '5AD' }),
-      netRegexCn: NetRegexes.ability({ source: '双塔尼亚', id: '5AD' }),
-      netRegexKo: NetRegexes.ability({ source: '트윈타니아', id: '5AD' }),
+      netRegex: { source: 'Twintania', id: '5AD' },
       alertText: (data, matches, output) => {
         if (data.me === matches.target)
           return output.hatchOnYou!();
       },
       infoText: (data, matches, output) => {
         if (data.me !== matches.target)
-          return output.hatchOn!({ player: data.ShortName(matches.target) });
+          return output.hatchOn!({ player: data.party.member(matches.target) });
       },
       outputStrings: {
         hatchOn: {

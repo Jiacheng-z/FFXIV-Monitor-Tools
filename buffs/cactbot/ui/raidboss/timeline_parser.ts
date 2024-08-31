@@ -1,10 +1,102 @@
+import JSON5 from 'json5';
+
 import { Lang } from '../../resources/languages';
+import logDefinitions, { LogDefinitionName } from '../../resources/netlog_defs';
+import { buildNetRegexForTrigger } from '../../resources/netregexes';
 import { UnreachableCode } from '../../resources/not_reached';
 import Regexes from '../../resources/regexes';
+import {
+  translateRegex,
+  translateRegexBuildParamAnon,
+  translateText,
+} from '../../resources/translations';
+import { NetParams } from '../../types/net_props';
 import { LooseTimelineTrigger, TriggerAutoConfig } from '../../types/trigger';
 
-import { commonReplacement } from './common_replacement';
-import defaultOptions, { RaidbossOptions } from './raidboss_options';
+import defaultOptions, { RaidbossOptions, TimelineConfig } from './raidboss_options';
+
+const isLogDefinitionName = (type: string): type is LogDefinitionName => {
+  return type in logDefinitions;
+};
+
+const isStringArray = (value: unknown[]): value is string[] => {
+  return value.find((v) => typeof v !== 'string') === undefined;
+};
+
+const isStringOrStringArray = (value: unknown): value is string | string[] => {
+  if (Array.isArray(value)) {
+    if (isStringArray(value))
+      return true;
+    return false;
+  }
+  return typeof value === 'string';
+};
+
+const isValidNetParams = <T extends LogDefinitionName>(
+  type: T,
+  params: Record<string, unknown>,
+): params is NetParams[T] => {
+  for (const key in params) {
+    // Make sure all keys are present on our definition type
+    if (!(key in logDefinitions[type].fields)) {
+      // If we're dealing with a repeating field, check its values
+      const logDefType = logDefinitions[type];
+      if ('repeatingFields' in logDefType && logDefType.repeatingFields.label === key) {
+        const param = params[key];
+        if (!Array.isArray(param))
+          return false;
+        // Expand the type of `possibleKeys` to `string[]` so that we can check for inclusion
+        const stringKeys = Array.from<string>(logDefType.repeatingFields.possibleKeys);
+        // Expand the type of `names` to `string[]` so that we can check for inclusion
+        const stringNames = Array.from<string>(logDefType.repeatingFields.names);
+        for (const repeatingEntry of param) {
+          // Only objects allowed in the array
+          if (!isObject(repeatingEntry))
+            return false;
+          // Object must specify the primary key
+          if (!(logDefType.repeatingFields.primaryKey in repeatingEntry))
+            return false;
+          // Primary key must have a value that conforms to the possible keys entries
+          // Check that all keys exist and that they're either string or string array
+          const primaryKey = repeatingEntry[logDefType.repeatingFields.primaryKey];
+          if (!isStringOrStringArray(primaryKey))
+            return false;
+          if (typeof primaryKey === 'string') {
+            if (!stringKeys.includes(primaryKey))
+              return false;
+          } else {
+            for (const primaryKeyEntry of primaryKey) {
+              if (!stringKeys.includes(primaryKeyEntry))
+                return false;
+            }
+          }
+          // All other keys must be allowed in `names`
+          for (const repeatingEntryKey in repeatingEntry) {
+            if (!stringNames.includes(repeatingEntryKey))
+              return false;
+          }
+        }
+
+        // Skip the remaining checks for this key, we've validated that it conforms
+        continue;
+      }
+
+      return false;
+    }
+    // Make sure our value is either a string/int or an array of strings/ints
+    if (!isStringOrStringArray(params[key]))
+      return false;
+    // These should never be specified on a timeline net regex.
+    if (key === 'capture' || key === 'timestamp')
+      return false;
+  }
+  return true;
+};
+
+const isObject = (x: unknown): x is { [key: string]: unknown } => {
+  // JavaScript considers [] to be an object, so check for that explicitly.
+  return x instanceof Object && !Array.isArray(x);
+};
 
 export type TimelineReplacement = {
   locale: Lang;
@@ -19,16 +111,17 @@ export type TimelineStyle = {
 };
 
 export type Event = {
-  id: number;
+  id: string;
   time: number;
   name: string;
   text: string;
   activeTime?: number;
   lineNumber?: number;
   duration?: number;
-  sortKey?: number;
+  sortKey: number;
   isDur?: boolean;
   style?: { [key: string]: string };
+  sync?: Sync;
 };
 
 export type Error = {
@@ -39,13 +132,18 @@ export type Error = {
 
 export type Sync = {
   id: number;
-  origRegexStr: string;
+  origInput: string | NetParams[keyof NetParams];
+  regexType: 'parsed' | 'net';
   regex: RegExp;
   start: number;
   end: number;
   time: number;
   lineNumber: number;
+  event: Event;
   jump?: number;
+  // TODO: could consider "maybe" jumps here to say "Ability?".
+  // TODO: also it'd be nice to be able to `forcejump` with out a `sync //`
+  jumpType?: 'force' | 'normal';
 };
 
 type ParsedPopupText = {
@@ -66,19 +164,58 @@ export type ParsedText = ParsedPopupText | ParsedTriggerText;
 
 export type Text = ParsedText & { time: number };
 
+export const regexes = {
+  comment: /^\s*#/,
+  commentLine: /#.*$/,
+  durationCommand: /(?:[^#]*?\s)?(?<text>duration\s+(?<seconds>[0-9]+(?:\.[0-9]+)?))(\s.*)?$/,
+  ignore: /^hideall\s+\"(?<id>[^"]+)\"(?:\s*#.*)?$/,
+  jumpCommand:
+    /(?:[^#]*?\s)?(?<text>(?<command>(?:force|)jump)\s+(?:"(?<label>[^"]*)"|(?<seconds>[0-9]+(?:\.[0-9]+)?)))(?:\s.*)?$/,
+  label: /^(?<time>[0-9]+(?:\.[0-9]+)?)\s+(?<text>label\s+"(?<label>[^"]*)")\s*$/,
+  line: /^(?<text>(?<time>[0-9]+(?:\.[0-9]+)?)\s+"(?<name>.*?)")(\s+(.*))?/,
+  popupText:
+    /^(?<type>info|alert|alarm)text\s+\"(?<id>[^"]+)\"\s+before\s+(?<beforeSeconds>-?[0-9]+(?:\.[0-9]+)?)(?:\s+\"(?<text>[^"]+)\")?$/,
+  soundAlert: /^define\s+soundalert\s+"[^"]*"\s+"[^"]*"$/,
+  speaker:
+    /define speaker "[^"]*"(\s+"[^"]*")?\s+(-?[0-9]+(?:\.[0-9]+)?)\s+(-?[0-9]+(?:\.[0-9]+)?)/,
+  syncRegexCommand: /(?:[^#]*?\s)?(?<text>sync\s*\/(?<regex>.*)\/)(?<args>\s.*)?$/,
+  syncNetRegex: new RegExp(
+    `(?:[^#]*?\\s)?(?<netRegexType>${
+      Object.keys(logDefinitions).join('|')
+    })\\s*(?<netRegex>\\{.*\\})(?<args>\\s.*)?$`,
+  ),
+  tts:
+    /^alertall\s+"(?<id>[^"]*)"\s+before\s+(?<beforeSeconds>-?[0-9]+(?:\.[0-9]+)?)\s+(?<command>sound|speak\s+"[^"]*")\s+"(?<text>[^"]*)"$/,
+  windowCommand:
+    /(?:[^#]*?\s)?(?<text>window\s+(?:(?<start>[0-9]+(?:\.[0-9]+)?),)?(?<end>[0-9]+(?:\.[0-9]+)?))(?:\s.*)?$/,
+};
+
 // This class reads the format of ACT Timeline plugin, described in
 // docs/TimelineGuide.md
 export class TimelineParser {
   protected options: RaidbossOptions;
   protected perTriggerAutoConfig: { [triggerId: string]: TriggerAutoConfig };
   protected replacements: TimelineReplacement[];
+  private timelineConfig: TimelineConfig;
 
-  public ignores: { [ignoreId: string]: boolean };
-  public events: Event[];
-  public texts: Text[];
-  public syncStarts: Sync[];
-  public syncEnds: Sync[];
-  public errors: Error[];
+  // A set of names which will not be notified about.
+  public ignores: { [ignoreId: string]: boolean } = {};
+  // Sorted by event occurrence time.
+  public events: Event[] = [];
+  // Sorted by event occurrence time.
+  public texts: Text[] = [];
+  // Sorted by sync.start time.
+  public syncStarts: Sync[] = [];
+  // Sorted by sync.end time.
+  public syncEnds: Sync[] = [];
+  // Sorted by event occurrence time.
+  public forceJumps: Sync[] = [];
+  // Sorted by line.
+  public errors: Error[] = [];
+  // Map of encountered label names to their time.
+  private labelToTime: { [name: string]: number } = {};
+  // Map of encountered syncs to the label they are jumping to.
+  private labelToSync: { [name: string]: Sync[] } = {};
 
   constructor(
     text: string,
@@ -86,52 +223,46 @@ export class TimelineParser {
     triggers: LooseTimelineTrigger[],
     styles?: TimelineStyle[],
     options?: RaidbossOptions,
+    zoneId?: number,
+    waitForParse?: boolean,
   ) {
     this.options = options ?? defaultOptions;
-    this.perTriggerAutoConfig = this.options['PerTriggerAutoConfig'] || {};
+    this.perTriggerAutoConfig = this.options.PerTriggerAutoConfig;
     this.replacements = replacements;
 
-    // A set of names which will not be notified about.
-    this.ignores = {};
-    // Sorted by event occurrence time.
-    this.events = [];
-    // Sorted by event occurrence time.
-    this.texts = [];
-    // Sorted by sync.start time.
-    this.syncStarts = [];
-    // Sorted by sync.end time.
-    this.syncEnds = [];
-    // Sorted by line.
-    this.errors = [];
+    this.timelineConfig = typeof zoneId === 'number'
+      ? this.options.PerZoneTimelineConfig[zoneId] ?? {}
+      : {};
+    for (const text of this.timelineConfig.Ignore ?? [])
+      this.ignores[text] = true;
 
-    this.parse(text, triggers, styles ?? []);
+    let uniqueId = 0;
+    for (const event of this.timelineConfig.Add ?? []) {
+      this.events.push({
+        id: `${++uniqueId}`,
+        time: event.time,
+        name: event.text,
+        text: event.text,
+        duration: event.duration,
+        activeTime: 0,
+        sortKey: 0,
+      });
+    }
+
+    // TODO: This is a workaround for now, but whenever this class is refactored,
+    // responsibility for callilng parse() should be moved up to the instantiating code.
+    if (!waitForParse)
+      this.parse(text, triggers, styles ?? [], uniqueId);
   }
 
-  private parse(text: string, triggers: LooseTimelineTrigger[], styles: TimelineStyle[]): void {
-    this.events = [];
-    this.syncStarts = [];
-    this.syncEnds = [];
-
-    let uniqueid = 1;
+  protected parse(
+    text: string,
+    triggers: LooseTimelineTrigger[],
+    styles: TimelineStyle[],
+    initialId: number,
+  ): void {
+    let uniqueid = initialId;
     const texts: { [id: string]: ParsedText[] } = {};
-    const regexes = {
-      comment: /^\s*#/,
-      commentLine: /#.*$/,
-      durationCommand: /(?:[^#]*?\s)?(?<text>duration\s+(?<seconds>[0-9]+(?:\.[0-9]+)?))(\s.*)?$/,
-      ignore: /^hideall\s+\"(?<id>[^"]+)\"$/,
-      jumpCommand: /(?:[^#]*?\s)?(?<text>jump\s+(?<seconds>[0-9]+(?:\.[0-9]+)?))(?:\s.*)?$/,
-      line: /^(?<text>(?<time>[0-9]+(?:\.[0-9]+)?)\s+"(?<name>.*?)")(\s+(.*))?/,
-      popupText:
-        /^(?<type>info|alert|alarm)text\s+\"(?<id>[^"]+)\"\s+before\s+(?<beforeSeconds>-?[0-9]+(?:\.[0-9]+)?)(?:\s+\"(?<text>[^"]+)\")?$/,
-      soundAlert: /^define\s+soundalert\s+"[^"]*"\s+"[^"]*"$/,
-      speaker:
-        /define speaker "[^"]*"(\s+"[^"]*")?\s+(-?[0-9]+(?:\.[0-9]+)?)\s+(-?[0-9]+(?:\.[0-9]+)?)/,
-      syncCommand: /(?:[^#]*?\s)?(?<text>sync\s*\/(?<regex>.*)\/)(?<args>\s.*)?$/,
-      tts:
-        /^alertall\s+"(?<id>[^"]*)"\s+before\s+(?<beforeSeconds>-?[0-9]+(?:\.[0-9]+)?)\s+(?<command>sound|speak\s+"[^"]*")\s+"(?<text>[^"]*)"$/,
-      windowCommand:
-        /(?:[^#]*?\s)?(?<text>window\s+(?:(?<start>[0-9]+(?:\.[0-9]+)?),)?(?<end>[0-9]+(?:\.[0-9]+)?))(?:\s.*)?$/,
-    };
 
     // Make all regexes case insensitive, and parse any special \y{} groups.
     for (const trigger of triggers ?? []) {
@@ -144,6 +275,7 @@ export class TimelineParser {
     for (let line of lines) {
       ++lineNumber;
       line = line.trim();
+
       // Drop comments and empty lines.
       if (!line || regexes.comment.test(line))
         continue;
@@ -152,7 +284,7 @@ export class TimelineParser {
       let match = regexes.ignore.exec(line);
       if (match && match['groups']) {
         const ignore = match['groups'];
-        if (ignore.id)
+        if (ignore.id !== undefined)
           this.ignores[ignore.id] = true;
         continue;
       }
@@ -160,7 +292,7 @@ export class TimelineParser {
       match = regexes.tts.exec(line);
       if (match && match['groups']) {
         const tts = match['groups'];
-        if (!tts.id || !tts.beforeSeconds || !tts.command)
+        if (tts.id === undefined || tts.beforeSeconds === undefined || tts.command === undefined)
           throw new UnreachableCode();
         // TODO: Support alert sounds?
         if (tts.command === 'sound')
@@ -170,7 +302,7 @@ export class TimelineParser {
         ttsItems.push({
           type: 'tts',
           secondsBefore: parseFloat(tts.beforeSeconds),
-          text: tts.text ? tts.text : tts.id,
+          text: tts.text ?? tts.id,
         });
         continue;
       }
@@ -184,7 +316,10 @@ export class TimelineParser {
       match = regexes.popupText.exec(line);
       if (match && match['groups']) {
         const popupText = match['groups'];
-        if (!popupText.type || !popupText.id || !popupText.beforeSeconds)
+        if (
+          popupText.type === undefined || popupText.id === undefined ||
+          popupText.beforeSeconds === undefined
+        )
           throw new UnreachableCode();
         const popupTextItems = texts[popupText.id] || [];
         texts[popupText.id] = popupTextItems;
@@ -194,10 +329,31 @@ export class TimelineParser {
         popupTextItems.push({
           type: type,
           secondsBefore: parseFloat(popupText.beforeSeconds),
-          text: popupText.text ? popupText.text : popupText.id,
+          text: popupText.text ?? popupText.id,
         });
         continue;
       }
+
+      match = regexes.label.exec(line);
+      if (match && match['groups']) {
+        const parsedLine = match['groups'];
+        if (parsedLine.time === undefined || parsedLine.label === undefined)
+          throw new UnreachableCode();
+        const seconds = parseFloat(parsedLine.time);
+        const label = parsedLine.label;
+
+        const prevTime = this.labelToTime[label];
+        if (prevTime !== undefined) {
+          const text = `Duplicate ${label} name found for time ${prevTime} and ${seconds}`;
+          this.errors.push({
+            error: text,
+            lineNumber: lineNumber,
+          });
+        }
+        this.labelToTime[label] = seconds;
+        continue;
+      }
+
       match = regexes.line.exec(line);
       if (!(match && match['groups'])) {
         this.errors.push({
@@ -205,12 +361,14 @@ export class TimelineParser {
           line: originalLine,
           error: 'Invalid format',
         });
-        console.log('Unknown timeline: ' + originalLine);
         continue;
       }
       const parsedLine = match['groups'];
       // Technically the name can be empty
-      if (!parsedLine.text || !parsedLine.time || parsedLine.name === undefined)
+      if (
+        parsedLine.text === undefined || parsedLine.time === undefined ||
+        parsedLine.name === undefined
+      )
         throw new UnreachableCode();
       line = line.replace(parsedLine.text, '').trim();
       // There can be # in the ability name, but probably not in the regex.
@@ -218,7 +376,7 @@ export class TimelineParser {
 
       const seconds = parseFloat(parsedLine.time);
       const e: Event = {
-        id: uniqueid++,
+        id: `${++uniqueid}`,
         time: seconds,
         // The original ability name in the timeline.  Used for hideall, infotext, etc.
         name: parsedLine.name,
@@ -226,63 +384,17 @@ export class TimelineParser {
         text: this.GetReplacedText(parsedLine.name),
         activeTime: 0,
         lineNumber: lineNumber,
+        sortKey: 0,
       };
       if (line) {
-        let commandMatch = regexes.durationCommand.exec(line);
-        if (commandMatch && commandMatch['groups']) {
-          const durationCommand = commandMatch['groups'];
-          if (!durationCommand.text || !durationCommand.seconds)
-            throw new UnreachableCode();
-          line = line.replace(durationCommand.text, '').trim();
-          e.duration = parseFloat(durationCommand.seconds);
-        }
+        line = this.matchDurationCommand(line, e);
 
-        commandMatch = regexes.syncCommand.exec(line);
-        if (commandMatch && commandMatch['groups']) {
-          const syncCommand = commandMatch['groups'];
-          if (!syncCommand.text || !syncCommand.regex)
-            throw new UnreachableCode();
-          line = line.replace(syncCommand.text, '').trim();
-          const sync: Sync = {
-            id: uniqueid,
-            origRegexStr: syncCommand.regex,
-            regex: Regexes.parse(this.GetReplacedSync(syncCommand.regex)),
-            start: seconds - 2.5,
-            end: seconds + 2.5,
-            time: seconds,
-            lineNumber: lineNumber,
-          };
-          if (syncCommand.args) {
-            let argMatch = regexes.windowCommand.exec(syncCommand.args);
-            if (argMatch && argMatch['groups']) {
-              const windowCommand = argMatch['groups'];
-              if (!windowCommand.text || !windowCommand.end)
-                throw new UnreachableCode();
-              line = line.replace(windowCommand.text, '').trim();
-              if (windowCommand.start) {
-                sync.start = seconds - parseFloat(windowCommand.start);
-                sync.end = seconds + parseFloat(windowCommand.end);
-              } else {
-                sync.start = seconds - (parseFloat(windowCommand.end) / 2);
-                sync.end = seconds + (parseFloat(windowCommand.end) / 2);
-              }
-            }
-            argMatch = regexes.jumpCommand.exec(syncCommand.args);
-            if (argMatch && argMatch['groups']) {
-              const jumpCommand = argMatch['groups'];
-              if (!jumpCommand.text || !jumpCommand.seconds)
-                throw new UnreachableCode();
-              line = line.replace(jumpCommand.text, '').trim();
-              sync.jump = parseFloat(jumpCommand.seconds);
-            }
-          }
-          this.syncStarts.push(sync);
-          this.syncEnds.push(sync);
-        }
+        line = this.matchSyncRegexCommand(line, uniqueid, seconds, lineNumber, e);
+
+        line = this.matchSyncNetRegex(line, lineNumber, originalLine, uniqueid, seconds, e);
       }
       // If there's text left that isn't a comment then we didn't parse that text so report it.
       if (line && !regexes.comment.exec(line)) {
-        console.log(`Unknown content '${line}' in timeline: ${originalLine}`);
         this.errors.push({
           lineNumber: lineNumber,
           line: originalLine,
@@ -303,11 +415,30 @@ export class TimelineParser {
         }
       }
       if (!found) {
-        const text = `No match for timeline trigger ${trigger.regex?.source ??
-          ''} in ${trigger.id ?? ''}`;
+        const text = `No match for timeline trigger ${
+          trigger.regex?.source ??
+            ''
+        } in ${trigger.id ?? ''}`;
         this.errors.push({ error: text });
         console.error(`*** ERROR: ${text}`);
       }
+    }
+
+    // Validate that all the jumps go to labels that exist.
+    for (const [label, syncs] of Object.entries(this.labelToSync)) {
+      const destination = this.labelToTime[label];
+      if (destination === undefined) {
+        const text = `No label named ${label} found to jump to`;
+        for (const sync of syncs) {
+          this.errors.push({
+            error: text,
+            lineNumber: sync.lineNumber,
+          });
+        }
+        continue;
+      }
+      for (const sync of syncs)
+        sync.jump = destination;
     }
 
     for (const e of this.events) {
@@ -330,9 +461,12 @@ export class TimelineParser {
           continue;
 
         // TODO: beforeSeconds should support being a function.
-        const autoConfig = trigger.id && this.perTriggerAutoConfig[trigger.id] || {};
+        const autoConfig = trigger.id !== undefined && this.perTriggerAutoConfig[trigger.id] || {};
         const beforeSeconds = autoConfig['BeforeSeconds'] ?? trigger.beforeSeconds;
 
+        // TODO: also put these before any forcejump as well; this will solve
+        // having to care about this at runtime.
+        // e.g. if the beforeSeconds would put the text prior to the jump destination
         this.texts.push({
           type: 'trigger',
           time: e.time - (beforeSeconds || 0),
@@ -352,7 +486,7 @@ export class TimelineParser {
     // Then assign a sortKey to each event so that we can maintain that order.
     this.events.sort((a, b) => {
       if (a.time === b.time)
-        return a.id - b.id;
+        return parseInt(a.id) - parseInt(b.id);
       return a.time - b.time;
     });
     this.events.forEach((event, idx) => event.sortKey = idx);
@@ -366,56 +500,216 @@ export class TimelineParser {
     this.syncEnds.sort((a, b) => {
       return a.end - b.end;
     });
+    this.forceJumps.sort((a, b) => {
+      return a.time - b.time;
+    });
   }
 
-  private GetReplacedHelper(
-    text: string,
-    replaceKey: 'replaceSync' | 'replaceText',
-    replaceLang: Lang,
-    isGlobal: boolean,
-  ): string {
-    if (!this.replacements)
-      return text;
+  private matchSyncNetRegex(
+    line: string,
+    lineNumber: number,
+    originalLine: string,
+    uniqueid: number,
+    seconds: number,
+    e: Event,
+  ) {
+    const commandMatch = regexes.syncNetRegex.exec(line);
+    if (!commandMatch || !commandMatch['groups'])
+      return line;
 
-    for (const r of this.replacements) {
-      if (r.locale && r.locale !== replaceLang)
-        continue;
-      const reps = r[replaceKey];
-      if (!reps)
-        continue;
-      for (const [key, value] of Object.entries(reps))
-        text = text.replace(Regexes.parse(key), value);
+    const syncCommand = commandMatch['groups'];
+    if (syncCommand.netRegexType === undefined || syncCommand.netRegex === undefined)
+      throw new UnreachableCode();
+
+    line = line.replace(syncCommand.netRegexType, '').trim();
+
+    const netRegexType = syncCommand.netRegexType;
+    if (!isLogDefinitionName(netRegexType)) {
+      this.errors.push({
+        lineNumber: lineNumber,
+        line: originalLine,
+        error: 'Invalid NetRegex type',
+      });
+      return line;
     }
-    // Common Replacements
-    const replacement = commonReplacement[replaceKey];
-    if (!replacement)
-      return text;
-    for (const [key, value] of Object.entries(replacement)) {
-      const repl = value[replaceLang];
-      if (!repl)
-        continue;
-      const regex = isGlobal ? Regexes.parseGlobal(key) : Regexes.parse(key);
-      text = text.replace(regex, repl);
+
+    this.parseType(netRegexType, lineNumber);
+
+    line = line.replace(syncCommand.netRegex, '').trim();
+
+    let params: unknown;
+    try {
+      // Use json5 here to support bareword keys and different quoting styles.
+      params = JSON5.parse(syncCommand.netRegex);
+    } catch (e) {
+      this.errors.push({
+        lineNumber: lineNumber,
+        line: originalLine,
+        error: 'Invalid NetRegex JSON',
+      });
+      return line;
     }
-    return text;
+
+    if (!isObject(params) || !isValidNetParams(netRegexType, params)) {
+      this.errors.push({
+        lineNumber: lineNumber,
+        line: originalLine,
+        error: 'Invalid NetRegex arguments',
+      });
+      return line;
+    }
+
+    const translatedParams = translateRegexBuildParamAnon(
+      params,
+      this.options.ParserLanguage,
+      this.replacements,
+    ).params;
+
+    const regex = buildNetRegexForTrigger(netRegexType, {
+      ...translatedParams,
+      capture: false,
+    });
+
+    // The original params should be TimelineNetParams, thus so should the output.
+    if (!isValidNetParams(netRegexType, translatedParams))
+      throw new UnreachableCode();
+
+    return this.buildRegexSync(
+      uniqueid,
+      'net',
+      translatedParams,
+      Regexes.parse(regex),
+      syncCommand.args,
+      seconds,
+      lineNumber,
+      e,
+      line,
+    );
+  }
+
+  private matchSyncRegexCommand(
+    line: string,
+    uniqueid: number,
+    seconds: number,
+    lineNumber: number,
+    e: Event,
+  ) {
+    const commandMatch = regexes.syncRegexCommand.exec(line);
+    if (!commandMatch || !commandMatch['groups'])
+      return line;
+    const syncCommand = commandMatch['groups'];
+    if (syncCommand.text === undefined || syncCommand.regex === undefined)
+      throw new UnreachableCode();
+    line = line.replace(syncCommand.text, '').trim();
+    return this.buildRegexSync(
+      uniqueid,
+      'parsed',
+      syncCommand.regex,
+      Regexes.parse(this.GetReplacedSync(syncCommand.regex)),
+      syncCommand.args,
+      seconds,
+      lineNumber,
+      e,
+      line,
+    );
+  }
+
+  private buildRegexSync(
+    uniqueid: number,
+    regexType: 'parsed' | 'net',
+    origInput: string | NetParams[keyof NetParams],
+    parsedRegex: RegExp,
+    args: string | undefined,
+    seconds: number,
+    lineNumber: number,
+    e: Event,
+    line: string,
+  ) {
+    const sync: Sync = {
+      id: uniqueid,
+      origInput: origInput,
+      regexType: regexType,
+      regex: parsedRegex,
+      start: seconds - 2.5,
+      end: seconds + 2.5,
+      time: seconds,
+      lineNumber: lineNumber,
+      event: e,
+    };
+    e.sync = sync;
+    if (args !== undefined) {
+      let argMatch = regexes.windowCommand.exec(args);
+      if (argMatch && argMatch['groups']) {
+        const windowCommand = argMatch['groups'];
+        if (windowCommand.text === undefined || windowCommand.end === undefined)
+          throw new UnreachableCode();
+        line = line.replace(windowCommand.text, '').trim();
+        if (windowCommand.start !== undefined) {
+          sync.start = seconds - parseFloat(windowCommand.start);
+          sync.end = seconds + parseFloat(windowCommand.end);
+        } else {
+          sync.start = seconds - parseFloat(windowCommand.end) / 2;
+          sync.end = seconds + parseFloat(windowCommand.end) / 2;
+        }
+      }
+      argMatch = regexes.jumpCommand.exec(args);
+      if (argMatch && argMatch['groups']) {
+        const jumpCommand = argMatch['groups'];
+        if (jumpCommand.text === undefined)
+          throw new UnreachableCode();
+        line = line.replace(jumpCommand.text, '').trim();
+
+        if (jumpCommand.seconds !== undefined)
+          sync.jump = parseFloat(jumpCommand.seconds);
+        else if (jumpCommand.label !== undefined)
+          (this.labelToSync[jumpCommand.label] ??= []).push(sync);
+        else
+          throw new UnreachableCode();
+        if (jumpCommand.command === 'forcejump')
+          sync.jumpType = 'force';
+        else
+          sync.jumpType = 'normal';
+      }
+    }
+    this.syncStarts.push(sync);
+    this.syncEnds.push(sync);
+    if (sync.jumpType === 'force')
+      this.forceJumps.push(sync);
+    return line;
+  }
+
+  private matchDurationCommand(line: string, e: Event) {
+    const commandMatch = regexes.durationCommand.exec(line);
+    if (commandMatch && commandMatch['groups']) {
+      const durationCommand = commandMatch['groups'];
+      if (durationCommand.text === undefined || durationCommand.seconds === undefined)
+        throw new UnreachableCode();
+      line = line.replace(durationCommand.text, '').trim();
+      e.duration = parseFloat(durationCommand.seconds);
+    }
+    return line;
+  }
+
+  // This no-op is intended to be overridden by subclasses, like the one in update_logdefs.ts.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public parseType(type: LogDefinitionName, lineNumber: number): void {
+    /* no-op */
   }
 
   private GetReplacedText(text: string): string {
-    if (!this.replacements)
-      return text;
+    // Anything in the timeline config takes precedence over timelineReplace sections in
+    // the trigger file.  It is also a full replacement, vs the regex-style GetReplacedHelper.
+    const rename = this.timelineConfig?.Rename?.[text];
+    if (rename !== undefined)
+      return rename;
 
-    const replaceLang = this.options.TimelineLanguage || this.options.ParserLanguage || 'en';
-    const isGlobal = false;
-    return this.GetReplacedHelper(text, 'replaceText', replaceLang, isGlobal);
+    const replaceLang = this.options.TimelineLanguage ?? this.options.ParserLanguage ?? 'en';
+    return translateText(text, replaceLang, this.replacements);
   }
 
-  private GetReplacedSync(sync: string): string {
-    if (!this.replacements)
-      return sync;
-
-    const replaceLang = this.options.ParserLanguage || 'en';
-    const isGlobal = true;
-    return this.GetReplacedHelper(sync, 'replaceSync', replaceLang, isGlobal);
+  private GetReplacedSync(sync: string | RegExp): string {
+    const replaceLang = this.options.ParserLanguage ?? 'en';
+    return translateRegex(sync, replaceLang, this.replacements);
   }
 
   public GetMissingTranslationsToIgnore(): RegExp[] {
@@ -424,10 +718,66 @@ export class TimelineParser {
       '--sync--',
       'Start',
       '^ ?21:',
+      '^( ?257)? 101:',
       '^(\\(\\?\\<timestamp\\>\\^\\.\\{14\\}\\)) (1B|21|23):',
       '^(\\^\\.\\{14\\})? ?(1B|21|23):',
       '^::\\y{AbilityCode}:$',
       '^\\.\\*$',
+      '^ 1\\[56\\]:\\[\\^:\\]\\*:\\[\\^:\\]\\*:',
+      '^( ?260)? 104:',
+      '^ ?29:',
     ].map((x) => Regexes.parse(x));
+  }
+
+  // Utility function.  This could be a function on TimelineParser, but it seems weird to
+  // store all of the original timeline texts unnecessarily when only config/utilities need it.
+  public static Translate(
+    timeline: TimelineParser,
+    timelineText: string,
+    syncErrors?: { [lineNumber: number]: boolean },
+    textErrors?: { [lineNumber: number]: boolean },
+  ): string[] {
+    const lineToText: { [lineNumber: number]: Event } = {};
+    const lineToSync: { [lineNumber: number]: Sync } = {};
+    for (const event of timeline.events) {
+      if (!event.lineNumber)
+        continue;
+      lineToText[event.lineNumber] = event;
+    }
+    for (const event of timeline.syncStarts)
+      lineToSync[event.lineNumber] = event;
+
+    // Combine replaced lines with errors.
+    const timelineLines = timelineText.split(/\n/);
+    const translatedLines: string[] = [];
+    timelineLines.forEach((timelineLine, idx) => {
+      const lineNumber = idx + 1;
+      let line = timelineLine.trim();
+
+      const lineText = lineToText[lineNumber];
+      if (lineText)
+        line = line.replace(` "${lineText.name}"`, ` "${lineText.text}"`);
+      const lineSync = lineToSync[lineNumber];
+      if (lineSync) {
+        if (typeof lineSync.origInput === 'string') {
+          line = line.replace(`sync /${lineSync.origInput}/`, `sync /${lineSync.regex.source}/`);
+        } else {
+          const translatedParams = translateRegexBuildParamAnon(
+            lineSync.origInput,
+            timeline.options.ParserLanguage,
+            timeline.replacements,
+          ).params;
+          line = line.replace(/{[^}]*}/, `{ ${JSON.stringify(translatedParams)} }`);
+        }
+      }
+
+      if (syncErrors?.[lineNumber])
+        line += ' #MISSINGSYNC';
+      if (textErrors?.[lineNumber])
+        line += ' #MISSINGTEXT';
+      translatedLines.push(line);
+    });
+
+    return translatedLines;
   }
 }

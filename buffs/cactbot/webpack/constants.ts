@@ -4,14 +4,15 @@ export const cactbotModules = {
   rdmty: 'ui/dps/rdmty/dps',
   xephero: 'ui/dps/xephero/xephero',
   eureka: 'ui/eureka/eureka',
-  fisher: 'ui/fisher/fisher',
   jobs: 'ui/jobs/jobs',
   oopsyraidsyLive: 'ui/oopsyraidsy/oopsy_live',
   oopsyraidsySummary: 'ui/oopsyraidsy/oopsy_summary',
+  oopsyraidsyViewer: 'ui/oopsyraidsy/oopsy_viewer',
   pullcounter: 'ui/pullcounter/pullcounter',
   radar: 'ui/radar/radar',
   raidboss: 'ui/raidboss/raidboss',
   raidemulator: 'ui/raidboss/raidemulator',
+  splitter: 'util/logtools/web_splitter',
   test: 'ui/test/test',
 };
 
@@ -50,11 +51,6 @@ export const cactbotHtmlChunksMap = {
       cactbotModules.eureka,
     ],
   },
-  'ui/fisher/fisher.html': {
-    chunks: [
-      cactbotModules.fisher,
-    ],
-  },
   'ui/jobs/jobs.html': {
     chunks: [
       cactbotModules.jobs,
@@ -64,6 +60,12 @@ export const cactbotHtmlChunksMap = {
     chunks: [
       cactbotChunks.oopsyraidsyData,
       cactbotModules.oopsyraidsySummary,
+    ],
+  },
+  'ui/oopsyraidsy/oopsy_viewer.html': {
+    chunks: [
+      cactbotChunks.oopsyraidsyData,
+      cactbotModules.oopsyraidsyViewer,
     ],
   },
   'ui/oopsyraidsy/oopsyraidsy.html': {
@@ -88,6 +90,24 @@ export const cactbotHtmlChunksMap = {
       cactbotModules.raidboss,
     ],
   },
+  'ui/raidboss/raidboss_alerts_only.html': {
+    chunks: [
+      cactbotChunks.raidbossData,
+      cactbotModules.raidboss,
+    ],
+  },
+  'ui/raidboss/raidboss_silent.html': {
+    chunks: [
+      cactbotChunks.raidbossData,
+      cactbotModules.raidboss,
+    ],
+  },
+  'ui/raidboss/raidboss_timeline_only.html': {
+    chunks: [
+      cactbotChunks.raidbossData,
+      cactbotModules.raidboss,
+    ],
+  },
   'ui/raidboss/raidemulator.html': {
     chunks: [
       cactbotChunks.raidbossData,
@@ -97,6 +117,11 @@ export const cactbotHtmlChunksMap = {
   'ui/test/test.html': {
     chunks: [
       cactbotModules.test,
+    ],
+  },
+  'util/logtools/splitter.html': {
+    chunks: [
+      cactbotModules.splitter,
     ],
   },
 };

@@ -15,9 +15,9 @@ import {
   kMPUI1Rate,
   kMPUI2Rate,
   kMPUI3Rate,
-  kWellFedContentTypes,
 } from './constants';
 import { JobsEventEmitter } from './event_emitter';
+import { FfxivVersion } from './jobs';
 import './jobs_config';
 import { JobsOptions } from './jobs_options';
 import { Player } from './player';
@@ -42,6 +42,7 @@ type JobDomObjects = {
   healthBar?: ResourceBar;
   manaBar?: ResourceBar;
   mpTicker?: TimerBar;
+  foodBuff?: HTMLElement;
 };
 
 export interface ResourceBox extends HTMLDivElement {
@@ -174,6 +175,27 @@ export class Bars {
           toward: 'left down',
         });
       }
+
+      // add food buff timer
+      this.o.foodBuff = makeAuraTimerIcon(
+        'foodbuff',
+        -1,
+        1,
+        this.options.BigBuffIconWidth,
+        this.options.BigBuffIconHeight,
+        '',
+        this.options.BigBuffBarHeight,
+        this.options.BigBuffTextHeight,
+        'white',
+        this.options.BigBuffBorderSize,
+        'yellow',
+        'yellow',
+        foodImage,
+      );
+      // hide it initially
+      this.o.foodBuff.style.display = 'none';
+
+      this.o.leftBuffsList.addElement('foodbuff', this.o.foodBuff, -1);
     }
 
     if (shouldShow.cpBar) {
@@ -196,7 +218,7 @@ export class Bars {
   }
 
   addJobBarContainer(): HTMLElement {
-    const id = this.player.job.toLowerCase() + '-bar';
+    const id = `${this.player.job.toLowerCase()}-bar`;
     let container = document.getElementById(id);
     if (!container) {
       container = document.createElement('div');
@@ -208,7 +230,7 @@ export class Bars {
   }
 
   addJobBoxContainer(): HTMLElement {
-    const id = this.player.job.toLowerCase() + '-boxes';
+    const id = `${this.player.job.toLowerCase()}-boxes`;
     let boxes = document.getElementById(id);
     if (!boxes) {
       boxes = document.createElement('div');
@@ -238,29 +260,18 @@ export class Bars {
     return textDiv as ResourceBox;
   }
 
-  addProcBox({
-    id,
-    fgColor,
-    threshold,
-    scale,
-    notifyWhenExpired,
-  }: {
+  addProcBox({ id, fgColor, threshold, notifyWhenExpired }: {
     id?: string;
     fgColor?: string;
     threshold?: number;
-    scale?: number;
     notifyWhenExpired?: boolean;
   }): TimerBox {
-    const elementId = this.player.job.toLowerCase() + '-procs';
-
-    let container = id ? document.getElementById(id) : undefined;
+    let container = id !== undefined ? document.getElementById(id) : undefined;
     if (!container) {
       container = document.createElement('div');
-      container.id = elementId;
-      document.getElementById('bars')?.appendChild(container);
+      container.classList.add('proc-box');
+      document.getElementById('procs-container')?.appendChild(container);
     }
-
-    document.getElementById('procs-container')?.appendChild(container);
 
     const timerBox = TimerBox.create({
       stylefill: 'empty',
@@ -269,12 +280,12 @@ export class Bars {
       threshold: threshold ? threshold : 0,
       hideafter: null,
       roundupthreshold: false,
-      valuescale: scale ? scale : 1,
     });
+    container.innerHTML = ''; // remove any existing timer boxes, if there are.
     container.appendChild(timerBox);
-    if (fgColor)
+    if (fgColor !== undefined)
       timerBox.fg = computeBackgroundColorFrom(timerBox, fgColor);
-    if (id) {
+    if (id !== undefined) {
       timerBox.id = id;
       timerBox.classList.add('timer-box');
     }
@@ -288,10 +299,7 @@ export class Bars {
     return timerBox;
   }
 
-  addTimerBar({
-    id,
-    fgColor,
-  }: {
+  addTimerBar({ id, fgColor }: {
     id: string;
     fgColor: string;
   }): TimerBar {
@@ -314,11 +322,7 @@ export class Bars {
     return timer;
   }
 
-  addResourceBar({
-    id,
-    fgColor,
-    maxvalue,
-  }: {
+  addResourceBar({ id, fgColor, maxvalue }: {
     id: string;
     fgColor: string;
     maxvalue: number;
@@ -364,7 +368,7 @@ export class Bars {
     pullCountdownContainer.appendChild(pullCountdown);
     pullCountdown.width = window.getComputedStyle(pullCountdownContainer).width;
     pullCountdown.height = window.getComputedStyle(pullCountdownContainer).height;
-    pullCountdown.classList.add('lang-' + this.options.DisplayLanguage);
+    pullCountdown.classList.add(`lang-${this.options.DisplayLanguage}`);
 
     // reset pull bar when in combat (game)
     this.ee.on('battle/in-combat', (ev) => {
@@ -499,7 +503,7 @@ export class Bars {
     mpTicker.loop = true;
     this.ee.on('battle/in-combat', (ev) => {
       // Hide out of combat if requested
-      if (mpTicker && !this.options.ShowMPTickerOutOfCombat && !ev.game) {
+      if (!this.options.ShowMPTickerOutOfCombat && !ev.game) {
         mpTicker.duration = 0;
         mpTicker.stylefill = 'empty';
       }
@@ -584,6 +588,7 @@ export class Bars {
     prevMp?: number;
     umbralStacks?: number;
     inCombat: boolean;
+    ffxivVersion: FfxivVersion;
   }): void {
     if (!this.o.mpTicker)
       return;
@@ -603,7 +608,9 @@ export class Bars {
     if (data.umbralStacks === -3)
       umbralTick = kMPUI3Rate;
 
-    const mpTick = Math.floor(data.maxMp * baseTick) + Math.floor(data.maxMp * umbralTick);
+    const mpTick = data.ffxivVersion < 700
+      ? Math.floor(data.maxMp * baseTick) + Math.floor(data.maxMp * umbralTick)
+      : data.maxMp * baseTick;
     if (delta === mpTick && data.umbralStacks <= 0) // MP ticks disabled in AF
       this.o.mpTicker.duration = kMPTickInterval;
 
@@ -696,61 +703,12 @@ export class Bars {
       : '1.0';
   }
 
-  _updateFoodBuff(o: {
-    inCombat: boolean;
-    contentType?: number;
-    foodBuffExpiresTimeMs: number;
-    foodBuffTimer: number;
-  }): number | undefined {
+  _showFoodBuff(show: boolean): void {
     // Non-combat jobs don't set up the left buffs list.
-    if (!this.o.leftBuffsList)
+    if (!this.o.leftBuffsList || !this.o.foodBuff)
       return;
 
-    const CanShowWellFedWarning = () => {
-      if (!this.options.HideWellFedAboveSeconds)
-        return false;
-      if (o.inCombat)
-        return false;
-      if (o.contentType === undefined)
-        return false;
-      return kWellFedContentTypes.includes(o.contentType);
-    };
-
-    // Returns the number of ms until it should be shown. If <= 0, show it.
-    const TimeToShowWellFedWarning = () => {
-      const nowMs = Date.now();
-      const showAtMs = o.foodBuffExpiresTimeMs - (this.options.HideWellFedAboveSeconds * 1000);
-      return showAtMs - nowMs;
-    };
-
-    window.clearTimeout(o.foodBuffTimer);
-    o.foodBuffTimer = 0;
-
-    const canShow = CanShowWellFedWarning();
-    const showAfterMs = TimeToShowWellFedWarning();
-
-    if (!canShow || showAfterMs > 0) {
-      this.o.leftBuffsList.removeElement('foodbuff');
-      if (canShow)
-        return window.setTimeout(this._updateFoodBuff.bind(this), showAfterMs);
-    } else {
-      const div = makeAuraTimerIcon(
-        'foodbuff',
-        -1,
-        1,
-        this.options.BigBuffIconWidth,
-        this.options.BigBuffIconHeight,
-        '',
-        this.options.BigBuffBarHeight,
-        this.options.BigBuffTextHeight,
-        'white',
-        this.options.BigBuffBorderSize,
-        'yellow',
-        'yellow',
-        foodImage,
-      );
-      this.o.leftBuffsList.addElement('foodbuff', div, -1);
-    }
+    this.o.foodBuff.style.display = show ? '' : 'none';
   }
 
   _setPullCountdown(seconds: number): void {
@@ -763,7 +721,7 @@ export class Bars {
       this.o.pullCountdown.duration = seconds;
       if (inCountdown && this.options.PlayCountdownSound) {
         const audio = new Audio('../../resources/sounds/freesound/sonar.webm');
-        audio.volume = 0.3;
+        audio.volume = this.options.CountdownSoundVolume;
         void audio.play();
       }
     }

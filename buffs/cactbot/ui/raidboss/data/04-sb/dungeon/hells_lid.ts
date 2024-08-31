@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -8,6 +7,7 @@ import { TriggerSet } from '../../../../../types/trigger';
 export type Data = RaidbossData;
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'HellsLid',
   zoneId: ZoneId.HellsLid,
   timelineFile: 'hells_lid.txt',
   timelineTriggers: [
@@ -45,18 +45,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Hells Lid Swing',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '27BE', source: 'Otake-Maru', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '27BE', source: 'Otake-Maru', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '27BE', source: 'Ôtake Maru', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '27BE', source: 'オオタケ丸', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '27BE', source: '大岳丸', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '27BE', source: '오오타케마루', capture: false }),
+      netRegex: { id: '27BE', source: 'Otake-Maru', capture: false },
       response: Responses.getOut(),
     },
     {
       id: 'Hells Lid Targeted Leap',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0001' }),
+      netRegex: { id: '0001' },
       infoText: (data, matches, output) => {
         if (data.me === matches.target)
           return output.targetText!();
@@ -84,34 +79,19 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Hells Lid Circling Winds',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '27C8', source: 'Kamaitachi', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '27C8', source: 'Kamaitachi', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '27C8', source: 'Kamaitachi', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '27C8', source: 'カマイタチ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '27C8', source: '镰鼬', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '27C8', source: '카마이타치', capture: false }),
+      netRegex: { id: '27C8', source: 'Kamaitachi', capture: false },
       response: Responses.getIn(),
     },
     {
       id: 'Hells Lid Rolling Winds',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '27C9', source: 'Kamaitachi', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '27C9', source: 'Kamaitachi', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '27C9', source: 'Kamaitachi', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '27C9', source: 'カマイタチ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '27C9', source: '镰鼬', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '27C9', source: '카마이타치', capture: false }),
+      netRegex: { id: '27C9', source: 'Kamaitachi', capture: false },
       response: Responses.goSides(),
     },
     {
       id: 'Hells Lid Sinister Tide',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '27D4', source: 'Genbu', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '27D4', source: 'Genbu', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '27D4', source: 'Genbu', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '27D4', source: '玄武', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '27D4', source: '玄武', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '27D4', source: '현무', capture: false }),
+      netRegex: { id: '27D4', source: 'Genbu', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -127,19 +107,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Hells Lid Hell Of Waste',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '002B' }),
+      netRegex: { id: '002B' },
       condition: Conditions.targetIsYou(),
       response: Responses.spread(),
     },
     {
       id: 'Hells Lid Hell Of Waves',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '27D3', source: 'Genbu', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '27D3', source: 'Genbu', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '27D3', source: 'Genbu', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '27D3', source: '玄武', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '27D3', source: '玄武', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '27D3', source: '현무', capture: false }),
+      netRegex: { id: '27D3', source: 'Genbu', capture: false },
       response: Responses.knockback(),
     },
   ],

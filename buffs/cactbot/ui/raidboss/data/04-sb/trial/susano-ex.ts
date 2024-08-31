@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import Outputs from '../../../../../resources/outputs';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
@@ -14,6 +13,7 @@ export interface Data extends RaidbossData {
 
 // Susano Extreme
 const triggerSet: TriggerSet<Data> = {
+  id: 'ThePoolOfTributeExtreme',
   zoneId: ZoneId.ThePoolOfTributeExtreme,
   timelineFile: 'susano-ex.txt',
   timelineTriggers: [
@@ -44,12 +44,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'SusEx Thundercloud Tracker',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatant({ name: 'Thunderhead', capture: false }),
-      netRegexDe: NetRegexes.addedCombatant({ name: 'Gewitterwolke', capture: false }),
-      netRegexFr: NetRegexes.addedCombatant({ name: 'Nuage Orageux', capture: false }),
-      netRegexJa: NetRegexes.addedCombatant({ name: '雷雲', capture: false }),
-      netRegexCn: NetRegexes.addedCombatant({ name: '雷云', capture: false }),
-      netRegexKo: NetRegexes.addedCombatant({ name: '번개구름', capture: false }),
+      netRegex: { name: 'Thunderhead', capture: false },
       run: (data) => data.cloud = true,
     },
     {
@@ -59,18 +54,13 @@ const triggerSet: TriggerSet<Data> = {
       // lightning attached to it.
       id: 'SusEx Thundercloud Cleanup',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2041', source: 'Thunderhead', target: 'Thunderhead', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2041', source: 'Gewitterwolke', target: 'Gewitterwolke', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2041', source: 'Nuage Orageux', target: 'Nuage Orageux', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2041', source: '雷雲', target: '雷雲', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2041', source: '雷云', target: '雷云', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2041', source: '번개구름', target: '번개구름', capture: false }),
+      netRegex: { id: '2041', source: 'Thunderhead', target: 'Thunderhead', capture: false },
       run: (data) => data.cloud = false,
     },
     {
       id: 'SusEx Churning Gain',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '4F6', capture: false }),
+      netRegex: { effectId: '4F6', capture: false },
       condition: (data) => !data.churning,
       run: (data) => data.churning = true,
     },
@@ -80,26 +70,21 @@ const triggerSet: TriggerSet<Data> = {
       // while having churning, but is probably ok in most cases.
       id: 'SusEx Churning Lose',
       type: 'LosesEffect',
-      netRegex: NetRegexes.losesEffect({ effectId: '4F6', capture: false }),
+      netRegex: { effectId: '4F6', capture: false },
       condition: (data) => data.churning,
       run: (data) => data.churning = false,
     },
     {
       id: 'SusEx Stormsplitter',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Susano', id: '2033' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Susano', id: '2033' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Susano', id: '2033' }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'スサノオ', id: '2033' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '须佐之男', id: '2033' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '스사노오', id: '2033' }),
+      netRegex: { source: 'Susano', id: '2033' },
       response: Responses.tankBusterSwap('alert', 'info'),
     },
     {
       // Red knockback marker indicator
       id: 'SusEx Knockback',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0017' }),
+      netRegex: { id: '0017' },
       condition: Conditions.targetIsYou(),
       alertText: (data, _matches, output) => {
         if (data.cloud)
@@ -157,13 +142,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'SusEx Brightstorm Stack',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '003E' }),
+      netRegex: { id: '003E' },
       response: Responses.stackMarkerOn(),
     },
     {
       id: 'SusEx Levinbolt',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '006E' }),
+      netRegex: { id: '006E' },
       condition: Conditions.targetIsYou(),
       alertText: (data, _matches, output) => {
         if (data.cloud)
@@ -215,12 +200,12 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'SusEx Levinbolt Stun',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '006F' }),
+      netRegex: { id: '006F' },
       infoText: (data, matches, output) => {
         // It's sometimes hard for tanks to see the line, so just give a
         // sound indicator for jumping rope back and forth.
         if (data.role === 'tank')
-          return output.text!({ player: data.ShortName(matches.target) });
+          return output.text!({ player: data.party.member(matches.target) });
       },
       outputStrings: {
         text: {
@@ -236,7 +221,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'SusEx Churning',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '4F6' }),
+      netRegex: { effectId: '4F6' },
       condition: Conditions.targetIsYou(),
       delaySeconds: (_data, matches) => parseFloat(matches.duration) - 3,
       response: Responses.stopEverything('alert'),
@@ -300,7 +285,7 @@ const triggerSet: TriggerSet<Data> = {
         'The Hidden Gate': 'Porte cachée',
         'The Sealed Gate': 'Porte scellée',
         'Ukehi': 'Ukehi',
-        'Yata-No-Kagami': 'Yata no Kagami',
+        'Yata-No-Kagami': '--poussée--',
         'Brightstorm': 'Claire tempête',
         'Yasakani-No-Magatama': 'Yasakani no Magatama',
         'The Parting Clouds': 'Dispersion de nuages',
@@ -312,7 +297,7 @@ const triggerSet: TriggerSet<Data> = {
       'replaceSync': {
         'Ame-No-Murakumo': 'アメノムラクモ',
         'Susano': 'スサノオ',
-        'Thunderhead': 'サンダーヘッド',
+        'Thunderhead': '雷雲',
         'Ama-No-Iwato': '天岩戸',
       },
       'replaceText': {

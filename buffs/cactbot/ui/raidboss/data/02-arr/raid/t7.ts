@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import Util from '../../../../../resources/util';
 import ZoneId from '../../../../../resources/zone_id';
@@ -13,6 +12,7 @@ export interface Data extends RaidbossData {
 }
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'TheSecondCoilOfBahamutTurn2',
   zoneId: ZoneId.TheSecondCoilOfBahamutTurn2,
   timelineFile: 't7.txt',
   initData: () => {
@@ -27,12 +27,7 @@ const triggerSet: TriggerSet<Data> = {
       id: 'T7 Meluseine Phase Change Watcher',
       type: 'Ability',
       // On Tail Slap.
-      netRegex: NetRegexes.ability({ id: '7A8', source: 'Melusine' }),
-      netRegexDe: NetRegexes.ability({ id: '7A8', source: 'Melusine' }),
-      netRegexFr: NetRegexes.ability({ id: '7A8', source: 'Mélusine' }),
-      netRegexJa: NetRegexes.ability({ id: '7A8', source: 'メリュジーヌ' }),
-      netRegexCn: NetRegexes.ability({ id: '7A8', source: '美瑠姬奴' }),
-      netRegexKo: NetRegexes.ability({ id: '7A8', source: '멜뤼진' }),
+      netRegex: { id: '7A8', source: 'Melusine' },
       condition: (data) => !data.monitoringHP && data.hpThresholds[data.currentPhase] !== undefined,
       preRun: (data) => data.monitoringHP = true,
       promise: (data, matches) =>
@@ -53,12 +48,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'T7 Ram',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '860', source: 'Proto-Chimera', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '860', source: 'Proto-Chimära', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '860', source: 'Protochimère', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '860', source: 'プロトキマイラ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '860', source: '原型奇美拉', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '860', source: '프로토 키마이라', capture: false }),
+      netRegex: { id: '860', source: 'Proto-Chimera', capture: false },
       // TODO: is this silenceable in 5.0?
       condition: (data) => data.CanStun() || data.CanSilence(),
       infoText: (_data, _matches, output) => output.text!(),
@@ -76,12 +66,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'T7 Dragon',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '861', source: 'Proto-Chimera', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '861', source: 'Proto-Chimära', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '861', source: 'Protochimère', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '861', source: 'プロトキマイラ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '861', source: '原型奇美拉', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '861', source: '프로토 키마이라', capture: false }),
+      netRegex: { id: '861', source: 'Proto-Chimera', capture: false },
       // TODO: is this silenceable in 5.0?
       condition: (data) => data.CanStun() || data.CanSilence(),
       infoText: (_data, _matches, output) => output.text!(),
@@ -99,12 +84,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'T7 Tail Slap',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '7A8', source: 'Melusine' }),
-      netRegexDe: NetRegexes.ability({ id: '7A8', source: 'Melusine' }),
-      netRegexFr: NetRegexes.ability({ id: '7A8', source: 'Mélusine' }),
-      netRegexJa: NetRegexes.ability({ id: '7A8', source: 'メリュジーヌ' }),
-      netRegexCn: NetRegexes.ability({ id: '7A8', source: '美瑠姬奴' }),
-      netRegexKo: NetRegexes.ability({ id: '7A8', source: '멜뤼진' }),
+      netRegex: { id: '7A8', source: 'Melusine' },
       condition: (data, matches) => data.me === matches.target && data.job === 'BLU',
       delaySeconds: 6,
       suppressSeconds: 5,
@@ -123,12 +103,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'T7 Renaud',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatant({ name: 'Renaud', capture: false }),
-      netRegexDe: NetRegexes.addedCombatant({ name: 'Renaud', capture: false }),
-      netRegexFr: NetRegexes.addedCombatant({ name: 'Renaud', capture: false }),
-      netRegexJa: NetRegexes.addedCombatant({ name: 'ルノー', capture: false }),
-      netRegexCn: NetRegexes.addedCombatant({ name: '雷诺', capture: false }),
-      netRegexKo: NetRegexes.addedCombatant({ name: '르노', capture: false }),
+      netRegex: { name: 'Renaud', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -144,7 +119,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'T7 Cursed Voice',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '1C3' }),
+      netRegex: { effectId: '1C3' },
       condition: Conditions.targetIsYou(),
       delaySeconds: (_data, matches) => parseFloat(matches.duration) - 3,
       alertText: (_data, _matches, output) => output.text!(),
@@ -162,7 +137,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'T7 Cursed Shriek',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '1C4' }),
+      netRegex: { effectId: '1C4' },
       durationSeconds: 3,
       alarmText: (data, matches, output) => {
         if (data.me === matches.target)
@@ -170,7 +145,7 @@ const triggerSet: TriggerSet<Data> = {
       },
       infoText: (data, matches, output) => {
         if (data.me !== matches.target)
-          return output.shriekOn!({ player: data.ShortName(matches.target) });
+          return output.shriekOn!({ player: data.party.member(matches.target) });
       },
       outputStrings: {
         shriekOn: {
@@ -194,7 +169,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'T7 Cursed Shriek Reminder',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '1C4' }),
+      netRegex: { effectId: '1C4' },
       delaySeconds: 7,
       durationSeconds: 3,
       infoText: (data, matches, output) => {
@@ -225,34 +200,19 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'T7 Petrifaction 1',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '7BB', source: 'Lamia Prosector', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '7BB', source: 'Lamia-Prosektorin', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '7BB', source: 'Lamia Dissectrice', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '7BB', source: 'ラミア・プロセクター', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '7BB', source: '拉米亚解剖女王', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '7BB', source: '라미아 시체해부자', capture: false }),
+      netRegex: { id: '7BB', source: 'Lamia Prosector', capture: false },
       response: Responses.lookAway(),
     },
     {
       id: 'T7 Petrifaction 2',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '7B1', source: 'Melusine', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '7B1', source: 'Melusine', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '7B1', source: 'Mélusine', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '7B1', source: 'メリュジーヌ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '7B1', source: '美瑠姬奴', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '7B1', source: '멜뤼진', capture: false }),
+      netRegex: { id: '7B1', source: 'Melusine', capture: false },
       response: Responses.lookAway(),
     },
     {
       id: 'T7 Tail',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '7B2', source: 'Melusine', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '7B2', source: 'Melusine', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '7B2', source: 'Mélusine', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '7B2', source: 'メリュジーヌ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '7B2', source: '美瑠姬奴', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '7B2', source: '멜뤼진', capture: false }),
+      netRegex: { id: '7B2', source: 'Melusine', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {

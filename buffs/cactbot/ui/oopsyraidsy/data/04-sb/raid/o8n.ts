@@ -31,20 +31,30 @@ const triggerSet: OopsyTriggerSet<Data> = {
       // Look away; does damage if failed.
       id: 'O8N Indolent Will',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '292C', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '292C', ...playerDamageFields }),
       condition: (data, matches) => data.DamageFromMatches(matches) > 0,
       mistake: (_data, matches) => {
-        return { type: 'warn', blame: matches.target, reportId: matches.targetId, text: matches.ability };
+        return {
+          type: 'warn',
+          blame: matches.target,
+          reportId: matches.targetId,
+          text: matches.ability,
+        };
       },
     },
     {
       // Look towards; does damage if failed.
       id: 'O8N Ave Maria',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '292B', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '292B', ...playerDamageFields }),
       condition: (data, matches) => data.DamageFromMatches(matches) > 0,
       mistake: (_data, matches) => {
-        return { type: 'warn', blame: matches.target, reportId: matches.targetId, text: matches.ability };
+        return {
+          type: 'warn',
+          blame: matches.target,
+          reportId: matches.targetId,
+          text: matches.ability,
+        };
       },
     },
     {
@@ -58,7 +68,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
           text: {
             en: 'Knocked off',
             de: 'Runtergefallen',
-            fr: 'A été assommé(e)',
+            fr: 'Renversé(e)',
             ja: 'ノックバック',
             cn: '击退坠落',
             ko: '넉백',
@@ -77,7 +87,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
           text: {
             en: 'Knocked off',
             de: 'Runtergefallen',
-            fr: 'A été assommé(e)',
+            fr: 'Renversé(e)',
             ja: 'ノックバック',
             cn: '击退坠落',
             ko: '넉백',

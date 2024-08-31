@@ -70,37 +70,12 @@ namespace Cactbot {
       public string EventName() { return "onPlayerDied"; }
     }
 
-    public class PartyWipeEvent : JSEvent {
-      public string EventName() { return "onPartyWipe"; }
-    }
-    public class FateEvent : JSEvent {
-      public FateEvent(string eventType, int fateID, int progress) {
-        this.eventType = eventType;
-        this.fateID = fateID;
-        this.progress = progress;
-      }
-      public string EventName() { return "onFateEvent"; }
-      public string eventType;
-      public int fateID;
-      public int progress;
-    }
-
-    public class CEEvent : JSEvent {
-      public CEEvent(string eventType, object data) {
-        this.eventType = eventType;
-        this.data = data;
-      }
-      public string EventName() { return "onCEEvent"; }
-      public string eventType;
-      public object data;
-    }
-
     public class PlayerChangedEvent : JSEvent {
       public PlayerChangedEvent(FFXIVProcess.EntityData e) {
         id = e.id;
         level = e.level;
         name = e.name;
-        job = e.job.ToString();
+        job = e.job.ToString().ToUpper();
         currentHP = e.hp;
         maxHP = e.max_hp;
         currentMP = e.mp;
@@ -113,7 +88,6 @@ namespace Cactbot {
         pos = new Point3F(e.pos_x, e.pos_y, e.pos_z);
         rotation = e.rotation;
         jobDetail = null;
-        bait = e.bait;
         debugJob = e.debug_job;
         currentShield = e.shield_value;
       }
@@ -139,7 +113,6 @@ namespace Cactbot {
 
       public Point3F pos;
       public float rotation;
-      public uint bait;
 
       // One of the FooJobDetails structures, depending on the value of |job|.
       public object jobDetail;

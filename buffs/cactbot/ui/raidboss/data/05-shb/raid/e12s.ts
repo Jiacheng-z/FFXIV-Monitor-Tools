@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { UnreachableCode } from '../../../../../resources/not_reached';
 import Outputs from '../../../../../resources/outputs';
 import { callOverlayHandler } from '../../../../../resources/overlay_plugin_api';
@@ -7,11 +6,13 @@ import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
 import { NetMatches } from '../../../../../types/net_matches';
+import { PartyMemberParamObject } from '../../../../../types/party';
 import { LocaleText, Output, TriggerSet } from '../../../../../types/trigger';
 
 export interface Data extends RaidbossData {
   isDoorBoss?: boolean;
   decOffset?: number;
+
   tethers?: string[];
   stockedTethers?: string[];
   castCount?: number;
@@ -20,23 +21,31 @@ export interface Data extends RaidbossData {
   formlessTargets?: string[];
   weightTargets?: string[];
   seenFirstBombs?: boolean;
+  statueStacks: string[];
   statueTetherNumber?: number;
   statueIds?: number[];
   statueDir?: string;
   statueLaserCount?: number;
-  phase?: string;
-  debuffs?: { [name: string]: number };
-  intermediateDebuffs?: string[];
-  safeZone?: string;
-  doubleAero?: string[];
+  smallLions?: NetMatches['AddedCombatant'][];
+
+  phase?: 'basic' | 'intermediate' | 'advanced' | 'terminal';
+  // Used across various stacks.
+  waterStacks: string[];
   seenInitialSpread?: boolean;
   seenInitialStacks?: boolean;
-  eyes?: string[];
+  basicDebuffs: NetMatches['GainsEffect'][];
+  myBasicDebuff?: 'eye' | 'shortIce' | 'longIce' | 'shortFire' | 'longFire' | 'water';
+  basicEyes: string[];
+  intermediateDebuffs: { [name: string]: number };
+  intermediateDebuffsOutputKeys: string[];
+  safeZone?: string;
+  advancedDebuffs: NetMatches['GainsEffect'][];
   sorrows?: { [name: string]: number };
-  smallLions?: NetMatches['AddedCombatant'][];
 }
 
 // TODO: double apoc clockwise vs counterclockwise call would be nice
+// TODO: stack partners
+// TODO: shadow eye people on blu need mit
 
 // Each tether ID corresponds to a primal:
 // 008C -- Shiva
@@ -55,7 +64,7 @@ const getTetherString = (tethers: string[] | undefined, output: Output) => {
   const sorted = tethers?.sort();
 
   const [first, second] = sorted ?? [];
-  if (!first || !second)
+  if (first === undefined || second === undefined)
     return;
 
   const comboStr = first + second;
@@ -137,7 +146,7 @@ const primalOutputStrings = {
     // Shiva spread.
     en: 'spread',
     de: 'verteilen',
-    fr: 'dispersion',
+    fr: 'dispersez-vous',
     ja: '散開',
     cn: '散开',
     ko: '산개',
@@ -146,7 +155,7 @@ const primalOutputStrings = {
     // Titan healer stacks.
     en: 'stacks',
     de: 'sammeln',
-    fr: 'packages',
+    fr: 'packez-vous',
     ja: 'ヒラ頭割り',
     cn: '治疗分摊',
     ko: '그룹 쉐어',
@@ -257,7 +266,7 @@ const matchedPositionToDir = (matches: NetMatches['AddedCombatant']) => {
   // Advanced Relativity party splits.
   // Map NW = 0, N = 1, ..., W = 7
 
-  return (Math.round(5 - 4 * Math.atan2(x, y) / Math.PI) % 8);
+  return Math.round(5 - 4 * Math.atan2(x, y) / Math.PI) % 8;
 };
 
 // Convert dir to Output
@@ -276,14 +285,26 @@ const dirToOutput = (dir: number, output: Output) => {
 };
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'EdensPromiseEternitySavage',
   zoneId: ZoneId.EdensPromiseEternitySavage,
   timelineFile: 'e12s.txt',
+  initData: () => {
+    return {
+      statueStacks: [],
+      waterStacks: [],
+      basicDebuffs: [],
+      basicEyes: [],
+      intermediateDebuffs: {},
+      intermediateDebuffsOutputKeys: [],
+      advancedDebuffs: [],
+    };
+  },
   triggers: [
     {
       // Headmarkers are randomized, so use a generic headMarker regex with no criteria.
       id: 'E12S Promise Formless Judgment You',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({}),
+      netRegex: {},
       condition: (data) => data.isDoorBoss,
       response: (data, matches, output) => {
         // cactbot-builtin-response
@@ -296,6 +317,13 @@ const triggerSet: TriggerSet<Data> = {
             cn: '死刑 + 换T',
             ko: '탱버 + 교대',
           },
+          formlessBusterBLU: {
+            en: 'Buster on YOU (w/${player})',
+            de: 'Tankbuster auf DIR (mit ${player})',
+            fr: 'Tankbuster sur VOUS (avec ${player})',
+            cn: '死刑点名 (与${player})',
+            ko: '탱버 대상자 (+${player})',
+          },
           formlessBusterOnYOU: Outputs.tankBusterOnYou,
         };
 
@@ -303,30 +331,40 @@ const triggerSet: TriggerSet<Data> = {
 
         // Track tankbuster targets, regardless if this is on you or not.
         // Use this to make more intelligent calls when the cast starts.
-        if (id === '00DA') {
-          data.formlessTargets ??= [];
-          data.formlessTargets.push(matches.target);
-        }
+        if (id !== '00DA')
+          return;
+
+        data.formlessTargets ??= [];
+        data.formlessTargets.push(matches.target);
 
         // From here on out, any response is for the current player.
-        if (matches.target !== data.me)
+        if (data.formlessTargets.length !== 2)
+          return;
+        if (!data.formlessTargets.includes(data.me))
           return;
 
         // Formless double tankbuster mechanic.
-        if (id === '00DA') {
-          if (data.role === 'tank')
-            return { alertText: output.formlessBusterAndSwap!() };
-          // Not that you personally can do anything about it, but maybe this
-          // is your cue to yell on voice comms for cover.
-          return { alarmText: output.formlessBusterOnYOU!() };
+        if (data.role === 'tank')
+          return { alertText: output.formlessBusterAndSwap!() };
+
+        // BLU tends to avail here, so call out your friend.
+        if (data.job === 'BLU') {
+          const [otherPlayer] = data.formlessTargets.filter((x) => x !== data.me);
+          return {
+            alertText: output.formlessBusterBLU!({ player: data.party.member(otherPlayer) }),
+          };
         }
+
+        // Not that you personally can do anything about it, but maybe this
+        // is your cue to yell on voice comms for cover.
+        return { alarmText: output.formlessBusterOnYOU!() };
       },
     },
     {
       // Headmarkers are randomized, so use a generic headMarker regex with no criteria.
       id: 'E12S Promise Junction Titan Bombs',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({}),
+      netRegex: {},
       condition: (data) => data.isDoorBoss,
       response: (data, matches, output) => {
         // cactbot-builtin-response
@@ -354,7 +392,7 @@ const triggerSet: TriggerSet<Data> = {
           titanOrangeStack: {
             en: 'Orange Stack',
             de: 'Orange - versammeln',
-            fr: 'Orange, package',
+            fr: 'Orange, packez-vous',
             ja: '橙、頭割り',
             cn: '橙色分摊',
             ko: '주황: 집합',
@@ -362,7 +400,7 @@ const triggerSet: TriggerSet<Data> = {
           titanYellowSpread: {
             en: 'Yellow Spread',
             de: 'Gelb - Verteilen',
-            fr: 'Jaune, dispersion',
+            fr: 'Jaune, dispersez-vous',
             ja: '黄、散開',
             cn: '黄色散开',
             ko: '노랑: 산개',
@@ -380,7 +418,7 @@ const triggerSet: TriggerSet<Data> = {
             if (data.weightTargets.includes(data.me)) {
               const partner = data.weightTargets[data.weightTargets[0] === data.me ? 1 : 0];
               return {
-                alarmText: output.titanBlueWithPartner!({ player: data.ShortName(partner) }),
+                alarmText: output.titanBlueWithPartner!({ player: data.party.member(partner) }),
               };
             }
           }
@@ -400,10 +438,50 @@ const triggerSet: TriggerSet<Data> = {
       },
     },
     {
+      id: 'E12S Promise Classical Sculpture',
+      type: 'HeadMarker',
+      netRegex: {},
+      condition: (data, matches) => {
+        if (!data.isDoorBoss)
+          return false;
+        if (getHeadmarkerId(data, matches) !== '003E')
+          return false;
+        data.statueStacks.push(matches.target);
+        return data.statueStacks.length === 2;
+      },
+      response: (data, _matches, output) => {
+        // cactbot-builtin-response
+        output.responseOutputStrings = {
+          stackOnYou: {
+            en: 'Stack on YOU (w/${player})',
+            de: 'Auf DIR sammeln (mit ${player})',
+            fr: 'Package sur VOUS (avec ${player})',
+            cn: '分摊点名 (与${player})',
+            ko: '쉐어 대상자 (+${player})',
+          },
+          stacks: {
+            en: 'Stacks: ${players}',
+            de: 'Sammeln: ${players}',
+            fr: 'Package: ${players}',
+            cn: '分摊: ${players}',
+            ko: '쉐어: ${players}',
+          },
+        };
+
+        if (!data.statueStacks.includes(data.me)) {
+          const players = data.statueStacks.sort().map((x) => data.party.member(x));
+          return { infoText: output.stacks!({ players: players }) };
+        }
+
+        const [otherPlayer] = data.statueStacks.filter((x) => x !== data.me);
+        return { alertText: output.stackOnYou!({ player: data.party.member(otherPlayer) }) };
+      },
+    },
+    {
       // Headmarkers are randomized, so use a generic headMarker regex with no criteria.
       id: 'E12S Promise Chiseled Sculpture',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({}),
+      netRegex: {},
       condition: (data, matches) => data.isDoorBoss && matches.target === data.me,
       run: (data, matches) => {
         const id = getHeadmarkerId(data, matches);
@@ -414,14 +492,14 @@ const triggerSet: TriggerSet<Data> = {
         if (id >= firstLaserMarker && id <= lastLaserMarker) {
           // ids are sequential: #1 square, #2 square, #3 square, #4 square, #1 triangle etc
           const decOffset = parseInt(id, 16) - parseInt(firstLaserMarker, 16);
-          data.statueTetherNumber = (decOffset % 4) + 1;
+          data.statueTetherNumber = decOffset % 4 + 1;
         }
       },
     },
     {
       id: 'E12S Promise Chiseled Sculpture Collector',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatantFull({ npcNameId: '9818' }),
+      netRegex: { npcNameId: '9818' },
       run: (data, matches) => {
         // Collect both sculptures up front, so when we find the tether on the
         // current player we can look up both of them immediately.
@@ -433,12 +511,7 @@ const triggerSet: TriggerSet<Data> = {
       id: 'E12S Promise Chiseled Sculpture Tether',
       type: 'Tether',
       // This always directly follows the 1B: headmarker line.
-      netRegex: NetRegexes.tether({ target: 'Chiseled Sculpture', id: '0011' }),
-      netRegexDe: NetRegexes.tether({ target: 'Abbild Eines Mannes', id: '0011' }),
-      netRegexFr: NetRegexes.tether({ target: 'Création Masculine', id: '0011' }),
-      netRegexJa: NetRegexes.tether({ target: '創られた男', id: '0011' }),
-      netRegexCn: NetRegexes.tether({ target: '被创造的男性', id: '0011' }),
-      netRegexKo: NetRegexes.tether({ target: '창조된 남자', id: '0011' }),
+      netRegex: { target: 'Chiseled Sculpture', id: '0011' },
       condition: (data, matches) => matches.source === data.me,
       durationSeconds: (data) => {
         // Handle laser #1 differently to not collide with the rapturous reach.
@@ -460,10 +533,6 @@ const triggerSet: TriggerSet<Data> = {
 
         if (statueData === null) {
           console.error(`sculpture: null statueData`);
-          return;
-        }
-        if (!statueData.combatants) {
-          console.error(`sculpture: null combatants`);
           return;
         }
         if (statueData.combatants.length !== 2) {
@@ -508,11 +577,11 @@ const triggerSet: TriggerSet<Data> = {
         };
         const numStr = numMap[data.statueTetherNumber ?? -1];
 
-        if (!numStr) {
+        if (numStr === undefined) {
           console.error(`sculpture: invalid tether number: ${data.statueTetherNumber ?? '???'}`);
           return;
         }
-        if (!data.statueDir) {
+        if (data.statueDir === undefined) {
           console.error(`sculpture: missing statueDir`);
           return;
         }
@@ -553,12 +622,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'E12S Promise Palm Of Temperance SE',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Guardian Of Eden', id: '58B4', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Wächter Von Eden', id: '58B4', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Gardien D\'Éden', id: '58B4', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ガーディアン・オブ・エデン', id: '58B4', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '伊甸守卫', id: '58B4', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '에덴의 수호자', id: '58B4', capture: false }),
+      netRegex: { source: 'Guardian Of Eden', id: '58B4', capture: false },
       durationSeconds: 10,
       infoText: (_data, _matches, output) => output.knockback!(),
       outputStrings: {
@@ -575,12 +639,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'E12S Promise Palm Of Temperance SW',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Guardian Of Eden', id: '58B5', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Wächter Von Eden', id: '58B5', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Gardien D\'Éden', id: '58B5', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ガーディアン・オブ・エデン', id: '58B5', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '伊甸守卫', id: '58B5', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '에덴의 수호자', id: '58B5', capture: false }),
+      netRegex: { source: 'Guardian Of Eden', id: '58B5', capture: false },
       durationSeconds: 10,
       infoText: (_data, _matches, output) => output.knockback!(),
       outputStrings: {
@@ -597,13 +656,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'E12S Promise Statue 2nd/3rd/4th Laser',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Chiseled Sculpture', id: '58B3', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Abbild Eines Mannes', id: '58B3', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Création Masculine', id: '58B3', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: '創られた男', id: '58B3', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '被创造的男性', id: '58B3', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '창조된 남자', id: '58B3', capture: false }),
-
+      netRegex: { source: 'Chiseled Sculpture', id: '58B3', capture: false },
       condition: (data) => !data.statueLaserCount || data.statueLaserCount < 4,
       durationSeconds: 3,
       suppressSeconds: 1,
@@ -672,12 +725,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'E12S Promise Weight Cleanup',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Eden\'s Promise', id: '58A5', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Edens Verheißung', id: '58A5', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Promesse D\'Éden', id: '58A5', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'プロミス・オブ・エデン', id: '58A5', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '伊甸之约', id: '58A5', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '에덴의 약속', id: '58A5', capture: false }),
+      netRegex: { source: 'Eden\'s Promise', id: '58A5', capture: false },
       run: (data) => {
         delete data.weightTargets;
         data.seenFirstBombs = true;
@@ -686,12 +734,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'E12S Promise Formless Judgment',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Eden\'s Promise', id: '58A9', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Edens Verheißung', id: '58A9', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Promesse D\'Éden', id: '58A9', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'プロミス・オブ・エデン', id: '58A9', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '伊甸之约', id: '58A9', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '에덴의 약속', id: '58A9', capture: false }),
+      netRegex: { source: 'Eden\'s Promise', id: '58A9', capture: false },
       response: (data, _matches, output) => {
         // cactbot-builtin-response
         output.responseOutputStrings = {
@@ -725,12 +768,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'E12S Promise Rapturous Reach Left',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Eden\'s Promise', id: '58AD', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Edens Verheißung', id: '58AD', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Promesse D\'Éden', id: '58AD', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'プロミス・オブ・エデン', id: '58AD', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '伊甸之约', id: '58AD', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '에덴의 약속', id: '58AD', capture: false }),
+      netRegex: { source: 'Eden\'s Promise', id: '58AD', capture: false },
       response: (data, _matches, output) => {
         // cactbot-builtin-response
         output.responseOutputStrings = {
@@ -775,12 +813,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'E12S Promise Rapturous Reach Right',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Eden\'s Promise', id: '58AE', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Edens Verheißung', id: '58AE', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Promesse D\'Éden', id: '58AE', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'プロミス・オブ・エデン', id: '58AE', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '伊甸之约', id: '58AE', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '에덴의 약속', id: '58AE', capture: false }),
+      netRegex: { source: 'Eden\'s Promise', id: '58AE', capture: false },
       response: (data, _matches, output) => {
         // cactbot-builtin-response
         output.responseOutputStrings = {
@@ -825,18 +858,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'E12S Promise Maleficium',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Eden\'s Promise', id: '58A8', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Edens Verheißung', id: '58A8', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Promesse D\'Éden', id: '58A8', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'プロミス・オブ・エデン', id: '58A8', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '伊甸之约', id: '58A8', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '에덴의 약속', id: '58A8', capture: false }),
+      netRegex: { source: 'Eden\'s Promise', id: '58A8', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'E12S Promise Junction Shiva',
       type: 'Tether',
-      netRegex: NetRegexes.tether({ id: shivaTetherId, capture: false }),
+      netRegex: { id: shivaTetherId, capture: false },
       // Call out what the mechanic will be so that folks have time to move.
       preRun: (data) => {
         data.junctionSuffix = 'spread';
@@ -868,7 +896,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'E12S Promise Junction Titan',
       type: 'Tether',
-      netRegex: NetRegexes.tether({ id: titanTetherId, capture: false }),
+      netRegex: { id: titanTetherId, capture: false },
       preRun: (data) => {
         data.junctionSuffix = 'stacks';
         data.junctionCount = (data.junctionCount ?? 0) + 1;
@@ -889,7 +917,7 @@ const triggerSet: TriggerSet<Data> = {
         junctionWithCast: {
           en: 'Healer Stacks',
           de: 'Heiler-Gruppen',
-          fr: 'Packages Heals',
+          fr: 'Packages sur les Heals',
           ja: 'ヒラ頭割り',
           cn: '治疗分摊',
           ko: '힐러 쉐어',
@@ -907,7 +935,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'E12S Promise Tether Collect',
       type: 'Tether',
-      netRegex: NetRegexes.tether({ id: tetherIds }),
+      netRegex: { id: tetherIds },
       run: (data, matches) => {
         data.tethers ??= [];
         data.tethers.push(matches.id);
@@ -916,18 +944,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'E12S Promise Stock',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Eden\'s Promise', id: '5892', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Edens Verheißung', id: '5892', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Promesse D\'Éden', id: '5892', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'プロミス・オブ・エデン', id: '5892', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '伊甸之约', id: '5892', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '에덴의 약속', id: '5892', capture: false }),
+      netRegex: { source: 'Eden\'s Promise', id: '5892', capture: false },
       infoText: (data, _matches, output) => {
         data.stockedTethers = data.tethers;
         delete data.tethers;
 
         const text = getTetherString(data.stockedTethers, output);
-        if (!text)
+        if (text === undefined)
           return;
         return output.stock!({ text: text });
       },
@@ -936,12 +959,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'E12S Promise Cast Release',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Eden\'s Promise', id: ['4E43', '5893'] }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Edens Verheißung', id: ['4E43', '5893'] }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Promesse D\'Éden', id: ['4E43', '5893'] }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'プロミス・オブ・エデン', id: ['4E43', '5893'] }),
-      netRegexCn: NetRegexes.startsUsing({ source: '伊甸之约', id: ['4E43', '5893'] }),
-      netRegexKo: NetRegexes.startsUsing({ source: '에덴의 약속', id: ['4E43', '5893'] }),
+      netRegex: { source: 'Eden\'s Promise', id: ['4E43', '5893'] },
       preRun: (data) => data.castCount = (data.castCount ?? 0) + 1,
       // The pattern is cast - cast - release - release - cast - release.
       // #4 (the 2nd release) starts casting just before the second lion fire breath.
@@ -958,9 +976,9 @@ const triggerSet: TriggerSet<Data> = {
         // which means that we need to grab the original tethers during the first stock.
         const isRelease = matches.id === '5893';
         const text = getTetherString(isRelease ? data.stockedTethers : data.tethers, output);
-        if (!text)
+        if (text === undefined)
           return;
-        if (!data.junctionSuffix)
+        if (data.junctionSuffix === undefined)
           return text;
         return output.junctionSuffix!({
           text: text,
@@ -976,7 +994,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'E12S Promise Tether Cleanup',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['4E43', '5892', '5893'], capture: false }),
+      netRegex: { id: ['4E43', '5892', '5893'], capture: false },
       delaySeconds: 10,
       run: (data) => delete data.tethers,
     },
@@ -984,19 +1002,14 @@ const triggerSet: TriggerSet<Data> = {
       id: 'E12S Promise Plunging Ice',
       type: 'StartsUsing',
       // This has a 9 second cast. :eyes:
-      netRegex: NetRegexes.startsUsing({ source: 'Eden\'s Promise', id: '589D', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Edens Verheißung', id: '589D', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Promesse D\'Éden', id: '589D', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'プロミス・オブ・エデン', id: '589D', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '伊甸之约', id: '589D', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '에덴의 약속', id: '589D', capture: false }),
+      netRegex: { source: 'Eden\'s Promise', id: '589D', capture: false },
       delaySeconds: 4,
       response: Responses.knockback(),
     },
     {
       id: 'E12S Promise Small Lion Spawn',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatantFull({ npcNameId: '9819' }),
+      netRegex: { npcNameId: '9819' },
       run: (data, matches) => {
         data.smallLions ??= [];
         data.smallLions.push(matches);
@@ -1005,15 +1018,11 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'E12S Promise Small Lion Tether',
       type: 'Tether',
-      netRegex: NetRegexes.tether({ source: 'Beastly Sculpture', id: '0011' }),
-      netRegexDe: NetRegexes.tether({ source: 'Abbild Eines Löwen', id: '0011' }),
-      netRegexFr: NetRegexes.tether({ source: 'Création Léonine', id: '0011' }),
-      netRegexJa: NetRegexes.tether({ source: '創られた獅子', id: '0011' }),
-      netRegexCn: NetRegexes.tether({ source: '被创造的狮子', id: '0011' }),
-      netRegexKo: NetRegexes.tether({ source: '창조된 사자', id: '0011' }),
+      netRegex: { source: 'Beastly Sculpture', id: '0011' },
       condition: Conditions.targetIsYou(),
       // Don't collide with reach left/right call.
       delaySeconds: 0.5,
+      durationSeconds: 7,
       response: (data, matches, output) => {
         // cactbot-builtin-response
         output.responseOutputStrings = {
@@ -1057,7 +1066,9 @@ const triggerSet: TriggerSet<Data> = {
         if (!data.smallLions || data.smallLions.length === 0)
           return;
 
-        const lion = data.smallLions?.find((l) => l.id.toUpperCase() === matches.sourceId.toUpperCase());
+        const lion = data.smallLions?.find((l) =>
+          l.id.toUpperCase() === matches.sourceId.toUpperCase()
+        );
         if (!lion) {
           console.error('Unable to locate a valid lion.');
           return { alertText: output.lionTetherOnYou!() };
@@ -1080,27 +1091,25 @@ const triggerSet: TriggerSet<Data> = {
       },
     },
     {
+      id: 'E12S Promise Laser Eye',
+      type: 'StartsUsing',
+      // This has a 14.5 second cast. :eyes:
+      netRegex: { source: 'Eden\'s Promise', id: '58B8', capture: false },
+      delaySeconds: 9.5,
+      response: Responses.knockback(),
+    },
+    {
       id: 'E12S Oracle Shockwave Pulsar',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Oracle Of Darkness', id: '58F0', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Orakel Der Dunkelheit', id: '58F0', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Prêtresse Des Ténèbres', id: '58F0', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: '闇の巫女', id: '58F0', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '暗之巫女', id: '58F0', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '어둠의 무녀', id: '58F0', capture: false }),
+      netRegex: { source: 'Oracle Of Darkness', id: '58F0', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'E12S Relativity Phase',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Oracle Of Darkness', id: '58E[0-3]' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Orakel Der Dunkelheit', id: '58E[0-3]' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Prêtresse Des Ténèbres', id: '58E[0-3]' }),
-      netRegexJa: NetRegexes.startsUsing({ source: '闇の巫女', id: '58E[0-3]' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '暗之巫女', id: '58E[0-3]' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '어둠의 무녀', id: '58E[0-3]' }),
+      netRegex: { source: 'Oracle Of Darkness', id: '58E[0-3]' },
       run: (data, matches) => {
-        const phaseMap: { [id: string]: string } = {
+        const phaseMap: { [id: string]: Data['phase'] } = {
           '58E0': 'basic',
           '58E1': 'intermediate',
           '58E2': 'advanced',
@@ -1112,78 +1121,53 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'E12S Oracle Basic Relativity',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Oracle Of Darkness', id: '58E0', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Orakel Der Dunkelheit', id: '58E0', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Prêtresse Des Ténèbres', id: '58E0', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: '闇の巫女', id: '58E0', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '暗之巫女', id: '58E0', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '어둠의 무녀', id: '58E0', capture: false }),
+      netRegex: { source: 'Oracle Of Darkness', id: '58E0', capture: false },
       response: Responses.bigAoe(),
     },
     {
       id: 'E12S Oracle Intermediate Relativity',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Oracle Of Darkness', id: '58E1', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Orakel Der Dunkelheit', id: '58E1', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Prêtresse Des Ténèbres', id: '58E1', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: '闇の巫女', id: '58E1', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '暗之巫女', id: '58E1', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '어둠의 무녀', id: '58E1', capture: false }),
+      netRegex: { source: 'Oracle Of Darkness', id: '58E1', capture: false },
       response: Responses.bigAoe(),
     },
     {
       id: 'E12S Oracle Advanced Relativity',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Oracle Of Darkness', id: '58E2', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Orakel Der Dunkelheit', id: '58E2', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Prêtresse Des Ténèbres', id: '58E2', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: '闇の巫女', id: '58E2', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '暗之巫女', id: '58E2', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '어둠의 무녀', id: '58E2', capture: false }),
+      netRegex: { source: 'Oracle Of Darkness', id: '58E2', capture: false },
       response: Responses.bigAoe(),
     },
     {
       id: 'E12S Oracle Terminal Relativity',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Oracle Of Darkness', id: '58E3', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Orakel Der Dunkelheit', id: '58E3', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Prêtresse Des Ténèbres', id: '58E3', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: '闇の巫女', id: '58E3', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '暗之巫女', id: '58E3', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '어둠의 무녀', id: '58E3', capture: false }),
+      netRegex: { source: 'Oracle Of Darkness', id: '58E3', capture: false },
       response: Responses.bigAoe(),
     },
     {
       id: 'E12S Oracle Darkest Dance',
       type: 'StartsUsing',
       // Darkest and Somber Dance both.
-      netRegex: NetRegexes.startsUsing({ source: 'Oracle Of Darkness', id: ['58BE', '58BD'], capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Orakel Der Dunkelheit', id: ['58BE', '58BD'], capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Prêtresse Des Ténèbres', id: ['58BE', '58BD'], capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: '闇の巫女', id: ['58BE', '58BD'], capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '暗之巫女', id: ['58BE', '58BD'], capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '어둠의 무녀', id: ['58BE', '58BD'], capture: false }),
+      netRegex: { source: 'Oracle Of Darkness', id: ['58BE', '58BD'], capture: false },
       infoText: (data, _matches, output) => {
         if (data.role === 'tank')
-          return output.tankBait!();
-        return output.partyUnder!();
+          return output.tanksOutPartyIn!();
+        return output.partyInTanksOut!();
       },
       outputStrings: {
-        tankBait: {
-          en: 'Bait Far',
-          de: 'Ködern - Weit weg',
-          fr: 'Attirez au loin',
-          ja: '遠くに誘導',
-          cn: '远诱导',
-          ko: '멀리 유도하기',
+        partyInTanksOut: {
+          en: 'Party In (Tanks Out)',
+          de: 'Gruppe Rein (Tanks Raus)',
+          fr: 'Équipe à l\'intérieur (Tanks à l\'extérieur)',
+          ja: 'ボスの足元へ (タンクは離れる)',
+          cn: '小队进 (T出)',
+          ko: '본대 안 (탱커 밖)',
         },
-        partyUnder: {
-          en: 'Get Under',
-          de: 'Unter ihn',
-          fr: 'En dessous',
-          ja: 'ボスと貼り付く',
-          cn: '去脚下',
-          ko: '보스 안쪽으로',
+        tanksOutPartyIn: {
+          en: 'Tanks Out (Party In)',
+          de: 'Tanks Raus (Gruppe Rein)',
+          fr: 'Tanks à l\'extérieur (Équipe à l\'intérieur',
+          ja: 'ボスからはなれる (パーティーが内側)',
+          cn: 'T出 (小队进)',
+          ko: '탱커 밖 (본대 안)',
         },
       },
     },
@@ -1191,46 +1175,36 @@ const triggerSet: TriggerSet<Data> = {
       id: 'E12S Oracle Somber Dance',
       type: 'Ability',
       // Call for second hit of somber dance after first hit lands.
-      netRegex: NetRegexes.ability({ source: 'Oracle Of Darkness', id: '58BD', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Orakel Der Dunkelheit', id: '58BD', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Prêtresse Des Ténèbres', id: '58BD', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: '闇の巫女', id: '58BD', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '暗之巫女', id: '58BD', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '어둠의 무녀', id: '58BD', capture: false }),
+      netRegex: { source: 'Oracle Of Darkness', id: '58BD', capture: false },
       suppressSeconds: 5,
       infoText: (data, _matches, output) => {
         if (data.role === 'tank')
-          return output.tankBait!();
-        return output.partyOut!();
+          return output.tanksInPartyOut!();
+        return output.partyOutTanksIn!();
       },
       outputStrings: {
-        tankBait: {
-          en: 'Bait Close',
-          de: 'Köder nah',
-          fr: 'Attirez proche',
-          ja: '近い誘導',
-          cn: '近诱导',
-          ko: '가까이 붙기',
+        partyOutTanksIn: {
+          en: 'Party Out (Tanks In)',
+          de: 'Gruppe Raus (Tanks Rein)',
+          fr: 'Équipe à l\'extérieur (Tanks à l\'intérieur)',
+          ja: 'ボスから離れる (タンクが内側)',
+          cn: '小队出 (T进)',
+          ko: '본대 밖 (탱커 안)',
         },
-        partyOut: {
-          en: 'Party Out',
-          de: 'Gruppe raus',
-          fr: 'Groupe au loin',
-          ja: '全員離れる',
-          cn: '不要靠近BOSS',
-          ko: '탱보다 멀리 있기',
+        tanksInPartyOut: {
+          en: 'Tanks In (Party Out)',
+          de: 'Gruppe Rein (Tanks Raus)',
+          fr: 'Tanks à l\'intérieur (Équipe à l\'extérieur',
+          ja: 'ボスに足元へ (パーティーは離れる)',
+          cn: 'T进 (小队出)',
+          ko: '탱커 안 (본대 밖)',
         },
       },
     },
     {
       id: 'E12S Oracle Cataclysm',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Oracle Of Darkness', id: '58C2' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Orakel Der Dunkelheit', id: '58C2' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Prêtresse Des Ténèbres', id: '58C2' }),
-      netRegexJa: NetRegexes.startsUsing({ source: '闇の巫女', id: '58C2' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '暗之巫女', id: '58C2' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '어둠의 무녀', id: '58C2' }),
+      netRegex: { source: 'Oracle Of Darkness', id: '58C2' },
       delaySeconds: 0.5,
       promise: async (data, matches, output) => {
         // select the Oracle Of Darkness with same source id
@@ -1247,11 +1221,6 @@ const triggerSet: TriggerSet<Data> = {
           delete data.safeZone;
           return;
         }
-        if (!oracleData.combatants) {
-          console.error(`Oracle Of Darkness: null combatants`);
-          delete data.safeZone;
-          return;
-        }
         if (oracleData.combatants.length !== 1) {
           console.error(`Oracle Of Darkness: expected 1, got ${oracleData.combatants.length}`);
           delete data.safeZone;
@@ -1264,7 +1233,7 @@ const triggerSet: TriggerSet<Data> = {
 
         // Snap heading to closest card and add 2 for opposite direction
         // N = 0, E = 1, S = 2, W = 3
-        const cardinal = ((2 - Math.round(oracle.Heading * 4 / Math.PI) / 2) + 2) % 4;
+        const cardinal = (2 - Math.round(oracle.Heading * 4 / Math.PI) / 2 + 2) % 4;
 
         const dirs: { [dir: number]: string } = {
           0: output.north!(),
@@ -1275,7 +1244,7 @@ const triggerSet: TriggerSet<Data> = {
 
         data.safeZone = dirs[cardinal];
       },
-      infoText: (data, _matches, output) => !data.safeZone ? output.unknown!() : data.safeZone,
+      infoText: (data, _matches, output) => data.safeZone ?? output.unknown!(),
       outputStrings: {
         unknown: Outputs.unknown,
         north: Outputs.north,
@@ -1287,12 +1256,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'E12S Shell Crusher',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Oracle Of Darkness', id: '58C3', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Orakel Der Dunkelheit', id: '58C3', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Prêtresse Des Ténèbres', id: '58C3', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: '闇の巫女', id: '58C3', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '暗之巫女', id: '58C3', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '어둠의 무녀', id: '58C3', capture: false }),
+      netRegex: { source: 'Oracle Of Darkness', id: '58C3', capture: false },
       response: Responses.getTogether(),
     },
     {
@@ -1300,25 +1264,28 @@ const triggerSet: TriggerSet<Data> = {
       type: 'Ability',
       // Spirit Taker always comes after Shell Crusher, so trigger on Shell Crusher damage
       // to warn people a second or two earlier than `starts using Spirit Taker` would occur.
-      netRegex: NetRegexes.ability({ source: 'Oracle Of Darkness', id: '58C3', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Orakel Der Dunkelheit', id: '58C3', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Prêtresse Des Ténèbres', id: '58C3', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: '闇の巫女', id: '58C3', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '暗之巫女', id: '58C3', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '어둠의 무녀', id: '58C3', capture: false }),
+      netRegex: { source: 'Oracle Of Darkness', id: '58C3', capture: false },
       suppressSeconds: 1,
       response: Responses.spread(),
     },
     {
       id: 'E12S Black Halo',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Oracle Of Darkness', id: '58C7' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Orakel Der Dunkelheit', id: '58C7' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Prêtresse Des Ténèbres', id: '58C7' }),
-      netRegexJa: NetRegexes.startsUsing({ source: '闇の巫女', id: '58C7' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '暗之巫女', id: '58C7' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '어둠의 무녀', id: '58C7' }),
+      netRegex: { source: 'Oracle Of Darkness', id: '58C7' },
       response: Responses.tankBuster(),
+    },
+    {
+      id: 'E12S Dark Water Collect',
+      type: 'GainsEffect',
+      netRegex: { effectId: '99D' },
+      run: (data, matches) => data.waterStacks.push(matches.target),
+    },
+    {
+      id: 'E12S Dark Water Cleanup',
+      type: 'Ability',
+      netRegex: { source: 'Oracle of Darkness', id: '58CA', capture: false },
+      suppressSeconds: 5,
+      run: (data) => data.waterStacks = [],
     },
     {
       id: 'E12S Basic Relativity Debuffs',
@@ -1327,75 +1294,120 @@ const triggerSet: TriggerSet<Data> = {
       // 998 Spell-In-Waiting: Shadoweye
       // 99D Spell-In-Waiting: Dark Water III
       // 99E Spell-In-Waiting: Dark Blizzard III
-      netRegex: NetRegexes.gainsEffect({ effectId: '99[78DE]' }),
-      condition: (data, matches) => data.phase === 'basic' && matches.target === data.me,
-      response: (_data, matches, output) => {
+      netRegex: { effectId: '99[78DE]' },
+      condition: (data, matches) => {
+        if (data.phase !== 'basic')
+          return false;
+        data.basicDebuffs.push(matches);
+        return true;
+      },
+      delaySeconds: 0.5,
+      response: (data, _matches, output) => {
         // cactbot-builtin-response
         output.responseOutputStrings = {
           shadoweye: {
-            en: 'Eye on YOU',
-            de: 'Auge auf DIR',
-            fr: 'Œil sur VOUS',
-            ja: '自分に目',
-            cn: '石化眼点名',
-            ko: '시선징 대상자',
+            en: 'Eye (w/${player})',
+            de: 'Auge (mit ${player})',
+            fr: 'Œil (avec ${player})',
+            ja: '自分に目 (w/${player})', // FIXME
+            cn: '石化眼点名 (与${player})',
+            ko: '시선징 (+${player})',
           },
-          water: intermediateRelativityOutputStrings.stack,
+          water: {
+            en: 'Stack (w/${player})',
+            de: 'Sammeln (mit ${player})',
+            fr: 'Pack (avec ${player})',
+            cn: '分摊 (与${player})',
+            ko: '쉐어징 (+${player})',
+          },
           longFire: {
-            en: 'Long Fire',
-            de: 'langes Feuer',
-            fr: 'Feu long',
-            ja: 'ファイガ(遅い)',
-            cn: '长火',
-            ko: '느린 파이가',
+            en: 'Long Fire (w/${player})',
+            de: 'langes Feuer (w/${player})',
+            fr: 'Feu long (avec ${player})',
+            ja: 'ファイガ(遅い) (w/${player})', // FIXME
+            cn: '长火 (与${player})',
+            ko: '느린 파이가 (+${player})',
           },
           shortFire: {
-            en: 'Short Fire',
-            de: 'kurzes Feuer',
-            fr: 'Feu court',
-            ja: 'ファイガ(早い)',
-            cn: '短火',
-            ko: '빠른 파이가',
+            en: 'Short Fire (w/${player})',
+            de: 'kurzes Feuer (w/${player})',
+            fr: 'Feu court (avec ${player})',
+            ja: 'ファイガ(早い) (w/${player})', // FIXME
+            cn: '短火 (与${player})',
+            ko: '빠른 파이가 (+${player})',
           },
           longIce: {
-            en: 'Long Ice',
-            de: 'langes Eis',
-            fr: 'Glace longue',
-            ja: 'ブリザガ(遅い)',
-            cn: '长冰',
-            ko: '느린 블리자가',
+            en: 'Long Ice (w/${player})',
+            de: 'langes Eis (w/${player})',
+            fr: 'Glace longue (avec ${player})',
+            ja: 'ブリザガ(遅い) (w/${player})', // FIXME
+            cn: '长冰 (与${player})',
+            ko: '느린 블리자가 (+${player})',
           },
           shortIce: {
-            en: 'Short Ice',
-            de: 'kurzes Eis',
-            fr: 'Glace courte',
-            ja: 'ブリザガ(早い)',
-            cn: '短冰',
-            ko: '빠른 블리자가',
+            en: 'Short Ice (w/${player})',
+            de: 'kurzes Eis (w/${player})',
+            fr: 'Glace courte (avec ${player})',
+            ja: 'ブリザガ(早い) (w/${player})', // FIXME
+            cn: '短冰 (与${player})',
+            ko: '빠른 블리자가 (+${player})',
           },
+          unknown: Outputs.unknown,
         };
 
-        if (!matches.effectId)
+        // Because this trigger is both collecting and calling, can't use suppress.
+        // Use this set value to know if we've called anything out yet.
+        if (data.myBasicDebuff !== undefined)
           return;
-        const id = matches.effectId.toUpperCase();
 
-        if (id === '998')
-          return { infoText: output.shadoweye!() };
-        if (id === '99D')
-          return { infoText: output.water!() };
+        const otherPlayer = (names: string[]): PartyMemberParamObject | string => {
+          if (names.length !== 2)
+            return output.unknown!();
+          const [name1, name2] = names;
+          if (!names.includes(data.me) || name1 === undefined || name2 === undefined)
+            return output.unknown!();
+          return data.party.member(name1 === data.me ? name2 : name1);
+        };
 
-        // Long fire/ice is 15 seconds, short fire/ice is 29 seconds.
-        const isLong = parseFloat(matches.duration) > 20;
-
-        if (id === '997') {
-          if (isLong)
-            return { alertText: output.longFire!() };
-          return { alertText: output.shortFire!() };
+        const eyes = data.basicDebuffs.filter((x) => x.effectId === '998').map((x) => x.target);
+        data.basicEyes.push(...eyes);
+        if (eyes.includes(data.me)) {
+          data.myBasicDebuff = 'eye';
+          return { infoText: output.shadoweye!({ player: otherPlayer(eyes) }) };
         }
-        if (id === '99E') {
-          if (isLong)
-            return { alertText: output.longIce!() };
-          return { alertText: output.shortIce!() };
+
+        const waters = data.basicDebuffs.filter((x) => x.effectId === '99D').map((x) => x.target);
+        if (waters.includes(data.me)) {
+          data.myBasicDebuff = 'water';
+          return { infoText: output.water!({ player: otherPlayer(waters) }) };
+        }
+
+        // Short fire/ice is 15 seconds, long fire/ice is 29 seconds.
+        const longBuffs = data.basicDebuffs.filter((x) => parseFloat(x.duration) > 20);
+        const shortBuffs = data.basicDebuffs.filter((x) => parseFloat(x.duration) < 20);
+
+        const shortFires = shortBuffs.filter((x) => x.effectId === '997').map((x) => x.target);
+        if (shortFires.includes(data.me)) {
+          data.myBasicDebuff = 'shortFire';
+          return { alertText: output.shortFire!({ player: otherPlayer(shortFires) }) };
+        }
+
+        const longFires = longBuffs.filter((x) => x.effectId === '997').map((x) => x.target);
+        if (longFires.includes(data.me)) {
+          data.myBasicDebuff = 'longFire';
+          return { infoText: output.longFire!({ player: otherPlayer(longFires) }) };
+        }
+
+        const shortIces = shortBuffs.filter((x) => x.effectId === '99E').map((x) => x.target);
+        if (shortIces.includes(data.me)) {
+          data.myBasicDebuff = 'shortIce';
+          return { alertText: output.shortIce!({ player: otherPlayer(shortIces) }) };
+        }
+
+        const longIces = longBuffs.filter((x) => x.effectId === '99E').map((x) => x.target);
+        if (longIces.includes(data.me)) {
+          data.myBasicDebuff = 'longIce';
+          return { alertText: output.longIce!({ player: otherPlayer(longIces) }) };
         }
       },
     },
@@ -1408,28 +1420,29 @@ const triggerSet: TriggerSet<Data> = {
       // 99C Spell-In-Waiting: Dark Eruption
       // 99E Spell-In-Waiting: Dark Blizzard III
       // 99F Spell-In-Waiting: Dark Aero III
-      netRegex: NetRegexes.gainsEffect({ effectId: ['690', '99[68CEF]'] }),
+      netRegex: { effectId: ['690', '99[68CEF]'] },
       condition: (data, matches) => data.phase === 'intermediate' && matches.target === data.me,
       preRun: (data, matches) => {
-        data.debuffs ??= {};
-        data.debuffs[matches.effectId.toUpperCase()] = parseFloat(matches.duration);
+        data.intermediateDebuffs[matches.effectId.toUpperCase()] = parseFloat(matches.duration);
       },
       durationSeconds: 20,
       infoText: (data, _matches, output) => {
-        const unsortedIds = Object.keys(data.debuffs ?? {});
+        const unsortedIds = Object.keys(data.intermediateDebuffs);
         if (unsortedIds.length !== 3)
           return;
 
         // Sort effect ids descending by duration.
-        const sortedIds = unsortedIds.sort((a, b) => (data.debuffs?.[b] ?? 0) - (data.debuffs?.[a] ?? 0));
+        const sortedIds = unsortedIds.sort((a, b) =>
+          (data.intermediateDebuffs?.[b] ?? 0) - (data.intermediateDebuffs?.[a] ?? 0)
+        );
         const keys = sortedIds.map((effectId) => effectIdToOutputStringKey[effectId]);
 
         const [key0, key1, key2] = keys;
-        if (!key0 || !key1 || !key2)
+        if (key0 === undefined || key1 === undefined || key2 === undefined)
           throw new UnreachableCode();
 
         // Stash outputstring keys to use later.
-        data.intermediateDebuffs = [key1, key2];
+        data.intermediateDebuffsOutputKeys = [key1, key2];
 
         return output.comboText!({
           effect1: output[key0]!(),
@@ -1459,7 +1472,7 @@ const triggerSet: TriggerSet<Data> = {
       //
       // Return = 994
       // Return IV = 995
-      netRegex: NetRegexes.gainsEffect({ effectId: '99[45]' }),
+      netRegex: { effectId: '99[45]' },
       condition: Conditions.targetIsYou(),
       response: (data, _matches, output) => {
         // cactbot-builtin-response
@@ -1477,44 +1490,33 @@ const triggerSet: TriggerSet<Data> = {
         if (data.phase !== 'intermediate')
           return { infoText: output.moveAway!() };
 
-        const key = data.intermediateDebuffs && data.intermediateDebuffs.shift();
-        if (!key)
+        const key = data.intermediateDebuffsOutputKeys.shift();
+        if (key === undefined)
           return { infoText: output.moveAway!() };
         return { alertText: output[key]!() };
       },
     },
     {
-      id: 'E12S Oracle Basic Relativity Shadow Eye Collector',
-      type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '998' }),
-      condition: (data) => data.phase === 'basic',
-      run: (data, matches) => {
-        data.eyes ??= [];
-        data.eyes.push(matches.target);
-      },
-    },
-    {
       id: 'E12S Oracle Basic Relativity Shadow Eye Other',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '998' }),
+      netRegex: { effectId: '998' },
       condition: (data) => data.phase === 'basic',
       delaySeconds: (_data, matches) => parseFloat(matches.duration) - 3,
       suppressSeconds: 3,
       alertText: (data, _matches, output) => {
-        const [player1, player2] = data.eyes ?? [];
-
+        const [player1, player2] = data.basicEyes;
         if (player1 !== data.me && player2 !== data.me) {
           // Call out both player names if you don't have eye
           return output.lookAwayFromPlayers!({
-            player1: data.ShortName(player1),
-            player2: data.ShortName(player2),
+            player1: data.party.member(player1),
+            player2: data.party.member(player2),
           });
-        } else if (player1 === data.me && player2) {
+        } else if (player1 === data.me && player2 !== undefined) {
           // Call out second player name if exists and you have eye
-          return output.lookAwayFromPlayer!({ player: data.ShortName(player2) });
+          return output.lookAwayFromPlayer!({ player: data.party.member(player2) });
         } else if (player2 === data.me) {
           // Call out first player name if you have eye
-          return output.lookAwayFromPlayer!({ player: data.ShortName(player1) });
+          return output.lookAwayFromPlayer!({ player: data.party.member(player1) });
         }
 
         // Return empty when only you have eye
@@ -1537,7 +1539,7 @@ const triggerSet: TriggerSet<Data> = {
       // For basic relativity, the shadoweye happens when the return puddle is dropped.
       id: 'E12S Relativity Look Outside',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '994' }),
+      netRegex: { effectId: '994' },
       condition: (data, matches) => data.phase !== 'basic' && matches.target === data.me,
       delaySeconds: (_data, matches) => parseFloat(matches.duration) - 2.5,
       alertText: (_data, _matches, output) => output.text!(),
@@ -1556,7 +1558,7 @@ const triggerSet: TriggerSet<Data> = {
       id: 'E12S Basic Relativity Yellow Hourglass',
       type: 'AddedCombatant',
       // Orient where "Yellow" Anger's Hourglass spawns
-      netRegex: NetRegexes.addedCombatantFull({ npcNameId: '9824' }),
+      netRegex: { npcNameId: '9824' },
       durationSeconds: 10,
       infoText: (_data, matches, output) => {
         return output.hourglass!({
@@ -1586,7 +1588,7 @@ const triggerSet: TriggerSet<Data> = {
       id: 'E12S Adv Relativity Hourglass Collect',
       type: 'AddedCombatant',
       // Collect Sorrow's Hourglass locations
-      netRegex: NetRegexes.addedCombatantFull({ npcNameId: '9823' }),
+      netRegex: { npcNameId: '9823' },
       run: (data, matches) => {
         const id = matches.id.toUpperCase();
 
@@ -1599,7 +1601,7 @@ const triggerSet: TriggerSet<Data> = {
       type: 'Tether',
       // '0086' is the Yellow tether that buffs "Quicken"
       // '0085' is the Red tether that buffs "Slow"
-      netRegex: NetRegexes.tether({ id: '0086' }),
+      netRegex: { id: '0086' },
       condition: (data) => data.phase === 'advanced',
       durationSeconds: 4,
       suppressSeconds: 3,
@@ -1638,16 +1640,20 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'E12S Initial Dark Water',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '99D' }),
+      netRegex: { effectId: '99D', capture: false },
       condition: (data) => !data.phase,
-      delaySeconds: (data, matches) => {
-        const duration = parseFloat(matches.duration);
-        return data.seenInitialSpread ? duration - 6 : duration - 8;
-      },
-      durationSeconds: 5,
+      durationSeconds: 10,
       suppressSeconds: 5,
       alertText: (data, _matches, output) => {
         data.seenInitialStacks = true;
+
+        if (data.waterStacks.length === 2) {
+          const [player1, player2] = data.waterStacks.sort().map((x) => data.party.member(x));
+          if (data.seenInitialSpread)
+            return output.knockbackIntoStacksOn!({ player1: player1, player2: player2 });
+          return output.stacksOn!({ player1: player1, player2: player2 });
+        }
+
         if (data.seenInitialSpread)
           return output.knockbackIntoStackGroups!();
         return output.stackGroups!();
@@ -1661,6 +1667,13 @@ const triggerSet: TriggerSet<Data> = {
           cn: '集合',
           ko: '쉐어',
         },
+        stacksOn: {
+          en: 'Stacks (${player1}, ${player2})',
+          de: 'Sammeln (${player1}, ${player2})',
+          fr: 'Packages (${player1}, ${player2})',
+          cn: '分摊 (${player1}, ${player2})',
+          ko: '쉐어 (${player1}, ${player2})',
+        },
         knockbackIntoStackGroups: {
           en: 'Knockback Into Stack Groups',
           de: 'Rückstoß, dann in Gruppen sammeln',
@@ -1669,12 +1682,19 @@ const triggerSet: TriggerSet<Data> = {
           cn: '击退分摊',
           ko: '넉백 후 쉐어',
         },
+        knockbackIntoStacksOn: {
+          en: 'Knockback => Stacks (${player1}, ${player2})',
+          de: 'Rückstoß => Sammeln (${player1}, ${player2})',
+          fr: 'Poussée => Package (${player1}, ${player2})',
+          cn: '击退 => 分摊 (${player1}, ${player2})',
+          ko: '넉백 => 쉐어 (${player1}, ${player2})',
+        },
       },
     },
     {
       id: 'E12S Initial Dark Eruption',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '99C' }),
+      netRegex: { effectId: '99C' },
       condition: (data) => !data.phase,
       delaySeconds: (data, matches) => {
         const duration = parseFloat(matches.duration);
@@ -1703,7 +1723,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'E12S Dark Water Stacks',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '99D' }),
+      netRegex: { effectId: '99D' },
       // During Advanced Relativity, there is a very short Dark Water III stack (12s)
       // that applies when people position themselves for the initial Return placement.
       // Most strategies auto-handle this, and so this feels like noise.  HOWEVER,
@@ -1714,9 +1734,15 @@ const triggerSet: TriggerSet<Data> = {
       condition: (data, matches) => data.phase !== undefined && parseFloat(matches.duration) > 13,
       delaySeconds: (_data, matches) => parseFloat(matches.duration) - 4,
       suppressSeconds: 5,
-      alertText: (_data, _matches, output) => output.text!(),
+      alertText: (data, _matches, output) => {
+        if (data.waterStacks.length === 2) {
+          const [player1, player2] = data.waterStacks.sort().map((x) => data.party.member(x));
+          return output.stacksOn!({ player1: player1, player2: player2 });
+        }
+        return output.stackGroups!();
+      },
       outputStrings: {
-        text: {
+        stackGroups: {
           en: 'Stack Groups',
           de: 'In Gruppen sammeln',
           fr: 'Packez-vous en groupe',
@@ -1724,34 +1750,12 @@ const triggerSet: TriggerSet<Data> = {
           cn: '集合',
           ko: '쉐어',
         },
-      },
-    },
-    {
-      id: 'E12S Double Aero Finder',
-      type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '99F' }),
-      // In advanced, Aero comes in ~23 and ~31s flavors
-      condition: (data, matches) => data.phase === 'advanced' && parseFloat(matches.duration) > 28,
-      infoText: (data, matches, output) => {
-        data.doubleAero ??= [];
-        data.doubleAero.push(data.ShortName(matches.target));
-
-        if (data.doubleAero.length !== 2)
-          return;
-
-        data.doubleAero.sort();
-        return output.text!({ name1: data.doubleAero[0], name2: data.doubleAero[1] });
-      },
-      // This will collide with 'E12S Adv Relativity Buff Collector', sorry.
-      tts: null,
-      outputStrings: {
-        text: {
-          en: 'Double Aero: ${name1}, ${name2}',
-          de: 'Doppel Windga: ${name1}, ${name2}',
-          fr: 'Double Vent : ${name1}, ${name2}',
-          ja: 'エアロガ×2: ${name1}, ${name2}',
-          cn: '双风: ${name1}, ${name2}',
-          ko: '더블 에어로가: ${name1}, ${name2}',
+        stacksOn: {
+          en: 'Stacks (${player1}, ${player2})',
+          de: 'Sammeln (${player1}, ${player2})',
+          fr: 'Packages (${player1}, ${player2})',
+          cn: '分摊 (${player1}, ${player2})',
+          ko: '쉐어 (${player1}, ${player2})',
         },
       },
     },
@@ -1761,49 +1765,84 @@ const triggerSet: TriggerSet<Data> = {
       // 997 Spell-In-Waiting: Dark Fire III
       // 998 Spell-In-Waiting: Shadoweye
       // 99F Spell-In-Waiting: Dark Aero III
-      netRegex: NetRegexes.gainsEffect({ effectId: '99[78F]' }),
-      condition: (data, matches) => data.phase === 'advanced' && data.me === matches.target,
+      netRegex: { effectId: '99[78F]' },
+      condition: (data, matches) => {
+        if (data.phase !== 'advanced')
+          return false;
+        data.advancedDebuffs.push(matches);
+        return true;
+      },
+      delaySeconds: 0.5,
       durationSeconds: 15,
-      alertText: (_data, matches, output) => {
-        const id = matches.effectId.toUpperCase();
+      response: (data, _matches, output) => {
+        // cactbot-builtin-response
+        output.responseOutputStrings = {
+          shadoweye: {
+            en: 'Eye (w/${player})',
+            de: 'Auge (mit ${player})',
+            fr: 'Œil(avec ${player})',
+            ja: '自分に目 (w/${player})', // FIXME
+            cn: '石化眼点名 (与${player})',
+            ko: '시선징 (+${player})',
+          },
+          doubleAero: {
+            en: 'Double Aero (w/${player})',
+            de: 'Doppel Windga (mit ${player})',
+            fr: 'Double Vent(avec ${player})',
+            ja: '自分にエアロガ×2 (w/${player})', // FIXME
+            cn: '双风点名 (与${player})',
+            ko: '더블 에어로가 (+${player})',
+          },
+          spread: {
+            en: 'Spread (w/${player1}, ${player2}, ${player3})',
+            de: 'Verteilen (mit ${player1}, ${player2}, ${player3})',
+            fr: 'Dispersion (avec ${player1}, ${player2}, ${player3})',
+            ja: '自分に散開 (w/${player1}, ${player2}, ${player3})', // FIXME
+            cn: '分散点名 (与${player1}, ${player2}, ${player3})',
+            ko: '산개징 (+${player1}, ${player2}, ${player3})',
+          },
+          unknown: Outputs.unknown,
+        };
 
-        // The shadoweye and the double aero person gets aero, so only consider the final aero.
-        if (id === '99F') {
-          if (parseFloat(matches.duration) < 28)
-            return;
-          return output.doubleAero!();
+        if (data.advancedDebuffs.length === 0)
+          return;
+
+        const otherPlayer = (names: string[]): PartyMemberParamObject | string => {
+          if (names.length !== 2)
+            return output.unknown!();
+          const [name1, name2] = names;
+          if (!names.includes(data.me) || name1 === undefined || name2 === undefined)
+            return output.unknown!();
+          return data.party.member(name1 === data.me ? name2 : name1);
+        };
+
+        const aeros = data.advancedDebuffs.filter((x) => {
+          if (x.effectId !== '99F')
+            return false;
+          // The shadoweye and the double aero person gets aero, so only consider the final aero.
+          return parseFloat(x.duration) > 28;
+        }).map((x) => x.target);
+        if (aeros.includes(data.me))
+          return { alarmText: output.doubleAero!({ player: otherPlayer(aeros) }) };
+
+        const eyes = data.advancedDebuffs.filter((x) => x.effectId === '998').map((x) => x.target);
+        if (eyes.includes(data.me))
+          return { alertText: output.shadoweye!({ player: otherPlayer(eyes) }) };
+
+        const spreads = data.advancedDebuffs.filter((x) => x.effectId === '997').map((x) =>
+          x.target
+        );
+        if (spreads.includes(data.me)) {
+          const otherSpreads = spreads.filter((x) => x !== data.me).sort().map((x) =>
+            data.party.member(x)
+          );
+          const [player1, player2, player3] = otherSpreads;
+          return {
+            infoText: output.spread!({ player1: player1, player2: player2, player3: player3 }),
+          };
         }
-        if (id === '997')
-          return output.spread!();
-        if (id === '998')
-          return output.shadoweye!();
       },
-      outputStrings: {
-        shadoweye: {
-          en: 'Eye on YOU',
-          de: 'Auge auf DIR',
-          fr: 'Œil sur VOUS',
-          ja: '自分に目',
-          cn: '石化眼点名',
-          ko: '시선징 대상자',
-        },
-        doubleAero: {
-          en: 'Double Aero on YOU',
-          de: 'Doppel Windga auf DIR',
-          fr: 'Double Vent sur VOUS',
-          ja: '自分にエアロガ×2',
-          cn: '双风点名',
-          ko: '더블 에어로가 대상자',
-        },
-        spread: {
-          en: 'Spread on YOU',
-          de: 'Verteilen auf DIR',
-          fr: 'Dispersion sur VOUS',
-          ja: '自分に散開',
-          cn: '分散点名',
-          ko: '산개징 대상자',
-        },
-      },
+      run: (data) => data.advancedDebuffs = [],
     },
   ],
   timelineReplace: [

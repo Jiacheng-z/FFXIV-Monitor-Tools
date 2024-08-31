@@ -49,7 +49,12 @@ const triggerSet: OopsyTriggerSet<Data> = {
       type: 'GainsEffect',
       netRegex: NetRegexes.gainsEffect({ effectId: '10B' }),
       mistake: (_data, matches) => {
-        return { type: 'warn', blame: matches.target, reportId: matches.targetId, text: matches.effect };
+        return {
+          type: 'warn',
+          blame: matches.target,
+          reportId: matches.targetId,
+          text: matches.effect,
+        };
       },
     },
     {
@@ -75,7 +80,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
       // Targets with Imp when Thunder III resolves receive a vulnerability stack and brief stun
       id: 'GubalHm Imp Thunder',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '195[AB]', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '195[AB]', ...playerDamageFields }),
       condition: (data, matches) => data.hasImp?.[matches.target],
       mistake: (_data, matches) => {
         return {
@@ -85,6 +90,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
           text: {
             en: 'Shocked Imp',
             de: 'Schockierter Imp',
+            fr: 'Kappa choqué(e)',
             ja: 'カッパを解除しなかった',
             cn: '河童状态吃了暴雷',
             ko: '물요정 상태 해제하지 않음',
@@ -95,21 +101,31 @@ const triggerSet: OopsyTriggerSet<Data> = {
     {
       id: 'GubalHm Quake',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '1956', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '1956', ...playerDamageFields }),
       // Always hits target, but if correctly resolved will deal 0 damage
       condition: (data, matches) => data.DamageFromMatches(matches) > 0,
       mistake: (_data, matches) => {
-        return { type: 'warn', blame: matches.target, reportId: matches.targetId, text: matches.ability };
+        return {
+          type: 'warn',
+          blame: matches.target,
+          reportId: matches.targetId,
+          text: matches.ability,
+        };
       },
     },
     {
       id: 'GubalHm Tornado',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '195[78]', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '195[78]', ...playerDamageFields }),
       // Always hits target, but if correctly resolved will deal 0 damage
       condition: (data, matches) => data.DamageFromMatches(matches) > 0,
       mistake: (_data, matches) => {
-        return { type: 'warn', blame: matches.target, reportId: matches.targetId, text: matches.ability };
+        return {
+          type: 'warn',
+          blame: matches.target,
+          reportId: matches.targetId,
+          text: matches.ability,
+        };
       },
     },
   ],

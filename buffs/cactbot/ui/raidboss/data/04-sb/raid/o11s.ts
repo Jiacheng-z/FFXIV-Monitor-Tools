@@ -1,4 +1,3 @@
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -10,18 +9,14 @@ export interface Data extends RaidbossData {
 
 // O11S - Alphascape 3.0 Savage
 const triggerSet: TriggerSet<Data> = {
+  id: 'AlphascapeV30Savage',
   zoneId: ZoneId.AlphascapeV30Savage,
   timelineFile: 'o11s.txt',
   triggers: [
     {
       id: 'O11S Mustard Bomb',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '326D', source: 'Omega' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '326D', source: 'Omega' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '326D', source: 'Oméga' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '326D', source: 'オメガ' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '326D', source: '欧米茄' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '326D', source: '오메가' }),
+      netRegex: { id: '326D', source: 'Omega' },
       response: Responses.tankBuster('alarm'),
     },
     {
@@ -35,24 +30,14 @@ const triggerSet: TriggerSet<Data> = {
       // will at least say left/right for the second.
       id: 'O11S Cannon Cleanup',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '326[24]', source: 'Omega', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '326[24]', source: 'Omega', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '326[24]', source: 'Oméga', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '326[24]', source: 'オメガ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '326[24]', source: '欧米茄', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '326[24]', source: '오메가', capture: false }),
+      netRegex: { id: '326[24]', source: 'Omega', capture: false },
       delaySeconds: 15,
       run: (data) => delete data.lastWasStarboard,
     },
     {
       id: 'O11S Starboard Cannon 1',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '326[23]', source: 'Omega', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '326[23]', source: 'Omega', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '326[23]', source: 'Oméga', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '326[23]', source: 'オメガ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '326[23]', source: '欧米茄', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '326[23]', source: '오메가', capture: false }),
+      netRegex: { id: '326[23]', source: 'Omega', capture: false },
       condition: (data) => data.lastWasStarboard === undefined,
       response: Responses.goLeft(),
       run: (data) => data.lastWasStarboard = true,
@@ -60,12 +45,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O11S Larboard Cannon 1',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '326[45]', source: 'Omega', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '326[45]', source: 'Omega', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '326[45]', source: 'Oméga', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '326[45]', source: 'オメガ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '326[45]', source: '欧米茄', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '326[45]', source: '오메가', capture: false }),
+      netRegex: { id: '326[45]', source: 'Omega', capture: false },
       condition: (data) => data.lastWasStarboard === undefined,
       response: Responses.goRight(),
       run: (data) => data.lastWasStarboard = false,
@@ -73,12 +53,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O11S Starboard Cannon 2',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3263', source: 'Omega', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3263', source: 'Omega', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3263', source: 'Oméga', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3263', source: 'オメガ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3263', source: '欧米茄', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3263', source: '오메가', capture: false }),
+      netRegex: { id: '3263', source: 'Omega', capture: false },
       condition: (data) => data.lastWasStarboard !== undefined,
       alertText: (data, _matches, output) => {
         if (data.lastWasStarboard)
@@ -90,7 +65,7 @@ const triggerSet: TriggerSet<Data> = {
         moveLeft: {
           en: 'Move (Left)',
           de: 'Bewegen (Links)',
-          fr: 'Bougez (Gauche)',
+          fr: 'Bougez (À gauche)',
           ja: '反対へ (左)',
           cn: '移动 (左)',
           ko: '오른쪽으로',
@@ -98,7 +73,7 @@ const triggerSet: TriggerSet<Data> = {
         stayLeft: {
           en: 'Stay (Left)',
           de: 'Stehenbleiben (Links)',
-          fr: 'Restez ici (Gauche)',
+          fr: 'Restez (À gauche)',
           ja: 'そのまま (左)',
           cn: '不动 (左)',
           ko: '대기 (오른쪽)',
@@ -108,12 +83,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O11S Larboard Cannon 2',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3265', source: 'Omega', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3265', source: 'Omega', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3265', source: 'Oméga', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3265', source: 'オメガ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3265', source: '欧米茄', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3265', source: '오메가', capture: false }),
+      netRegex: { id: '3265', source: 'Omega', capture: false },
       condition: (data) => data.lastWasStarboard !== undefined,
       alertText: (data, _matches, output) => {
         if (data.lastWasStarboard)
@@ -125,7 +95,7 @@ const triggerSet: TriggerSet<Data> = {
         stayRight: {
           en: 'Stay (Right)',
           de: 'Stehenbleiben (Rechts)',
-          fr: 'Restez ici (Droite)',
+          fr: 'Restez (À droite)',
           ja: 'そのまま (右)',
           cn: '不动 (右)',
           ko: '대기 (왼쪽)',
@@ -133,7 +103,7 @@ const triggerSet: TriggerSet<Data> = {
         moveRight: {
           en: 'Move (Right)',
           de: 'Bewegen (Rechts)',
-          fr: 'Bougez (Droite)',
+          fr: 'Bougez (À droite)',
           ja: '反対へ (右)',
           cn: '移动 (右)',
           ko: '왼쪽으로',
@@ -143,18 +113,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O11S Starboard Surge 1',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3266', source: 'Omega', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3266', source: 'Omega', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3266', source: 'Oméga', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3266', source: 'オメガ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3266', source: '欧米茄', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3266', source: '오메가', capture: false }),
+      netRegex: { id: '3266', source: 'Omega', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'Left (then opposite)',
           de: 'Links (dann umgekehrt)',
-          fr: 'Gauche (puis Droite)',
+          fr: 'À gauche (puis à l\'opposée)',
           ja: '左 (零式)',
           cn: '左 (零式)',
           ko: '왼쪽으로 (바로 반대로)',
@@ -164,18 +129,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O11S Larboard Surge 1',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3268', source: 'Omega', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3268', source: 'Omega', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3268', source: 'Oméga', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3268', source: 'オメガ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3268', source: '欧米茄', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3268', source: '오메가', capture: false }),
+      netRegex: { id: '3268', source: 'Omega', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'Right (then opposite)',
           de: 'Rechts (dann umgekehrt)',
-          fr: 'Droite (puis Gauche)',
+          fr: 'À droite (puis à l\'opposée)',
           ja: '右 (零式)',
           cn: '右 (零式)',
           ko: '오른쪽으로 (바로 반대로)',
@@ -185,19 +145,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O11S Starboard Surge 2',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3266', source: 'Omega', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3266', source: 'Omega', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3266', source: 'Oméga', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3266', source: 'オメガ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3266', source: '欧米茄', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3266', source: '오메가', capture: false }),
+      netRegex: { id: '3266', source: 'Omega', capture: false },
       delaySeconds: 4,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'Opposite (Left)',
           de: 'Umgekehrt (Links)',
-          fr: 'Côté opposé (Gauche)',
+          fr: 'À l\'opposée (À gauche)',
           ja: '反対へ (左)',
           cn: '对面 (左)',
           ko: '오른쪽으로',
@@ -207,19 +162,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O11S Larboard Surge 2',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3268', source: 'Omega', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3268', source: 'Omega', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3268', source: 'Oméga', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3268', source: 'オメガ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3268', source: '欧米茄', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3268', source: '오메가', capture: false }),
+      netRegex: { id: '3268', source: 'Omega', capture: false },
       delaySeconds: 4,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'Opposite (Right)',
           de: 'Umgekehrt (Rechts)',
-          fr: 'Côté opposé (Droite)',
+          fr: 'À l\'opposée (À droite)',
           ja: '反対へ (右)',
           cn: '对面 (右)',
           ko: '왼쪽으로',
@@ -306,8 +256,8 @@ const triggerSet: TriggerSet<Data> = {
         'Repel': 'Répulsion',
         'Reset': 'Réinitialisation',
         'Rush': 'Ruée',
-        'Starboard/Larboard Cannon': 'Tribord/Bâbord',
-        'Starboard/Larboard Surge': 'Tribord/Bâbord',
+        'Starboard/Larboard Cannon': 'Canon à tribord/bâbord',
+        'Starboard/Larboard Surge': 'Canon à tribord/bâbord',
         '(?<! )Storage Violation': 'Corruption de données S',
         'Unmitigated Explosion': 'Grosse explosion',
         'Update Program': 'Boucle de programme : mise à jour',

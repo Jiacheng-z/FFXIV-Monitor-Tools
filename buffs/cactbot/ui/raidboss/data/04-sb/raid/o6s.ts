@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -11,36 +10,27 @@ export interface Data extends RaidbossData {
 
 // O6S - Sigmascape 2.0 Savage
 const triggerSet: TriggerSet<Data> = {
+  id: 'SigmascapeV20Savage',
   zoneId: ZoneId.SigmascapeV20Savage,
   timelineFile: 'o6s.txt',
   triggers: [
     {
       id: 'O6S Demonic Shear',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2829', source: 'Demon Chadarnook' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2829', source: 'Gefallen(?:e|er|es|en) Chadarnook' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2829', source: 'Démon Chadarnouk' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2829', source: 'チャダルヌーク・デーモン' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2829', source: '恶魔查达奴克' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2829', source: '차다르누크 악령' }),
+      netRegex: { id: '2829', source: 'Demon Chadarnook' },
       response: Responses.tankBuster(),
     },
     {
       id: 'O6S Storms Grip',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatant({ name: 'The Storm\'s Grip', capture: false }),
-      netRegexDe: NetRegexes.addedCombatant({ name: 'Sturmgebiet', capture: false }),
-      netRegexFr: NetRegexes.addedCombatant({ name: 'Zone De Tempête', capture: false }),
-      netRegexJa: NetRegexes.addedCombatant({ name: '暴風域', capture: false }),
-      netRegexCn: NetRegexes.addedCombatant({ name: '暴风领域', capture: false }),
-      netRegexKo: NetRegexes.addedCombatant({ name: '폭풍 영역', capture: false }),
+      netRegex: { name: 'The Storm\'s Grip', capture: false },
       condition: (data) => data.role === 'tank',
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'Hallowed Wind Stack',
           de: 'Heiliger Boden Wind',
-          fr: 'Packez vous dans le vent',
+          fr: 'Packez-vous dans le vent',
           ja: '隅で頭割り',
           cn: '风分摊',
           ko: '쉐어징',
@@ -50,7 +40,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O6S Demonic Stone',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0001' }),
+      netRegex: { id: '0001' },
       condition: Conditions.targetIsYou(),
       alarmText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -67,13 +57,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O6S Last Kiss Tracker',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0017' }),
+      netRegex: { id: '0017' },
       run: (data, matches) => data.lastKiss = matches.target,
     },
     {
       id: 'O6S Last Kiss Marker',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0017' }),
+      netRegex: { id: '0017' },
       condition: Conditions.targetIsYou(),
       alarmText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -90,7 +80,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O6S Last Kiss',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '5BF' }),
+      netRegex: { effectId: '5BF' },
       condition: (data, matches) => {
         // The person who gets the marker briefly gets the effect, so
         // don't tell them twice.
@@ -152,17 +142,17 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       'locale': 'fr',
-      'missingTranslations': true,
       'replaceSync': {
         'Demon Chadarnook': 'démon Chadarnouk',
         'Easterly': 'rafale ultime',
         'Goddess Chadarnook': 'déesse Chadarnouk',
         'Haunt': 'Cauchemar corporel',
+        'I have claimed the girl in the picture!': 'Héhéhé... La fille du tableau m\'appartient.',
         'Portrayal of Earth': 'peinture de la terre',
         'Portrayal of Fire': 'peinture du feu',
         'Portrayal of Water': 'peinture de l\'eau',
         'Portrayal of Wind': 'peinture du vent',
-        'The Storm\'s Grip': 'Emprise de la tempête',
+        'The Storm\'s Grip': 'Zone de tempête',
       },
       'replaceText': {
         'Demonic Howl': 'Hurlement démoniaque',
@@ -174,7 +164,7 @@ const triggerSet: TriggerSet<Data> = {
         'Demonic Wave': 'Vague démoniaque',
         'Divine Lure': 'Séduction divine',
         'Earthquake': 'Grand séisme',
-        'Easterlies': 'Rafale Ultim',
+        'Easterlies': 'Rafales ultimes',
         'Featherlance': 'Lance de plume',
         'Flash Fire': 'Flammes subites',
         'Flash Flood': 'Pluie subite',

@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -10,6 +9,7 @@ export interface Data extends RaidbossData {
 }
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'Paglthan',
   zoneId: ZoneId.Paglthan,
   timelineFile: 'paglthan.txt',
   timelineTriggers: [
@@ -27,29 +27,19 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paglthan Critical Rip',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5C4E', source: 'Amhuluk' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5C4E', source: 'Amhuluk' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5C4E', source: 'Amhuluk' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5C4E', source: 'アムルック' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5C4E', source: '阿姆鲁克' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5C4E', source: '아물룩' }),
+      netRegex: { id: '5C4E', source: 'Amhuluk' },
       response: Responses.tankBuster(),
     },
     {
       id: 'Paglthan Electric Burst',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5C4D', source: 'Amhuluk', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5C4D', source: 'Amhuluk', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5C4D', source: 'Amhuluk', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5C4D', source: 'アムルック', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5C4D', source: '阿姆鲁克', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5C4D', source: '아물룩', capture: false }),
+      netRegex: { id: '5C4D', source: 'Amhuluk', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Paglthan Lightning Rod Gain',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: 'A0E' }),
+      netRegex: { effectId: 'A0E' },
       condition: Conditions.targetIsYou(),
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -66,65 +56,45 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paglthan Lightning Rod Lose',
       type: 'LosesEffect',
-      netRegex: NetRegexes.losesEffect({ effectId: 'A0E' }),
+      netRegex: { effectId: 'A0E' },
       condition: Conditions.targetIsYou(),
       response: Responses.goMiddle(),
     },
     {
       id: 'Paglthan Ballistic',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5C97', source: 'Magitek Fortress', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5C97', source: 'Magitek-Festung', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5C97', source: 'Forteresse Magitek', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5C97', source: '魔導フォートレス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5C97', source: '魔导要塞', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5C97', source: '마도 요새', capture: false }),
+      netRegex: { id: '5C97', source: 'Magitek Fortress', capture: false },
       response: Responses.knockback(),
     },
     {
       id: 'Paglthan Defensive Reaction',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5C9E', source: 'Magitek Core', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5C9E', source: 'Magitek-Reaktor', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5C9E', source: 'Réacteur Magitek', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5C9E', source: '魔導コア', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5C9E', source: '魔导核心', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5C9E', source: '마도핵', capture: false }),
+      netRegex: { id: '5C9E', source: 'Magitek Core', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Paglthan Twisted Scream',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5B47', source: 'Lunar Bahamut', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5B47', source: 'Luna-Bahamut', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5B47', source: 'Luna-Bahamut', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5B47', source: 'ルナバハムート', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5B47', source: '真月巴哈姆特', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5B47', source: '루나 바하무트', capture: false }),
+      netRegex: { id: '5B47', source: 'Lunar Bahamut', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Paglthan Akh Morn',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '005D' }),
+      netRegex: { id: '005D' },
       response: Responses.stackMarkerOn(),
     },
     {
       id: 'Paglthan Mega Flare Spread',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0017' }),
+      netRegex: { id: '0017' },
       condition: Conditions.targetIsYou(),
       response: Responses.spread(),
     },
     {
       id: 'Paglthan Mega Flare Move',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '5B4D', source: 'Lunar Bahamut' }),
-      netRegexDe: NetRegexes.ability({ id: '5B4D', source: 'Luna-Bahamut' }),
-      netRegexFr: NetRegexes.ability({ id: '5B4D', source: 'Luna-Bahamut' }),
-      netRegexJa: NetRegexes.ability({ id: '5B4D', source: 'ルナバハムート' }),
-      netRegexCn: NetRegexes.ability({ id: '5B4D', source: '真月巴哈姆特' }),
-      netRegexKo: NetRegexes.ability({ id: '5B4D', source: '루나 바하무트' }),
+      netRegex: { id: '5B4D', source: 'Lunar Bahamut' },
       condition: Conditions.targetIsYou(),
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -141,7 +111,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paglthan Kan Rhai Marker',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0104' }),
+      netRegex: { id: '0104' },
       condition: Conditions.targetIsYou(),
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -158,12 +128,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paglthan Kan Rhai Move',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '5B4F', source: 'Lunar Bahamut', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: '5B4F', source: 'Luna-Bahamut', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: '5B4F', source: 'Luna-Bahamut', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: '5B4F', source: 'ルナバハムート', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: '5B4F', source: '真月巴哈姆特', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: '5B4F', source: '루나 바하무트', capture: false }),
+      netRegex: { id: '5B4F', source: 'Lunar Bahamut', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -179,35 +144,20 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paglthan Lunar Flare Reset',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '5B49', source: 'Lunar Bahamut', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: '5B49', source: 'Luna-Bahamut', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: '5B49', source: 'Luna-Bahamut', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: '5B49', source: 'ルナバハムート', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: '5B49', source: '真月巴哈姆特', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: '5B49', source: '루나 바하무트', capture: false }),
+      netRegex: { id: '5B49', source: 'Lunar Bahamut', capture: false },
       run: (data) => data.lunarFlares = 0,
     },
     {
       id: 'Paglthan Lunar Flare Collect',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5B4[AB]', source: 'Lunar Bahamut', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5B4[AB]', source: 'Luna-Bahamut', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5B4[AB]', source: 'Luna-Bahamut', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5B4[AB]', source: 'ルナバハムート', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5B4[AB]', source: '真月巴哈姆特', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5B4[AB]', source: '루나 바하무트', capture: false }),
+      netRegex: { id: '5B4[AB]', source: 'Lunar Bahamut', capture: false },
       run: (data) => data.lunarFlares = (data.lunarFlares ?? 0) + 1,
     },
     {
       // Get middle is 4x5B4A and 4x5B4B, get outside is 5x5B4A
       id: 'Paglthan Lunar Flare',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5B4[AB]', source: 'Lunar Bahamut', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5B4[AB]', source: 'Luna-Bahamut', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5B4[AB]', source: 'Luna-Bahamut', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5B4[AB]', source: 'ルナバハムート', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5B4[AB]', source: '真月巴哈姆特', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5B4[AB]', source: '루나 바하무트', capture: false }),
+      netRegex: { id: '5B4[AB]', source: 'Lunar Bahamut', capture: false },
       delaySeconds: 0.5,
       suppressSeconds: 1,
       alertText: (data, _matches, output) => {
@@ -238,23 +188,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paglthan Flatten',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5B58', source: 'Lunar Bahamut' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5B58', source: 'Luna-Bahamut' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5B58', source: 'Luna-Bahamut' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5B58', source: 'ルナバハムート' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5B58', source: '真月巴哈姆特' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5B58', source: '루나 바하무트' }),
+      netRegex: { id: '5B58', source: 'Lunar Bahamut' },
       response: Responses.tankBuster(),
     },
     {
       id: 'Paglthan Giga Flare',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5B57', source: 'Lunar Bahamut', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5B57', source: 'Luna-Bahamut', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5B57', source: 'Luna-Bahamut', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5B57', source: 'ルナバハムート', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5B57', source: '真月巴哈姆特', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5B57', source: '루나 바하무트', capture: false }),
+      netRegex: { id: '5B57', source: 'Lunar Bahamut', capture: false },
       response: Responses.aoe(),
     },
   ],

@@ -1,4 +1,3 @@
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -8,6 +7,7 @@ export type Data = RaidbossData;
 
 // Fractal Continuum
 const triggerSet: TriggerSet<Data> = {
+  id: 'TheFractalContinuum',
   zoneId: ZoneId.TheFractalContinuum,
   timelineFile: 'fractal_continuum.txt',
   timelineTriggers: [
@@ -33,53 +33,32 @@ const triggerSet: TriggerSet<Data> = {
   triggers: [
     {
       id: 'Fractal Rapid Sever',
-      netRegex: NetRegexes.startsUsing({ id: 'F7A', source: 'Phantom Ray' }),
-      netRegexDe: NetRegexes.startsUsing({ id: 'F7A', source: 'Phantomschimmer' }),
-      netRegexFr: NetRegexes.startsUsing({ id: 'F7A', source: 'Rayon Fantomatique' }),
-      netRegexJa: NetRegexes.startsUsing({ id: 'F7A', source: 'ファントムレイ' }),
-      netRegexCn: NetRegexes.startsUsing({ id: 'F7A', source: '幻影光' }),
-      netRegexKo: NetRegexes.startsUsing({ id: 'F7A', source: '환영 광선' }),
+      type: 'StartsUsing',
+      netRegex: { id: 'F7A', source: 'Phantom Ray' },
       response: Responses.tankBuster(),
     },
     {
       id: 'Fractal Slash',
-      netRegex: NetRegexes.startsUsing({ id: 'F83', source: 'Minotaur', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: 'F83', source: 'Minotaurus', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: 'F83', source: 'Minotaure', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: 'F83', source: 'ミノタウロス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: 'F83', source: '弥诺陶洛斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: 'F83', source: '미노타우로스', capture: false }),
+      type: 'StartsUsing',
+      netRegex: { id: 'F83', source: 'Minotaur', capture: false },
       response: Responses.awayFromFront(),
     },
     {
       id: 'Fractal Swipe',
-      netRegex: NetRegexes.startsUsing({ id: 'F81', source: 'Minotaur', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: 'F81', source: 'Minotaurus', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: 'F81', source: 'Minotaure', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: 'F81', source: 'ミノタウロス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: 'F81', source: '弥诺陶洛斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: 'F81', source: '미노타우로스', capture: false }),
+      type: 'StartsUsing',
+      netRegex: { id: 'F81', source: 'Minotaur', capture: false },
       response: Responses.awayFromFront(),
     },
     {
       id: 'Fractal Small Swing',
-      netRegex: NetRegexes.startsUsing({ id: 'F82', source: 'Minotaur', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: 'F82', source: 'Minotaurus', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: 'F82', source: 'Minotaure', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: 'F82', source: 'ミノタウロス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: 'F82', source: '弥诺陶洛斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: 'F82', source: '미노타우로스', capture: false }),
+      type: 'StartsUsing',
+      netRegex: { id: 'F82', source: 'Minotaur', capture: false },
       response: Responses.getOut(),
     },
     {
       id: 'Fractal Big Swing',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: 'F87', source: 'Minotaur', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: 'F87', source: 'Minotaurus', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: 'F87', source: 'Minotaure', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: 'F87', source: 'ミノタウロス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: 'F87', source: '弥诺陶洛斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: 'F87', source: '미노타우로스', capture: false }),
+      netRegex: { id: 'F87', source: 'Minotaur', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -88,14 +67,14 @@ const triggerSet: TriggerSet<Data> = {
           fr: 'Utilisez un incubateur',
           ja: 'キメラ培養器を使う',
           cn: '打开笼子',
-          ko: '감옥 해제',
+          ko: '키메라 배양기 사용하기',
         },
       },
     },
     {
       id: 'Fractal Aetherochemical Bomb',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '2D3', capture: false }),
+      netRegex: { effectId: '2D3', capture: false },
       condition: (data) => data.CanCleanse(),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -111,12 +90,8 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       id: 'Fractal Alarums',
-      netRegex: NetRegexes.addedCombatant({ name: 'Clockwork Alarum', capture: false }),
-      netRegexDe: NetRegexes.addedCombatant({ name: 'Uhrwerk-Alarm', capture: false }),
-      netRegexFr: NetRegexes.addedCombatant({ name: 'Alarum Mécanique', capture: false }),
-      netRegexJa: NetRegexes.addedCombatant({ name: 'アラガンワーク・アラーム', capture: false }),
-      netRegexCn: NetRegexes.addedCombatant({ name: '发条报警虫', capture: false }),
-      netRegexKo: NetRegexes.addedCombatant({ name: '알라그 태엽경보장치', capture: false }),
+      type: 'AddedCombatant',
+      netRegex: { name: 'Clockwork Alarum', capture: false },
       suppressSeconds: 5,
       response: Responses.killAdds(),
     },

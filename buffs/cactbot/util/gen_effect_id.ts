@@ -1,133 +1,103 @@
 import path from 'path';
 
-import { CoinachWriter } from './coinach';
-import { cleanName, getIntlTable, Table } from './csv_util';
+import { ConsoleLogger, LogLevelKey } from './console_logger';
+import { cleanName } from './csv_util';
+import { OutputFileAttributes, XivApi } from './xivapi';
 
-// Maybe this should be called Status like the table, but everything else
-// says gain/lose effects.
-const effectsOutputFile = 'effect_id.ts';
-
-// TODO: add renaming?
-// Almagest: 563
-
-// There are a looooot of duplicate effect names in pvp, and it's impossible
-// to differentiate other than manually.  There's also older effects that
-// did different things that are still around.
-//
-// This is a map of id to skill name (for smoke testing/documentation).
-const knownMapping = {
-  'Thundercloud': '164',
-  'Battle Litany': '786',
-  'Right Eye': '1910',
-  'Left Eye': '1454',
-  'Meditative Brotherhood': '1182',
-  'Brotherhood': '1185',
-  'Embolden': '1297',
-  'Technical Finish': '1822',
-  'Sheltron': '1856',
-  'Lord of Crowns': '1876',
-  'Lady of Crowns': '1877',
-  'Divination': '1878',
-  'Further Ruin': '2701',
-  'The Balance': '1882',
-  'The Bole': '1883',
-  'The Arrow': '1884',
-  'The Spear': '1885',
-  'The Ewer': '1886',
-  'The Spire': '1887',
-  'Sword Oath': '1902',
-  'Tactician': '1951',
-  // This is for others, 1821 is for self.
-  'Standard Finish': '2105',
-  'The Wanderer\'s Minuet': '2216',
-  'Mage\'s Ballad': '2217',
-  'Army\'s Paeon': '2218',
-  'Stormbite': '1201',
-  'Caustic Bite': '1200',
-  'Windbite': '129',
-  'Venomous Bite': '124',
-  'Higanbana': '1228',
-  'Wildfire': '861',
-  'Chain Stratagem': '1221',
-  'Vulnerability Up': '638',
-  'Eukrasian Dosis III': '2616',
-} as const;
-
-// These custom name of effect will not be checked, but you'd better make it clean.
-// Use this only when you need to handle different effects with a same name.
-const customMapping = {
-  'EmboldenSelf': '1239',
-} as const;
-
-const printError = (
-  header: string,
-  what: string,
-  map: Record<string | number, unknown>,
-  key: string,
-) => console.error(`${header} ${what}: ${JSON.stringify(map[key])}`);
-
-const makeEffectMap = (table: Table<'#', 'Name'>) => {
-  const foundNames = new Set();
-
-  const map = new Map<string, string>();
-  for (const [id, effect] of Object.entries(table)) {
-    const rawName = effect['Name'];
-    if (!rawName)
-      continue;
-    const name = cleanName(rawName);
-    // Skip empty strings.
-    if (!name)
-      continue;
-
-    if (rawName in knownMapping) {
-      if (id !== knownMapping[rawName as keyof typeof knownMapping]) {
-        printError('skipping', rawName, table, id);
-        continue;
-      }
-    }
-
-    if (map.has(name)) {
-      printError('collision', name, table, id);
-      printError('collision', name, table, map.get(name) ?? '');
-      map.delete(name);
-      continue;
-    }
-    if (foundNames.has(name)) {
-      printError('collision', name, table, id);
-      continue;
-    }
-
-    foundNames.add(name);
-    map.set(name, id);
-  }
-
-  // Make sure everything specified in known_mapping was found in the above loop.
-  for (const rawName of Object.keys(knownMapping)) {
-    const name = cleanName(rawName);
-    if (name && !foundNames.has(name))
-      printError('missing', name, knownMapping, rawName);
-  }
-
-  // Add custom effect name for necessary duplicates.
-  for (const [name, id] of Object.entries(customMapping))
-    map.set(name, id);
-
-  // Store ids as hex.
-  map.forEach((id, name) => map.set(name, parseInt(id).toString(16).toUpperCase()));
-
-  return Object.fromEntries(map);
+const _EFFECT_ID: OutputFileAttributes = {
+  // Maybe this should be called Status like the table, but everything else
+  // says gain/lose effects.
+  outputFile: 'resources/effect_id.ts',
+  type: '',
+  header: '',
+  asConst: true,
 };
 
-export default async (): Promise<void> => {
-  const table = await getIntlTable('Status', ['#', 'Name', 'Icon', 'PartyListPriority']);
+const _SHEET = 'Status';
 
-  const writer = new CoinachWriter(null, true);
-  void writer.writeTypeScript(
-    path.join('resources', effectsOutputFile),
-    'gen_effect_id.ts',
-    null,
-    null,
-    true,
-    makeEffectMap(table),
+const _FIELDS = [
+  'Name',
+];
+
+type ResultStatus = {
+  row_id: number;
+  fields: {
+    Name?: string;
+  };
+};
+
+type XivApiStatus = ResultStatus[];
+
+type OutputEffectId = {
+  [name: string]: string; // the id is converted to hex, so use string
+};
+
+const _SCRIPT_NAME = path.basename(import.meta.url);
+const log = new ConsoleLogger();
+log.setLogLevel('alert');
+
+const assembleData = (apiData: XivApiStatus): OutputEffectId => {
+  const formattedData: OutputEffectId = {};
+  const map = new Map<string, number>();
+  const collisionNames = new Set<string>();
+
+  log.debug('Processing & assembling data...');
+  for (const effect of apiData) {
+    const id = effect.row_id;
+    const rawName = effect.fields.Name;
+    if (rawName === undefined)
+      continue;
+    let name = cleanName(rawName);
+    // Skip empty strings.
+    if (name === '')
+      continue;
+
+    // Add ID to the collision names.
+    if (map.has(name)) {
+      log.info(
+        `Collision detected: ${name} (IDs: ${id}, ${map.get(name) ?? ''}).  Renaming...`,
+      );
+      const oid = map.get(name) ?? 0;
+      if (oid) {
+        map.set(`${name}_${oid.toString(16).toUpperCase()}`, oid);
+      }
+      collisionNames.add(name);
+      name = `${name}_${id.toString(16).toUpperCase()}`;
+    }
+    map.set(name, id);
+    log.debug(`Adding ${name} (ID: ${id}) to data output.`);
+  }
+  log.debug('Completed initial pass. Starting post-processing...');
+
+  for (const name of collisionNames) {
+    map.delete(name);
+  }
+  log.debug('Collisions names removed.');
+
+  // Store ids as hex.
+  map.forEach((id, name) => formattedData[name] = id.toString(16).toUpperCase());
+  log.debug('Data assembly/formatting complete.');
+  return formattedData;
+};
+
+export default async (logLevel: LogLevelKey): Promise<void> => {
+  log.setLogLevel(logLevel);
+  log.info(`Starting processing for ${_SCRIPT_NAME}`);
+
+  const api = new XivApi(null, log);
+
+  const apiData = await api.queryApi(
+    _SHEET,
+    _FIELDS,
+  ) as XivApiStatus;
+
+  const outputData = assembleData(apiData);
+
+  await api.writeFile(
+    _SCRIPT_NAME,
+    _EFFECT_ID,
+    outputData,
   );
+
+  log.successDone(`Completed processing for ${_SCRIPT_NAME}`);
 };

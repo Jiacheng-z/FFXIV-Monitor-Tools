@@ -36,7 +36,7 @@ const processAbilityLine = (splitLine: string[]) => {
   }
 
   const amount = UnscrambleDamage(damage);
-  const lowByte = `00${flags}`.substr(-2);
+  const lowByte = `00${flags}`.slice(-2);
 
   return {
     amount: amount,
@@ -132,7 +132,7 @@ export class DeathReport {
     const deltaMs = timestamp - base;
     const prefix = deltaMs < 0 ? '-' : '';
     const deltaTotalSeconds = Math.round(Math.abs(deltaMs) / 1000);
-    const deltaSeconds = `00${deltaTotalSeconds % 60}`.substr(-2);
+    const deltaSeconds = `00${deltaTotalSeconds % 60}`.slice(-2);
     const deltaMinutes = Math.floor(deltaTotalSeconds / 60);
     return `${prefix}${deltaMinutes}:${deltaSeconds}`;
   }
@@ -222,6 +222,7 @@ export class DeathReport {
     const text = Translate(this.lang, {
       en: `Gain: ${effectName}`,
       de: `Erhalten: ${effectName}`,
+      fr: `Gagne: ${effectName}`,
       ja: `獲得: ${effectName}`,
       cn: `获得: ${effectName}`,
       ko: `얻음: ${effectName}`,
@@ -241,6 +242,7 @@ export class DeathReport {
     const text = Translate(this.lang, {
       en: `Lose: ${effectName}`,
       de: `Verloren: ${effectName}`,
+      fr: `Perd: ${effectName}`,
       ja: `失う: ${effectName}`,
       cn: `失去: ${effectName}`,
       ko: `잃음: ${effectName}`,
@@ -346,12 +348,13 @@ export class DeathReport {
       sourceName = event.splitLine[logDefinitions.GainsEffect.fields.source];
     }
 
-    if (!buffName || !sourceName)
+    if (buffName === undefined || sourceName === undefined)
       return;
 
     const text = Translate(this.lang, {
       en: `Missed ${buffName} (${sourceName})`,
       de: `${buffName} verfehlte (${sourceName})`,
+      fr: `${buffName} manqué(e) (${sourceName})`,
       ja: `${buffName}をミスした (${sourceName}から)`,
       cn: `没吃到 ${buffName} (来自${sourceName})`,
       ko: `${buffName} 놓침 (${sourceName})`,

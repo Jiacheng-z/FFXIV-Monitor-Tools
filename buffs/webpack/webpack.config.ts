@@ -1,6 +1,9 @@
 import path from 'path';
 
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
+// copy-webpack-plugin has changed to a newer export syntax that current eslint
+// version doesn't support
+// eslint-disable-next-line import/default
 import CopyPlugin from 'copy-webpack-plugin';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
@@ -33,12 +36,14 @@ export default (
         'jobs',
         'oopsyraidsyLive',
         'oopsyraidsySummary',
+        'oopsyraidsyViewer',
         'pullcounter',
         'radar',
         'raidboss',
         'raidemulator',
         'test',
         'timerbarTest',
+        'splitter',
         'buff',
         'settings',
       ].includes(key)
@@ -60,6 +65,8 @@ export default (
     new MiniCssExtractPlugin(),
     ...htmlPluginRules,
     new CopyPlugin({
+      // All of these patterns should be served individually from the static
+      // directory below.
       patterns: [
         {
           // copy sounds and images
@@ -129,7 +136,7 @@ export default (
                 [
                   '@babel/preset-env',
                   {
-                    targets: { chrome: '75' },
+                    targets: { chrome: '95' },
                   },
                 ],
                 [
@@ -176,14 +183,7 @@ export default (
         },
         {
           test: /data[\\\/](?!\w*_manifest\.txt).*\.txt$/,
-          use: [
-            {
-              loader: 'raw-loader',
-            },
-            {
-              loader: './webpack/loaders/timeline-loader.ts',
-            },
-          ],
+          type: 'asset/source',
         },
       ],
     },

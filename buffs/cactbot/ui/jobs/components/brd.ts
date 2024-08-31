@@ -3,36 +3,33 @@ import TimerBar from '../../../resources/timerbar';
 import TimerBox from '../../../resources/timerbox';
 import { JobDetail } from '../../../types/event';
 import { ResourceBox } from '../bars';
-import { kAbility, kDoTTickInterval } from '../constants';
-import { DotTracker } from '../event_emitter';
+import { kAbility } from '../constants';
 import { computeBackgroundColorFrom } from '../utils';
 
 import { BaseComponent, ComponentInterface } from './base';
 
 export class BRDComponent extends BaseComponent {
   straightShotProc: TimerBox;
-  causticBiteBox: TimerBox;
-  stormBiteBox: TimerBox;
+  biteBox: TimerBox;
+  empyrealBox: TimerBox;
   songBox: TimerBox;
   repertoireBox: ResourceBox;
   repertoireTimer: TimerBar;
-  repertoireTracker5x: DotTracker;
   soulVoiceBox: ResourceBox;
+  wanderersCoda: HTMLDivElement;
+  magesCoda: HTMLDivElement;
+  armysCoda: HTMLDivElement;
 
   ethosStacks = 0;
+  hawkeyeselapsed = 31;
 
   constructor(o: ComponentInterface) {
     super(o);
 
     // DoT
-    this.causticBiteBox = this.bars.addProcBox({
-      id: 'brd-procs-causticbite',
-      fgColor: 'brd-color-causticbite',
-      notifyWhenExpired: true,
-    });
-    this.stormBiteBox = this.bars.addProcBox({
-      id: 'brd-procs-stormbite',
-      fgColor: 'brd-color-stormbite',
+    this.biteBox = this.bars.addProcBox({
+      id: 'brd-procs-bite',
+      fgColor: 'brd-color-bite',
       notifyWhenExpired: true,
     });
 
@@ -50,25 +47,37 @@ export class BRDComponent extends BaseComponent {
     });
     this.repertoireTimer.toward = 'right';
     this.repertoireTimer.stylefill = 'fill';
+    this.repertoireTimer.loop = true;
 
-    this.repertoireTracker5x = new DotTracker({ emitter: this.emitter, player: this.player });
-    if (this.is5x) {
-      // Only with-DoT-target you last attacked will trigger bars timer.
-      // So it work not well in multiple targets fight.
-      this.repertoireTracker5x.onTick([
-        EffectId.Stormbite,
-        EffectId.Windbite,
-        EffectId.CausticBite,
-        EffectId.VenomousBite,
-      ], () => {
-        this.repertoireTimer.duration = kDoTTickInterval;
-      });
-    } else {
-      this.repertoireTimer.loop = true;
-    }
+    // Coda
+    const stacksContainer = document.createElement('div');
+    stacksContainer.id = 'brd-stacks';
+    stacksContainer.classList.add('stacks');
+    const codaContainer = document.createElement('div');
+    codaContainer.id = 'brd-stacks-coda';
+    stacksContainer.appendChild(codaContainer);
+    this.bars.addJobBarContainer().appendChild(stacksContainer);
+
+    this.magesCoda = document.createElement('div');
+    this.armysCoda = document.createElement('div');
+    this.wanderersCoda = document.createElement('div');
+
+    this.magesCoda.id = 'brd-stacks-magescoda';
+    this.armysCoda.id = 'brd-stacks-armyscoda';
+    this.wanderersCoda.id = 'brd-stacks-wandererscoda';
+    [
+      this.magesCoda,
+      this.armysCoda,
+      this.wanderersCoda,
+    ].forEach((e) => codaContainer.appendChild(e));
 
     this.soulVoiceBox = this.bars.addResourceBox({
       classList: ['brd-color-soulvoice'],
+    });
+
+    this.empyrealBox = this.bars.addProcBox({
+      id: 'brd-procs-empyreal',
+      fgColor: 'brd-color-empyreal',
     });
 
     this.straightShotProc = this.bars.addProcBox({
@@ -86,44 +95,34 @@ export class BRDComponent extends BaseComponent {
       case kAbility.MagesBallad:
       case kAbility.ArmysPaeon:
       case kAbility.theWanderersMinuet:
-        // Seem EW BRD's repertoire always tick every 3s after song start
+        // Repertoire always tick every 3s after song start
         // 45s and 0s not included
-        // FIXME: stop timer when song is at last 3s or ended
-        if (!this.is5x)
-          this.repertoireTimer.duration = 3;
+        this.repertoireTimer.duration = 3;
+        break;
+      case kAbility.EmpyrealArrow:
+        this.empyrealBox.duration = 15;
         break;
     }
   }
 
   override onMobGainsEffectFromYou(id: string): void {
-    // Iron jaws just refreshes these effects by gain once more,
-    // so it doesn't need to be handled separately.
     // Log line of getting DoT comes a little late after DoT appear on target,
     // so -0.5s
     switch (id) {
-      case EffectId.Stormbite:
+      case EffectId.Stormbite_4B1:
       case EffectId.Windbite:
-        if (this.is5x)
-          this.stormBiteBox.duration = 30 - 0.5;
-        else
-          this.stormBiteBox.duration = 45 - 0.5;
-        break;
-
-      case EffectId.CausticBite:
+      case EffectId.CausticBite_4B0:
       case EffectId.VenomousBite:
-        if (this.is5x)
-          this.causticBiteBox.duration = 30 - 0.5;
-        else
-          this.causticBiteBox.duration = 45 - 0.5;
+        this.biteBox.duration = 45 - 0.5;
         break;
     }
   }
 
   override onJobDetailUpdate(jobDetail: JobDetail['BRD']): void {
+    // song
     this.songBox.fg = computeBackgroundColorFrom(this.songBox, 'brd-color-song');
     this.repertoireBox.parentNode.classList.remove('minuet', 'ballad', 'paeon', 'full');
     this.repertoireBox.innerText = '';
-    // TODO: These threshold have not been adjust to fit EW
     if (jobDetail.songName === 'Minuet') {
       this.repertoireBox.innerText = jobDetail.songProcs.toString();
       this.repertoireBox.parentNode.classList.add('minuet');
@@ -136,12 +135,18 @@ export class BRDComponent extends BaseComponent {
       this.repertoireBox.innerText = '';
       this.repertoireBox.parentNode.classList.add('ballad');
       this.songBox.fg = computeBackgroundColorFrom(this.songBox, 'brd-color-song.ballad');
-      this.songBox.threshold = 3;
+      if (this.ffxivVersion < 700)
+        this.songBox.threshold = 14;
+      else
+        this.songBox.threshold = 5;
     } else if (jobDetail.songName === 'Paeon') {
       this.repertoireBox.innerText = jobDetail.songProcs.toString();
       this.repertoireBox.parentNode.classList.add('paeon');
       this.songBox.fg = computeBackgroundColorFrom(this.songBox, 'brd-color-song.paeon');
-      this.songBox.threshold = 13;
+      if (this.ffxivVersion < 700)
+        this.songBox.threshold = 3;
+      else
+        this.songBox.threshold = 15;
     }
 
     if (this.songBox.duration === null)
@@ -150,38 +155,50 @@ export class BRDComponent extends BaseComponent {
     const seconds = jobDetail.songMilliseconds / 1000.0;
     if (!this.songBox.duration || seconds > oldSeconds)
       this.songBox.duration = seconds;
+    if (seconds < 3 && this.repertoireTimer.value !== 0)
+      this.repertoireTimer.duration = 0;
+
+    // coda
+    this.magesCoda.classList.toggle('active', jobDetail.coda.includes('Ballad'));
+    this.armysCoda.classList.toggle('active', jobDetail.coda.includes('Paeon'));
+    this.wanderersCoda.classList.toggle('active', jobDetail.coda.includes('Minuet'));
 
     // Soul Voice
     const soulGauge = jobDetail.soulGauge.toString();
     if (soulGauge !== this.soulVoiceBox.innerText) {
       this.soulVoiceBox.innerText = soulGauge;
       this.soulVoiceBox.parentNode.classList.remove('high');
-      // TODO: Maybe adjust to 80 for more Blast Arrow?
-      if (jobDetail.soulGauge >= 95)
+      if (jobDetail.soulGauge >= 80)
         this.soulVoiceBox.parentNode.classList.add('high');
     }
 
     // GCD calculate
-    if (jobDetail.songName === 'Paeon' && this.player.speedBuffs.paeonStacks !== jobDetail.songProcs)
+    if (
+      jobDetail.songName === 'Paeon' && this.player.speedBuffs.paeonStacks !== jobDetail.songProcs
+    )
       this.player.speedBuffs.paeonStacks = jobDetail.songProcs;
   }
 
   override onStatChange({ gcdSkill }: { gcdSkill: number }): void {
-    this.stormBiteBox.valuescale = gcdSkill;
-    this.stormBiteBox.threshold = gcdSkill * 2;
-    this.causticBiteBox.valuescale = gcdSkill;
-    this.causticBiteBox.threshold = gcdSkill * 2;
-    this.songBox.valuescale = gcdSkill;
+    this.biteBox.threshold = gcdSkill * 2;
+    this.empyrealBox.threshold = gcdSkill;
   }
 
   override onYouGainEffect(id: string): void {
     switch (id) {
       case EffectId.StraightShotReady:
-        if (this.is5x)
-          this.straightShotProc.duration = 10;
-        else
-          this.straightShotProc.duration = 30;
+      case EffectId.HawksEye_F15:
+        this.straightShotProc.duration = 30 + 1; // time won't go down before animation complete;
+        this.hawkeyeselapsed = 0;
         break;
+      case EffectId.Barrage_80: {
+        if (this.ffxivVersion < 700)
+          break;
+        if (this.hawkeyeselapsed !== 31)
+          this.hawkeyeselapsed = this.straightShotProc.elapsed;
+        this.straightShotProc.duration = 10;
+        break;
+      }
       // Bard is complicated
       // Paeon -> Minuet/Ballad -> muse -> muse ends
       // Paeon -> runs out -> ethos -> within 30s -> Minuet/Ballad -> muse -> muse ends
@@ -203,7 +220,15 @@ export class BRDComponent extends BaseComponent {
   override onYouLoseEffect(id: string): void {
     switch (id) {
       case EffectId.StraightShotReady:
+      case EffectId.HawksEye_F15:
         this.straightShotProc.duration = 0;
+        this.straightShotProc.reset();
+        this.hawkeyeselapsed = 31;
+        break;
+      case EffectId.Barrage_80:
+        if (this.ffxivVersion < 700)
+          break;
+        this.straightShotProc.duration = 31 - this.hawkeyeselapsed - this.straightShotProc.elapsed;
         break;
       case EffectId.ArmysMuse:
         // Muse effect ends
@@ -221,10 +246,10 @@ export class BRDComponent extends BaseComponent {
 
   override reset(): void {
     this.straightShotProc.duration = 0;
-    this.stormBiteBox.duration = 0;
-    this.causticBiteBox.duration = 0;
+    this.biteBox.duration = 0;
     this.repertoireTimer.duration = 0;
     this.ethosStacks = 0;
     this.songBox.duration = 0;
+    this.hawkeyeselapsed = 31;
   }
 }

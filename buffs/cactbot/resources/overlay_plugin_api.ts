@@ -154,7 +154,7 @@ const callOverlayHandlerInternal: IOverlayHandler = (
   } else {
     p = new Promise((resolve, reject) => {
       sendMessage(msg, (data) => {
-        if (!data) {
+        if (data === null) {
           resolve(data);
           return;
         }
@@ -273,7 +273,7 @@ export const init = (): void => {
       connectWs(wsUrl);
     } else {
       const waitForApi = function() {
-        if (!window.OverlayPluginApi || !window.OverlayPluginApi.ready) {
+        if (!window.OverlayPluginApi?.ready) {
           window.setTimeout(waitForApi, 300);
           return;
         }
@@ -298,12 +298,15 @@ export const init = (): void => {
     }
 
     // Here the OverlayPlugin API is registered to the window object,
-    // but this is mainly for backwards compatibility.For cactbot's built-in files,
+    // but this is mainly for backwards compatibility. For cactbot's built-in files,
     // it is recommended to use the various functions exported in resources/overlay_plugin_api.ts.
+
+    /* eslint-disable deprecation/deprecation */
     window.addOverlayListener = addOverlayListener;
     window.removeOverlayListener = removeOverlayListener;
     window.callOverlayHandler = callOverlayHandler;
     window.dispatchOverlayEvent = dispatchOverlayEvent;
+    /* eslint-enable deprecation/deprecation */
   }
 
   inited = true;

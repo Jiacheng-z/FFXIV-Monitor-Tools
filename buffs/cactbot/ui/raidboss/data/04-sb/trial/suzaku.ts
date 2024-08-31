@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -9,35 +8,26 @@ export type Data = RaidbossData;
 
 // Suzaku Normal
 const triggerSet: TriggerSet<Data> = {
+  id: 'HellsKier',
   zoneId: ZoneId.HellsKier,
   timelineFile: 'suzaku.txt',
   triggers: [
     {
       id: 'Suzaku Cremate',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3220', source: 'Suzaku' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3220', source: 'Suzaku' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3220', source: 'Suzaku' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3220', source: '朱雀' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3220', source: '朱雀' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3220', source: '주작' }),
+      netRegex: { id: '3220', source: 'Suzaku' },
       response: Responses.tankBuster(),
     },
     {
       id: 'Suzaku Screams Of The Damned',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3221', source: 'Suzaku', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3221', source: 'Suzaku', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3221', source: 'Suzaku', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3221', source: '朱雀', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3221', source: '朱雀', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3221', source: '주작', capture: false }),
+      netRegex: { id: '3221', source: 'Suzaku', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Suzaku Primary Target',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '699' }),
+      netRegex: { effectId: '699' },
       condition: Conditions.targetIsYou(),
       suppressSeconds: 1,
       infoText: (_data, _matches, output) => output.text!(),
@@ -46,6 +36,7 @@ const triggerSet: TriggerSet<Data> = {
           en: 'Lady tether on YOU',
           de: 'Verbindung auf DIR',
           fr: 'Lien sur VOUS',
+          ja: '線ついた',
           cn: '连线点名',
           ko: '화염조 대상자',
         },
@@ -54,38 +45,26 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Suzaku Southron Star',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3234', source: 'Suzaku', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3234', source: 'Suzaku', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3234', source: 'Suzaku', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3234', source: '朱雀', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3234', source: '朱雀', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3234', source: '주작', capture: false }),
+      netRegex: { id: '3234', source: 'Suzaku', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Suzaku Phantom Flurry',
-      netRegex: NetRegexes.startsUsing({ id: '3231', source: 'Suzaku' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3231', source: 'Suzaku' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3231', source: 'Suzaku' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3231', source: '朱雀' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3231', source: '朱雀' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3231', source: '주작' }),
+      type: 'StartsUsing',
+      netRegex: { id: '3231', source: 'Suzaku' },
       response: Responses.tankBuster(),
     },
     {
       id: 'Suzaku Rekindle',
-      netRegex: NetRegexes.headMarker({ id: '3230' }),
+      type: 'HeadMarker',
+      netRegex: { id: '3230' },
       condition: Conditions.targetIsYou(),
       response: Responses.spread(),
     },
     {
       id: 'Suzaku Ruthless Refrain',
-      netRegex: NetRegexes.startsUsing({ id: '3230', source: 'Suzaku', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3230', source: 'Suzaku', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3230', source: 'Suzaku', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3230', source: '朱雀', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3230', source: '朱雀', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3230', source: '주작', capture: false }),
+      type: 'StartsUsing',
+      netRegex: { id: '3230', source: 'Suzaku', capture: false },
       response: Responses.knockback(),
     },
   ],

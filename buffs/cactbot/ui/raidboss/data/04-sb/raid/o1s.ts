@@ -1,4 +1,3 @@
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -8,29 +7,20 @@ export type Data = RaidbossData;
 
 // O1S - Deltascape 1.0 Savage
 const triggerSet: TriggerSet<Data> = {
+  id: 'DeltascapeV10Savage',
   zoneId: ZoneId.DeltascapeV10Savage,
   timelineFile: 'o1s.txt',
   triggers: [
     {
       id: 'O1S Blaze',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1EDD', source: 'Alte Roite', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1EDD', source: 'Alte Roite', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1EDD', source: 'Alte Roite', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1EDD', source: 'アルテ・ロイテ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1EDD', source: '老者', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1EDD', source: '알테 로이테', capture: false }),
+      netRegex: { id: '1EDD', source: 'Alte Roite', capture: false },
       response: Responses.stackMarker(),
     },
     {
       id: 'O1S Breath Wing',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1ED6', source: 'Alte Roite', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1ED6', source: 'Alte Roite', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1ED6', source: 'Alte Roite', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1ED6', source: 'アルテ・ロイテ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1ED6', source: '老者', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1ED6', source: '알테 로이테', capture: false }),
+      netRegex: { id: '1ED6', source: 'Alte Roite', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -46,45 +36,25 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O1S Clamp',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1EDE', source: 'Alte Roite', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1EDE', source: 'Alte Roite', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1EDE', source: 'Alte Roite', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1EDE', source: 'アルテ・ロイテ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1EDE', source: '老者', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1EDE', source: '알테 로이테', capture: false }),
+      netRegex: { id: '1EDE', source: 'Alte Roite', capture: false },
       response: Responses.awayFromFront(),
     },
     {
       id: 'O1S Downburst',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1ED8', source: 'Alte Roite', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1ED8', source: 'Alte Roite', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1ED8', source: 'Alte Roite', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1ED8', source: 'アルテ・ロイテ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1ED8', source: '老者', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1ED8', source: '알테 로이테', capture: false }),
+      netRegex: { id: '1ED8', source: 'Alte Roite', capture: false },
       response: Responses.knockback(),
     },
     {
       id: 'O1S Roar',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1ED4', source: 'Alte Roite', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1ED4', source: 'Alte Roite', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1ED4', source: 'Alte Roite', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1ED4', source: 'アルテ・ロイテ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1ED4', source: '老者', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1ED4', source: '알테 로이테', capture: false }),
+      netRegex: { id: '1ED4', source: 'Alte Roite', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'O1S Charybdis',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1ED3', source: 'Alte Roite', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1ED3', source: 'Alte Roite', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1ED3', source: 'Alte Roite', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1ED3', source: 'アルテ・ロイテ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1ED3', source: '老者', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1ED3', source: '알테 로이테', capture: false }),
+      netRegex: { id: '1ED3', source: 'Alte Roite', capture: false },
       response: Responses.aoe(),
     },
   ],
@@ -124,7 +94,7 @@ const triggerSet: TriggerSet<Data> = {
         'Wyrm Tail': 'Queue du dragon ancestral',
       },
       'replaceText': {
-        '\\(safe\\)': '(sûre)',
+        '\\(safe\\)': '(safe)',
         '\\(spread\\)': '(dispersion)',
         '\\(stack\\)': '(package)',
         'Blaze': 'Givre',

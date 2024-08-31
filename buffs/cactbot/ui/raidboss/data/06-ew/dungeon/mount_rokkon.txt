@@ -1,0 +1,1131 @@
+### MOUNT ROKKON
+# ZoneId: 471
+
+hideall "--Reset--"
+hideall "--sync--"
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+# Yozakura the Fleeting (left path) #
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+
+# -p 83A9:1011.6 837E:1365.9 838F:1663.8
+# -ii 838A 8391 8382
+
+# Last Glimpse will be sealed off
+1000.0 "--sync--" SystemLogMessage { id: "7DC", param1: "10DC" } window 10000,0
+1011.6 "Glory Neverlasting" Ability { id: "83A9", source: "Yozakura the Fleeting" }
+1021.6 "Art of the Windblossom" Ability { id: "8369", source: "Yozakura the Fleeting" }
+1030.7 "Oka Ranman" Ability { id: "836E", source: "Yozakura the Fleeting" }
+1035.8 "--middle--" Ability { id: "8612", source: "Yozakura the Fleeting" }
+1040.1 "Seal of the Fleeting" Ability { id: "8379", source: "Yozakura the Fleeting" }
+# TODO: is this always wind?
+#1040.3 "Seal Marker 1" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+#1042.3 "Seal Marker 2" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+1049.5 "Seal of Riotous Bloom" Ability { id: "8374", source: "Yozakura the Fleeting" }
+1052.7 "Seal of the Blossom" Ability { id: "837[5678]", source: "Yozakura the Fleeting" }
+1059.7 "--sync--" Ability { id: "8612", source: "Yozakura the Fleeting" }
+
+#cactbot-timeline-lint-disable-sync-order
+# -> rain path
+1060.9 "--sync--" StartsUsing { id: "837E", source: "Yozakura the Fleeting" } window 50,50 jump 1360.9
+1065.9 "Bunshin?" #Ability { id: "837E", source: "Yozakura the Fleeting" }
+
+# -> wind path
+1060.8 "--sync--" StartsUsing { id: "838F", source: "Yozakura the Fleeting" } window 50,50 jump 1660.8
+1070.1 "Windblossom Whirl?" #Ability { id: "8390", source: "Yozakura the Fleeting" }
+#cactbot-timeline-lint-enable-sync-order
+
+# Rain path
+1359.7 "--sync--" Ability { id: "8612", source: "Yozakura the Fleeting" }
+1360.9 "--sync--" StartsUsing { id: "837E", source: "Yozakura the Fleeting" }
+1365.9 "Bunshin" Ability { id: "837E", source: "Yozakura the Fleeting" }
+1375.0 "Shadowflight (cast)" Ability { id: "837F", source: "Yozakura the Fleeting" }
+1380.0 "Shadowflight" Ability { id: "8380", source: "Mirrored Yozakura" }
+1385.2 "Art of the Fireblossom" Ability { id: "8368", source: "Yozakura the Fleeting" }
+
+1394.3 "Oka Ranman" Ability { id: "836E", source: "Yozakura the Fleeting" }
+1399.4 "--middle--" Ability { id: "8612", source: "Yozakura the Fleeting" }
+1403.5 "Seal of the Fleeting" Ability { id: "8379", source: "Yozakura the Fleeting" }
+#1103.7 "Seal Marker 1" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+#1105.7 "Seal Marker 2" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+#1107.7 "Seal Marker 3" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+#1109.7 "Seal Marker 4" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+1416.9 "Seal of Riotous Bloom" Ability { id: "8374", source: "Yozakura the Fleeting" }
+1420.1 "Seal of the Blossom 1" Ability { id: "837[5678]", source: "Yozakura the Fleeting" }
+1425.1 "Seal of Riotous Bloom" Ability { id: "8374", source: "Yozakura the Fleeting" }
+1428.1 "Seal of the Blossom 2" Ability { id: "837[5678]", source: "Yozakura the Fleeting" }
+1437.2 "--sync--" Ability { id: "8612", source: "Yozakura the Fleeting" }
+1443.4 "Bunshin" Ability { id: "837E", source: "Yozakura the Fleeting" }
+1451.5 "Mudrain" Ability { id: "8389", source: "Yozakura the Fleeting" }
+1456.7 "--sync--" Ability { id: "838B", source: "Yozakura the Fleeting" }
+1460.9 "Icebloom 1" #Ability { id: "838C", source: "Yozakura the Fleeting" }
+1462.9 "Icebloom 2" #Ability { id: "838C", source: "Yozakura the Fleeting" }
+1464.8 "Mud Pie (cast)" Ability { id: "838D", source: "Yozakura the Fleeting" }
+1464.9 "Icebloom 3" #Ability { id: "838C", source: "Yozakura the Fleeting" }
+1471.9 "Mud Pie" #Ability { id: "838E", source: "Mud Bubble" }
+1472.7 "Shadowflight (cast)" Ability { id: "837F", source: "Yozakura the Fleeting" }
+1477.7 "Shadowflight" Ability { id: "8380", source: "Mirrored Yozakura" }
+1484.9 "Kuge Rantsui" Ability { id: "83AA", source: "Yozakura the Fleeting" }
+1493.1 "Glory Neverlasting" Ability { id: "83A9", source: "Yozakura the Fleeting" }
+
+1503.3 "Oka Ranman" Ability { id: "836E", source: "Yozakura the Fleeting" } window 20,20 forcejump 1394.3
+
+
+# Wind path
+1659.7 "--sync--" Ability { id: "8612", source: "Yozakura the Fleeting" }
+1660.8 "--sync--" StartsUsing { id: "838F", source: "Yozakura the Fleeting" }
+1663.8 "--sync--" Ability { id: "838F", source: "Yozakura the Fleeting" }
+1670.1 "Windblossom Whirl" Ability { id: "8390", source: "Yozakura the Fleeting" }
+1670.1 "Levinblossom Strike" Ability { id: "8392", source: "Yozakura the Fleeting" }
+1675.2 "Windblossom Whirl" Ability { id: "86F0", source: "Yozakura the Fleeting" }
+1675.2 "Levinblossom Strike" Ability { id: "8392", source: "Yozakura the Fleeting" }
+1680.2 "Windblossom Whirl" Ability { id: "86F0", source: "Yozakura the Fleeting" }
+1680.2 "Levinblossom Strike" Ability { id: "8392", source: "Yozakura the Fleeting" }
+1685.2 "Windblossom Whirl" Ability { id: "86F0", source: "Yozakura the Fleeting" }
+1685.2 "Levinblossom Strike" Ability { id: "8392", source: "Yozakura the Fleeting" }
+1687.2 "Drifting Petals" Ability { id: "8393", source: "Yozakura the Fleeting" }
+1693.3 "Windblossom Whirl" Ability { id: "8390", source: "Yozakura the Fleeting" }
+1693.3 "Levinblossom Strike" Ability { id: "8392", source: "Yozakura the Fleeting" }
+1696.3 "Art of the Fireblossom" Ability { id: "8368", source: "Yozakura the Fleeting" }
+1705.4 "Oka Ranman" Ability { id: "836E", source: "Yozakura the Fleeting" }
+1710.5 "--sync--" Ability { id: "8612", source: "Yozakura the Fleeting" }
+1714.8 "Seal of the Fleeting" Ability { id: "8379", source: "Yozakura the Fleeting" }
+#1713.9 "Seal Marker 1" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+#1715.9 "Seal Marker 2" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+#1717.9 "Seal Marker 3" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+#1719.9 "Seal Marker 4" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+1728.2 "Seal of Riotous Bloom" Ability { id: "8374", source: "Yozakura the Fleeting" }
+1731.4 "Seal of the Blossom 1" Ability { id: "837[5678]", source: "Yozakura the Fleeting" }
+1736.4 "Seal of Riotous Bloom" Ability { id: "8374", source: "Yozakura the Fleeting" }
+1739.4 "Seal of the Blossom 2" Ability { id: "837[5678]", source: "Yozakura the Fleeting" }
+
+1748.6 "--sync--" Ability { id: "8612", source: "Yozakura the Fleeting" }
+#1752.8 "Season Indicator 1" Ability { id: "838[34]", source: "Yozakura the Fleeting" }
+#1754.9 "Season Indicator 2" Ability { id: "838[34]", source: "Yozakura the Fleeting" }
+#1757.0 "Season Indicator 3" Ability { id: "838[34]", source: "Yozakura the Fleeting" }
+#1759.1 "Season Indicator 4" Ability { id: "838[34]", source: "Yozakura the Fleeting" }
+1759.5 "Seasons of the Fleeting" Ability { id: "8381", source: "Yozakura the Fleeting" }
+1760.4 "Season of Element 1" #Ability { id: "838[5678]", source: "Yozakura the Fleeting" }
+1762.5 "Season of Element 2" #Ability { id: "838[5678]", source: "Yozakura the Fleeting" }
+1764.6 "Season of Element 3" #Ability { id: "838[5678]", source: "Yozakura the Fleeting" }
+1766.7 "Season of Element 4" #Ability { id: "838[5678]", source: "Yozakura the Fleeting" }
+1776.0 "Kuge Rantsui" Ability { id: "83AA", source: "Yozakura the Fleeting" }
+1784.2 "Glory Neverlasting" Ability { id: "83A9", source: "Yozakura the Fleeting" }
+
+1789.3 "--sync--" Ability { id: "8612", source: "Yozakura the Fleeting" }
+1790.5 "--sync--" StartsUsing { id: "838F", source: "Yozakura the Fleeting" }
+1793.5 "--sync--" Ability { id: "838F", source: "Yozakura the Fleeting" } window 30,30 forcejump 1663.8
+
+# YOZAKURA ABILITIES (ALL PATHS)
+# 1961 attack
+# 8368 Art of the Fireblossom circle cast and damage
+# 8369 Art of the Windblossom donut cast and damage
+# 836E Oka Ranman self-targeted cast and ability for various Seal
+# 8374 Seal of Riotous Bloom self-targeted cast and ability during Oka Ranman
+# 8375 Seal of the Fireblossom circle damage
+# 8376 Seal of the Windblossom donut damage
+# 8377 Seal of the Rainblossom intercard damage
+# 8378 Seal of the Levinblossom card damage
+# 8379 Seal of the Fleeting self-targetd ability
+# 837A Seal of the Fireblossom fire marker
+# 837B Seal of the Windblossom wind marker
+# 837C Seal of the Levinblossom thunder marker
+# 837D Seal of the Rainblossom rain marker
+# 83A9 Glory Neverlasting cast and damage tankbuster
+# 83AA Kuge Rantsui cast and damage aoe
+# 8612 --sync-- repositioning
+
+# YOZAKURA ABILITIES (LEFT AND RIGHT PATH)
+# 837E Bunshin self-targeted cast and ability to summon clone
+# 837F Shadowflight self-targeted cast and ability
+# 8380 Shadowflight clone backstab damage
+# 8381 Seasons of the Fleeting cast and self-targeted ability
+# 8382 Seasons of the Fleeting self-targeted ability used between Seasons
+# 8383 --sync-- line indicator
+# 8384 --sync-- pinwheel indicator
+# 8385 Season of Fire 4x lines (back safe)
+# 8386 Season of Water 4x lines (front safe)
+# 8387 Season of Lightning intercardinal pinwheel
+# 8388 Season of Earth cardinal pinwheel
+# 8389 Mudrain self-targeted cast and ability
+# 838A Mudrain cast and damage for initial circles
+# 8393 Drifting Petals cast and knockback damage
+
+# YOZAKURA ABILITIES (LEFT PATH)
+# 838F Windblossom Whirl cast and self-targeted
+# 8390 Windblossom Whirl cast and damage for donut
+# 8391 Levinblossom Strike cast and self-targeted
+# 8392 Levinblossom Strike cast and damage for lightning circles
+# 838B Icebloom self-targeted cast and ability
+# 838C Icebloom cast and damage for three chasing circles
+# 838D Mud Pie self-targeted cast and ability
+# 838E Mud Pie cast and damage for mud line aoes
+# 86F0 Windblossom Whirl ongoing donut damage for repeated donuts
+
+
+#~~~~~~~~~~~~~~~~~~~#
+# Moko the Restless #
+#~~~~~~~~~~~~~~~~~~~#
+
+# -p 85AD:2011.9
+# -ii 8597 86D2 878A 85A0 859A 859E 871C 85A4 85A7
+
+# Hall of the Unseen will be sealed off
+2000.0 "--sync--" SystemLogMessage { id: "7DC", param1: "10DF" } window 10000,0
+2011.9 "Kenki Release" Ability { id: "85AD", source: "Moko the Restless" }
+2022.1 "--middle--" Ability { id: "85AF", source: "Moko the Restless" }
+2028.5 "Iai-kasumi-giri" Ability { id: "8587", source: "Moko the Restless" }
+2035.6 "Iai-kasumi-giri" Ability { id: "858[98A]", source: "Moko the Restless" }
+2048.7 "Iai-kasumi-giri" Ability { id: "858[98A]", source: "Moko the Restless" }
+2056.8 "Soldiers of Death" Ability { id: "8593", source: "Moko the Restless" }
+2071.8 "Iron Rain" Ability { id: "8594", source: "Ashigaru Kyuhei" }
+2074.9 "Soldiers of Death" Ability { id: "8593", source: "Moko the Restless" }
+2083.6 "Spearman's Orders" Ability { id: "8595", source: "Moko the Restless" }
+2083.6 "--sync--" Ability { id: "8596", source: "Moko the Restless" }
+2095.7 "--sync--" Ability { id: "8596", source: "Moko the Restless" }
+2103.1 "Soldiers of Death" Ability { id: "8593", source: "Moko the Restless" }
+2118.1 "Iron Rain" Ability { id: "8594", source: "Ashigaru Kyuhei" }
+2124.2 "Kenki Release" Ability { id: "85AD", source: "Moko the Restless" }
+2131.4 "--middle--" Ability { id: "85AF", source: "Moko the Restless" }
+2143.5 "Double Kasumi-giri 1" Ability { id: "858[BCDE]", source: "Moko the Restless" }
+2147.1 "Double Kasumi-giri 2" Ability { id: ["858F", "859[012]"], source: "Moko the Restless" }
+2160.2 "Double Kasumi-giri 1" Ability { id: "858[BCDE]", source: "Moko the Restless" }
+2163.8 "Double Kasumi-giri 2" Ability { id: ["858F", "859[012]"], source: "Moko the Restless" }
+
+#cactbot-timeline-lint-disable-sync-order
+# => path 01
+2169.0 "--sync--" StartsUsing { id: "85A8", source: "Moko the Restless" } window 50,50 jump 2269
+2172.0 "Untempered Sword?" #Ability { id: "85A8", source: "Moko the Restless" }
+
+# => path 02
+2170.5 "--sync--" StartsUsing { id: "85AB", source: "Moko the Restless" } window 50,50 jump 2570.5
+2173.5 "Moonless Night?" #Ability { id: "85AB", source: "Moko the Restless" }
+
+# => path 03
+2169.0 "--sync--" StartsUsing { id: "85A1", source: "Moko the Restless" } window 50,50 jump 2869
+2172.0 "Tengu-yobi?" #Ability { id: "85A1", source: "Moko the Restless" }
+
+# => path 04
+2169.0 "--sync--" StartsUsing { id: "85A5", source: "Moko the Restless" } window 50,50 jump 3169
+2172.0 "Spiritspark?" #Ability { id: "85A5", source: "Moko the Restless" }
+#cactbot-timeline-lint-enable-sync-order
+
+# path 01
+2231.4 "--middle--" Ability { id: "85AF", source: "Moko the Restless" }
+2243.5 "Double Kasumi-giri 1" Ability { id: "858[BCDE]", source: "Moko the Restless" }
+2247.1 "Double Kasumi-giri 2" Ability { id: ["858F", "859[012]"], source: "Moko the Restless" }
+2260.2 "Double Kasumi-giri 1" Ability { id: "858[BCDE]", source: "Moko the Restless" }
+2263.8 "Double Kasumi-giri 2" Ability { id: ["858F", "859[012]"], source: "Moko the Restless" }
+
+2269.0 "--sync--" StartsUsing { id: "85A8", source: "Moko the Restless" }
+2272.0 "Untempered Sword" Ability { id: "85A8", source: "Moko the Restless" }
+2276.0 "Unsheathing 1" Ability { id: "85A9", source: "Ancient Katana" }
+2280.0 "Unsheathing 2" Ability { id: "85A9", source: "Ancient Katana" }
+2282.2 "Veil Sever 1" Ability { id: "85AA", source: "Ancient Katana" }
+2284.1 "Unsheathing 3" Ability { id: "85A9", source: "Ancient Katana" }
+2286.3 "Veil Sever 2" Ability { id: "85AA", source: "Ancient Katana" }
+2288.2 "Unsheathing 4" Ability { id: "85A9", source: "Ancient Katana" }
+2290.4 "Veil Sever 3" Ability { id: "85AA", source: "Ancient Katana" }
+2294.4 "Veil Sever 4" Ability { id: "85AA", source: "Ancient Katana" }
+
+2298.1 "--middle--" Ability { id: "85AF", source: "Moko the Restless" }
+2304.4 "Iai-kasumi-giri" Ability { id: "858[789A]", source: "Moko the Restless" }
+2311.5 "Kenki Release" Ability { id: "85AD", source: "Moko the Restless" }
+
+2317.7 "--sync--" Ability { id: "85AF", source: "Moko the Restless" }
+2324.1 "Azure Auspice" Ability { id: "859C", source: "Moko the Restless" }
+2329.7 "Boundless Azure" Ability { id: "859D", source: "Moko the Restless" }
+2342.4 "Upwell 1" Ability { id: "859F", source: "Moko the Restless" } duration 10
+2348.3 "Upwell 2" Ability { id: "859F", source: "Moko the Restless" } duration 10
+2356.3 "Upwell 3" Ability { id: "859F", source: "Moko the Restless" } duration 10
+2366.7 "--middle--" Ability { id: "85AF", source: "Moko the Restless" }
+2378.8 "Double Kasumi-giri 1" Ability { id: "858[BCDE]", source: "Moko the Restless" }
+2382.4 "Double Kasumi-giri 2" Ability { id: ["858F", "859[012]"], source: "Moko the Restless" }
+2389.5 "Kenki Release" Ability { id: "85AD", source: "Moko the Restless" }
+2398.6 "Soldiers of Death" Ability { id: "8593", source: "Moko the Restless" }
+2407.3 "Spearman's Orders" Ability { id: "8595", source: "Moko the Restless" }
+2407.3 "--sync--" Ability { id: "8596", source: "Moko the Restless" }
+2418.8 "--sync--" Ability { id: "8596", source: "Moko the Restless" }
+2426.2 "Soldiers of Death" Ability { id: "8593", source: "Moko the Restless" }
+2441.2 "Iron Rain" Ability { id: "8594", source: "Ashigaru Kyuhei" }
+
+2448.4 "--middle--" Ability { id: "85AF", source: "Moko the Restless" } window 30,30 forcejump 2231.4
+
+
+# path 02
+2531.4 "--middle--" Ability { id: "85AF", source: "Moko the Restless" }
+2543.5 "Double Kasumi-giri 1" Ability { id: "858[BCDE]", source: "Moko the Restless" }
+2547.1 "Double Kasumi-giri 2" Ability { id: ["858F", "859[012]"], source: "Moko the Restless" }
+2560.2 "Double Kasumi-giri 1" Ability { id: "858[BCDE]", source: "Moko the Restless" }
+2563.8 "Double Kasumi-giri 2" Ability { id: ["858F", "859[012]"], source: "Moko the Restless" }
+
+2569.1 "--sync--" Ability { id: "85AF", source: "Moko the Restless" }
+2570.5 "--sync--" StartsUsing { id: "85AB", source: "Moko the Restless" }
+2573.5 "Moonless Night" Ability { id: "85AB", source: "Moko the Restless" }
+2581.7 "Clearout 1" Ability { id: "85AC", source: "Oni's Claw" }
+2590.9 "Clearout 2" Ability { id: "85AC", source: "Oni's Claw" }
+
+2595.7 "--middle--" Ability { id: "85AF", source: "Moko the Restless" }
+2601.9 "Iai-kasumi-giri" Ability { id: "858[789A]", source: "Moko the Restless" }
+2609.0 "Kenki Release" Ability { id: "85AD", source: "Moko the Restless" }
+
+2615.2 "--sync--" Ability { id: "85AF", source: "Moko the Restless" }
+2621.6 "Scarlet Auspice" Ability { id: "8598", source: "Moko the Restless" }
+2627.2 "Boundless Scarlet" Ability { id: "8599", source: "Moko the Restless" }
+2641.9 "Explosion 1" Ability { id: "859B", source: "Moko the Restless" }
+2646.9 "Explosion 2" Ability { id: "859B", source: "Moko the Restless" }
+2651.9 "Explosion 3" Ability { id: "859B", source: "Moko the Restless" }
+2652.3 "--middle--" Ability { id: "85AF", source: "Moko the Restless" }
+2664.5 "Double Kasumi-giri 1" Ability { id: "858[BCDE]", source: "Moko the Restless" }
+2668.1 "Double Kasumi-giri 2" Ability { id: ["858F", "859[012]"], source: "Moko the Restless" }
+2675.2 "Kenki Release" Ability { id: "85AD", source: "Moko the Restless" }
+2684.3 "Soldiers of Death" Ability { id: "8593", source: "Moko the Restless" }
+2693.0 "Spearman's Orders" Ability { id: "8595", source: "Moko the Restless" }
+2693.0 "--sync--" Ability { id: "8596", source: "Moko the Restless" }
+2704.7 "--sync--" Ability { id: "8596", source: "Moko the Restless" }
+2712.3 "Soldiers of Death" Ability { id: "8593", source: "Moko the Restless" }
+2727.3 "Iron Rain" Ability { id: "8594", source: "Ashigaru Kyuhei" }
+
+2734.5 "--middle--" Ability { id: "85AF", source: "Moko the Restless" } window 30,30 forcejump 2531.4
+
+
+# path 03
+2831.4 "--middle--" Ability { id: "85AF", source: "Moko the Restless" }
+2843.5 "Double Kasumi-giri 1" Ability { id: "858[BCDE]", source: "Moko the Restless" }
+2847.1 "Double Kasumi-giri 2" Ability { id: ["858F", "859[012]"], source: "Moko the Restless" }
+2860.2 "Double Kasumi-giri 1" Ability { id: "858[BCDE]", source: "Moko the Restless" }
+2863.8 "Double Kasumi-giri 2" Ability { id: ["858F", "859[012]"], source: "Moko the Restless" }
+
+2869.0 "--sync--" StartsUsing { id: "85A1", source: "Moko the Restless" }
+2872.0 "Tengu-yobi" Ability { id: "85A1", source: "Moko the Restless" }
+2884.0 "Yama-kagura" Ability { id: "85A2", source: "Ill-come Tengu" }
+
+2889.1 "--middle--" Ability { id: "85AF", source: "Moko the Restless" }
+2895.4 "Iai-kasumi-giri" Ability { id: "858[789A]", source: "Moko the Restless" }
+
+2908.6 "Yama-kagura" Ability { id: "85A2", source: "Ill-come Tengu" }
+2910.6 "Ghastly Grasp" Ability { id: "85A3", source: "Moko the Restless" }
+2918.6 "Kenki Release" Ability { id: "85AD", source: "Moko the Restless" }
+2924.7 "--sync--" Ability { id: "85AF", source: "Moko the Restless" }
+2931.1 "Azure Auspice" Ability { id: "859C", source: "Moko the Restless" }
+2936.7 "Boundless Azure" Ability { id: "859D", source: "Moko the Restless" }
+2949.4 "Upwell 1" Ability { id: "859F", source: "Moko the Restless" } duration 10
+2955.4 "Upwell 2" Ability { id: "859F", source: "Moko the Restless" } duration 10
+2963.4 "Upwell 3" Ability { id: "859F", source: "Moko the Restless" } duration 10
+
+2973.8 "--middle--" Ability { id: "85AF", source: "Moko the Restless" }
+2985.9 "Double Kasumi-giri 1" Ability { id: "858[BCDE]", source: "Moko the Restless" }
+2989.5 "Double Kasumi-giri 2" Ability { id: ["858F", "859[012]"], source: "Moko the Restless" }
+2996.6 "Kenki Release" Ability { id: "85AD", source: "Moko the Restless" }
+
+3005.7 "Soldiers of Death" Ability { id: "8593", source: "Moko the Restless" }
+3014.3 "Spearman's Orders" Ability { id: "8595", source: "Moko the Restless" }
+3014.3 "--sync--" Ability { id: "8596", source: "Moko the Restless" }
+3026.0 "--sync--" Ability { id: "8596", source: "Moko the Restless" }
+3033.4 "Soldiers of Death" Ability { id: "8593", source: "Moko the Restless" }
+3048.4 "Iron Rain" Ability { id: "8594", source: "Ashigaru Kyuhei" }
+
+3055.6 "--sync--" Ability { id: "85AF", source: "Moko the Restless" } window 30,30 forcejump 2831.4
+
+
+# path 04
+3131.4 "--middle--" Ability { id: "85AF", source: "Moko the Restless" }
+3143.5 "Double Kasumi-giri 1" Ability { id: "858[BCDE]", source: "Moko the Restless" }
+3147.1 "Double Kasumi-giri 2" Ability { id: ["858F", "859[012]"], source: "Moko the Restless" }
+3160.2 "Double Kasumi-giri 1" Ability { id: "858[BCDE]", source: "Moko the Restless" }
+3163.8 "Double Kasumi-giri 2" Ability { id: ["858F", "859[012]"], source: "Moko the Restless" }
+
+3169.0 "--sync--" StartsUsing { id: "85A5", source: "Moko the Restless" }
+3172.0 "Spiritspark" Ability { id: "85A5", source: "Moko the Restless" }
+3177.0 "Spiritflame 1" Ability { id: "85A6", source: "Moko the Restless" }
+3182.8 "Spiritflame 2" Ability { id: "85A6", source: "Moko the Restless" }
+3188.6 "Spiritflame 3" Ability { id: "85A6", source: "Moko the Restless" }
+3194.3 "Spiritflame 4" Ability { id: "85A6", source: "Moko the Restless" }
+
+3205.1 "--middle--" Ability { id: "85AF", source: "Moko the Restless" }
+3211.4 "Iai-kasumi-giri" Ability { id: "858[789A]", source: "Moko the Restless" }
+3218.5 "Kenki Release" Ability { id: "85AD", source: "Moko the Restless" }
+
+3224.7 "--sync--" Ability { id: "85AF", source: "Moko the Restless" }
+3230.9 "Scarlet Auspice" Ability { id: "8598", source: "Moko the Restless" }
+3236.5 "Boundless Scarlet" Ability { id: "8599", source: "Moko the Restless" }
+3251.3 "Explosion 1" Ability { id: "859B", source: "Moko the Restless" }
+3256.3 "Explosion 2" Ability { id: "859B", source: "Moko the Restless" }
+3261.3 "Explosion 3" Ability { id: "859B", source: "Moko the Restless" }
+
+3261.7 "--middle--" Ability { id: "85AF", source: "Moko the Restless" }
+3273.9 "Double Kasumi-giri 1" Ability { id: "858[BCDE]", source: "Moko the Restless" }
+3277.5 "Double Kasumi-giri 2" Ability { id: ["858F", "859[012]"], source: "Moko the Restless" }
+3284.6 "Kenki Release" Ability { id: "85AD", source: "Moko the Restless" }
+3293.7 "Soldiers of Death" Ability { id: "8593", source: "Moko the Restless" }
+3302.4 "Spearman's Orders" Ability { id: "8595", source: "Moko the Restless" }
+3302.4 "--sync--" Ability { id: "8596", source: "Moko the Restless" }
+3314.1 "--sync--" Ability { id: "8596", source: "Moko the Restless" }
+3321.7 "Soldiers of Death" Ability { id: "8593", source: "Moko the Restless" }
+3336.7 "Iron Rain" Ability { id: "8594", source: "Ashigaru Kyuhei" }
+
+3343.9 "--sync--" Ability { id: "85AF", source: "Moko the Restless" } window 30,30 forcejump 3131.4
+
+
+# MOKO ABILITIES
+# 8587 Iai-kasumi-giri cast and damage for back-safe attack
+# 8588 Iai-kasumi-giri cast and damage for front-safe attack
+# 8589 Iai-kasumi-giri cast and damage for left-safe attack
+# 858A Iai-kasumi-giri cast and damage for right-safe attack
+# 858B Double Kasumi-giri long cast and damage for back-safe attack 1
+# 858C Double Kasumi-giri long cast and damage for left-safe attack 1
+# 858D Double Kasumi-giri long cast and damage for front-safe attack 1
+# 858E Double Kasumi-giri long cast and damage for right-safe attack 1
+# 858F Double Kasumi-giri short cast and damage for back-safe attack 2
+# 8590 Double Kasumi-giri short cast and damage for left-safe attack 2
+# 8591 Double Kasumi-giri short cast and damage for front-safe attack 2
+# 8592 Double Kasumi-giri short cast and damage for right-safe attack 2
+# 8593 Soldiers of Death cast and ability before Iron Rain
+# 8594 Iron Rain cast and damage for Soldiers of Death bombardment
+# 8595 Spearman's Orders cast and ability before Spearpoint Push
+# 8596 --sync-- unknown abilty during Spearman's Orders
+# 8597 Spearpoint Push initial damage from Spearman's Orders
+# 8598 Scarlet Auspice cast and circle damage
+# 8599 Boundless Scarlet cast and self-targeted ability
+# 859A Boundless Scarlet cast and damage for initial Z lines
+# 859B Explosion cast and damage from expanding lines
+# 85A2 Yama-kagua cast and knockback damage from Ill-come Tengu adds
+# 85A3 Ghastly Grasp cast and self-targeted
+# 85A4 Ghastly Grasp damage from ground aoes during Tengu pushback
+# 85AB Moonless Night cast and self-targeted summoning of Oni's Claw
+# 85AC Clearout cast and large circle damage from Oni's Claw
+# 895B Explosion cast and damage for exploding fire lines
+# 859C Azure Auspice cast and donut damage before Boundless Azure
+# 859D Boundless Azure cast and self-targeted ability
+# 859E Boundless Azure cast and damage for initial Z lines
+# 859F Upwell cast and initial damage for expanding water lines
+# 85A0 Upwell ongoing damage for expanding water lines
+# 85A1 Tengu-yobi cast and self-targeted summon of Ill-come Tengu
+# 85A2 Yama-kagura cast and damage for knockback lines
+# 85A5 Spiritspark cast and self-targeted ability
+# 85A6 Spiritflame cast and damage for ground circles
+# 85A7 Arm of Purgatory damage for running into summoned heads during Spiritspark
+# 85A8 Untempered Sword cast and ability before Unsheathing / Veil Sever
+# 85A9 Unsheathing cast and damage of initial sword circles
+# 85AA Veil Sever cast and damage of sword lines
+# 85AD Kenki Release cast and raidwide damage
+# 85AF --sync-- repositioning
+# 86D2 Spearpoint Push ongoing damage from Spearman's Orders
+# 871C --sync-- unknown ability during Spearman's Orders
+# 878A --sync-- auto damage
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+# Yozakura the Fleeting (middle path) #
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+
+# -p 83A9:4011.6
+# -ii 8396 8399 839A 839D 839F
+
+# Hall of Temptation will be sealed off
+4000.0 "--sync--" SystemLogMessage { id: "7DC", param1: "10DD" } window 10000,0
+4011.6 "Glory Neverlasting" Ability { id: "83A9", source: "Yozakura the Fleeting" }
+
+#cactbot-timeline-lint-disable-sync-order
+# -> door
+4016.7 "--sync--" StartsUsing { id: "8394", source: "Yozakura the Fleeting" } window 20,20 jump 4116.7
+4019.7 "Tatami Trap?" #Ability { id: "8394", source: "Yozakura the Fleeting" }
+
+# -> rope
+4015.7 "--sync--" StartsUsing { id: "8369", source: "Yozakura the Fleeting" } window 20,20 jump 4315.7
+4020.7 "Art of the Windblossom?" #Ability { id: "8369", source: "Yozakura the Fleeting" }
+#cactbot-timeline-lint-enable-sync-order
+
+# door
+4116.7 "--sync--" StartsUsing { id: "8394", source: "Yozakura the Fleeting" }
+4119.7 "Tatami Trap" Ability { id: "8394", source: "Yozakura the Fleeting" }
+4129.8 "Kuge Rantsui" Ability { id: "83AA", source: "Yozakura the Fleeting" }
+4135.9 "Tatami-gaeshi" Ability { id: "8395", source: "Yozakura the Fleeting" }
+4146.2 "Art of the Windblossom" Ability { id: "8369", source: "Yozakura the Fleeting" }
+
+4155.3 "Oka Ranman" Ability { id: "836E", source: "Yozakura the Fleeting" }
+4160.4 "--middle--" Ability { id: "8612", source: "Yozakura the Fleeting" }
+4164.5 "Seal of the Fleeting" Ability { id: "8379", source: "Yozakura the Fleeting" }
+#4164.7 "Seal Marker 1" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+#4166.7 "Seal Marker 2" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+4173.9 "Seal of Riotous Bloom" Ability { id: "8374", source: "Yozakura the Fleeting" }
+4176.9 "Seal of the Blossom" Ability { id: "837[5678]", source: "Yozakura the Fleeting" }
+
+4184.0 "--middle--" Ability { id: "8612", source: "Yozakura the Fleeting" }
+4188.2 "Tatami Trap" Ability { id: "8394", source: "Yozakura the Fleeting" }
+4195.4 "Levinblossom Lance 1" Ability { id: "839[78]", source: "Yozakura the Fleeting" } duration 5
+4207.7 "Levinblossom Lance 2" Ability { id: "839[78]", source: "Yozakura the Fleeting" } duration 5
+4217.7 "Tatami-gaeshi" Ability { id: "8395", source: "Yozakura the Fleeting" }
+
+4224.9 "Art of the Fireblossom" Ability { id: "8368", source: "Yozakura the Fleeting" }
+4234.0 "Oka Ranman" Ability { id: "836E", source: "Yozakura the Fleeting" }
+4239.1 "--middle--" Ability { id: "8612", source: "Yozakura the Fleeting" }
+4243.2 "Seal of the Fleeting" Ability { id: "8379", source: "Yozakura the Fleeting" }
+#4243.2 "Seal Marker 1" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+#4245.2 "Seal Marker 2" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+#4247.2 "Seal Marker 3" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+#4249.2 "Seal Marker 4" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+4256.8 "Seal of Riotous Bloom" Ability { id: "8374", source: "Yozakura the Fleeting" }
+4259.9 "Seal of the Blossom 1" Ability { id: "837[5678]", source: "Yozakura the Fleeting" }
+4264.9 "Seal of Riotous Bloom" Ability { id: "8374", source: "Yozakura the Fleeting" }
+4267.9 "Seal of the Blossom 2" Ability { id: "837[5678]", source: "Yozakura the Fleeting" }
+4280.9 "Kuge Rantsui" Ability { id: "83AA", source: "Yozakura the Fleeting" }
+4289.1 "Glory Neverlasting" Ability { id: "83A9", source: "Yozakura the Fleeting" }
+
+4293.2 "--middle--" Ability { id: "8612", source: "Yozakura the Fleeting" }
+4297.3 "Tatami Trap" Ability { id: "8394", source: "Yozakura the Fleeting" } window 30,30 forcejump 4188.2
+
+
+# rope
+4315.7 "--sync--" StartsUsing { id: "8369", source: "Yozakura the Fleeting" }
+4320.7 "Art of the Windblossom" Ability { id: "8369", source: "Yozakura the Fleeting" }
+4329.8 "Oka Ranman" Ability { id: "836E", source: "Yozakura the Fleeting" }
+
+4334.9 "--middle--" Ability { id: "8612", source: "Yozakura the Fleeting" }
+4339.1 "Seal of the Fleeting" Ability { id: "8379", source: "Yozakura the Fleeting" }
+#4039.3 "Seal Marker 1" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+#4041.3 "Seal Marker 2" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+4348.6 "Seal of Riotous Bloom" Ability { id: "8374", source: "Yozakura the Fleeting" }
+4351.8 "Seal of the Blossom" Ability { id: "837[5678]", source: "Yozakura the Fleeting" }
+
+4358.8 "--north--" Ability { id: "8612", source: "Yozakura the Fleeting" }
+4363.1 "Silent Whistle" Ability { id: "839B", source: "Yozakura the Fleeting" }
+4373.2 "Donden-gaeshi" Ability { id: "839C", source: "Yozakura the Fleeting" }
+4384.5 "Art of the Fluff" Ability { id: "839E", source: "Shiromaru" }
+4386.5 "Fireblossom Flare" Ability { id: "83A0", source: "Yozakura the Fleeting" }
+4391.6 "Fireblossom Flare" Ability { id: "83A0", source: "Yozakura the Fleeting" }
+4393.5 "Donden-gaeshi" Ability { id: "839C", source: "Yozakura the Fleeting" }
+4404.8 "Art of the Fluff" Ability { id: "839E", source: "Shiromaru" }
+4406.8 "Fireblossom Flare" Ability { id: "83A0", source: "Yozakura the Fleeting" }
+4411.9 "Fireblossom Flare" Ability { id: "83A0", source: "Yozakura the Fleeting" }
+4417.8 "Art of the Fireblossom" Ability { id: "8368", source: "Yozakura the Fleeting" }
+
+4427.0 "Oka Ranman" Ability { id: "836E", source: "Yozakura the Fleeting" }
+4432.1 "--middle--" Ability { id: "8612", source: "Yozakura the Fleeting" }
+4436.4 "Seal of the Fleeting" Ability { id: "8379", source: "Yozakura the Fleeting" }
+#4436.6 "Seal Marker 1" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+#4438.6 "Seal Marker 2" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+#4440.6 "Seal Marker 3" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+#4442.6 "Seal Marker 4" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+4450.1 "Seal of Riotous Bloom" Ability { id: "8374", source: "Yozakura the Fleeting" }
+4453.2 "Seal of the Blossom 1" Ability { id: "837[5678]", source: "Yozakura the Fleeting" }
+4458.2 "Seal of Riotous Bloom" Ability { id: "8374", source: "Yozakura the Fleeting" }
+4461.4 "Seal of the Blossom 2" Ability { id: "837[5678]", source: "Yozakura the Fleeting" }
+4474.3 "Kuge Rantsui" Ability { id: "83AA", source: "Yozakura the Fleeting" }
+4482.5 "Glory Neverlasting" Ability { id: "83A9", source: "Yozakura the Fleeting" }
+
+4486.6 "--north--" Ability { id: "8612", source: "Yozakura the Fleeting" }
+4490.9 "Silent Whistle" Ability { id: "839B", source: "Yozakura the Fleeting" } window 50,50 jump 4363.1
+
+
+# YOZAKURA ABILITIES (MIDDLE PATH)
+# 8394 Tatami Trap cast and self-targeted ability for floor shaking
+# 8395 Tatami-gaeshi cast and self-targeted ability for floor flipping
+# 8396 Tatami-gaeshi cast and damage for floor flip
+# 8397 Levinblossom Lance cast and self-targeted for blue counterclockwise line aoes
+# 8398 Levinblossom Lance cast and self-targeted for orange clockwise line aoes
+# 8399 Levinblossom Lance cast and self-targeted ability for 839A
+# 839A Levinblossom Lance damage for rotating lance line aoe
+# 839B Silent Whistle cast and self-targeted ability to summon dogs
+# 839C Donden-gaeshi cast and self-targeted ability tethering dogs
+# 839D Art of the Fluff cast and damage for lookaway from Kuromaru/Shibamaru
+# 839E Art of the Fluff cast and damage for lookaway from Shiromaru
+# 839F Fireblossom Flare cast and self-targeted ability to summon ground circles
+# 83A0 Fireblossom Flare cast and damage for ground circle aoes
+
+
+#~~~~~~~~~~~~~~~~~~~#
+# Gorai the Uncaged #
+#~~~~~~~~~~~~~~~~~~~#
+
+# -p 8500:5017.6
+# -it "Shishu White Baboon"
+# -ii 84D4 8501 84EE 84E6 84E5 84E9 84E0 84FF 84F9 84F7 84F4 84F5
+
+# Hall of Becoming will be sealed off
+5000.0 "--sync--" SystemLogMessage { id: "7DC", param1: "10E0" } window 10000,0
+5012.6 "--sync--" StartsUsing { id: "8500", source: "Gorai the Uncaged" }
+5017.6 "Unenlightenment" Ability { id: "8500", source: "Gorai the Uncaged" }
+
+5027.1 "Flickering Flame" Ability { id: "84D5", source: "Gorai the Uncaged" }
+5037.4 "Plectrum of Power" Ability { id: "84D8", source: "Gorai the Uncaged" }
+5040.1 "Fire Spread" Ability { id: "84DA", source: "Gorai the Uncaged" }
+
+5047.3 "Flickering Flame" Ability { id: "84D5", source: "Gorai the Uncaged" }
+5057.6 "Morphic Melody" Ability { id: "84D9", source: "Gorai the Uncaged" }
+5060.3 "Fire Spread" Ability { id: "84DB", source: "Gorai the Uncaged" }
+
+5072.6 "Sulphuric Stone" Ability { id: "84D6", source: "Gorai the Uncaged" }
+5082.9 "Plectrum of Power" Ability { id: "84D8", source: "Gorai the Uncaged" }
+5085.6 "Falling Rock" Ability { id: "84DD", source: "Gorai the Uncaged" }
+
+5092.8 "Sulphuric Stone" Ability { id: "84D6", source: "Gorai the Uncaged" }
+5103.1 "Morphic Melody" Ability { id: "84D9", source: "Gorai the Uncaged" }
+5105.8 "Falling Rock" Ability { id: "84DE", source: "Gorai the Uncaged" }
+
+# This is inconsistent among timelines, so don't sync.
+5111.1 "--middle--" #Ability { id: "84D3", source: "Gorai the Uncaged" }
+
+#cactbot-timeline-lint-disable-sync-order
+# -> path 05
+5114.3 "--sync--" StartsUsing { id: "84ED", source: "Gorai the Uncaged" } window 30,30 jump 5214.3
+5116.8 "Pure Shock?" #Ability { id: "84ED", source: "Gorai the Uncaged" }
+
+# -> path 06
+5112.1 "--sync--" StartsUsing { id: "84F2", source: "Gorai the Uncaged" } window 30,30 jump 5312.1
+5115.1 "Thundercall?" Ability { id: "84F2", source: "Gorai the Uncaged" }
+
+# -> path 07
+5112.1 "--sync--" StartsUsing { id: "84F8", source: "Gorai the Uncaged" } window 30,30 jump 5412.1
+5117.1 "Fighting Spirits?" #Ability { id: "84F8", source: "Gorai the Uncaged" }
+#cactbot-timeline-lint-enable-sync-order
+
+# path 05
+5211.1 "--middle--" Ability { id: "84D3", source: "Gorai the Uncaged" }
+5214.3 "--sync--" StartsUsing { id: "84ED", source: "Gorai the Uncaged" }
+5216.8 "Pure Shock" Ability { id: "84ED", source: "Gorai the Uncaged" }
+5218.5 "--stun--" Ability { id: "84EF", source: "Gorai the Uncaged" }
+5220.2 "Wily Wall" Ability { id: "84F0", source: "Shishu White Baboon" }
+5222.2 "--targetable--"
+5228.1 "Impure Purgation 1" Ability { id: "84E7", source: "Gorai the Uncaged" }
+5230.1 "Impure Purgation 2" Ability { id: "84E8", source: "Gorai the Uncaged" }
+5236.1 "Spike of Flame" Ability { id: "84E4", source: "Gorai the Uncaged" }
+5245.0 "String Snap 1" Ability { id: "84EA", source: "Gorai the Uncaged" }
+5247.0 "String Snap 2" Ability { id: "84EB", source: "Gorai the Uncaged" }
+5249.0 "String Snap 3" Ability { id: "84EC", source: "Gorai the Uncaged" }
+5252.3 "Self-destruct" Ability { id: "84F1", source: "Shishu White Baboon" }
+# -> shared loop
+5260.4 "--middle--" Ability { id: "84D3", source: "Gorai the Uncaged" }
+5267.7 "Rousing Reincarnation" Ability { id: "84DF", source: "Gorai the Uncaged" } window 30,30 forcejump 5567.7
+
+
+# path 06
+5309.8 "--sync--" Ability { id: "84D3", source: "Gorai the Uncaged" }
+5312.1 "--sync--" StartsUsing { id: "84F2", source: "Gorai the Uncaged" }
+5315.1 "Thundercall" Ability { id: "84F2", source: "Gorai the Uncaged" }
+5329.0 "Shock" Ability { id: "84DC", source: "Ball of Levin" }
+5335.0 "Humble Hammer" Ability { id: "84F6", source: "Gorai the Uncaged" } duration 8.8
+5346.3 "--sync--" Ability { id: "84D3", source: "Gorai the Uncaged" }
+5351.6 "Thundercall" Ability { id: "84F2", source: "Gorai the Uncaged" }
+5359.5 "Humble Hammer" Ability { id: "84F6", source: "Gorai the Uncaged" } duration 8.8
+5376.5 "Shock" Ability { id: "84F3", source: "Ball of Levin" }
+# -> shared loop
+5379.9 "--sync--" Ability { id: "84D3", source: "Gorai the Uncaged" }
+5387.2 "Rousing Reincarnation" Ability { id: "84DF", source: "Gorai the Uncaged" } window 30,30 forcejump 5567.7
+
+
+# path 07
+5409.9 "--sync--" Ability { id: "84D3", source: "Gorai the Uncaged" }
+5412.1 "--sync--" StartsUsing { id: "84F8", source: "Gorai the Uncaged" }
+5417.1 "Fighting Spirits" Ability { id: "84F8", source: "Gorai the Uncaged" }
+5426.1 "Worldly Pursuit 1" Ability { id: "84FB", source: "Gorai the Uncaged" }
+5429.9 "Worldly Pursuit 2" Ability { id: "84FC", source: "Gorai the Uncaged" }
+5433.7 "Worldly Pursuit 3" Ability { id: "84FC", source: "Gorai the Uncaged" }
+5437.5 "Worldly Pursuit 4" Ability { id: "84FC", source: "Gorai the Uncaged" }
+5441.3 "Worldly Pursuit 5" Ability { id: "84FC", source: "Gorai the Uncaged" }
+5447.4 "Biwa Breaker 1" Ability { id: "84FD", source: "Gorai the Uncaged" }
+5449.1 "Biwa Breaker 2" #Ability { id: "86D1", source: "Gorai the Uncaged" }
+5450.8 "Biwa Breaker 3" #Ability { id: "86D1", source: "Gorai the Uncaged" }
+5452.5 "Biwa Breaker 4" #Ability { id: "86D1", source: "Gorai the Uncaged" }
+5454.2 "Biwa Breaker 5" #Ability { id: "86D1", source: "Gorai the Uncaged" }
+# -> shared loop
+5461.9 "--sync--" Ability { id: "84D3", source: "Gorai the Uncaged" }
+5469.1 "Rousing Reincarnation" Ability { id: "84DF", source: "Gorai the Uncaged" } window 30,30 forcejump 5567.7
+
+
+# shared loop
+5560.4 "--middle--" Ability { id: "84D3", source: "Gorai the Uncaged" }
+5567.7 "Rousing Reincarnation" Ability { id: "84DF", source: "Gorai the Uncaged" }
+5574.0 "Malformed Prayer" Ability { id: "84E1", source: "Gorai the Uncaged" }
+5585.0 "Burst 1" Ability { id: "84E2", source: "Gorai the Uncaged" }
+5586.2 "Impure Purgation 1" Ability { id: "84E7", source: "Gorai the Uncaged" }
+5588.2 "Impure Purgation 2" Ability { id: "84E8", source: "Gorai the Uncaged" }
+5591.0 "Burst 2" Ability { id: "84E2", source: "Gorai the Uncaged" }
+5597.0 "Burst 3" Ability { id: "84E2", source: "Gorai the Uncaged" }
+5599.1 "Spike of Flame" Ability { id: "84E4", source: "Gorai the Uncaged" }
+
+5610.9 "Unenlightenment" Ability { id: "8500", source: "Gorai the Uncaged" }
+5620.2 "Flame and Sulphur" Ability { id: "84D7", source: "Gorai the Uncaged" }
+5630.5 "Plectrum of Power/Morphic Melody" Ability { id: ["84D8", "84D9"], source: "Gorai the Uncaged" }
+5633.2 "Falling Rock" Ability { id: ["84DD", "84DE"], source: "Gorai the Uncaged" }
+5633.2 "Fire Spread" Ability { id: ["84DA", "84DB"], source: "Gorai the Uncaged" }
+5641.4 "Flame and Sulphur" Ability { id: "84D7", source: "Gorai the Uncaged" }
+5651.7 "Morphic Melody/Plectrum of Power" Ability { id: ["84D9", "84D8"], source: "Gorai the Uncaged" }
+5654.4 "Falling Rock" Ability { id: ["84DD", "84DE"], source: "Gorai the Uncaged" }
+5654.4 "Fire Spread" Ability { id: ["84DA", "84DB"], source: "Gorai the Uncaged" }
+
+5664.5 "Torching Torment" Ability { id: "84FE", source: "Gorai the Uncaged" }
+5676.8 "Unenlightenment" Ability { id: "8500", source: "Gorai the Uncaged" }
+5687.1 "String Snap 1" Ability { id: "84EA", source: "Gorai the Uncaged" }
+5689.1 "String Snap 2" Ability { id: "84EB", source: "Gorai the Uncaged" }
+5691.1 "String Snap 3" Ability { id: "84EC", source: "Gorai the Uncaged" }
+5697.0 "Spike of Flame" Ability { id: "84E4", source: "Gorai the Uncaged" }
+5708.8 "Unenlightenment" Ability { id: "8500", source: "Gorai the Uncaged" }
+
+5717.2 "--middle--" Ability { id: "84D3", source: "Gorai the Uncaged" }
+5724.4 "Rousing Reincarnation" Ability { id: "84DF", source: "Gorai the Uncaged" } window 100,100 forcejump 5567.7
+
+
+# GORAI ABILITIES
+# 84D3 --sync-- repositioning ability
+# 84D4 --sync-- auto damage
+# 84D5 Flickering Flame cast and self-targeted summoning blue flames for lines
+# 84D6 Sulphuric Stone cast and self-targeted summoning rocks
+# 84D7 Flame and Sulphur cast and self-targeted summoning rocks and lines
+# 84D8 Plectrum of Power cast and self-targeted purple effect that expands everything
+# 84D9 Morphic Melody cast and self-targeted blue effect that donutifies everything
+# 84DA Fire Spread expanded line damage after Plectrum of Power 84D8
+# 84DB Fire Spread split line damage after Morphic Melody 84D9
+# 84DC Shock Ball of Levin self-targeted ability before 84F5
+# 84DD Falling Rock expanded rock damage after Plectrum of Power 84D8
+# 84DE Falling Rock donutified rock damage after Morphic Melody 84D9
+# 84DF Rousing Reincarnation cast and self-targeted ability
+# 84E0 Rousing Reincarnation ability on player that gives Rodential Rebirth
+# 84E1 Malformed Prayer cast and self-targeted ability that starts the tower sequence
+# 84E2 Burst tower damage
+# 84E3 Dramatic Burst missed tower damage
+# 84E4 Spike of Flame cast and self-targeted ability
+# 84E5 Spike of Flame cast and damage for targeted circle on player
+# 84E6 Impure Purgation cast and self-targeted for 2x pinwheel
+# 84E7 Impure Purgation cast and damage for first pinwheel
+# 84E8 Impure Purgation cast and damage for second pinwheel
+# 84E9 String Snap cast and self-targeted ability
+# 84EA String Snap cast and damage for earth ring 1
+# 84EB String Snap cast and damage for earth ring 2
+# 84EC String Snap cast and damage for earth ring 3
+# 84F8 Fighting Spirits cast and self-targeted ability
+# 84F9 Fighting Spirits and and raidwide damage
+# 84FB Worldly Pursuit cast and damage from initial cross jump
+# 84FC Worldly Pursuit cast and damage from ongoing cross jumps
+# 84FD Biwa Breaker cast and initial damage from multiple raidwides
+# 84ED Pure Shock cast and self-targeted ability for chain to Shishu White Baboon
+# 84EE Pure Shock cast and damage for chain to Shishu White Baboon
+# 84EF --sync-- stun to pull to Shishu White Baboon
+# 84F0 Wily Wall cast and self-targeted Shishu White Baboon ability to create octagon wall
+# 84F1 Self-destruct long cast and damage from Shishu White Baboon
+# 84F2 Thundercall cast and self-targeted Ball of Levin summoning
+# 84F3 Shock Ball of Levin self-targeted ability before 84F4/84F5
+# 84F4 Shock small ground circle damage from Ball of Levin hit by Humble Hammer
+# 84F5 Shock arge ground circle damage from Ball of Levin
+# 84F6 Humble Hammer cast and self-targeted ability
+# 84F7 Humble Hammer ongoing hammer circles that shrink orbs
+# 84FE Torching Torment cast and ability for tankbuster
+# 84FF Torching Torment damage from tankbuster
+# 8500 Unenlightenment cast and self-targeted ability
+# 8501 Unenlightenment raidwide damage
+# 86D1 Biwa Breaker damage from followup raidwides
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+# Yozakura the Fleeting (right path) #
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+
+# -p 83A9:6012
+# -ii 83A2 83A3 83A8 8382 838A
+
+# Autumn Rivers' End will be sealed off
+6000.0 "--sync--" SystemLogMessage { id: "7DC", param1: "10DE" } window 10000,0
+6012.0 "Glory Neverlasting" Ability { id: "83A9", source: "Yozakura the Fleeting" }
+
+#cactbot-timeline-lint-disable-sync-order
+# -> no dogu
+6016.1 "--sync--" StartsUsing { id: "8368", source: "Yozakura the Fleeting" } window 30,30 jump 6116.1
+6019.1 "Art of the Fireblossom?" #Ability { id: "8368", source: "Yozakura the Fleeting" }
+
+# -> dogu
+6016.1 "--sync--" StartsUsing { id: "8369", source: "Yozakura the Fleeting" } window 30,30 jump 6316.1
+6021.1 "Art of the Windblossom?" Ability { id: "8369", source: "Yozakura the Fleeting" }
+#cactbot-timeline-lint-enable-sync-order
+
+# no dogu path
+6116.1 "--sync--" StartsUsing { id: "8368", source: "Yozakura the Fleeting" }
+6119.1 "Art of the Fireblossom" Ability { id: "8368", source: "Yozakura the Fleeting" }
+6123.3 "--sync--" Ability { id: "8612", source: "Yozakura the Fleeting" }
+6129.6 "Bunshin" Ability { id: "837E", source: "Yozakura the Fleeting" }
+6138.7 "Shadowflight (cast)" Ability { id: "837F", source: "Yozakura the Fleeting" }
+6143.6 "Shadowflight" Ability { id: "8380", source: "Mirrored Yozakura" }
+
+6150.8 "Oka Ranman" Ability { id: "836E", source: "Yozakura the Fleeting" }
+6155.9 "--sync--" Ability { id: "8612", source: "Yozakura the Fleeting" }
+6160.0 "Seal of the Fleeting" Ability { id: "8379", source: "Yozakura the Fleeting" }
+#6060.2 "Seal Marker 1" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+#6062.2 "Seal Marker 2" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+6169.4 "Seal of Riotous Bloom" Ability { id: "8374", source: "Yozakura the Fleeting" }
+6172.6 "Seal of the Blossom" Ability { id: "837[5678]", source: "Yozakura the Fleeting" }
+
+6182.6 "Nubuki" Ability { id: "83A1", source: "Yozakura the Fleeting" }
+6191.7 "--sync--" Ability { id: "83A4", source: "Yozakura the Fleeting" }
+6194.7 "Root Arrangement 1" Ability { id: "83A5", source: "Yozakura the Fleeting" }
+6195.8 "Root Arrangement 2" #Ability { id: "83A6", source: "Yozakura the Fleeting" }
+6196.8 "Root Arrangement 3" #Ability { id: "83A6", source: "Yozakura the Fleeting" }
+6197.8 "Root Arrangement 4" #Ability { id: "83A6", source: "Yozakura the Fleeting" }
+6206.7 "--sync--" Ability { id: "83A4", source: "Yozakura the Fleeting" }
+6209.7 "Root Arrangement 1" Ability { id: "83A5", source: "Yozakura the Fleeting" }
+6210.8 "Root Arrangement 2" #Ability { id: "83A6", source: "Yozakura the Fleeting" }
+6211.8 "Root Arrangement 3" #Ability { id: "83A6", source: "Yozakura the Fleeting" }
+6212.8 "Root Arrangement 4" #Ability { id: "83A6", source: "Yozakura the Fleeting" }
+
+6221.7 "Art of the Windblossom" Ability { id: "8369", source: "Yozakura the Fleeting" }
+6230.8 "Oka Ranman" Ability { id: "836E", source: "Yozakura the Fleeting" }
+6235.9 "--sync--" Ability { id: "8612", source: "Yozakura the Fleeting" }
+6240.1 "Seal of the Fleeting" Ability { id: "8379", source: "Yozakura the Fleeting" }
+#6140.3 "Seal Marker 1" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+#6142.3 "Seal Marker 2" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+#6144.3 "Seal Marker 3" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+#6146.3 "Seal Marker 4" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+6253.8 "Seal of Riotous Bloom" Ability { id: "8374", source: "Yozakura the Fleeting" }
+6257.0 "Seal of the Blossom 1" Ability { id: "837[5678]", source: "Yozakura the Fleeting" }
+6262.0 "Seal of Riotous Bloom" Ability { id: "8374", source: "Yozakura the Fleeting" }
+6265.0 "Seal of the Blossom 2" Ability { id: "837[5678]", source: "Yozakura the Fleeting" }
+6278.0 "Kuge Rantsui" Ability { id: "83AA", source: "Yozakura the Fleeting" }
+6286.2 "Glory Neverlasting" Ability { id: "83A9", source: "Yozakura the Fleeting" }
+
+6293.3 "Nubuki" Ability { id: "83A1", source: "Yozakura the Fleeting" } window 30,30 forcejump 6182.6
+
+
+# dogu path
+6316.1 "--sync--" StartsUsing { id: "8369", source: "Yozakura the Fleeting" }
+6321.1 "Art of the Windblossom" Ability { id: "8369", source: "Yozakura the Fleeting" }
+6325.3 "--sync--" Ability { id: "8612", source: "Yozakura the Fleeting" }
+#6329.4 "Season Indicator 1" Ability { id: "838[34]", source: "Yozakura the Fleeting" }
+#6331.5 "Season Indicator 2" Ability { id: "838[34]", source: "Yozakura the Fleeting" }
+#6333.6 "Season Indicator 3" Ability { id: "838[34]", source: "Yozakura the Fleeting" }
+#6335.7 "Season Indicator 4" Ability { id: "838[34]", source: "Yozakura the Fleeting" }
+6336.1 "Seasons of the Fleeting" Ability { id: "8381", source: "Yozakura the Fleeting" }
+6337.0 "Season of Element 1" #Ability { id: "838[5678]", source: "Yozakura the Fleeting" }
+6339.1 "Season of Element 2" #Ability { id: "838[5678]", source: "Yozakura the Fleeting" }
+6341.2 "Season of Element 3" #Ability { id: "838[5678]", source: "Yozakura the Fleeting" }
+6343.3 "Season of Element 4" #Ability { id: "838[5678]", source: "Yozakura the Fleeting" }
+
+6351.6 "Oka Ranman" Ability { id: "836E", source: "Yozakura the Fleeting" }
+6356.7 "--middle--" Ability { id: "8612", source: "Yozakura the Fleeting" }
+6360.8 "Seal of the Fleeting" Ability { id: "8379", source: "Yozakura the Fleeting" }
+#6361.0 "Seal Marker 1" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+#6363.0 "Seal Marker 2" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+6370.2 "Seal of Riotous Bloom" Ability { id: "8374", source: "Yozakura the Fleeting" }
+6373.4 "Seal of the Blossom" Ability { id: "837[5678]", source: "Yozakura the Fleeting" }
+
+6380.4 "--middle--" Ability { id: "8612", source: "Yozakura the Fleeting" }
+6384.5 "Witherwind" Ability { id: "83A7", source: "Yozakura the Fleeting" }
+6389.6 "Mudrain" Ability { id: "8389", source: "Yozakura the Fleeting" }
+6399.8 "--sync--" Ability { id: "8612", source: "Yozakura the Fleeting" }
+6405.8 "Drifting Petals" Ability { id: "8393", source: "Yozakura the Fleeting" }
+6429.9 "Art of the Fireblossom" Ability { id: "8368", source: "Yozakura the Fleeting" }
+6439.0 "Oka Ranman" Ability { id: "836E", source: "Yozakura the Fleeting" }
+
+6444.1 "--sync--" Ability { id: "8612", source: "Yozakura the Fleeting" }
+6448.3 "Seal of the Fleeting" Ability { id: "8379", source: "Yozakura the Fleeting" }
+#6448.5 "Seal Marker 1" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+#6450.5 "Seal Marker 2" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+#6452.5 "Seal Marker 3" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+#6454.5 "Seal Marker 4" Ability { id: "837[ABCD]", source: "Yozakura the Fleeting" }
+6461.7 "Seal of Riotous Bloom" Ability { id: "8374", source: "Yozakura the Fleeting" }
+6464.7 "Seal of the Blossom 1" Ability { id: "837[5678]", source: "Yozakura the Fleeting" }
+6469.8 "Seal of Riotous Bloom" Ability { id: "8374", source: "Yozakura the Fleeting" }
+6473.0 "Seal of the Blossom 2" Ability { id: "837[5678]", source: "Yozakura the Fleeting" }
+6486.0 "Kuge Rantsui" Ability { id: "83AA", source: "Yozakura the Fleeting" }
+6494.2 "Glory Neverlasting" Ability { id: "83A9", source: "Yozakura the Fleeting" }
+
+6498.3 "--middle--" Ability { id: "8612", source: "Yozakura the Fleeting" }
+6502.4 "Witherwind" Ability { id: "83A7", source: "Yozakura the Fleeting" } window 30,30 forcejump 6384.5
+
+
+# YOZAKURA ABILITIES (RIGHT PATH)
+# 83A1 Nubuki cast and self-targeted to generate Accursed Seedling roots
+# 83A2 Behind Barbs damage from standing in the Accursed Seedling
+# 83A3 Explosion cast and damage from Living Gaol when it captures you
+# 83A4 Root Arrangement cast and self-targeted ability for chasing rock
+# 83A5 Root Arrangement cast and damage for chasing rock hit #1
+# 83A6 Root Arrangement damage for chasing rock hits #2-4
+# 83A7 Witherwind cast and self-targeted tornado summoning
+# 83A8 Cutting Leaves damage for hitting tornados
+
+
+#~~~~~~~~~#
+# Shishio #
+#~~~~~~~~~#
+
+# -p 83F5:7015.7
+# -ii 86DE 83DA 83DE 83DF 83E0 83E3 83E4 83E5 83E2 87F9 87FB 83DB 87A3 87A4 87A6 87AB 83ED 872B 83F2
+
+# Stone's Silence will be sealed off
+7000.0 "--sync--" SystemLogMessage { id: "7DC", param1: "10E1" } window 10000,0
+7015.7 "Enkyo" Ability { id: "83F5", source: "Shishio" }
+7017.8 "--middle--" Ability { id: "83F7", source: "Shishio" }
+7022.0 "Stormcloud Summons" Ability { id: "83D7", source: "Shishio" }
+7026.7 "Smokeater" Ability { id: "83D8", source: "Shishio" }
+# Note: This always seems to be Once on Rokujo
+7036.8 "Once on Rokujo" Ability { id: "83DD", source: "Shishio" }
+7053.4 "Splitting Cry" Ability { id: "83F6", source: "Shishio" }
+7055.5 "--middle--" Ability { id: "83F7", source: "Shishio" }
+# Note: this one can be Twice or Thrice on Rokujo
+7059.8 "Stormcloud Summons" Ability { id: "83D7", source: "Shishio" }
+7064.5 "Smokeater 1" Ability { id: "83D8", source: "Shishio" }
+7066.6 "Smokeater 2" #Ability { id: "83D9", source: "Shishio" }
+7068.5 "Smokeater 3?" #Ability { id: "83D9", source: "Shishio" }
+7093.0 "Haunting Cry" Ability { id: "83E8", source: "Shishio" }
+
+#cactbot-timeline-lint-disable-sync-order
+# -> path 08
+7104.0 "--sync--" StartsUsing { id: "83EE", source: "Feral Thrall" }
+7110.0 "Rush?" Ability { id: "83EE", source: "Feral Thrall" } window 30,30 jump 7210
+
+# -> path 09
+7093.9 "--sync--" StartsUsing { id: "83E9", source: "Shishio" } window 30,30 jump 7293.9
+7098.9 "Focused Tremor?" #Ability { id: "83E9", source: "Shishio" }
+
+# -> path 10
+7097.0 "--sync--" StartsUsing { id: "83F0", source: "Devilish Thrall" } window 30,30 jump 7397
+7105.0 "Left Swipe?" #Ability { id: "83F1", source: "Devilish Thrall" }
+7105.0 "Right Swipe?" #Ability { id: "83F0", source: "Devilish Thrall" }
+
+# -> path 11
+7099.0 "--sync--" StartsUsing { id: "872B", source: "Haunting Thrall" } window 30,30 jump 7599
+7103.0 "Reisho?" #Ability { id: "872B", source: "Haunting Thrall" }
+#cactbot-timeline-lint-enable-sync-order
+
+# path 08
+7193.0 "Haunting Cry" Ability { id: "83E8", source: "Shishio" }
+7204.0 "--sync--" StartsUsing { id: "83EE", source: "Feral Thrall" }
+7210.0 "Rush" Ability { id: "83EE", source: "Feral Thrall" }
+7212.0 "Vasoconstrictor 1" Ability { id: "83EF", source: "Venomous Thrall" }
+7217.0 "Vasoconstrictor 2" Ability { id: "83EF", source: "Venomous Thrall" }
+7217.0 "--sync--" Ability { id: "83F7", source: "Shishio" }
+7223.0 "Thunder Vortex" Ability { id: "83F4", source: "Shishio" }
+7230.2 "Splitting Cry" Ability { id: "83F6", source: "Shishio" }
+# -> shared loop
+7240.3 "Enkyo" Ability { id: "83F5", source: "Shishio" } window 30,30 forcejump 7634.4
+
+# path 09
+7293.0 "Haunting Cry" Ability { id: "83E8", source: "Shishio" }
+7293.9 "--sync--" StartsUsing { id: "83E9", source: "Shishio" }
+7298.9 "Focused Tremor" Ability { id: "83E9", source: "Shishio" }
+7303.2 "Yoki (cast)" Ability { id: "83EA", source: "Shishio" }
+7308.0 "Yoki 1" Ability { id: "83EB", source: "Shishio" }
+7312.0 "Yoki 2" Ability { id: "83EB", source: "Shishio" }
+7315.3 "--sync--" Ability { id: "83F7", source: "Shishio" }
+7324.3 "Yoki-uzu" Ability { id: "83EC", source: "Shishio" }
+# -> shared loop
+7334.4 "Enkyo" Ability { id: "83F5", source: "Shishio" } window 30,30 forcejump 7634.4
+
+# path 10
+7393.0 "Haunting Cry" Ability { id: "83E8", source: "Shishio" }
+7397.0 "--sync--" StartsUsing { id: "83F0", source: "Devilish Thrall" }
+7405.0 "Left Swipe 1" Ability { id: "83F1", source: "Devilish Thrall" }
+7405.0 "Right Swipe 1" Ability { id: "83F0", source: "Devilish Thrall" }
+7415.3 "Left Swipe 2" Ability { id: "83F1", source: "Devilish Thrall" }
+7415.3 "Right Swipe 2" Ability { id: "83F0", source: "Devilish Thrall" }
+7424.3 "Splitting Cry" Ability { id: "83F6", source: "Shishio" }
+# -> shared loop
+7434.4 "Enkyo" Ability { id: "83F5", source: "Shishio" } window 30,30 forcejump 7634.4
+
+# path 11
+7593.0 "Haunting Cry" Ability { id: "83E8", source: "Shishio" }
+7599.0 "--sync--" StartsUsing { id: "872B", source: "Haunting Thrall" }
+7603.0 "Reisho" Ability { id: "872B", source: "Haunting Thrall" }
+7611.1 "--middle--" Ability { id: "83F7", source: "Shishio" }
+7617.1 "Thunder Vortex" Ability { id: "83F4", source: "Shishio" }
+7624.3 "Splitting Cry" Ability { id: "83F6", source: "Shishio" }
+# -> shared loop
+7634.4 "Enkyo" Ability { id: "83F5", source: "Shishio" } window 30,30 forcejump 7634.4
+
+
+# shared loop
+7634.4 "Enkyo" Ability { id: "83F5", source: "Shishio" }
+7636.5 "--middle--" Ability { id: "83F7", source: "Shishio" }
+7640.7 "Stormcloud Summons" Ability { id: "83D7", source: "Shishio" }
+7645.4 "Smokeater" Ability { id: "83D8", source: "Shishio" }
+# Note: This always seems to be Onefold the first time around.
+7650.5 "Thunder Onefold" Ability { id: "83E1", source: "Shishio" }
+7678.1 "Splitting Cry" Ability { id: "83F6", source: "Shishio" }
+
+7684.2 "--jump--" Ability { id: "83F7", source: "Shishio" }
+7693.5 "Noble Pursuit" Ability { id: "83E6", source: "Shishio" }
+7694.4 "Levinburst" Ability { id: "83E7", source: "Rairin" }
+7700.4 "Thunder Vortex" Ability { id: "83F4", source: "Shishio" }
+7707.5 "Enkyo" Ability { id: "83F5", source: "Shishio" }
+
+7713.7 "--middle--" Ability { id: "83F7", source: "Shishio" }
+7717.9 "Stormcloud Summons" Ability { id: "83D7", source: "Shishio" }
+7722.6 "Smokeater 1" Ability { id: "83D8", source: "Shishio" }
+7724.7 "Smokeater 2?" #Ability { id: "83D9", source: "Shishio" }
+7726.6 "Smokeater 3?" #Ability { id: "83D9", source: "Shishio" }
+7750.2 "Enkyo" Ability { id: "83F5", source: "Shishio" }
+
+# this is the start of the loop, as there's an extra delay on the 7713.7 jump
+# the first time through
+7757.4 "--middle--" Ability { id: "83F7", source: "Shishio" }
+7761.6 "Stormcloud Summons" Ability { id: "83D7", source: "Shishio" }
+7766.3 "Smokeater 1" Ability { id: "83D8", source: "Shishio" }
+7768.4 "Smokeater 2?" #Ability { id: "83D9", source: "Shishio" }
+7770.4 "Smokeater 3?" #Ability { id: "83D9", source: "Shishio" }
+# Note: this is +/- 2 seconds depending on how many Smokeaters, so no sync
+7773.4 "Thunder Onefold/Thunder Twofold/Thunder Threefold" #Ability { id: ["83E1", "87AD", "87FA"], source: "Shishio" }
+7798.8 "Splitting Cry" Ability { id: "83F6", source: "Shishio" }
+
+7804.9 "--jump--" Ability { id: "83F7", source: "Shishio" }
+7814.2 "Noble Pursuit" Ability { id: "83E6", source: "Shishio" }
+7815.1 "Levinburst" Ability { id: "83E7", source: "Rairin" }
+7821.1 "Thunder Vortex" Ability { id: "83F4", source: "Shishio" }
+7828.2 "Enkyo" Ability { id: "83F5", source: "Shishio" }
+
+7835.4 "--middle--" Ability { id: "83F7", source: "Shishio" }
+7839.6 "Stormcloud Summons" Ability { id: "83D7", source: "Shishio" } window 30,30 forcejump 7717.9
+
+
+# SHISHIO ABILITIES
+# 83D7 Stormcloud Summons cast and self-targeted ability
+# 83D8 Smokeater cast and self-targeted ability for first inhale
+# 83D9 Smokeater self-targeted ability for optional second and third inhales
+# 83DA --sync-- Raiun ability on Shishio after being inhaled
+# 83DB Once on Rokujo cast and self-targeted ability for 1x Smokeater line
+# 83DD Once on Rokujo cast and damage for 1x Smokeater line aoe
+# 83DE Leaping Levin Raiun 1x Smokeater small cloud circles
+# 83DF Leaping Levin Raiun 2x Smokeater medium cloud circles
+# 83E0 Leaping Levin Raiun 3x Smokeater large cloud circles
+# 83E1 Thunder Onefold cast and self-targeted ability
+# 83E2 Thunder Onefold cast and damage for 1x Smokeater initial cloud circles
+# 83E3 Cloud to Cloud cast and damage for 1x Smokeater small lines
+# 83E4 Cloud to Cloud cast and damage for 2x Smokeater medium lines
+# 83E5 Cloud to Cloud cast and damage for 3x Smokeater large lines
+# 83E6 Noble Pursuit cast and damage for line aoe
+# 83E7 Levinburst line damage for going through rings during Noble Pursuit
+# 83E8 Haunting Cry cast and raidwide damage
+# 83E9 Focused Tremor cast and raidwide damage
+# 83EA Yoki cast and self-targeted ability to summon circles
+# 83EB Yoki cast and damage for ground circles
+# 83EC Yoki-uzu cast and damage for "get out (into quicksand)" aoe
+# 83ED Unsagely Spin Clever Thrall centered circle
+# 83EE Rush Feral Thrall line aoe
+# 83EF Vasoconstrictor Venomous Trhall targeted circle
+# 83F0 Right Swipe cast and damage for Devilish Thrall cleave
+# 83F1 Left Swipe cast and damage for Devilish Thrall cleave
+# 83F2 Reisho Haunting Thrall centered circle
+# 83F4 Thunder Vortex cast and damage for donut
+# 83F5 Enkyo cast and damage for raidwide
+# 83F6 Splitting Cry cast and damage for tankbuster
+# 83F7 --sync-- repositioning
+# 86DE --sync-- auto damage
+# 872B Reisho Haunting Thrall centered circle
+# 872C Reisho Haunting Thrall centered circle
+# 87A3 Twice on Rokujo cast and self-targeted ability for 2x Smokeater lines
+# 87A4 Twice on Rokujo self-targeted ability (???)
+# 87A5 Twice on Rokujo cast and damage for 2x Smokeater line aoe
+# 87A6 Thrice on Rokujo cast and self-targeted ability for 3x Smokeater lines
+# 87AB Thrice on Rokujo self-targeted ability (???)
+# 87AC Thrice on Rokujo cast and damage for 3x Smokeater line aoe
+# 87AD Thunder Twofold cast and self-targeted ability
+# 87F9 Thunder Twofold cast and damage for 2x Smokeater initial cloud circles
+# 87FA Thunder Threefold cast and self-targeted ability
+# 87FB Thunder Threefold cast and damage for 3x Smokeater initial cloud circles
+
+
+#~~~~~~~~#
+# Enenra #
+#~~~~~~~~#
+
+# Note: you cannot kill a clone during the split phase, it will stop at 1 hp
+# and so the timeline is thankfully stable for that phase.
+
+# TODO: is Clearing Smoke / Smoke Rings random?
+
+# -p 8042:8013
+# -ii 8058 8049 804A 804B 8047
+
+# Pond of Spring Rain will be sealed off
+8000.0 "--sync--" SystemLogMessage { id: "7DC", param1: "10E2" } window 10000,0
+8013.0 "Flagrant Combustion" Ability { id: "8042", source: "Enenra" }
+8016.1 "--jump--" Ability { id: "84C2", source: "Enenra" }
+8029.9 "Out of the Smoke" Ability { id: "804C", source: "Enenra" }
+8030.1 "--sync--" Ability { id: "804E", source: "Enenra" }
+8034.0 "Into the Fire" Ability { id: "804D", source: "Enenra" }
+8043.1 "Kiseru Clamor 1" Ability { id: "8048", source: "Enenra" } duration 6
+8047.2 "Kiseru Clamor 2" Ability { id: "8048", source: "Enenra" } duration 6
+
+8049.3 "--jump--" Ability { id: "84C2", source: "Enenra" }
+8063.1 "Out of the Smoke" Ability { id: "804C", source: "Enenra" }
+8063.3 "--sync--" Ability { id: "804E", source: "Enenra" }
+8067.2 "Into the Fire" Ability { id: "804D", source: "Enenra" }
+
+8073.4 "--west--" Ability { id: "84C2", source: "Enenra" }
+8077.4 "Smoke and Mirrors" Ability { id: "8043", source: "Enenra" }
+8077.7 "--sync--" Ability { id: "8045", source: "Enenra" }
+8083.4 "Kiseru Clamor x2" Ability { id: "8048", source: "Enenra" } duration 6
+8087.5 "Kiseru Clamor x2" Ability { id: "8048", source: "Enenra" } duration 6
+8089.7 "--jump--" Ability { id: "84C2", source: "Enenra" }
+8103.5 "Out of the Smoke x2" Ability { id: "804C", source: "Enenra" }
+8103.7 "--sync--" Ability { id: "804E", source: "Enenra" }
+8107.6 "Into the Fire x2" #Ability { id: "804D", source: "Enenra" }
+8111.8 "--sync--" Ability { id: "84C2", source: "Enenra" }
+8121.6 "--sync--" Ability { id: ["8062", "8063"], source: "Enenra" }
+8125.0 "Clearing Smoke/Smoke Rings" Ability { id: ["8052", "8053"], source: "Enenra" }
+8130.8 "Smoke Stack" Ability { id: "8046", source: "Enenra" }
+
+8136.3 "--sync--" Ability { id: "84C2", source: "Enenra" }
+8142.0 "Smoldering Damnation" Ability { id: "804F", source: "Enenra" }
+8154.6 "Smoldering 1" #Ability { id: "8050", source: "Enenra" }
+8157.2 "Smoldering 2" #Ability { id: "8050", source: "Enenra" }
+8159.8 "Smoldering 3" #Ability { id: "8050", source: "Enenra" }
+8162.7 "Pipe Cleaner" Ability { id: "8054", source: "Enenra" }
+#8162.9 "Pipe Cleaner" Ability { id: "8055", source: "Enenra" }
+# TODO: this can tether multiple people and delay the timeline?
+
+8167.8 "--west--" Ability { id: "84C2", source: "Enenra" }
+8169.4 "--sync--" StartsUsing { id: "8043", source: "Enenra" } window 10,20
+8171.9 "Smoke and Mirrors" Ability { id: "8043", source: "Enenra" }
+8172.2 "--sync--" Ability { id: "8045", source: "Enenra" }
+8179.9 "Flagrant Combustion x2" Ability { id: "8042", source: "Enenra" }
+8182.9 "--sync--" Ability { id: "84C2", source: "Enenra" }
+8188.7 "Smoldering Damnation" Ability { id: "804F", source: "Enenra" }
+8195.3 "--sync--" Ability { id: "84C2", source: "Enenra" }
+8201.3 "Smoldering 1" #Ability { id: "8050", source: "Enenra" }
+8203.9 "Smoldering 2" #Ability { id: "8050", source: "Enenra" }
+8205.1 "--sync--" Ability { id: ["8062", "8063"], source: "Enenra" }
+8206.3 "Smoldering 3" #Ability { id: "8050", source: "Enenra" }
+8208.5 "Clearing Smoke/Smoke Rings" Ability { id: ["8052", "8053"], source: "Enenra" }
+8214.3 "Smoke Stack" Ability { id: "8046", source: "Enenra" }
+
+8222.7 "Flagrant Combustion" Ability { id: "8042", source: "Enenra" }
+8238.9 "Snuff" Ability { id: "8056", source: "Enenra" }
+8243.1 "Uplift" Ability { id: "8057", source: "Enenra" }
+8248.0 "Flagrant Combustion" Ability { id: "8042", source: "Enenra" }
+8258.1 "Kiseru Clamor 1" Ability { id: "8048", source: "Enenra" } duration 6
+8262.2 "Kiseru Clamor 2" Ability { id: "8048", source: "Enenra" } duration 6
+
+8264.3 "--jump--" Ability { id: "84C2", source: "Enenra" }
+8277.9 "Out of the Smoke" Ability { id: "804C", source: "Enenra" }
+8278.1 "--sync--" Ability { id: "804E", source: "Enenra" }
+8282.0 "Into the Fire" Ability { id: "804D", source: "Enenra" }
+8291.1 "Flagrant Combustion" Ability { id: "8042", source: "Enenra" }
+8300.2 "Flagrant Combustion" Ability { id: "8042", source: "Enenra" }
+
+8313.4 "--sync--" Ability { id: "84C2", source: "Enenra" }
+8317.4 "Smoke and Mirrors" Ability { id: "8043", source: "Enenra" } window 30,30 forcejump 8077.4
+
+
+# ENENRA ABILITIES
+# 1961 attack auto damage
+# 8042 Flagrant Combustion cast and raidwide damage
+# 8043 Smoke and Mirrors cast and self-targeted clone creation
+# 8045 --sync-- ability to create clone
+# 8046 Smoke Stack cast and self-targeted ability for one clone merge
+# 8047 Smoke Stack cast and self-targeted ability for other clone merge
+# 8048 Kiseru Clamor cast and damage for initial jump that creates Bedrock Uplift earth rings
+# 8049 Bedrock Uplift cast and damage for earth ring 2
+# 804A Bedrock Uplift cast and damage for earth ring 3
+# 804B Bedrock Uplift cast and damage for earth ring 4
+# 804C Out of the Smoke long cast and self-targeted prior to Into the Fire
+# 804D Into the Fire cast and self-targeted for 180 cleave
+# 804E --sync-- repositioning during Out of the Smoke
+# 804F Smoldering Damnation cast and self-targeted ability to summon growing circles
+# 8050 Smoldering cast and damage for growing ground circle
+# 8052 Clearing Smoke cast and damage for Clearing Smoke knockback
+# 8053 Smoke Rings cast and damage for "get out" Smoke Rings collision
+# 8054 Pipe Cleaner cast and self-targeted ability for tether line cleave
+# 8055 Pipe Cleaner damage from tether earthshaker-esque line cleave
+# 8056 Snuff cast and tankbuster damage
+# 8057 Uplift cast and followup ground circle to Snuff
+# 8058 Into the Fire cast and damage for 180 cleave
+# 8062 Clearing Smoke cast and self-targeted ability for Clearing Smoke knockback collision
+# 8063 Smoke Rings cast and self-targeted ability for Smoke Rings collision
+# 84C2 --sync-- repositioning

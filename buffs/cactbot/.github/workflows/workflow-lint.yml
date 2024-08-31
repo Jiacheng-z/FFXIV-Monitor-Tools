@@ -1,0 +1,42 @@
+name: Workflow Lint
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '*.yml'
+      - '.github/workflows/*.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '*.yml'
+      - '.github/workflows/*.yml'
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install yamllint
+        run: |
+          pip install yamllint
+
+      - name: Run yamllint
+        run: |
+          yamllint -c .yamllint.yml -f github .github/workflows
+
+      - name: Run workflow lint script
+        run: |
+          node .github/scripts/lint-workflow.cjs
+        env:
+          GH_TOKEN: ${{ secrets.BOT_TOKEN }}
+
+      - name: Run actionlint
+        uses: docker://rhysd/actionlint:latest
+        env:
+          SHELLCHECK_OPTS: --exclude=SC2086
+        with:
+          args: -color

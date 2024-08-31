@@ -1,5 +1,5 @@
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
+import Util from '../../../../../resources/util';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
 import { TriggerSet } from '../../../../../types/trigger';
@@ -15,6 +15,7 @@ export interface Data extends RaidbossData {
 }
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'TheForbiddenLandEurekaHydatos',
   zoneId: ZoneId.TheForbiddenLandEurekaHydatos,
   timelineFile: 'eureka_hydatos.txt',
   resetWhenOutOfCombat: false,
@@ -76,48 +77,35 @@ const triggerSet: TriggerSet<Data> = {
     },
   ],
   triggers: [
+    // https://xivapi.com/LogMessage/916
+    // en: 7 minutes have elapsed since your last activity. [...]
+    // There is no network packet for these log lines; so have to use GameLog.
     {
       id: 'BA Falling Asleep',
       type: 'GameLog',
-      netRegex: NetRegexes.gameLog({ line: '7 minutes have elapsed since your last activity..*?', capture: false }),
-      netRegexDe: NetRegexes.gameLog({ line: 'Seit deiner letzten Aktivität sind 7 Minuten vergangen..*?', capture: false }),
-      netRegexFr: NetRegexes.gameLog({ line: 'Votre personnage est inactif depuis 7 minutes.*?', capture: false }),
-      netRegexJa: NetRegexes.gameLog({ line: '操作がない状態になってから7分が経過しました。.*?', capture: false }),
-      netRegexCn: NetRegexes.gameLog({ line: '已经7分钟没有进行任何操作.*?', capture: false }),
-      netRegexKo: NetRegexes.gameLog({ line: '7분 동안 아무 조작을 하지 않았습니다.*?', capture: false }),
+      netRegex: { line: '7 minutes have elapsed since your last activity..*?', capture: false },
       response: Responses.wakeUp(),
     },
+    // https://xivapi.com/LogMessage/9069
+    // en: The memories of heroes past live on again!
     {
-      id: 'BA Saved By Rememberance',
-      type: 'GameLog',
-      netRegex: NetRegexes.gameLog({ line: 'The memories of heroes past live on again.*?', capture: false }),
-      netRegexDe: NetRegexes.gameLog({ line: 'Das Vermächtnis vergangener Helden lebt von Neuem auf.*?', capture: false }),
-      netRegexFr: NetRegexes.gameLog({ line: 'L\'égide des héros vaillants vous a ressuscité.*?', capture: false }),
-      netRegexJa: NetRegexes.gameLog({ line: '英傑の加護の効果が発揮され、蘇生された.*?', capture: false }),
-      netRegexCn: NetRegexes.gameLog({ line: '发动了英杰的加护的效果，重新苏醒了过来.*?', capture: false }),
-      netRegexKo: NetRegexes.gameLog({ line: '영걸의 가호의 효과가 발휘되어 부활했습니다.*?', capture: false }),
+      id: 'BA Saved By Remembrance',
+      type: 'ActorControlSelfExtra',
+      netRegex: { category: Util.actorControlType.logMsg, param1: '236D', capture: false },
       sound: 'Long',
     },
     {
       id: 'BA Seal',
-      type: 'GameLog',
-      netRegex: NetRegexes.message({ line: '.* will be sealed off.*?', capture: false }),
-      netRegexDe: NetRegexes.message({ line: 'Noch 15 Sekunden, bis sich (?:(?:der|die|das) )?(?:Zugang zu(?:[rm]| den)? )?.* schließt.*?', capture: false }),
-      netRegexFr: NetRegexes.message({ line: 'Fermeture d(?:e|u|es) .*? dans.*?', capture: false }),
-      netRegexJa: NetRegexes.message({ line: '.*?の封鎖まであと', capture: false }),
-      netRegexCn: NetRegexes.message({ line: '距.*?被封锁还有.*?', capture: false }),
-      netRegexKo: NetRegexes.message({ line: '15초 후에 .*?(?:이|가) 봉쇄됩니다.*?', capture: false }),
+      type: 'SystemLogMessage',
+      // "will be sealed off"
+      netRegex: { id: '7DC', capture: false },
       run: (data) => data.sealed = true,
     },
     {
       id: 'BA Clear Data',
-      type: 'GameLog',
-      netRegex: NetRegexes.message({ line: '.*is no longer sealed.*?', capture: false }),
-      netRegexDe: NetRegexes.message({ line: '.*öffnet sich (?:wieder|erneut).*?', capture: false }),
-      netRegexFr: NetRegexes.message({ line: '.*Ouverture .*?', capture: false }),
-      netRegexJa: NetRegexes.message({ line: '.*の封鎖が解かれた.*?', capture: false }),
-      netRegexCn: NetRegexes.message({ line: '.*的封锁解除了.*?', capture: false }),
-      netRegexKo: NetRegexes.message({ line: '.*의 봉쇄가 해제되었습니다.*?', capture: false }),
+      type: 'SystemLogMessage',
+      // "is no longer sealed"
+      netRegex: { id: '7DE', capture: false },
       run: (data) => {
         delete data.side;
         delete data.mythcall;
@@ -131,55 +119,43 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'BA West Side',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '3956', source: 'Art', target: '[^:]+', capture: false }),
-      netRegexDe: NetRegexes.abilityFull({ id: '3956', source: 'Art', target: '[^:]+', capture: false }),
-      netRegexFr: NetRegexes.abilityFull({ id: '3956', source: 'Art', target: '[^:]+', capture: false }),
-      netRegexJa: NetRegexes.abilityFull({ id: '3956', source: 'アルト', target: '[^:]+', capture: false }),
-      netRegexCn: NetRegexes.abilityFull({ id: '3956', source: '亚特', target: '[^:]+', capture: false }),
-      netRegexKo: NetRegexes.abilityFull({ id: '3956', source: '아르트', target: '[^:]+', capture: false }),
+      // The two sides are far enough apart that even though you see the autos
+      // from the opposite boss, you don't see the player target (which is blank).
+      // This considers you on the west side if Art autos somebody, and the name isn't blank.
+      netRegex: { id: '3956', source: 'Art', target: '[^:]+', capture: false },
       suppressSeconds: 1000,
       run: (data) => data.side = 'west',
     },
     {
       id: 'BA East Side',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '3957', source: 'Owain', target: '[^:]+', capture: false }),
-      netRegexDe: NetRegexes.abilityFull({ id: '3957', source: 'Owain', target: '[^:]+', capture: false }),
-      netRegexFr: NetRegexes.abilityFull({ id: '3957', source: 'Owain', target: '[^:]+', capture: false }),
-      netRegexJa: NetRegexes.abilityFull({ id: '3957', source: 'オーウェン', target: '[^:]+', capture: false }),
-      netRegexCn: NetRegexes.abilityFull({ id: '3957', source: '欧文', target: '[^:]+', capture: false }),
-      netRegexKo: NetRegexes.abilityFull({ id: '3957', source: '오와인', target: '[^:]+', capture: false }),
+      netRegex: {
+        id: '3957',
+        source: 'Owain',
+        target: '[^:]+',
+        capture: false,
+      },
       suppressSeconds: 1000,
       run: (data) => data.side = 'east',
     },
     {
       id: 'BA Art Mythcall',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3927', source: 'Art', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3927', source: 'Art', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3927', source: 'Art', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3927', source: 'アルト', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3927', source: '亚特', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3927', source: '아르트', capture: false }),
+      netRegex: { id: '3927', source: 'Art', capture: false },
       condition: (data) => data.side === 'west',
       run: (data) => data.mythcall = true,
     },
     {
       id: 'BA Art Tankbuster',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3934', source: 'Art' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3934', source: 'Art' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3934', source: 'Art' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3934', source: 'アルト' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3934', source: '亚特' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3934', source: '아르트' }),
+      netRegex: { id: '3934', source: 'Art' },
       condition: (data) => data.side === 'west',
       response: Responses.tankBuster(),
     },
     {
       id: 'BA Art Orb Marker',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '005C' }),
+      netRegex: { id: '005C' },
       condition: (data) => data.side === 'west',
       alarmText: (data, matches, output) => {
         if (data.me !== matches.target)
@@ -213,43 +189,28 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'BA Art Piercing Dark Marker',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '008B' }),
+      netRegex: { id: '008B' },
       condition: (data, matches) => data.side === 'west' && data.me === matches.target,
       response: Responses.spread(),
     },
     {
       id: 'BA Art Legendcarver',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3928', source: 'Art', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3928', source: 'Art', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3928', source: 'Art', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3928', source: 'アルト', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3928', source: '亚特', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3928', source: '아르트', capture: false }),
+      netRegex: { id: '3928', source: 'Art', capture: false },
       condition: (data) => data.side === 'west',
       response: Responses.getOut(),
     },
     {
       id: 'BA Art Legendspinner',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3929', source: 'Art', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3929', source: 'Art', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3929', source: 'Art', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3929', source: 'アルト', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3929', source: '亚特', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3929', source: '아르트', capture: false }),
+      netRegex: { id: '3929', source: 'Art', capture: false },
       condition: (data) => data.side === 'west',
       response: Responses.getIn(),
     },
     {
       id: 'BA Art Mythcall Legendcarver',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3928', source: 'Art', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3928', source: 'Art', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3928', source: 'Art', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3928', source: 'アルト', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3928', source: '亚特', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3928', source: '아르트', capture: false }),
+      netRegex: { id: '3928', source: 'Art', capture: false },
       condition: (data) => data.side === 'west' && data.mythcall,
       delaySeconds: 3.5,
       response: Responses.getUnder(),
@@ -257,12 +218,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'BA Art Mythcall Legendspinner',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3929', source: 'Art', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3929', source: 'Art', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3929', source: 'Art', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3929', source: 'アルト', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3929', source: '亚特', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3929', source: '아르트', capture: false }),
+      netRegex: { id: '3929', source: 'Art', capture: false },
       condition: (data) => data.side === 'west' && data.mythcall,
       delaySeconds: 3.5,
       infoText: (_data, _matches, output) => output.text!(),
@@ -280,38 +236,34 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'BA Owain Tankbuster',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3945', source: 'Owain' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3945', source: 'Owain' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3945', source: 'Owain' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3945', source: 'オーウェン' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3945', source: '欧文' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3945', source: '오와인' }),
+      netRegex: { id: '3945', source: 'Owain' },
       condition: (data) => data.side === 'west',
       response: Responses.tankBuster(),
     },
     {
       id: 'BA Owain Piercing Light Marker',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '008B' }),
+      netRegex: { id: '008B' },
       condition: (data, matches) => data.side === 'east' && data.me === matches.target,
       response: Responses.spread(),
     },
     {
       id: 'BA Owain Dorito Stack',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '008B' }),
+      netRegex: { id: '008B' },
       condition: (data, matches) => data.side === 'east' && data.me === matches.target,
       response: Responses.doritoStack(),
     },
+    // https://xivapi.com/PublicContentTextData/2122
+    // en: Munderg, turn flesh to ash!
     {
       id: 'BA Owain Fire Element',
-      type: 'GameLog',
-      netRegex: NetRegexes.dialog({ line: '[^:]*:Munderg, turn flesh to ash.*?', capture: false }),
-      netRegexDe: NetRegexes.dialog({ line: '[^:]*:Munderg, entfessele den Flammeneid.*?', capture: false }),
-      netRegexFr: NetRegexes.dialog({ line: '[^:]*:Oui... Munderg, sens le feu embraser nos âmes.*?', capture: false }),
-      netRegexJa: NetRegexes.dialog({ line: '[^:]*:白の妖槍「ムンジャルグ」、燃え上がれ！.*?', capture: false }),
-      netRegexCn: NetRegexes.dialog({ line: '[^:]*:红颈妖枪，点燃一切！.*?', capture: false }),
-      netRegexKo: NetRegexes.dialog({ line: '[^:]*:하얀 요창 \'문데르크\'여, 불타올라라!.*?', capture: false }),
+      type: 'ActorControlExtra',
+      netRegex: {
+        category: Util.actorControlType.publicContentText,
+        param2: '84A',
+        capture: false,
+      },
       condition: (data) => data.side === 'east',
       alertText: (_data, _matches, output) => output.getToIce!(),
       infoText: (_data, _matches, output) => output.switchMagia!(),
@@ -334,15 +286,16 @@ const triggerSet: TriggerSet<Data> = {
         },
       },
     },
+    // https://xivapi.com/PublicContentTextData/2123
+    // en: Munderg, turn blood to ice!
     {
       id: 'BA Owain Ice Element',
-      type: 'GameLog',
-      netRegex: NetRegexes.dialog({ line: '[^:]*:Munderg, turn blood to ice.*?', capture: false }),
-      netRegexDe: NetRegexes.dialog({ line: '[^:]*:Munderg, das Eis der Ewigkeit soll sie für Äonen bannen.*?', capture: false }),
-      netRegexFr: NetRegexes.dialog({ line: '[^:]*:C\'est bien, Munderg... Glace le sang de mes ennemis.*?', capture: false }),
-      netRegexJa: NetRegexes.dialog({ line: '[^:]*:白の妖槍「ムンジャルグ」、震え凍れよ！.*?', capture: false }),
-      netRegexCn: NetRegexes.dialog({ line: '[^:]*:红颈妖枪，冻结万物！.*?', capture: false }),
-      netRegexKo: NetRegexes.dialog({ line: '[^:]*:하얀 요창 \'문데르크\'여, 얼어붙어라!.*?', capture: false }),
+      type: 'ActorControlExtra',
+      netRegex: {
+        category: Util.actorControlType.publicContentText,
+        param2: '84B',
+        capture: false,
+      },
       condition: (data) => data.side === 'east',
       alertText: (_data, _matches, output) => output.getToFire!(),
       infoText: (_data, _matches, output) => output.switchMagia!(),
@@ -368,139 +321,84 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'BA Owain Ivory Palm',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '3941', source: 'Ivory Palm' }),
-      netRegexDe: NetRegexes.ability({ id: '3941', source: 'Weiß(?:e|er|es|en) Hand' }),
-      netRegexFr: NetRegexes.ability({ id: '3941', source: 'Paume D\'Ivoire' }),
-      netRegexJa: NetRegexes.ability({ id: '3941', source: '白き手' }),
-      netRegexCn: NetRegexes.ability({ id: '3941', source: '白手' }),
-      netRegexKo: NetRegexes.ability({ id: '3941', source: '하얀 손' }),
+      netRegex: { id: '3941', source: 'Ivory Palm' },
       condition: (data, matches) => data.side === 'east' && data.me === matches.target,
       response: Responses.doritoStack(),
     },
     {
       id: 'BA Owain Pitfall',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '394D', source: 'Owain', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '394D', source: 'Owain', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '394D', source: 'Owain', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '394D', source: 'オーウェン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '394D', source: '欧文', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '394D', source: '오와인', capture: false }),
+      netRegex: { id: '394D', source: 'Owain', capture: false },
       condition: (data) => data.side === 'east',
       response: Responses.getOut(),
     },
     {
       id: 'BA Silence Centaur',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3BFE', source: 'Arsenal Centaur' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3BFE', source: 'Arsenal-Zentaur' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3BFE', source: 'Centaure De L\'Arsenal' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3BFE', source: 'アーセナル・セントール' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3BFE', source: '兵武半人马' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3BFE', source: '무기고 켄타우로스' }),
+      netRegex: { id: '3BFE', source: 'Arsenal Centaur' },
       condition: (data) => data.CanSleep(),
       response: Responses.sleep(),
     },
     {
       id: 'BA Raiden Tankbuster',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '387B', source: 'Raiden' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '387B', source: 'Raiden' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '387B', source: 'Raiden' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '387B', source: 'ライディーン' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '387B', source: '莱丁' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '387B', source: '라이딘' }),
+      netRegex: { id: '387B', source: 'Raiden' },
       condition: (data) => data.sealed,
       response: Responses.tankBuster(),
     },
     {
       id: 'BA Raiden Lancing Bolt',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '008A' }),
+      netRegex: { id: '008A' },
       condition: (data, matches) => data.sealed && data.me === matches.target,
       response: Responses.spread(),
     },
     {
       id: 'BA Raiden Ame',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3868', source: 'Raiden', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3868', source: 'Raiden', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3868', source: 'Raiden', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3868', source: 'ライディーン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3868', source: '莱丁', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3868', source: '라이딘', capture: false }),
+      netRegex: { id: '3868', source: 'Raiden', capture: false },
       condition: (data) => data.sealed,
       response: Responses.getOut(),
     },
     {
       id: 'BA Raiden Whirling',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '386A', source: 'Raiden', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '386A', source: 'Raiden', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '386A', source: 'Raiden', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '386A', source: 'ライディーン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '386A', source: '莱丁', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '386A', source: '라이딘', capture: false }),
+      netRegex: { id: '386A', source: 'Raiden', capture: false },
       condition: (data) => data.sealed,
       response: Responses.getUnder(),
     },
     {
       id: 'BA Raiden For Honor',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '387C', source: 'Raiden', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '387C', source: 'Raiden', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '387C', source: 'Raiden', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '387C', source: 'ライディーン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '387C', source: '莱丁', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '387C', source: '라이딘', capture: false }),
+      netRegex: { id: '387C', source: 'Raiden', capture: false },
       condition: (data) => data.sealed,
       response: Responses.getOut(),
     },
     {
       id: 'BA Raiden Lateral 1',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '386C', source: 'Raiden', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '386C', source: 'Raiden', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '386C', source: 'Raiden', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '386C', source: 'ライディーン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '386C', source: '莱丁', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '386C', source: '라이딘', capture: false }),
+      netRegex: { id: '386C', source: 'Raiden', capture: false },
       condition: (data) => data.sealed,
       response: Responses.goLeft(),
     },
     {
       id: 'BA Raiden Lateral 2',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '386B', source: 'Raiden', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '386B', source: 'Raiden', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '386B', source: 'Raiden', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '386B', source: 'ライディーン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '386B', source: '莱丁', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '386B', source: '라이딘', capture: false }),
+      netRegex: { id: '386B', source: 'Raiden', capture: false },
       condition: (data) => data.sealed,
       response: Responses.goRight(),
     },
     {
       id: 'BA AV Tankbuster',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '379A', source: 'Absolute Virtue' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '379A', source: 'Absolut(?:e|er|es|en) Tugend' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '379A', source: 'Vertu Absolue' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '379A', source: 'アブソリュートヴァーチュー' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '379A', source: '绝对的美德' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '379A', source: '절대미덕' }),
+      netRegex: { id: '379A', source: 'Absolute Virtue' },
       condition: (data) => data.sealed,
       response: Responses.tankBuster(),
     },
     {
       id: 'BA AV Eidos Dark Bracelets',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3787', source: 'Absolute Virtue', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3787', source: 'Absolut(?:e|er|es|en) Tugend', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3787', source: 'Vertu Absolue', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3787', source: 'アブソリュートヴァーチュー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3787', source: '绝对的美德', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3787', source: '절대미덕', capture: false }),
+      netRegex: { id: '3787', source: 'Absolute Virtue', capture: false },
       condition: (data) => data.sealed,
       infoText: (_data, _matches, output) => output.text!(),
       run: (data) => data.bracelets = 'dark',
@@ -518,12 +416,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'BA AV Eidos Light Bracelets',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3786', source: 'Absolute Virtue', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3786', source: 'Absolut(?:e|er|es|en) Tugend', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3786', source: 'Vertu Absolue', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3786', source: 'アブソリュートヴァーチュー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3786', source: '绝对的美德', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3786', source: '절대미덕', capture: false }),
+      netRegex: { id: '3786', source: 'Absolute Virtue', capture: false },
       condition: (data) => data.sealed,
       infoText: (_data, _matches, output) => output.text!(),
       run: (data) => data.bracelets = 'light',
@@ -541,12 +434,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'BA AV Eidos Hostile Aspect',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '378B', source: 'Absolute Virtue', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '378B', source: 'Absolut(?:e|er|es|en) Tugend', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '378B', source: 'Vertu Absolue', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '378B', source: 'アブソリュートヴァーチュー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '378B', source: '绝对的美德', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '378B', source: '절대미덕', capture: false }),
+      netRegex: { id: '378B', source: 'Absolute Virtue', capture: false },
       condition: (data) => data.sealed,
       alertText: (data, _matches, output) => {
         if (!data.seenHostile) {
@@ -603,12 +491,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'BA AV Eidos Impact Stream',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3788', source: 'Absolute Virtue', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3788', source: 'Absolut(?:e|er|es|en) Tugend', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3788', source: 'Vertu Absolue', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3788', source: 'アブソリュートヴァーチュー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3788', source: '绝对的美德', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3788', source: '절대미덕', capture: false }),
+      netRegex: { id: '3788', source: 'Absolute Virtue', capture: false },
       condition: (data) => data.sealed,
       alertText: (data, _matches, output) => {
         if (data.bracelets === 'light')
@@ -638,15 +521,22 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       // Note: These use 00:3...: lines, without any proper "gains effect" lines.
-      // In other words, they need to be the fully translated in game log.
+      // In other words, they need to be fully translated in the game log.
       // There are no "gainsEffect" lines for the clones, only for Absolute Virtue directly.
       // Ideally parser logic could be added for this case, but this is where we are.
+      // Note: Use .*? in the regex, as it appears from recent logs that special characters
+      // may be included in these lines, e.g.:
+      // 332E||Relative Virtue gains the effect of Umbral Essence.|
+      //
+      // TODO: There are ActorControl packets (GainEffect, category=0x0014) for these effects,
+      // but the FFXIV parsing plugin does not emit 0x1A lines. This is being looked at.
+      // See OverlayPlugin/cactbot#99 for further info.
       id: 'BA AV Eidos Relative Virtue Astral',
       type: 'GameLog',
-      netRegex: NetRegexes.gameLog({ line: 'Relative Virtue gains the effect of Astral Essence.*?', capture: false }),
-      netRegexDe: NetRegexes.gameLog({ line: 'Die Relative Tugend erhält den Effekt von.*?Arm der Lichts.*?', capture: false }),
-      netRegexFr: NetRegexes.gameLog({ line: 'Vertu relative bénéficie de l\'effet.*?Bras de Lumière.*?', capture: false }),
-      netRegexCn: NetRegexes.gameLog({ line: '相对的美德附加了“光之腕”效果.*?', capture: false }),
+      netRegex: {
+        line: 'Relative Virtue gains the effect of .*?Astral Essence.*?',
+        capture: false,
+      },
       condition: (data) => data.sealed,
       run: (data) => {
         // RV clones get buffs in the reverse order that they do their attacks in.
@@ -658,10 +548,10 @@ const triggerSet: TriggerSet<Data> = {
       // See note above for `BA AV Eidos Relative Virtue Astral`.
       id: 'BA AV Eidos Relative Virtue Umbral',
       type: 'GameLog',
-      netRegex: NetRegexes.gameLog({ line: 'Relative Virtue gains the effect of Umbral Essence.*?', capture: false }),
-      netRegexDe: NetRegexes.gameLog({ line: 'Die Relative Tugend erhält den Effekt von.*?Arm der Dunkelheit.*?', capture: false }),
-      netRegexFr: NetRegexes.gameLog({ line: 'Vertu relative bénéficie de l\'effet.*?Bras de Ténèbres.*?', capture: false }),
-      netRegexCn: NetRegexes.gameLog({ line: '相对的美德附加了“暗之腕”效果.*?', capture: false }),
+      netRegex: {
+        line: 'Relative Virtue gains the effect of .*?Umbral Essence.*?',
+        capture: false,
+      },
       condition: (data) => data.sealed,
       run: (data) => {
         // RV clones get buffs in the reverse order that they do their attacks in.
@@ -672,12 +562,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'BA AV Triple Impact Stream',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3797', source: 'Absolute Virtue', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3797', source: 'Absolut(?:e|er|es|en) Tugend', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3797', source: 'Vertu Absolue', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3797', source: 'アブソリュートヴァーチュー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3797', source: '绝对的美德', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3797', source: '절대미덕', capture: false }),
+      netRegex: { id: '3797', source: 'Absolute Virtue', capture: false },
       condition: (data) => data.sealed,
       alertText: (data, _matches, output) => {
         if (!data.clones)
@@ -711,12 +596,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'BA AV Eidos Turbulent Aether',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '3790', source: 'Absolute Virtue', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: '3790', source: 'Absolut(?:e|er|es|en) Tugend', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: '3790', source: 'Vertu Absolue', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: '3790', source: 'アブソリュートヴァーチュー', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: '3790', source: '绝对的美德', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: '3790', source: '절대미덕', capture: false }),
+      netRegex: { id: '3790', source: 'Absolute Virtue', capture: false },
       condition: (data) => data.sealed,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -733,24 +613,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'BA AV Call Wyvern',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '3798', source: 'Absolute Virtue', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: '3798', source: 'Absolut(?:e|er|es|en) Tugend', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: '3798', source: 'Vertu Absolue', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: '3798', source: 'アブソリュートヴァーチュー', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: '3798', source: '绝对的美德', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: '3798', source: '절대미덕', capture: false }),
+      netRegex: { id: '3798', source: 'Absolute Virtue', capture: false },
       condition: (data) => data.sealed,
       response: Responses.killAdds(),
     },
     {
       id: 'BA Ozma Sphere Form',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Proto Ozma', id: ['37B3', '37A5', '379F'], capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Proto-Yadis', id: ['37B3', '37A5', '379F'], capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Proto-Ozma', id: ['37B3', '37A5', '379F'], capture: false }),
-      netRegexJa: NetRegexes.ability({ source: 'プロトオズマ', id: ['37B3', '37A5', '379F'], capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '奥兹玛原型', id: ['37B3', '37A5', '379F'], capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '프로토 오즈마', id: ['37B3', '37A5', '379F'], capture: false }),
+      netRegex: { source: 'Proto Ozma', id: ['37B3', '37A5', '379F'], capture: false },
       condition: (data) => data.sealed,
       preRun: (data) => {
         data.blackHoleCount = (data.blackHoleCount ?? 0) + 1;
@@ -784,12 +654,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'BA Ozma Pyramid Form',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Proto Ozma', id: '37A4', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Proto-Yadis', id: '37A4', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Proto-Ozma', id: '37A4', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: 'プロトオズマ', id: '37A4', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '奥兹玛原型', id: '37A4', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '프로토 오즈마', id: '37A4', capture: false }),
+      netRegex: { source: 'Proto Ozma', id: '37A4', capture: false },
       condition: (data) => data.sealed,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -806,12 +671,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'BA Ozma Pyramid Form 2',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Proto Ozma', id: '37A4', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Proto-Yadis', id: '37A4', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Proto-Ozma', id: '37A4', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: 'プロトオズマ', id: '37A4', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '奥兹玛原型', id: '37A4', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '프로토 오즈마', id: '37A4', capture: false }),
+      netRegex: { source: 'Proto Ozma', id: '37A4', capture: false },
       condition: (data) => data.sealed,
       delaySeconds: 9,
       infoText: (_data, _matches, output) => output.text!(),
@@ -829,12 +689,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'BA Ozma Star Form',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Proto Ozma', id: '37B2', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Proto-Yadis', id: '37B2', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Proto-Ozma', id: '37B2', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: 'プロトオズマ', id: '37B2', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '奥兹玛原型', id: '37B2', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '프로토 오즈마', id: '37B2', capture: false }),
+      netRegex: { source: 'Proto Ozma', id: '37B2', capture: false },
       condition: (data) => data.sealed,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -851,12 +706,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'BA Ozma Star Form 2',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Proto Ozma', id: '37B2', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Proto-Yadis', id: '37B2', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Proto-Ozma', id: '37B2', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: 'プロトオズマ', id: '37B2', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '奥兹玛原型', id: '37B2', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '프로토 오즈마', id: '37B2', capture: false }),
+      netRegex: { source: 'Proto Ozma', id: '37B2', capture: false },
       condition: (data) => data.sealed,
       delaySeconds: 9,
       infoText: (data, _matches, output) => {
@@ -889,12 +739,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'BA Ozma Cube Form',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Proto Ozma', id: '379E', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Proto-Yadis', id: '379E', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Proto-Ozma', id: '379E', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: 'プロトオズマ', id: '379E', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '奥兹玛原型', id: '379E', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '프로토 오즈마', id: '379E', capture: false }),
+      netRegex: { source: 'Proto Ozma', id: '379E', capture: false },
       condition: (data) => data.sealed,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -911,12 +756,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'BA Ozma Cube Form 2',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Proto Ozma', id: '379E', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Proto-Yadis', id: '379E', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Proto-Ozma', id: '379E', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: 'プロトオズマ', id: '379E', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '奥兹玛原型', id: '379E', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '프로토 오즈마', id: '379E', capture: false }),
+      netRegex: { source: 'Proto Ozma', id: '379E', capture: false },
       condition: (data) => data.sealed,
       delaySeconds: 9,
       alertText: (data, _matches, output) => {
@@ -951,12 +791,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'BA Ozma Pyramid Shade',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: ['Ozmashade', 'Shadow'], id: '37A4', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: ['Yadis-Schatten', 'Proto-Yadis-Schatten'], id: '37A4', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: ['Ombre D\'Ozma', 'Ombre De Proto-Ozma'], id: '37A4', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: ['オズマの影', 'プロトオズマの影'], id: '37A4', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: ['奥兹玛之影', '奥兹玛原型之影'], id: '37A4', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: ['오즈마의 그림자', '프로토 오즈마의 그림자'], id: '37A4', capture: false }),
+      netRegex: { source: ['Ozmashade', 'Shadow'], id: '37A4', capture: false },
       condition: (data) => data.sealed,
       suppressSeconds: 1,
       alertText: (_data, _matches, output) => output.text!(),
@@ -974,12 +809,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'BA Ozma Star Shade',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: ['Ozmashade', 'Shadow'], id: '37B2', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: ['Yadis-Schatten', 'Proto-Yadis-Schatten'], id: '37B2', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: ['Ombre D\'Ozma', 'Ombre De Proto-Ozma'], id: '37B2', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: ['オズマの影', 'プロトオズマの影'], id: '37B2', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: ['奥兹玛之影', '奥兹玛原型之影'], id: '37B2', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: ['오즈마의 그림자', '프로토 오즈마의 그림자'], id: '37B2', capture: false }),
+      netRegex: { source: ['Ozmashade', 'Shadow'], id: '37B2', capture: false },
       condition: (data) => data.sealed,
       suppressSeconds: 1,
       alertText: (_data, _matches, output) => output.text!(),
@@ -997,12 +827,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'BA Ozma Cube Shade',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: ['Ozmashade', 'Shadow'], id: '379E', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: ['Yadis-Schatten', 'Proto-Yadis-Schatten'], id: '379E', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: ['Ombre D\'Ozma', 'Ombre De Proto-Ozma'], id: '379E', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: ['オズマの影', 'プロトオズマの影'], id: '379E', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: ['奥兹玛之影', '奥兹玛原型之影'], id: '379E', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: ['오즈마의 그림자', '프로토 오즈마의 그림자'], id: '379E', capture: false }),
+      netRegex: { source: ['Ozmashade', 'Shadow'], id: '379E', capture: false },
       condition: (data) => data.sealed,
       suppressSeconds: 1,
       alertText: (_data, _matches, output) => output.text!(),
@@ -1020,12 +845,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'BA Ozma Adds',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Arsenal Urolith', id: '37B0', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Arsenal-Urolith', id: '37B0', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Urolithe De L\'arsenal', id: '37B0', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: 'アーセナル・ウロリス', id: '37B0', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '兵武乌洛里石', id: '37B0', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '무기고 요결석', id: '37B0', capture: false }),
+      netRegex: { source: 'Arsenal Urolith', id: '37B0', capture: false },
       condition: (data) => data.sealed,
       delaySeconds: 2,
       suppressSeconds: 1,
@@ -1034,19 +854,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'BA Ozma Acceleration Bomb',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '37AA', source: 'Proto Ozma' }),
-      netRegexDe: NetRegexes.ability({ id: '37AA', source: 'Proto-Yadis' }),
-      netRegexFr: NetRegexes.ability({ id: '37AA', source: 'Proto-Ozma' }),
-      netRegexJa: NetRegexes.ability({ id: '37AA', source: 'プロトオズマ' }),
-      netRegexCn: NetRegexes.ability({ id: '37AA', source: '奥兹玛原型' }),
-      netRegexKo: NetRegexes.ability({ id: '37AA', source: '프로토 오즈마' }),
+      netRegex: { id: '37AA', source: 'Proto Ozma' },
       condition: (data, matches) => data.sealed && data.me === matches.target,
       response: Responses.stopEverything(),
     },
     {
       id: 'BA Ozma Meteor',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0039' }),
+      netRegex: { id: '0039' },
       condition: (data, matches) => data.sealed && data.me === matches.target,
       response: Responses.meteorOnYou(),
     },
@@ -1055,7 +870,8 @@ const triggerSet: TriggerSet<Data> = {
     {
       'locale': 'de',
       'replaceSync': {
-        '7 minutes have elapsed since your last activity..*?': 'Seit deiner letzten Aktivität sind 7 Minuten vergangen.',
+        '7 minutes have elapsed since your last activity..*?':
+          'Seit deiner letzten Aktivität sind 7 Minuten vergangen.',
         'Absolute Virtue': 'Absolut(?:e|er|es|en) Tugend',
         'Arsenal Centaur': 'Arsenal-Zentaur',
         'Art': 'Art',
@@ -1071,15 +887,19 @@ const triggerSet: TriggerSet<Data> = {
         'Relative Virtue(?! gains)': 'Relative Tugend',
         'Shadow': 'Proto-Yadis-Schatten',
         'Streak Lightning': 'Blitzladung',
-        '5 minutes have elapsed since your last activity': 'Seit deiner letzten Aktivität sind 5 Minuten vergangen',
-        'The memories of heroes past live on again': 'Das Vermächtnis vergangener Helden lebt von Neuem auf',
+        '5 minutes have elapsed since your last activity':
+          'Seit deiner letzten Aktivität sind 5 Minuten vergangen',
+        'The memories of heroes past live on again':
+          'Das Vermächtnis vergangener Helden lebt von Neuem auf',
         'Munderg, turn flesh to ash': 'Munderg, entfessele den Flammeneid',
         'Munderg, turn blood to ice': 'Munderg, das Eis der Ewigkeit soll sie für Äonen bannen',
         'The Shin-Zantetsuken Containment Unit': 'Shin-Zantetsuken-Quarantäneblock',
         'The Lance of Virtue Containment Unit': 'Lanze der Tugend-Quarantäneblock',
         'The Proto Ozma Containment Unit': 'Proto-Yadis-Quarantäneblock',
-        'Relative Virtue gains the effect of Astral Essence': 'Die Relative Tugend erhält den Effekt von.*?Arm der Lichts',
-        'Relative Virtue gains the effect of Umbral Essence': 'Die Relative Tugend erhält den Effekt von.*?Arm der Dunkelheit',
+        'Relative Virtue gains the effect of .*?Astral Essence.*?':
+          'Die Relative Tugend erhält den Effekt von.*?Arm der Lichts',
+        'Relative Virtue gains the effect of .*?Umbral Essence.*?':
+          'Die Relative Tugend erhält den Effekt von.*?Arm der Dunkelheit',
       },
       'replaceText': {
         '\\(Stack\\)': '(Sammeln)',
@@ -1148,23 +968,33 @@ const triggerSet: TriggerSet<Data> = {
     {
       'locale': 'fr',
       'replaceSync': {
-        '7 minutes have elapsed since your last activity..*?': 'Votre personnage est inactif depuis 7 minutes.*?',
+        '7 minutes have elapsed since your last activity.':
+          'Votre personnage est inactif depuis 7 minutes',
         'Absolute Virtue': 'Vertu absolue',
         'Arsenal Centaur': 'Centaure de l\'Arsenal',
         'Art': 'Art',
         'Ball Lightning': 'Orbe de foudre',
         'Arsenal Urolith': 'Urolithe de l\'Arsenal',
         'Ivory Palm': 'Paume d\'ivoire',
+        'Munderg, turn blood to ice': 'C\'est bien, Munderg... Glace le sang de mes ennemis',
+        'Munderg, turn flesh to ash': 'Oui... Munderg, sens le feu embraser nos âmes',
         'Orlasrach': 'Orlasrach',
         'Owain': 'Owain',
         '(?<! )Ozma(?!\\w)': 'Ozma',
         'Ozmashade': 'Ombre d\'Ozma',
         'Proto Ozma(?! containment)': 'Proto-Ozma',
         'Raiden': 'Raiden',
-        'Relative Virtue': 'Vertu relative',
+        'Relative Virtue(?! gains)': 'Vertu relative',
+        'Relative Virtue gains the effect of .*?Astral Essence.*?':
+          'Vertu relative bénéficie de l\'effet.*?Bras de Lumière',
+        'Relative Virtue gains the effect of .*?Umbral Essence.*?':
+          'Vertu relative bénéficie de l\'effet.*?Bras de Ténèbres',
         'Shadow': 'Ombre de Proto-Ozma',
         'Streak Lightning': 'Éclair chargeant',
-        'The Lance of Virtue Containment Unit': 'l\'enceinte de confinement de la lance de la vertu',
+        'The Lance of Virtue Containment Unit':
+          'l\'enceinte de confinement de la lance de la vertu',
+        'The memories of heroes past live on again':
+          'L\'égide des héros vaillants vous a ressuscité',
         'The Proto Ozma Containment Unit': 'l\'enceinte de confinement de Proto-Ozma',
         'The Shin-Zantetsuken Containment Unit': 'l\'enceinte de confinement de Shin-Zantetsuken',
       },
@@ -1239,7 +1069,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       'locale': 'ja',
       'replaceSync': {
-        '7 minutes have elapsed since your last activity..*?': '操作がない状態になってから7分が経過しました。.*?',
+        '7 minutes have elapsed since your last activity.': '操作がない状態になってから7分が経過しました。',
         'Absolute Virtue': 'アブソリュートヴァーチュー',
         'Arsenal Centaur': 'アーセナル・セントール',
         'Art': 'アルト',
@@ -1258,6 +1088,9 @@ const triggerSet: TriggerSet<Data> = {
         'The Lance of Virtue Containment Unit': 'ランス・オブ・ヴァーチュー封印区',
         'The Proto Ozma Containment Unit': 'プロトオズマ封印区',
         'The Shin-Zantetsuken Containment Unit': '真・斬鉄剣封印区',
+        'The memories of heroes past live on again': '英傑の加護の効果が発揮され、蘇生された',
+        'Munderg, turn flesh to ash': '白の妖槍「ムンジャルグ」、燃え上がれ！',
+        'Munderg, turn blood to ice': '白の妖槍「ムンジャルグ」、震え凍れよ！',
       },
       'replaceText': {
         '\\?': ' ?',
@@ -1334,7 +1167,7 @@ const triggerSet: TriggerSet<Data> = {
         'Absolute Virtue': '绝对的美德',
         'Arsenal Centaur': '兵武半人马',
         'Art': '亚特',
-        'Ball Lightning': '闪电球',
+        'Ball Lightning': '雷球',
         'Arsenal Urolith': '兵武乌洛里石',
         'Ivory Palm': '白手',
         'Orlasrach': '烈焰金枪',
@@ -1353,8 +1186,8 @@ const triggerSet: TriggerSet<Data> = {
         'The Lance of Virtue Containment Unit': '美德之枪封印区',
         'The Shin-Zantetsuken Containment Unit': '真·斩铁剑封印区',
         'The Proto Ozma Containment Unit': '奥兹玛原型封印区',
-        'Relative Virtue gains the effect of Astral Essence': '相对的美德附加了“光之腕”效果',
-        'Relative Virtue gains the effect of Umbral Essence': '相对的美德附加了“暗之腕”效果',
+        'Relative Virtue gains the effect of .*?Astral Essence.*?': '相对的美德附加了“光之腕”效果',
+        'Relative Virtue gains the effect of .*?Umbral Essence.*?': '相对的美德附加了“暗之腕”效果',
       },
       'replaceText': {
         'Acallam Na Senorach': '真妖枪旋',
@@ -1446,6 +1279,7 @@ const triggerSet: TriggerSet<Data> = {
         'The Lance of Virtue Containment Unit': '미덕의 창 봉인 구역',
         'The Shin-Zantetsuken Containment Unit': '진 참철검 봉인 구역',
         'The Proto Ozma Containment Unit': '프로토 오즈마 봉인 구역',
+        'The memories of heroes past live on again': '영걸의 가호의 효과가 발휘되어 부활했습니다',
       },
       'replaceText': {
         'Acallam Na Senorach': '피어너의 창',

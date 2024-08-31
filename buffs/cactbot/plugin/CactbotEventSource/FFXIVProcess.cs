@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using CactbotEventSource.loc;
+using RainbowMage.OverlayPlugin;
 
 namespace Cactbot {
 
@@ -49,7 +50,6 @@ namespace Cactbot {
     internal IntPtr player_ptr_addr_ = IntPtr.Zero;
     internal IntPtr job_data_outer_addr_ = IntPtr.Zero;
     internal IntPtr in_combat_addr_ = IntPtr.Zero;
-    internal IntPtr bait_addr_ = IntPtr.Zero;
 
     // Values found in the EntityStruct's type field.
     public enum EntityType : byte {
@@ -107,6 +107,8 @@ namespace Cactbot {
       DNC = 38,
       RPR = 39,
       SGE = 40,
+      VPR = 41,
+      PCT = 42,
     };
 
     static internal bool IsGatherer(EntityJob job) {
@@ -146,7 +148,6 @@ namespace Cactbot {
       public short level = 0;
       public string debug_job;
       public int shield_value = 0;
-      public uint bait = 0;
 
       public override bool Equals(object obj) {
         return obj is EntityData o &&
@@ -168,8 +169,7 @@ namespace Cactbot {
           job == o.job &&
           level == o.level &&
           debug_job == o.debug_job &&
-          shield_value == o.shield_value &&
-          bait == o.bait;
+          shield_value == o.shield_value;
       }
 
       public override int GetHashCode() {
@@ -194,7 +194,6 @@ namespace Cactbot {
         hash = hash * 31 + level.GetHashCode();
         hash = hash * 31 + shield_value.GetHashCode();
         hash = hash * 31 + debug_job.GetHashCode();
-        hash = hash * 31 + bait.GetHashCode();
         return hash;
       }
     };
@@ -212,7 +211,9 @@ namespace Cactbot {
 
     internal abstract void ReadSignatures();
 
-    public FFXIVProcess(ILogger logger) { logger_ = logger; }
+    public FFXIVProcess(ILogger logger) {
+      logger_ = logger;
+    }
 
     public bool HasProcess() {
       // If FindProcess failed, return false. But also return false if
@@ -220,22 +221,16 @@ namespace Cactbot {
       return process_ != null && !process_.HasExited;
     }
 
-    public bool FindProcess() {
-      if (HasProcess())
-        return true;
-
-      // Only support the DirectX 11 binary. The DirectX 9 one has different addresses.
-      Process found_process = (from x in Process.GetProcessesByName("ffxiv_dx11")
-                               where !x.HasExited && x.MainModule != null && x.MainModule.ModuleName == "ffxiv_dx11.exe"
-                               select x).FirstOrDefault<Process>();
-      if (found_process != null && found_process.HasExited)
-        found_process = null;
-      bool changed_existance = (process_ == null) != (found_process == null);
-      bool changed_pid = process_ != null && found_process != null && process_.Id != found_process.Id;
+    public void OnProcessChanged(Process process) {
+      if (process != null && process.HasExited) {
+        process = null;
+      }
+      bool changed_existance = (process_ == null) != (process == null);
+      bool changed_pid = process_ != null && process != null && process_.Id != process.Id;
       if (changed_existance || changed_pid) {
         player_ptr_addr_ = IntPtr.Zero;
         job_data_outer_addr_ = IntPtr.Zero;
-        process_ = found_process != null ? new LimitedProcess(found_process) : null;
+        process_ = process != null ? new LimitedProcess(process) : null;
 
         if (process_ != null) {
           ReadSignatures();
@@ -247,12 +242,10 @@ namespace Cactbot {
                            where !x.HasExited && x.MainModule != null && x.MainModule.ModuleName == "ffxiv.exe"
                            select x).Count();
         if (found_32bit > 0) {
-          logger_.LogError(Strings.FoundDX9FFXIVErrorMessage);
+          logger_.Log(LogLevel.Error, Strings.FoundDX9FFXIVErrorMessage);
           showed_dx9_error_ = true;
         }
       }
-
-      return process_ != null;
     }
 
     public bool IsActive() {
@@ -264,10 +257,6 @@ namespace Cactbot {
       return active_process_id == process_.Id;
     }
 
-    internal uint GetBait() {
-      uint[] jorts = Read32U(bait_addr_, 1);
-      return jorts[0];
-    }
     public unsafe abstract EntityData GetEntityDataFromByteArray(byte[] source);
 
     public bool GetInGameCombat() {
@@ -381,11 +370,11 @@ namespace Cactbot {
     /// <param name="offset">The offset from the end of the found pattern to read a pointer from the process memory.</param>
     /// <param name="rip_addressing">Uses x64 RIP relative addressing mode</param>
     /// <returns>A list of pointers read relative to the end of strings in the process memory matching the |pattern|.</returns>
-    internal List<IntPtr> SigScan(string pattern, int offset, bool rip_addressing) {
+    internal List<IntPtr> SigScan(string pattern, int pattern_offset, bool rip_addressing, int rip_offset = 0) {
       List<IntPtr> matches_list = new List<IntPtr>();
 
       if (pattern == null || pattern.Length % 2 != 0) {
-        logger_.LogError(Strings.InvalidSignaturePatternErrorMessage, pattern);
+        logger_.Log(LogLevel.Error, Strings.InvalidSignaturePatternErrorMessage, pattern);
         return matches_list;
       }
 
@@ -418,7 +407,7 @@ namespace Cactbot {
 
         IntPtr num_bytes_read = IntPtr.Zero;
         if (NativeMethods.ReadProcessMemory(process_.Handle, read_start_addr, read_buffer, read_size, ref num_bytes_read)) {
-          int max_search_offset = num_bytes_read.ToInt32() - pattern_array.Length - Math.Max(0, offset);
+          int max_search_offset = num_bytes_read.ToInt32() - pattern_array.Length - Math.Max(0, pattern_offset);
           // With RIP we will read a 4byte pointer at the |offset|, else we read an 8byte pointer. Either
           // way we can't find a pattern such that the pointer we want to read is off the end of the buffer.
           if (rip_addressing)
@@ -440,17 +429,17 @@ namespace Cactbot {
             if (found_pattern) {
               IntPtr pointer;
               if (rip_addressing) {
-                Int32 rip_ptr_offset = BitConverter.ToInt32(read_buffer, search_offset + pattern_array.Length + offset);
+                Int32 rip_ptr_offset = BitConverter.ToInt32(read_buffer, search_offset + pattern_array.Length + pattern_offset);
                 Int64 pattern_start_game_addr = read_start_addr.ToInt64() + search_offset;
-                Int64 pointer_offset_from_pattern_start = pattern_array.Length + offset;
-                Int64 rip_ptr_base = pattern_start_game_addr + pointer_offset_from_pattern_start + 4;
+                Int64 pointer_offset_from_pattern_start = pattern_array.Length + pattern_offset;
+                Int64 rip_ptr_base = pattern_start_game_addr + pointer_offset_from_pattern_start + 4 + rip_offset;
                 // In RIP addressing, the pointer from the executable is 32bits which we stored as |rip_ptr_offset|. The pointer
                 // is then added to the address of the byte following the pointer, making it relative to that address, which we
                 // stored as |rip_ptr_base|.
                 pointer = new IntPtr((Int64)rip_ptr_offset + rip_ptr_base);
               } else {
                 // In normal addressing, the 64bits found with the pattern are the absolute pointer.
-                pointer = new IntPtr(BitConverter.ToInt64(read_buffer, search_offset + pattern_array.Length + offset));
+                pointer = new IntPtr(BitConverter.ToInt64(read_buffer, search_offset + pattern_array.Length + pattern_offset));
               }
               matches_list.Add(pointer);
             }

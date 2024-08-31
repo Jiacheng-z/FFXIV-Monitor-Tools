@@ -53,10 +53,6 @@ export class JobsEventEmitter extends EventEmitter<EventMap> {
       this.processEnmityTargetData(ev);
     });
 
-    addOverlayListener('onPartyWipe', () => {
-      this.emit('battle/wipe');
-    });
-
     addOverlayListener('onInCombatChangedEvent', (ev) => {
       this.emit('battle/in-combat', {
         game: ev.detail.inGameCombat,
@@ -93,13 +89,13 @@ export class JobsEventEmitter extends EventEmitter<EventMap> {
         break;
       case logDefinitions.GainsEffect.type: {
         const matches = normalizeLogLine(ev.line, logDefinitions.GainsEffect.fields);
-        if (matches.effectId)
+        if (matches.effectId !== undefined)
           this.emit('effect/gain', matches.effectId, matches);
         break;
       }
       case logDefinitions.LosesEffect.type: {
         const matches = normalizeLogLine(ev.line, logDefinitions.LosesEffect.fields);
-        if (matches.effectId)
+        if (matches.effectId !== undefined)
           this.emit('effect/lose', matches.effectId, matches);
         break;
       }
@@ -112,6 +108,12 @@ export class JobsEventEmitter extends EventEmitter<EventMap> {
           this.emit('tick/hot', damage, matches);
         break;
       }
+      case logDefinitions.ActorControl.type: {
+        const matches = normalizeLogLine(ev.line, logDefinitions.ActorControl.fields);
+        if (matches.command === '40000010' || matches.command === '4000000F')
+          this.emit('battle/wipe');
+        break;
+      }
 
       default:
         break;
@@ -119,11 +121,11 @@ export class JobsEventEmitter extends EventEmitter<EventMap> {
   }
 
   processEnmityTargetData({ Target: target }: OverlayEventResponses['EnmityTargetData']): void {
-    if (target) {
+    if (target !== null) {
       this.emit('battle/target', {
         name: target.Name,
-        distance: target.Distance,
-        effectiveDistance: target.EffectiveDistance,
+        distance: parseFloat(target.Distance),
+        effectiveDistance: parseFloat(target.EffectiveDistance),
       });
     } else {
       this.emit('battle/target');
@@ -198,7 +200,7 @@ export class DotTracker extends EventEmitter<{ tick: (targetId?: string) => void
 
     this.ee.on('tick/dot', (_damage, { id, effectId }) => {
       if (
-        id &&
+        id !== undefined &&
         this.lastAttackedTarget === id &&
         this.targets.includes(id) &&
         // if effectId is not 0, that means this DoT tick is produced

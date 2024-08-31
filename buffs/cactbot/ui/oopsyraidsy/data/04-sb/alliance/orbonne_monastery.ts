@@ -50,8 +50,8 @@ const triggerSet: OopsyTriggerSet<Data> = {
     'Orbonne Ultima Demi-Belias Time Eruption 1': '38D0', // fast/slow clocks
     'Orbonne Ultima Demi-Belias Time Eruption 2': '38D1', // fast/slow clocks
     'Orbonne Ultima Demi-Hashmal Towerfall': '38D7', // control tower falling over
-    'Orbonna Ultima Demi-Hashmal Extreme Edge 1': '38DA', // left/right cleave dash
-    'Orbonna Ultima Demi-Hashmal Extreme Edge 2': '38DB', // left/right cleave dash
+    'Orbonne Ultima Demi-Hashmal Extreme Edge 1': '38DA', // left/right cleave dash
+    'Orbonne Ultima Demi-Hashmal Extreme Edge 2': '38DB', // left/right cleave dash
     'Orbonne Ultima Demi-Belias Eruption': '37C8', // headmarker with chasing telegraphed circle aoes
     'Orbonne Ultima Dominion Ray Of Light': '38B7', // lingering line aoe with Eastward/Westward March
     'Orbonne Ultima Embrace Initial': '38B9', // hidden blue traps being placed
@@ -81,20 +81,30 @@ const triggerSet: OopsyTriggerSet<Data> = {
       // castbar that you need to have Heavenly Shield up for, or you get a vuln and knockback.
       id: 'Orbonne Agrias Judgment Blade',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '3857', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '3857', ...playerDamageFields }),
       condition: (data, matches) => data.DamageFromMatches(matches) > 0,
       mistake: (_data, matches) => {
-        return { type: 'warn', blame: matches.target, reportId: matches.targetId, text: matches.ability };
+        return {
+          type: 'warn',
+          blame: matches.target,
+          reportId: matches.targetId,
+          text: matches.ability,
+        };
       },
     },
     {
       // same as Judgment Blade, but from Sword Knight
       id: 'Orbonne Agrias Mortal Blow',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '385E', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '385E', ...playerDamageFields }),
       condition: (data, matches) => data.DamageFromMatches(matches) > 0,
       mistake: (_data, matches) => {
-        return { type: 'warn', blame: matches.target, reportId: matches.targetId, text: matches.ability };
+        return {
+          type: 'warn',
+          blame: matches.target,
+          reportId: matches.targetId,
+          text: matches.ability,
+        };
       },
     },
   ],

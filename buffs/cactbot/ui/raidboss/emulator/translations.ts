@@ -30,30 +30,30 @@ const emulatorButtons: Translation = {
     cn: '关闭',
   },
   '.doneButton': {
-    en: 'Done<span class="doneBtnTimeout"></span>',
-    de: 'Fertig<span class="doneBtnTimeout"></span>',
-    fr: 'Terminé<span class="doneBtnTimeout"></span>',
-    ja: '完了<span class="doneBtnTimeout"></span>',
-    cn: '完成<span class="doneBtnTimeout"></span>',
+    en: 'Done<span class="done-btn-timeout"></span>',
+    de: 'Fertig<span class="done-btn-timeout"></span>',
+    fr: 'Terminé<span class="done-btn-timeout"></span>',
+    ja: '完了<span class="done-btn-timeout"></span>',
+    cn: '完成<span class="done-btn-timeout"></span>',
   },
   '.loadNetworkLogButton': {
     en: 'Load Network Log',
     de: 'Lade Network Log',
-    fr: 'Charger Network Log',
+    fr: 'Charger le Network Log',
     ja: 'ネットワークログを読み込む',
     cn: '加载网络日志',
   },
   '.exportDBButton': {
     en: 'Export DB',
     de: 'DB exportieren',
-    fr: 'Export DB',
+    fr: 'Exporter DB',
     ja: 'DBをエクスポート',
     cn: '导出数据库',
   },
   '.importDBButton': {
     en: 'Import DB',
     de: 'DB importieren',
-    fr: 'Import DB',
+    fr: 'Importer DB',
     ja: 'DBをインポート',
     cn: '导入数据库',
   },
@@ -77,14 +77,14 @@ const emulatorTitle: Translation = {
 } as const;
 
 const emulatorImportModal: Translation = {
-  '.importProgressModal .modal-title': {
+  '.import-progress-modal .modal-title': {
     en: 'Log File Import Progress',
     de: 'Fortschritt des Logdatei Imports',
-    fr: 'Import du fichier log en cours',
+    fr: 'Progression de l\'importation du fichier journal',
     ja: 'ログファイルのインポート進捗',
     cn: '日志文件导入进度',
   },
-  '.importProgressModal .modal-body-contents': {
+  '.import-progress-modal .modal-body-contents': {
     en: `<h3>Latest encounter:</h3>
     Zone: <span class="zone"></span><br />
     Encounter: <span class="encounter"></span><br />
@@ -149,8 +149,7 @@ const emulatorDeleteModal: Translation = {
   '.deleteDBModal .modal-body': {
     en: '<p>You are about to delete the encounter database. Are you sure?</p>',
     de: '<p>Du bist kurz davor die Kampfdatenbank zu löschen. Bist du sicher?</p>',
-    fr:
-      '<p>Vous êtes sur le point de supprimer la base de données du combat. En êtes-vous sûr ?</p>',
+    fr: '<p>Vous êtes sur le point de supprimer la base de données du combat. Êtes-vous sûr ?</p>',
     ja: '<p>エンカウントDBを削除します。よろしいですか？</p>',
     cn: '<p>即将删除战斗数据库。确定删除吗？</p>',
   },
@@ -287,6 +286,7 @@ const emulatorDisconnectedModal: Translation = {
   '.disconnectedModal .modal-title': {
     en: 'Currently Disconnected',
     de: 'Momentan nicht vebunden',
+    fr: 'Actuellement déconnecté',
     ja: '切断されています',
     cn: '已断开连接',
   },
@@ -345,7 +345,7 @@ const emulatorLabels: Translation = {
   ' label[for=hideCollector]': {
     en: 'Hide Collectors',
     de: 'Verstecke "Sammel" Einträge',
-    fr: 'Masquer les entrées "Collecté"',
+    fr: 'Masquer les entrées collectées',
     ja: '無出力トリガーを隠す',
     cn: '隐藏收集器',
   },
@@ -432,13 +432,6 @@ const emulatorEncounterInfo: Translation = {
     ja: '持続時間: <span class="label"></span>',
     cn: '持续时间: <span class="label"></span>',
   },
-  '.encounterOffset': {
-    en: 'Pull At: <span class="label"></span>',
-    de: 'Start um: <span class="label"></span>',
-    fr: 'Pull à : <span class="label"></span>',
-    ja: '戦闘開始: <span class="label"></span>',
-    cn: '开始于: <span class="label"></span>',
-  },
   '.encounterName': {
     en: 'Name: <span class="label"></span>',
     de: 'Name: <span class="label"></span>',
@@ -481,7 +474,7 @@ export const emulatorTooltipTranslations: Translation = {
 // Template elements need special handling, any templates that have translatable elements
 // should be listed here
 export const emulatorTemplateTranslations: { [selector: string]: Translation } = {
-  'template.encounterInfo': emulatorEncounterInfo,
+  'template.encounter-info': emulatorEncounterInfo,
 };
 
 export const emulatorStartStatuses = {

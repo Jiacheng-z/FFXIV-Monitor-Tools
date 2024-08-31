@@ -1,6 +1,6 @@
 import { Lang } from '../../resources/languages';
 import logDefinitions from '../../resources/netlog_defs';
-import NetRegexes from '../../resources/netregexes';
+import NetRegexes, { commonNetRegex } from '../../resources/netregexes';
 import { UnreachableCode } from '../../resources/not_reached';
 import { addOverlayListener, callOverlayHandler } from '../../resources/overlay_plugin_api';
 import { LocaleNetRegex } from '../../resources/translations';
@@ -213,7 +213,7 @@ const bossFightTriggers: readonly Boss[] = [
 ] as const;
 
 const getLocaleObject = <T>(object: LocaleObject<T>, lang: Lang): T => {
-  return object[lang] || object.en;
+  return object[lang] ?? object.en;
 };
 
 class PullCounter {
@@ -222,6 +222,8 @@ class PullCounter {
   private party: Party[] = [];
   private bosses: Boss[] = [];
   private resetRegex = NetRegexes.echo({ line: '.*pullcounter reset.*?' });
+  private wipeEndRegex = commonNetRegex.userWipeEcho;
+  private wipeFadeInRegex = commonNetRegex.wipe;
   private countdownEngageRegex: RegExp;
   private pullCounts: { [bossId: string]: number } = {};
 
@@ -231,8 +233,7 @@ class PullCounter {
   constructor(private options: PullCounterOptions, private element: HTMLElement) {
     this.party = [];
 
-    this.countdownEngageRegex = LocaleNetRegex.countdownEngage[this.options.ParserLanguage] ||
-      LocaleNetRegex.countdownEngage['en'];
+    this.countdownEngageRegex = LocaleNetRegex.countdownEngage[this.options.ParserLanguage];
 
     void callOverlayHandler({
       call: 'cactbotLoadData',
@@ -275,10 +276,13 @@ class PullCounter {
         return;
       }
     }
-    if (e.line[0] !== logDefinitions.GameLog.type)
+    const type = e.line[0];
+    if (type !== logDefinitions.GameLog.type && type !== logDefinitions.ActorControl.type)
       return;
     if (this.resetRegex.test(log))
       this.ResetPullCounter();
+    if (this.wipeEndRegex.test(log) || this.wipeFadeInRegex.test(log))
+      this.Wipe();
     if (this.countdownEngageRegex.test(log)) {
       if (this.countdownBoss)
         this.OnFightStart(this.countdownBoss);
@@ -305,7 +309,7 @@ class PullCounter {
       const firstChar = word[0];
       if (firstChar === undefined)
         return '';
-      return firstChar.toUpperCase() + word.substr(1);
+      return firstChar.toUpperCase() + word.slice(1);
     }).join(' ');
 
     this.ReloadTriggers();
@@ -321,6 +325,7 @@ class PullCounter {
       }
     } else {
       const id = this.zoneName;
+      this.pullCounts[id] = 0;
       console.log(`resetting pull count of: ${id}`);
       this.ShowElementFor(id);
     }
@@ -332,7 +337,7 @@ class PullCounter {
     this.bosses = [];
     this.countdownBoss = undefined;
 
-    if (!this.zoneId || !this.pullCounts)
+    if (!this.zoneId)
       return;
 
     for (const boss of bossFightTriggers) {
@@ -380,7 +385,7 @@ class PullCounter {
     });
   }
 
-  OnPartyWipe() {
+  Wipe() {
     this.element.classList.add('wipe');
   }
 
@@ -389,7 +394,7 @@ class PullCounter {
   }
 
   SetSaveData(e?: SavedConfig) {
-    if (!e || !e.data) {
+    if (e?.data === undefined) {
       this.pullCounts = {};
       this.ReloadTriggers();
       return;
@@ -397,10 +402,12 @@ class PullCounter {
 
     try {
       if (typeof e.data !== 'string')
+        // FIXME:
+        // eslint-disable-next-line @typescript-eslint/no-base-to-string
         throw new Error(e.data.toString());
 
       const parsed: unknown = JSON.parse(e.data);
-      if (!parsed || typeof parsed !== 'object')
+      if (parsed === null || typeof parsed !== 'object')
         throw new Error(e.data);
 
       for (const [id, count] of Object.entries(parsed ?? {})) {
@@ -428,6 +435,5 @@ UserConfig.getUserConfigLocation('pullcounter', defaultOptions, () => {
   addOverlayListener('LogLine', (e) => pullcounter.OnNetLog(e));
   addOverlayListener('ChangeZone', (e) => pullcounter.OnChangeZone(e));
   addOverlayListener('onInCombatChangedEvent', (e) => pullcounter.OnInCombatChange(e));
-  addOverlayListener('onPartyWipe', () => pullcounter.OnPartyWipe());
   addOverlayListener('PartyChanged', (e) => pullcounter.OnPartyChange(e));
 });

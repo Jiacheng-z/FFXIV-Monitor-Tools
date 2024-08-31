@@ -144,7 +144,7 @@ ACT -> Plugins -> OverlayPlugin.dll -> 원하는 오버레이 -> 개발자 도�
 일부분은 사용자 요소(custom element)를 사용하고,
 사용자 요소는 별도로 튜닝하는 방법을 제공하지 않기 때문입니다.
 만약 수정이 불가능한 타임라인 막대에 대해 원하는 수정 사항이 있다면,
-얼마든지 [Github Issue](https://github.com/quisquous/cactbot/issues/new/choose)에 글을 작성해주세요.
+얼마든지 [Github Issue](https://github.com/OverlayPlugin/cactbot/issues/new/choose)에 글을 작성해주세요.
 
 **경고**: cactbot은 CSS 하위 호환 유지를 보장하지 않습니다.
 나중에 cactbot에서 요소들을 재배열 할 수도 있고,
@@ -210,7 +210,7 @@ Options.Triggers.push({
 
 이를 해결하는 방법으로는 트리거의 출력을 수정하여 조정하는 것이 있습니다.
 fireball #1 원본 트리거는
-[ui/raidboss/data/04-sb/ultimate/unending_coil_ultimate.js](https://github.com/quisquous/cactbot/blob/triggers/04-sb/ultimate/unending_coil_ultimate.js#:~:text=UCU%20Nael%20Fireball%201)에서 찾을 수 있습니다.
+[ui/raidboss/data/04-sb/ultimate/unending_coil_ultimate.js](https://github.com/OverlayPlugin/cactbot/blob/triggers/04-sb/ultimate/unending_coil_ultimate.js#:~:text=UCU%20Nael%20Fireball%201)에서 찾을 수 있습니다.
 
 이 코드들을 `cactbot/user/raidboss.js` 파일 아래 부분에 붙여넣습니다.
 
@@ -221,11 +221,6 @@ Options.Triggers.push({
     {
       id: 'UCU Nael Fireball 1',
       netRegex: NetRegexes.ability({ source: 'Ragnarok', id: '26B8', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Ragnarök', id: '26B8', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Ragnarok', id: '26B8', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: 'ラグナロク', id: '26B8', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '诸神黄昏', id: '26B8', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '라그나로크', id: '26B8', capture: false }),
       delaySeconds: 35,
       suppressSeconds: 99999,
       // infoText는 화면에 초록색으로 표시되는 문구입니다.
@@ -247,7 +242,7 @@ Options.Triggers.push({
 지금은 도발 알림이 같은 파티나 연합 파티에 있는 경우에만 작동하고, 일부 직업에 대해서만 작동하고 있습니다.
 이 예시는 어떻게 모든 플레이어에 대해 알림을 보여주도록 만들 수 있는지 보여줍니다.
 도발 트리거는
-[ui/raidboss/data/00-misc/general.js](https://github.com/quisquous/cactbot/blob/triggers/00-misc/general.js#:~:text=General%20Provoke)에서 찾을 수 있습니다.
+[ui/raidboss/data/00-misc/general.js](https://github.com/OverlayPlugin/cactbot/blob/triggers/00-misc/general.js#:~:text=General%20Provoke)에서 찾을 수 있습니다.
 
 다음 예시는 `condition` 함수(function)가 수정된 버전입니다.
 이 트리거는 cactbot에 내장된 트리거인 `General Provoke`와 id가 동일하기 때문에
@@ -267,16 +262,18 @@ Options.Triggers.push({
         // 내가 탱커가 아닌 경우
         return true;
       },
-      infoText: function(data, matches) {
-        let name = data.ShortName(matches.source);
-        return {
-          en: 'Provoke: ' + name,
-          de: 'Herausforderung: ' + name,
-          fr: 'Provocation: ' + name,
-          ja: '挑発: ' + name,
-          cn: '挑衅: ' + name,
-          ko: '도발: ' + name,
-        };
+      infoText: (data, matches, output) => {
+        return output.text({ player: data.party.member(matches.source) });
+      },
+      outputStrings: {
+        text: {
+          en: 'Provoke: ${player}',
+          de: 'Herausforderung: ${player}',
+          fr: 'Provocation: ${player}',
+          ja: '挑発: ${player}',
+          cn: '挑衅: ${player}',
+          ko: '도발: ${player}',
+        },
       },
     },
   ],
@@ -414,7 +411,7 @@ User 폴더의 위치를 모른다면, [User 디렉토리 설정하기](#User-�
     });
     ```
 
-1) [데이터 목록](../../ui/raidboss/data)에서 지금 수정하고 싶은 레이드나 던전의 `.js` 파일을 찾아서 여세요. 해당하는 던전의 영문명은 직접 알아내야 합니다.
+1) [데이터 목록](https://github.com/OverlayPlugin/cactbot/tree/triggers)에서 지금 수정하고 싶은 레이드나 던전의 `.js` 파일을 찾아서 여세요. 해당하는 던전의 영문명은 직접 알아내야 합니다.
 
 1) `raidboss.js` 파일에 붙여넣은 내용 중, `ZoneId.SomeId`를 지우고 그 위치에 방금 찾아서 연 `.js` 파일에 나와있는 `zoneId`를 붙여넣습니다.
 예시) `e8s.js`에는 `ZoneId.EdensVerseRefulgenceSavage`가 `zoneId`로 적혀있으므로, `ZoneId.SomeId`를 지우고 `ZoneId.EdensVerseRefulgenceSavage`를 붙여넣습니다.
@@ -438,11 +435,6 @@ User 폴더의 위치를 모른다면, [User 디렉토리 설정하기](#User-�
       { // <- id 바로 위의 여는 중괄호가 하나의 트리거의 시작점입니다.
         id: 'E8S Reflected Frost 1',
         netRegex: NetRegexes.ability({ source: 'Frozen Mirror', id: '4DB[78]', capture: false }),
-        netRegexDe: NetRegexes.ability({ source: 'Eisspiegel', id: '4DB[78]', capture: false }),
-        netRegexFr: NetRegexes.ability({ source: 'miroir de glace', id: '4DB[78]', capture: false }),
-        netRegexJa: NetRegexes.ability({ source: '氷面鏡', id: '4DB[78]', capture: false }),
-        netRegexCn: NetRegexes.ability({ source: '冰面镜', id: '4DB[78]', capture: false }),
-        netRegexKo: NetRegexes.ability({ source: '얼음 거울', id: '4DB[78]', capture: false }),
         suppressSeconds: 5,
         infoText: {
           en: 'Swap Sides',
@@ -462,11 +454,6 @@ User 폴더의 위치를 모른다면, [User 디렉토리 설정하기](#User-�
       {
         id: 'E8S Reflected Frost 1',
         netRegex: NetRegexes.ability({ source: 'Frozen Mirror', id: '4DB[78]', capture: false }),
-        netRegexDe: NetRegexes.ability({ source: 'Eisspiegel', id: '4DB[78]', capture: false }),
-        netRegexFr: NetRegexes.ability({ source: 'miroir de glace', id: '4DB[78]', capture: false }),
-        netRegexJa: NetRegexes.ability({ source: '氷面鏡', id: '4DB[78]', capture: false }),
-        netRegexCn: NetRegexes.ability({ source: '冰面镜', id: '4DB[78]', capture: false }),
-        netRegexKo: NetRegexes.ability({ source: '얼음 거울', id: '4DB[78]', capture: false }),
         suppressSeconds: 5,
         infoText: {
           en: 'Swap Sides',
@@ -489,7 +476,7 @@ User 폴더의 위치를 모른다면, [User 디렉토리 설정하기](#User-�
 
 1) `user` 폴더의 `raidboss.js` 파일을 편집 프로그램으로 엽니다. (메모장으로도 가능하며, 추가 프로그램을 설치할 의향이 있다면, [notepad++](https://notepad-plus-plus.org/downloads/)를 추천합니다.) 해당 파일이 없다면, 새로 만듭니다. 확장자가 js로 생성됐는지 반드시 확인하세요.
 
-1) 수정하고 싶은 타임라인을 [데이터 목록](../../ui/raidboss/data)에서 다운로드하세요.
+1) 수정하고 싶은 타임라인을 [데이터 목록](https://github.com/OverlayPlugin/cactbot/tree/triggers)에서 다운로드하세요.
     1) 목록에서 해당 파일을 찾습니다.
     1) `Raw` 버튼을 클릭합니다.
     1) 화면 우클릭 후, `다른 이름으로 저장`을 클릭하면 다운로드할 수 있습니다.
@@ -507,9 +494,9 @@ User 폴더의 위치를 모른다면, [User 디렉토리 설정하기](#User-�
     });
     ```
 
-1) 수정하고 싶은 타임라인의 던전에 해당하는 `.js` 파일을 [데이터 목록](../../ui/raidboss/data)에서 열고, 그 파일 상단에 있는 `zoneId` 값을 `ZoneId.SomeId` 대신 집어 넣습니다. 예를 들어, 절알렉 타임라인을 수정하고 있다면, `the_epic_of_alexander.js`을 열어서 그 곳에 적힌 `ZoneId.TheEpicOfAlexanderUltimate`를 `ZoneId.SomeId`를 대신해 붙여넣습니다.
+1) 수정하고 싶은 타임라인의 던전에 해당하는 `.js` 파일을 [데이터 목록](https://github.com/OverlayPlugin/cactbot/tree/triggers)에서 열고, 그 파일 상단에 있는 `zoneId` 값을 `ZoneId.SomeId` 대신 집어 넣습니다. 예를 들어, 절알렉 타임라인을 수정하고 있다면, `the_epic_of_alexander.js`을 열어서 그 곳에 적힌 `ZoneId.TheEpicOfAlexanderUltimate`를 `ZoneId.SomeId`를 대신해 붙여넣습니다.
 
-1) `timelineFile` 뒤에 `txt` 파일명을 방금 다운로드한 타임라인 `txt` 파일명으로 수정합니다.
+1) `timelineFile` 뒤의 `txt` 파일명을 방금 다운로드한 타임라인 `txt` 파일명으로 수정합니다.
 
 1) 다운로드 한 타임라인을 편집기로 열어 원하는 대로 수정합니다.
 
@@ -528,11 +515,6 @@ Options.Triggers.push({
     {
       id: 'E8S Reflected Frost 1', // 이렇게 어느 문장 뒤에도 메모를 추가할 수 있습니다.
       netRegex: NetRegexes.ability({ source: 'Frozen Mirror', id: '4DB[78]', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Eisspiegel', id: '4DB[78]', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'miroir de glace', id: '4DB[78]', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: '氷面鏡', id: '4DB[78]', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '冰面镜', id: '4DB[78]', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '얼음 거울', id: '4DB[78]', capture: false }),
       suppressSeconds: 5,
       infoText: {
         en: 'Swap Sides',

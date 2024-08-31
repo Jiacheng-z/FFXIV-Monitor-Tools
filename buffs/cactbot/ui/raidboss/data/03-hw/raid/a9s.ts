@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -11,6 +10,7 @@ export interface Data extends RaidbossData {
 }
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'AlexanderTheEyesOfTheCreatorSavage',
   zoneId: ZoneId.AlexanderTheEyesOfTheCreatorSavage,
   timelineFile: 'a9s.txt',
   initData: () => {
@@ -131,23 +131,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A9S Stockpile Count',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Refurbisher 0', id: '1A38', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Rekompositor', id: '1A38', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Récupérateur', id: '1A38', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'リファビッシャー', id: '1A38', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '废品翻新装置', id: '1A38', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '재생자', id: '1A38', capture: false }),
+      netRegex: { source: 'Refurbisher 0', id: '1A38', capture: false },
       run: (data) => data.stockpileCount++,
     },
     {
       id: 'A9S Scrapline',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Refurbisher 0', id: '1A3C', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Rekompositor', id: '1A3C', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Récupérateur', id: '1A3C', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'リファビッシャー', id: '1A3C', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '废品翻新装置', id: '1A3C', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '재생자', id: '1A3C', capture: false }),
+      netRegex: { source: 'Refurbisher 0', id: '1A3C', capture: false },
       alertText: (data, _matches, output) => {
         if (data.mainTank === data.me)
           return;
@@ -180,12 +170,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A9S Double Scrapline',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Refurbisher 0', id: '1A3D', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Rekompositor', id: '1A3D', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Récupérateur', id: '1A3D', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'リファビッシャー', id: '1A3D', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '废品翻新装置', id: '1A3D', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '재생자', id: '1A3D', capture: false }),
+      netRegex: { source: 'Refurbisher 0', id: '1A3D', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -201,7 +186,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A9S Scrap Rock',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0017' }),
+      netRegex: { id: '0017' },
       condition: Conditions.targetIsYou(),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -218,7 +203,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A9S Scrap Burst',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0017', capture: false }),
+      netRegex: { id: '0017', capture: false },
       delaySeconds: 5,
       suppressSeconds: 1,
       alertText: (_data, _matches, output) => output.text!(),
@@ -236,7 +221,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A9S Scrap Bomb Stack',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '003E' }),
+      netRegex: { id: '003E' },
       // TODO: dubious to tell the person tanking to do it here.
       // But maybe fine to inform.
       response: Responses.stackMarkerOn(),
@@ -244,25 +229,20 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A9S Spread',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '000E' }),
+      netRegex: { id: '000E' },
       condition: Conditions.targetIsYou(),
       response: Responses.spread(),
     },
     {
       id: 'A9S Auto',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Refurbisher 0', id: '1AFE' }),
-      netRegexDe: NetRegexes.ability({ source: 'Rekompositor', id: '1AFE' }),
-      netRegexFr: NetRegexes.ability({ source: 'Récupérateur', id: '1AFE' }),
-      netRegexJa: NetRegexes.ability({ source: 'リファビッシャー', id: '1AFE' }),
-      netRegexCn: NetRegexes.ability({ source: '废品翻新装置', id: '1AFE' }),
-      netRegexKo: NetRegexes.ability({ source: '재생자', id: '1AFE' }),
+      netRegex: { source: 'Refurbisher 0', id: '1AFE' },
       run: (data, matches) => data.mainTank = matches.target,
     },
     {
       id: 'A9S Power Generator Add Tether',
       type: 'Tether',
-      netRegex: NetRegexes.tether({ id: '0011', capture: false }),
+      netRegex: { id: '0011', capture: false },
 
       suppressSeconds: 30,
       infoText: (data, _matches, output) => {

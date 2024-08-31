@@ -1,4 +1,3 @@
-import NetRegexes from '../../../../../resources/netregexes';
 import Outputs from '../../../../../resources/outputs';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
@@ -9,29 +8,20 @@ export type Data = RaidbossData;
 
 // Suzaku Extreme
 const triggerSet: TriggerSet<Data> = {
+  id: 'HellsKierExtreme',
   zoneId: ZoneId.HellsKierExtreme,
   timelineFile: 'suzaku-ex.txt',
   triggers: [
     {
       id: 'SuzEx Cremate',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '32D1', source: 'Suzaku' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '32D1', source: 'Suzaku' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '32D1', source: 'Suzaku' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '32D1', source: '朱雀' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '32D1', source: '朱雀' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '32D1', source: '주작' }),
+      netRegex: { id: '32D1', source: 'Suzaku' },
       response: Responses.tankBuster(),
     },
     {
       id: 'SuzEx Phantom Flurry',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '32DC', source: 'Suzaku', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '32DC', source: 'Suzaku', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '32DC', source: 'Suzaku', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '32DC', source: '朱雀', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '32DC', source: '朱雀', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '32DC', source: '주작', capture: false }),
+      netRegex: { id: '32DC', source: 'Suzaku', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: Outputs.tankBuster,
@@ -40,12 +30,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'SuzEx Mesmerizing Melody',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '32DA', source: 'Suzaku', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '32DA', source: 'Suzaku', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '32DA', source: 'Suzaku', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '32DA', source: '朱雀', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '32DA', source: '朱雀', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '32DA', source: '주작', capture: false }),
+      netRegex: { id: '32DA', source: 'Suzaku', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -61,12 +46,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'SuzEx Ruthless Refrain',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '32DB', source: 'Suzaku', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '32DB', source: 'Suzaku', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '32DB', source: 'Suzaku', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '32DB', source: '朱雀', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '32DB', source: '朱雀', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '32DB', source: '주작', capture: false }),
+      netRegex: { id: '32DB', source: 'Suzaku', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {

@@ -58,17 +58,14 @@ export default class Encounter {
   initialize(): void {
     const startStatuses = new Set<string>();
 
-    this.logLines.forEach((line, i) => {
-      if (!line)
-        throw new UnreachableCode();
-
+    for (const line of this.logLines) {
       this.tzOffsetMillis = line.tzOffsetMillis;
 
       let res: MatchStartInfo | MatchEndInfo | undefined = EmulatorCommon.matchStart(
         line.networkLine,
       );
       if (res) {
-        this.firstLineIndex = i;
+        this.firstLineIndex = line.index;
         if (res.StartType)
           startStatuses.add(res.StartType);
         const startIn = parseInt(res.StartIn);
@@ -82,7 +79,7 @@ export default class Encounter {
         } else if (isLineEventSource(line) && isLineEventTarget(line)) {
           if (
             line.id.startsWith('1') ||
-            (line.id.startsWith('4') && isPetName(line.name, this.language))
+            line.id.startsWith('4') && isPetName(line.name, this.language)
           ) {
             // Player or pet ability
             if (line.targetId.startsWith('4') && !isPetName(line.targetName, this.language)) {
@@ -101,7 +98,7 @@ export default class Encounter {
       const matchedLang = res?.language;
       if (isLang(matchedLang))
         this.language = matchedLang;
-    });
+    }
 
     this.combatantTracker = new CombatantTracker(this.logLines, this.language);
     this.startTimestamp = this.combatantTracker.firstTimestamp;

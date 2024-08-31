@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -8,35 +7,26 @@ import { TriggerSet } from '../../../../../types/trigger';
 export type Data = RaidbossData;
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'EdensGateInundation',
   zoneId: ZoneId.EdensGateInundation,
   timelineFile: 'e3n.txt',
   triggers: [
     {
       id: 'E3N Tidal Roar',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3FC4', source: 'Leviathan', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3FC4', source: 'Leviathan', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3FC4', source: 'Léviathan', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3FC4', source: 'リヴァイアサン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3FC4', source: '利维亚桑', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3FC4', source: '리바이어선', capture: false }),
+      netRegex: { id: '3FC4', source: 'Leviathan', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'E3N Rip Current',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0017' }),
+      netRegex: { id: '0017' },
       response: Responses.tankBuster(),
     },
     {
       id: 'E3N Tidal Wave Look',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3FD2', source: 'Leviathan', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3FD2', source: 'Leviathan', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3FD2', source: 'Léviathan', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3FD2', source: 'リヴァイアサン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3FD2', source: '利维亚桑', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3FD2', source: '리바이어선', capture: false }),
+      netRegex: { id: '3FD2', source: 'Leviathan', capture: false },
       delaySeconds: 3,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -53,12 +43,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'E3N Tidal Wave Knockback',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3FD2', source: 'Leviathan', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3FD2', source: 'Leviathan', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3FD2', source: 'Léviathan', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3FD2', source: 'リヴァイアサン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3FD2', source: '利维亚桑', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3FD2', source: '리바이어선', capture: false }),
+      netRegex: { id: '3FD2', source: 'Leviathan', capture: false },
       // 3 seconds of cast, 10 seconds of delay.
       // This gives a warning within 5 seconds, so you can hit arm's length.
       delaySeconds: 8,
@@ -67,12 +52,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'E3N Undersea Quake Outside',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3FD0', source: 'Leviathan', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3FD0', source: 'Leviathan', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3FD0', source: 'Léviathan', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3FD0', source: 'リヴァイアサン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3FD0', source: '利维亚桑', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3FD0', source: '리바이어선', capture: false }),
+      netRegex: { id: '3FD0', source: 'Leviathan', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -88,23 +68,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'E3N Undersea Quake Inside',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3FCF', source: 'Leviathan', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3FCF', source: 'Leviathan', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3FCF', source: 'Léviathan', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3FCF', source: 'リヴァイアサン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3FCF', source: '利维亚桑', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3FCF', source: '리바이어선', capture: false }),
+      netRegex: { id: '3FCF', source: 'Leviathan', capture: false },
       response: Responses.goSides('alarm'),
     },
     {
       id: 'E3N Maelstrom',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3FD8', source: 'Leviathan', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3FD8', source: 'Leviathan', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3FD8', source: 'Léviathan', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3FD8', source: 'リヴァイアサン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3FD8', source: '利维亚桑', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3FD8', source: '리바이어선', capture: false }),
+      netRegex: { id: '3FD8', source: 'Leviathan', capture: false },
       delaySeconds: 8,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -114,52 +84,47 @@ const triggerSet: TriggerSet<Data> = {
           fr: 'Évitez les zones au sol et les piqués',
           ja: '円範囲から離れる',
           cn: '躲圈闪避',
-          ko: '돌진이랑 장판 피하세요',
+          ko: '돌진이랑 장판 피하기',
         },
       },
     },
     {
       id: 'E3N Drenching Pulse Spread',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '00A9' }),
+      netRegex: { id: '00A9' },
       condition: Conditions.targetIsYou(),
       response: Responses.spread(),
     },
     {
       id: 'E3N Tsunami',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3FD4', source: 'Leviathan', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3FD4', source: 'Leviathan', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3FD4', source: 'Léviathan', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3FD4', source: 'リヴァイアサン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3FD4', source: '利维亚桑', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3FD4', source: '리바이어선', capture: false }),
+      netRegex: { id: '3FD4', source: 'Leviathan', capture: false },
       response: Responses.aoe(),
     },
     {
       // Crashing Pulse and Smothering Waters
       id: 'E3N Stack',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '003E' }),
+      netRegex: { id: '003E' },
       response: Responses.stackMarkerOn(),
     },
     {
       id: 'E3N Surging Waters Marker',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '00AD' }),
+      netRegex: { id: '00AD' },
       response: Responses.knockbackOn(),
     },
     {
       id: 'E3N Splashing Waters Spread',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0082' }),
+      netRegex: { id: '0082' },
       condition: Conditions.targetIsYou(),
       response: Responses.spread(),
     },
     {
       id: 'E3N Swirling Waters Donut',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0099' }),
+      netRegex: { id: '0099' },
       condition: Conditions.targetIsYou(),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {

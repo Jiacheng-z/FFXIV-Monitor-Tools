@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -9,6 +8,7 @@ export type Data = RaidbossData;
 
 // Susano Normal
 const triggerSet: TriggerSet<Data> = {
+  id: 'ThePoolOfTribute',
   zoneId: ZoneId.ThePoolOfTribute,
   timelineFile: 'susano.txt',
   timelineTriggers: [
@@ -23,13 +23,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Susano Brightstorm',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '003E' }),
+      netRegex: { id: '003E' },
       response: Responses.stackMarkerOn(),
     },
     {
       id: 'Susano Seasplitter',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0017' }),
+      netRegex: { id: '0017' },
       condition: Conditions.targetIsYou(),
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -45,23 +45,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Susano Ukehi',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Susano', id: '2026', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Susano', id: '2026', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Susano', id: '2026', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'スサノオ', id: '2026', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '须佐之男', id: '2026', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '스사노오', id: '2026', capture: false }),
+      netRegex: { source: 'Susano', id: '2026', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Susano Stormsplitter',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Susano', id: '2023' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Susano', id: '2023' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Susano', id: '2023' }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'スサノオ', id: '2023' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '须佐之男', id: '2023' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '스사노오', id: '2023' }),
+      netRegex: { source: 'Susano', id: '2023' },
       response: Responses.tankCleave('alert'),
     },
   ],
@@ -144,7 +134,7 @@ const triggerSet: TriggerSet<Data> = {
       },
       'replaceText': {
         'Ame-No-Murakumo': '天之丛云',
-        'Assail': '攻击指示',
+        'Assail': '强击',
         'Brightstorm': '晴岚',
         'Dark Levin': '紫电',
         'Rasen Kaikyo': '螺旋海峡',

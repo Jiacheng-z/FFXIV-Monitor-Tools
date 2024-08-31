@@ -5,6 +5,7 @@ import { callOverlayHandler } from '../../resources/overlay_plugin_api';
 import Regexes from '../../resources/regexes';
 import UserConfig, { ConfigEntry, ConfigValue, OptionsTemplate } from '../../resources/user_config';
 import ZoneInfo from '../../resources/zone_info';
+import { BaseOptions } from '../../types/data';
 import { SavedConfig, SavedConfigEntry } from '../../types/event';
 import { LooseOopsyTrigger, LooseOopsyTriggerSet } from '../../types/oopsy';
 import {
@@ -118,6 +119,13 @@ const kPrefixToCategory = {
     cn: '晓月之终途 (6.x)',
     ko: '효월의 종언 (6.x)',
   },
+  '07-dt': {
+    en: 'Dawntrail (DT 7.x)',
+    de: 'Dawntrail (DT 7.x)',
+    fr: 'Dawntrail (DT 7.x)',
+    ja: '黄金のレガシー (7.x)',
+    cn: '金曦之遗辉 (7.x)',
+  },
   'user': {
     en: 'User Triggers',
     de: 'Benutzer Trigger',
@@ -186,6 +194,30 @@ const kDirectoryToCategory = {
     cn: '绝境战',
     ko: '절 난이도',
   },
+  hunts: {
+    en: 'Hunts & FATEs',
+    de: 'Hohe Jagd & FATEs',
+    fr: 'Chasse & Aléas',
+    ja: 'モブハント & フェイト',
+    cn: '怪物狩猎 & 危命任务',
+    ko: '마물 & 돌발',
+  },
+  map: {
+    en: 'Treasure Map',
+    de: 'Schatzkarten',
+    fr: 'Cartes au trésor',
+    ja: '宝箱地図',
+    cn: '宝物地图',
+    ko: '보물 지도',
+  },
+  deepdungeon: {
+    en: 'Deep Dungeon',
+    de: 'Tiefes Gewölbe',
+    fr: 'Donjon sans fond',
+    ja: 'ディープダンジョン',
+    cn: '深层迷宫',
+    ko: '딥 던전',
+  },
 };
 
 // TODO: maybe we should also sort all the filenames properly too?
@@ -205,6 +237,12 @@ const fileNameToTitle = (filename: string) => {
   return capitalized;
 };
 
+const getOptDefault = (opt: ConfigEntry, options: BaseOptions): ConfigValue => {
+  if (typeof opt.default === 'function')
+    return opt.default(options);
+  return opt.default;
+};
+
 // Annotations by userFileHandler (processRaidbossFiles) on triggers.
 // raidboss_config also combines normal and timeline triggers when building the config ui.
 export type ConfigLooseTrigger = LooseTrigger & LooseTimelineTrigger & {
@@ -217,10 +255,7 @@ export type ConfigLooseTrigger = LooseTrigger & LooseTimelineTrigger & {
   configOutput?: { [field: string]: string };
 };
 
-export type ConfigLooseTriggerSet = LooseTriggerSet & {
-  filename?: string;
-  isUserTriggerSet?: boolean;
-};
+export type ConfigLooseTriggerSet = LooseTriggerSet;
 
 export type ConfigLooseOopsyTrigger = LooseOopsyTrigger;
 
@@ -299,12 +334,10 @@ export class CactbotConfigurator {
   // Helper translate function.  Takes in an object with language keys
   // and returns a single entry based on available translations.
   translate<T>(textObj: LocaleObject<T>): T {
-    if (textObj === null || typeof textObj !== 'object' || !textObj['en'])
+    if (textObj === null || typeof textObj !== 'object')
       throw new Error(`Invalid config: ${JSON.stringify(textObj)}`);
     const t = textObj[this.lang];
-    if (t)
-      return t;
-    return textObj['en'];
+    return t ?? textObj['en'];
   }
 
   getBooleanOption(group: string, path: string | string[], defaultValue: boolean): boolean {
@@ -322,8 +355,10 @@ export class CactbotConfigurator {
     return defaultValue;
   }
 
-  getStringOption(group: string, path: string | string[], defaultValue: ConfigValue): string {
+  getStringOption(group: string, path: string | string[], defaultValue: string): string {
     const value = this.getOption(group, path, defaultValue);
+    if (value === '')
+      return defaultValue;
     return value.toString();
   }
 
@@ -345,18 +380,20 @@ export class CactbotConfigurator {
     return defaultValue;
   }
 
-  // Takes a variable length `path` and returns the defaultValue if any key is missing.
-  // e.g. (foo, [bar, baz], 5) with {foo: { bar: { baz: 3 } } } will return
-  // the value 3.
-  getOption(group: string, path: string | string[], defaultValue: ConfigValue): ConfigValue {
+  // Gets the leaf node for a given option group/path.
+  // Returns undefined on failure.
+  _getOptionLeafHelper(
+    group: string,
+    path: string | string[],
+  ): SavedConfigEntry | undefined {
     let objOrValue = this.savedConfig[group];
     if (objOrValue === undefined)
-      return defaultValue;
+      return;
 
     const args = Array.isArray(path) ? path : [path];
     if (args.length === 0) {
       console.error(`path must have at least one element`);
-      return defaultValue;
+      return;
     }
 
     for (const arg of args) {
@@ -365,14 +402,25 @@ export class CactbotConfigurator {
         // until leaf node ConfigValue.
         const info = JSON.stringify([group, ...args].join(', '));
         console.error(`Unexpected entry: ${info}}`);
-        return defaultValue;
+        return;
       }
       const item: SavedConfigEntry | undefined = objOrValue[arg];
       // If not found, then use default value.
       if (typeof item === 'undefined')
-        return defaultValue;
+        return;
       objOrValue = item;
     }
+
+    return objOrValue;
+  }
+
+  // Takes a variable length `path` and returns the defaultValue if any key is missing.
+  // e.g. (foo, [bar, baz], 5) with {foo: { bar: { baz: 3 } } } will return
+  // the value 3.
+  getOption(group: string, path: string | string[], defaultValue: ConfigValue): ConfigValue {
+    const objOrValue = this._getOptionLeafHelper(group, path);
+    if (objOrValue === undefined)
+      return defaultValue;
 
     // At the leaf node.
     // Some number options pass in empty string as a default.
@@ -383,8 +431,11 @@ export class CactbotConfigurator {
       !emptyDefaultNumber && !isStringNumber && typeof defaultValue !== typeof objOrValue ||
       typeof objOrValue === 'object'
     ) {
+      const args = Array.isArray(path) ? path : [path];
       const info = JSON.stringify([group, ...args].join(', '));
       console.error(
+        // FIXME:
+        // eslint-disable-next-line @typescript-eslint/no-base-to-string
         `Unexpected type: ${info}, ${objOrValue.toString()}, ${typeof objOrValue}, ${typeof defaultValue}`,
       );
       return defaultValue;
@@ -392,10 +443,28 @@ export class CactbotConfigurator {
     return objOrValue;
   }
 
+  // Similar to getOption, but gets an arbitrary SavedConfigEntry json subset instead of
+  // guaranteeing a leaf node ConfigValue.
+  getJsonOption(
+    group: string,
+    path: string | string[],
+    defaultValue: SavedConfigEntry,
+  ): SavedConfigEntry {
+    const objOrValue = this._getOptionLeafHelper(group, path);
+    return objOrValue ?? defaultValue;
+  }
+
   // Sets an option in the config at a variable level of nesting.
   // e.g. (foo, [bar, baz], 3) will set {foo: { bar: { baz: 3 } } }.
   // e.g. (foo, bar, 4) will set { foo: { bar: 4 } }.
-  setOption(group: string, path: string | string[], defaultValue: ConfigValue): void {
+  setOption(group: string, path: string | string[], value: ConfigValue): void {
+    // Make callers explicitly use setJsonOption if they want a SavedConfigEntry,
+    // as the vast majority of callers only want a ConfigValue value.
+    this.setJsonOption(group, path, value);
+  }
+
+  // Same as setOption but with a more permissive value.
+  setJsonOption(group: string, path: string | string[], value: SavedConfigEntry): void {
     // Set keys and create default {} if it doesn't exist.
     let obj = this.savedConfig[group] ??= {};
 
@@ -405,12 +474,12 @@ export class CactbotConfigurator {
       return;
     }
     const finalArg = args.slice(-1)[0];
-    if (!finalArg)
+    if (finalArg === undefined)
       throw new UnreachableCode();
 
     const allButFinalArg = args.slice(0, -1);
     for (const arg of allButFinalArg) {
-      if (typeof obj !== 'undefined' && typeof obj !== 'object' || Array.isArray(obj)) {
+      if (typeof obj !== 'object' || Array.isArray(obj)) {
         // SavedConfigEntry is arbitrary JSON, but these options should be nothing but objects
         // until leaf node ConfigValue.
         console.error(`Unexpected entry: ${JSON.stringify([group, ...args].join(', '))}`);
@@ -420,14 +489,14 @@ export class CactbotConfigurator {
       obj = obj[arg] ??= {};
     }
 
-    if (typeof obj !== 'undefined' && typeof obj !== 'object' || Array.isArray(obj)) {
+    if (typeof obj !== 'object' || Array.isArray(obj)) {
       // SavedConfigEntry is arbitrary JSON, but these options should be nothing but objects
       // until leaf node ConfigValue.
       console.error(`Unexpected entry: ${JSON.stringify([group, ...args].join(', '))}`);
       return;
     }
-    // Any type of ConfigValue is fine here and we'll validate on loading.
-    obj[finalArg] = defaultValue;
+    // Any type of SavedConfigEntry is fine here and we'll validate on loading.
+    obj[finalArg] = value;
     void this.saveConfigData();
   }
 
@@ -437,15 +506,11 @@ export class CactbotConfigurator {
       throw new UnreachableCode();
 
     const textDiv = document.createElement('div');
-    if (!textDiv)
-      throw new UnreachableCode();
     textDiv.classList.add('reload-text');
     textDiv.innerText = this.translate(kReloadText);
     container.appendChild(textDiv);
 
     const buttonInput = document.createElement('input');
-    if (!buttonInput)
-      throw new UnreachableCode();
     buttonInput.classList.add('reload-button');
     buttonInput.type = 'button';
     buttonInput.onclick = () => {
@@ -453,6 +518,43 @@ export class CactbotConfigurator {
     };
     buttonInput.value = this.translate(kReloadButtonText);
     container.appendChild(buttonInput);
+  }
+
+  buildConfigEntry(
+    derivedOptions: BaseOptions,
+    groupDiv: HTMLElement,
+    opt: ConfigEntry,
+    group: string,
+    path?: string[],
+  ): void {
+    // Note: `derivedOptions` here is the `RaidbossOptions` or `JobsOptions`
+    // and may be different than `this.configOptions`.
+    switch (opt.type) {
+      case 'checkbox':
+        this.buildCheckbox(derivedOptions, groupDiv, opt, group, path);
+        break;
+      case 'html':
+        this.buildHtml(derivedOptions, groupDiv, opt, group, path);
+        break;
+      case 'select':
+        this.buildSelect(derivedOptions, groupDiv, opt, group, path);
+        break;
+      case 'float':
+        this.buildFloat(derivedOptions, groupDiv, opt, group, path);
+        break;
+      case 'integer':
+        this.buildInteger(derivedOptions, groupDiv, opt, group, path);
+        break;
+      case 'string':
+        this.buildString(derivedOptions, groupDiv, opt, group, path);
+        break;
+      case 'directory':
+        this.buildDirectory(derivedOptions, groupDiv, opt, group, path);
+        break;
+      default:
+        console.error(`unknown type: ${JSON.stringify(opt)}`);
+        break;
+    }
   }
 
   // Top level UI builder, builds everything.
@@ -471,29 +573,7 @@ export class CactbotConfigurator {
         for (const opt of options) {
           if (!this.developerOptions && opt.debugOnly)
             continue;
-          switch (opt.type) {
-            case 'checkbox':
-              this.buildCheckbox(groupDiv, opt, group);
-              break;
-            case 'html':
-              this.buildHtml(groupDiv, opt, group);
-              break;
-            case 'select':
-              this.buildSelect(groupDiv, opt, group);
-              break;
-            case 'float':
-              this.buildFloat(groupDiv, opt, group);
-              break;
-            case 'integer':
-              this.buildInteger(groupDiv, opt, group);
-              break;
-            case 'directory':
-              this.buildDirectory(groupDiv, opt, group);
-              break;
-            default:
-              console.error('unknown type: ' + JSON.stringify(opt));
-              break;
-          }
+          this.buildConfigEntry(this.configOptions, groupDiv, opt, group);
         }
 
         const builder = template.buildExtraUI;
@@ -510,6 +590,8 @@ export class CactbotConfigurator {
     container.appendChild(collapser);
 
     const a = document.createElement('a');
+    // TODO: fix me
+    /* eslint-disable-next-line deprecation/deprecation */
     a.name = group;
     collapser.appendChild(a);
 
@@ -531,44 +613,74 @@ export class CactbotConfigurator {
     return groupDiv;
   }
 
-  buildNameDiv(opt: ConfigEntry): HTMLElement {
+  buildLeftDiv(opt: ConfigEntry): HTMLElement {
     const div = document.createElement('div');
-    div.innerHTML = this.translate(opt.name);
-    div.classList.add('option-name');
+
+    // Build Name
+    const nameDiv = document.createElement('div');
+    nameDiv.innerHTML = this.translate(opt.name);
+    nameDiv.classList.add('option-name');
+    div.appendChild(nameDiv);
+
+    // Build the trigger comment
+    if (opt.comment) {
+      const commentDiv = document.createElement('div');
+      commentDiv.innerHTML = opt.comment[this.lang] ?? opt.comment?.en ?? '';
+      commentDiv.classList.add('comment');
+      div.appendChild(commentDiv);
+    }
     return div;
   }
 
-  buildCheckbox(parent: HTMLElement, opt: ConfigEntry, group: string): void {
+  buildCheckbox(
+    options: BaseOptions,
+    parent: HTMLElement,
+    opt: ConfigEntry,
+    group: string,
+    path?: string[],
+  ): void {
     const div = document.createElement('div');
     div.classList.add('option-input-container');
 
     const input = document.createElement('input');
-    if (!input)
-      throw new UnreachableCode();
     div.appendChild(input);
     input.type = 'checkbox';
 
-    const defaultValue = typeof opt.default === 'boolean' ? opt.default : false;
-    if (typeof opt.default !== 'boolean')
-      console.error(`Invalid non-boolean default: ${group} ${opt.id}`);
-    input.checked = this.getBooleanOption(group, opt.id, defaultValue);
-    input.onchange = () => this.setOption(group, opt.id, input.checked);
+    const optDefault = getOptDefault(opt, options);
+    const defaultValue = typeof optDefault === 'boolean' ? optDefault : false;
+    const optIdPath = [...path ?? [], opt.id];
+    if (typeof optDefault !== 'boolean')
+      console.error(`Invalid non-boolean default: ${group} ${optIdPath.join(' ')}`);
+    input.checked = this.getBooleanOption(group, optIdPath, defaultValue);
+    input.onchange = () => this.setOption(group, optIdPath, input.checked);
 
-    parent.appendChild(this.buildNameDiv(opt));
+    parent.appendChild(this.buildLeftDiv(opt));
     parent.appendChild(div);
   }
 
-  buildHtml(parent: HTMLElement, opt: ConfigEntry, _group: string): void {
+  buildHtml(
+    _options: BaseOptions,
+    parent: HTMLElement,
+    opt: ConfigEntry,
+    _group: string,
+    _path?: string[],
+  ): void {
     const div = document.createElement('div');
     div.classList.add('option-input-container');
     if (opt.html)
       div.innerHTML = this.translate(opt.html);
 
-    parent.appendChild(this.buildNameDiv(opt));
+    parent.appendChild(this.buildLeftDiv(opt));
     parent.appendChild(div);
   }
 
-  buildDirectory(parent: HTMLElement, opt: ConfigEntry, group: string): void {
+  buildDirectory(
+    options: BaseOptions,
+    parent: HTMLElement,
+    opt: ConfigEntry,
+    group: string,
+    path?: string[],
+  ): void {
     const div = document.createElement('div');
     div.classList.add('option-input-container');
     div.classList.add('input-dir-container');
@@ -589,9 +701,11 @@ export class CactbotConfigurator {
       else
         label.innerText = this.translate(kDirectoryDefaultText);
     };
-    setLabel(this.getStringOption(group, opt.id, opt.default));
+    const optIdPath = [...path ?? [], opt.id];
+    const optDefault = getOptDefault(opt, options);
+    setLabel(this.getStringOption(group, optIdPath, optDefault.toString()));
 
-    parent.appendChild(this.buildNameDiv(opt));
+    parent.appendChild(this.buildLeftDiv(opt));
     parent.appendChild(div);
 
     input.onclick = async () => {
@@ -611,7 +725,7 @@ export class CactbotConfigurator {
       if (result !== undefined) {
         const dir = result.data ?? '';
         if (dir !== prevValue)
-          this.setOption(group, opt.id, dir);
+          this.setOption(group, optIdPath, dir);
         setLabel(dir);
       } else {
         console.error('cactbotChooseDirectory returned undefined');
@@ -619,15 +733,23 @@ export class CactbotConfigurator {
     };
   }
 
-  buildSelect(parent: HTMLElement, opt: ConfigEntry, group: string): void {
+  buildSelect(
+    options: BaseOptions,
+    parent: HTMLElement,
+    opt: ConfigEntry,
+    group: string,
+    path?: string[],
+  ): void {
     const div = document.createElement('div');
     div.classList.add('option-input-container');
 
     const input = document.createElement('select');
     div.appendChild(input);
 
-    const defaultValue = this.getOption(group, opt.id, opt.default);
-    input.onchange = () => this.setOption(group, opt.id, input.value);
+    const optIdPath = [...path ?? [], opt.id];
+    const optDefault = getOptDefault(opt, options);
+    const defaultValue = this.getOption(group, optIdPath, optDefault);
+    input.onchange = () => this.setOption(group, optIdPath, input.value);
 
     if (opt.options) {
       const innerOptions = this.translate(opt.options);
@@ -641,12 +763,18 @@ export class CactbotConfigurator {
       }
     }
 
-    parent.appendChild(this.buildNameDiv(opt));
+    parent.appendChild(this.buildLeftDiv(opt));
     parent.appendChild(div);
   }
 
   // FIXME: this could use some data validation if a user inputs non-floats.
-  buildFloat(parent: HTMLElement, opt: ConfigEntry, group: string): void {
+  buildFloat(
+    options: BaseOptions,
+    parent: HTMLElement,
+    opt: ConfigEntry,
+    group: string,
+    path?: string[],
+  ): void {
     const div = document.createElement('div');
     div.classList.add('option-input-container');
 
@@ -654,21 +782,30 @@ export class CactbotConfigurator {
     div.appendChild(input);
     input.type = 'text';
     input.step = 'any';
+    const optDefault = getOptDefault(opt, options);
+    input.placeholder = optDefault.toString();
+    const optIdPath = [...path ?? [], opt.id];
     input.value = this.getNumberOption(
       group,
-      opt.id,
-      parseFloat(opt.default.toString()),
+      optIdPath,
+      parseFloat(optDefault.toString()),
     ).toString();
-    const setFunc = () => this.setOption(group, opt.id, input.value);
+    const setFunc = () => this.setOption(group, optIdPath, input.value);
     input.onchange = setFunc;
     input.oninput = setFunc;
 
-    parent.appendChild(this.buildNameDiv(opt));
+    parent.appendChild(this.buildLeftDiv(opt));
     parent.appendChild(div);
   }
 
   // FIXME: this could use some data validation if a user inputs non-integers.
-  buildInteger(parent: HTMLElement, opt: ConfigEntry, group: string): void {
+  buildInteger(
+    options: BaseOptions,
+    parent: HTMLElement,
+    opt: ConfigEntry,
+    group: string,
+    path?: string[],
+  ): void {
     const div = document.createElement('div');
     div.classList.add('option-input-container');
 
@@ -676,12 +813,47 @@ export class CactbotConfigurator {
     div.appendChild(input);
     input.type = 'text';
     input.step = '1';
-    input.value = this.getNumberOption(group, opt.id, parseInt(opt.default.toString())).toString();
-    const setFunc = () => this.setOption(group, opt.id, input.value);
+    const optDefault = getOptDefault(opt, options);
+    input.placeholder = optDefault.toString();
+    const optIdPath = [...path ?? [], opt.id];
+    input.value = this.getNumberOption(group, optIdPath, parseInt(optDefault.toString()))
+      .toString();
+    const setFunc = () => this.setOption(group, optIdPath, input.value);
     input.onchange = setFunc;
     input.oninput = setFunc;
 
-    parent.appendChild(this.buildNameDiv(opt));
+    parent.appendChild(this.buildLeftDiv(opt));
+    parent.appendChild(div);
+  }
+
+  buildString(
+    options: BaseOptions,
+    parent: HTMLElement,
+    opt: ConfigEntry,
+    group: string,
+    path?: string[],
+  ): void {
+    const div = document.createElement('div');
+    div.classList.add('option-input-container');
+
+    const input = document.createElement('input');
+    input.classList.add('input-string-field');
+    div.appendChild(input);
+
+    const optIdPath = [...path ?? [], opt.id];
+    input.type = 'text';
+    const optDefault = getOptDefault(opt, options);
+    input.placeholder = optDefault.toString();
+    input.value = this.getStringOption(
+      group,
+      optIdPath,
+      optDefault.toString(),
+    ).toString();
+    const setFunc = () => this.setOption(group, optIdPath, input.value);
+    input.onchange = setFunc;
+    input.oninput = setFunc;
+
+    parent.appendChild(this.buildLeftDiv(opt));
     parent.appendChild(div);
   }
 
@@ -693,6 +865,8 @@ export class CactbotConfigurator {
     for (const [filename, triggerSet] of Object.entries(files)) {
       if (!filename.endsWith('.js') && !filename.endsWith('.ts'))
         continue;
+
+      triggerSet.filename = filename;
 
       let prefixKey = '00-misc';
       let prefix: LocaleText = kPrefixToCategory['00-misc'];
@@ -716,12 +890,20 @@ export class CactbotConfigurator {
       let zoneId: number | undefined = undefined;
 
       // Make assumptions about trigger structure here to try to get the zoneId out.
-      if (triggerSet && typeof triggerSet.zoneId === 'number') {
+      if (typeof triggerSet.zoneId === 'number') {
         zoneId = triggerSet.zoneId;
         // Use the translatable zone info name, if possible.
         const zoneInfo = ZoneInfo[zoneId];
         if (zoneInfo)
           title = this.translate(zoneInfo.name);
+      }
+
+      let zoneLabel: LocaleText | undefined = undefined;
+
+      // if a zoneLabel is set, use for the title
+      if (triggerSet.zoneLabel) {
+        zoneLabel = triggerSet.zoneLabel;
+        title = this.translate(zoneLabel);
       }
 
       const fileKey = filename.replace(/\//g, '-').replace(/.[jt]s$/, '');
@@ -741,11 +923,9 @@ export class CactbotConfigurator {
     const userMap: ConfigProcessedFileMap<T> = {};
     let userFileIdx = 0;
     for (const triggerSet of userTriggerSets || []) {
-      if (!triggerSet)
-        continue;
       // TODO: pass in userTriggerSets as a filename -> triggerSet map as well
       // so we don't need to read this added value.
-      if (!triggerSet.filename)
+      if (triggerSet.filename === undefined)
         throw new Error('UserHandler must add filename');
       const fileKey = `user/${triggerSet.filename}/${userFileIdx++}`;
 
@@ -753,17 +933,28 @@ export class CactbotConfigurator {
       // may also use zoneRegex or also have errors and not have either.
       let title = '???';
       let zoneId: number | undefined = undefined;
-      if (typeof triggerSet.zoneId === 'number') {
+      let zoneLabel: LocaleText | undefined = undefined;
+
+      /* eslint-disable-next-line deprecation/deprecation */
+      const origZoneRegex = triggerSet.zoneRegex;
+
+      // if a zoneLabel is set, use for the title
+      if (triggerSet.zoneLabel) {
+        zoneLabel = triggerSet.zoneLabel;
+        title = this.translate(zoneLabel);
+      } else if (typeof triggerSet.zoneId === 'number') {
         zoneId = triggerSet.zoneId;
         // Use the translatable zone info name, if possible.
         const zoneInfo = ZoneInfo[zoneId];
         if (zoneInfo)
           title = this.translate(zoneInfo.name);
-      } else if (triggerSet.zoneRegex) {
+      } else if (triggerSet.zoneId === null) {
+        title = this.translate(kPrefixToCategory['00-misc']);
+      } else if (origZoneRegex) {
         // zoneRegex can be a localized object.
-        let zoneRegex = triggerSet.zoneRegex instanceof RegExp
-          ? triggerSet.zoneRegex
-          : triggerSet.zoneRegex[this.lang];
+        let zoneRegex = origZoneRegex instanceof RegExp
+          ? origZoneRegex
+          : origZoneRegex[this.lang];
         if (typeof zoneRegex === 'string')
           zoneRegex = Regexes.parse(zoneRegex);
         if (zoneRegex instanceof RegExp)

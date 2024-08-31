@@ -1,5 +1,6 @@
 import { UnreachableCode } from '../../resources/not_reached';
 import { addOverlayListener, callOverlayHandler } from '../../resources/overlay_plugin_api';
+import PartyTracker from '../../resources/party';
 import UserConfig from '../../resources/user_config';
 import { OopsyMistakeType } from '../../types/oopsy';
 
@@ -40,26 +41,29 @@ export const addDebugInfo = (collector: MistakeCollector, numMistakes: number): 
   }
 };
 
+// Note: changes to this setup function should be reflected in
+// oopsy_viewer as well.
 UserConfig.getUserConfigLocation('oopsyraidsy', defaultOptions, () => {
   const options = { ...defaultOptions };
 
-  const mistakeCollector = new MistakeCollector(options);
+  const partyTracker = new PartyTracker(options);
+  const mistakeCollector = new MistakeCollector(options, true);
   const summaryElement = document.getElementById('summary');
   const liveListElement = document.getElementById('livelist');
 
   // Choose the ui based on whether this is the summary view or the live list.
   // They have different elements in the file.
   if (summaryElement) {
-    const listView = new OopsySummaryList(options, summaryElement);
+    const listView = new OopsySummaryList(options, summaryElement, partyTracker);
     mistakeCollector.AddObserver(listView);
 
     const tableElement = document.getElementById('mistake-table');
     if (!tableElement)
       throw new UnreachableCode();
-    const table = new OopsySummaryTable(options, tableElement);
+    const table = new OopsySummaryTable(tableElement, partyTracker);
     mistakeCollector.AddObserver(table);
   } else if (liveListElement) {
-    const listView = new OopsyLiveList(options, liveListElement);
+    const listView = new OopsyLiveList(options, liveListElement, partyTracker);
     mistakeCollector.AddObserver(listView);
     addOverlayListener(
       'onInCombatChangedEvent',
@@ -71,10 +75,11 @@ UserConfig.getUserConfigLocation('oopsyraidsy', defaultOptions, () => {
 
   // NOTE: add "debug=1" url parameter to add extra events.
   const params = new URLSearchParams(window.location.search);
-  if (params.get('debug'))
+  // FIXME: should this consider the value?
+  if (typeof params.get('debug') === 'string')
     addDebugInfo(mistakeCollector, 2200);
 
-  const damageTracker = new DamageTracker(options, mistakeCollector, oopsyFileData);
+  const damageTracker = new DamageTracker(options, mistakeCollector, partyTracker, oopsyFileData);
 
   addOverlayListener('LogLine', (e) => damageTracker.OnNetLog(e));
   addOverlayListener('onPlayerChangedEvent', (e) => damageTracker.OnPlayerChange(e));

@@ -30,7 +30,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
     'ShinryuEx Benighting Breath': '264A', // 90 degree conal attack
   },
   shareWarn: {
-    'ShinryuEx Levinbolt': '25EA', // untelegraphed lightning spread
+    'ShinryuEx Levinbolt Spread': '25EA', // untelegraphed lightning spread
     'ShinryuEx Earth Breath': '25ED', // earthshaker-esque conal attacks
   },
   soloWarn: {
@@ -62,7 +62,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
     {
       id: 'ShinryuEx Tidal Wave',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '25DA', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '25DA', ...playerDamageFields }),
       deathReason: (_data, matches) => {
         return {
           id: matches.targetId,
@@ -70,7 +70,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
           text: {
             en: 'Pushed off!',
             de: 'Runter geschubst!',
-            fr: 'A été poussé(e) !',
+            fr: 'Repoussé(e) !',
             ja: '落ちた',
             cn: '击退坠落',
             ko: '넉백됨',
@@ -80,9 +80,9 @@ const triggerSet: OopsyTriggerSet<Data> = {
     },
     {
       // Knockback from center.
-      id: 'Shinryu Aerial Blast',
+      id: 'ShinryuEx Aerial Blast',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '25DF', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '25DF', ...playerDamageFields }),
       deathReason: (_data, matches) => {
         return {
           id: matches.targetId,
@@ -90,7 +90,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
           text: {
             en: 'Pushed off!',
             de: 'Runter geschubst!',
-            fr: 'A été poussé(e) !',
+            fr: 'Repoussé(e) !',
             ja: '落ちた',
             cn: '击退坠落',
             ko: '넉백됨',

@@ -55,10 +55,15 @@ const triggerSet: OopsyTriggerSet<Data> = {
       // Getting hit by a ghost without throttle (the mandatory post-chimney one).
       id: 'O5N Possess',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '28AC', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '28AC', ...playerDamageFields }),
       condition: (data, matches) => !data.hasThrottle?.[matches.target],
       mistake: (_data, matches) => {
-        return { type: 'fail', blame: matches.target, reportId: matches.targetId, text: matches.ability };
+        return {
+          type: 'fail',
+          blame: matches.target,
+          reportId: matches.targetId,
+          text: matches.ability,
+        };
       },
     },
   ],

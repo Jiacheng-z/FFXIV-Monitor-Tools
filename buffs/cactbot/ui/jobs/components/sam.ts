@@ -20,6 +20,7 @@ export class SAMComponent extends BaseComponent {
   fugetsu: TimerBox;
   tsubameGaeshi: TimerBox;
   higanbana: TimerBox;
+  lastTsubameGaeshiTimestamp?: string;
 
   constructor(o: ComponentInterface) {
     super(o);
@@ -51,25 +52,25 @@ export class SAMComponent extends BaseComponent {
     this.meditationGauge = this.bars.addResourceBox({
       classList: ['sam-color-meditation'],
     });
-    this.fuka = this.bars.addProcBox({
-      id: 'sam-procs-fuka',
-      fgColor: 'sam-color-fuka',
-      notifyWhenExpired: true,
-    });
 
     this.fugetsu = this.bars.addProcBox({
       id: 'sam-procs-fugetsu',
       fgColor: 'sam-color-fugetsu',
       notifyWhenExpired: true,
     });
-    this.tsubameGaeshi = this.bars.addProcBox({
-      id: 'sam-procs-tsubamegaeshi',
-      fgColor: 'sam-color-tsubamegaeshi',
+    this.fuka = this.bars.addProcBox({
+      id: 'sam-procs-fuka',
+      fgColor: 'sam-color-fuka',
+      notifyWhenExpired: true,
     });
     this.higanbana = this.bars.addProcBox({
       id: 'sam-procs-higanbana',
       fgColor: 'sam-color-higanbana',
       notifyWhenExpired: true,
+    });
+    this.tsubameGaeshi = this.bars.addProcBox({
+      id: 'sam-procs-tsubamegaeshi',
+      fgColor: 'sam-color-tsubamegaeshi',
     });
 
     this.reset();
@@ -85,69 +86,67 @@ export class SAMComponent extends BaseComponent {
   override onJobDetailUpdate(jobDetail: JobDetail['SAM']): void {
     this.kenkiGauge.innerText = jobDetail.kenki.toString();
     this.meditationGauge.innerText = jobDetail.meditationStacks.toString();
-    if (jobDetail.kenki >= 70)
-      this.kenkiGauge.parentNode.classList.add('high');
-    else
-      this.kenkiGauge.parentNode.classList.remove('high');
-    if (jobDetail.meditationStacks >= 2)
-      this.meditationGauge.parentNode.classList.add('high');
-    else
-      this.meditationGauge.parentNode.classList.remove('high');
+    this.kenkiGauge.parentNode.classList.toggle('high', jobDetail.kenki >= 70);
+    this.meditationGauge.parentNode.classList.toggle('high', jobDetail.meditationStacks >= 2);
 
-    if (jobDetail.setsu)
-      this.setsu.classList.add('active');
-    else
-      this.setsu.classList.remove('active');
-    if (jobDetail.getsu)
-      this.getsu.classList.add('active');
-    else
-      this.getsu.classList.remove('active');
-    if (jobDetail.ka)
-      this.ka.classList.add('active');
-    else
-      this.ka.classList.remove('active');
+    this.setsu.classList.toggle('active', jobDetail.setsu);
+    this.getsu.classList.toggle('active', jobDetail.getsu);
+    this.ka.classList.toggle('active', jobDetail.ka);
   }
 
-  override onYouGainEffect(id: string, matches: PartialFieldMatches<'GainsEffect'>):void {
-    if (id === EffectId.Fugetsu) {
+  override onYouGainEffect(id: string, matches: PartialFieldMatches<'GainsEffect'>): void {
+    if (id === EffectId.Fuka) {
       this.fuka.duration = parseFloat(matches.duration ?? '0') - 0.5; // -0.5s for log line delay
       this.player.speedBuffs.fuka = true;
     }
-    if (id === EffectId.Fuka)
+    if (id === EffectId.Fugetsu)
       this.fugetsu.duration = parseFloat(matches.duration ?? '0') - 0.5; // -0.5s for log line delay
   }
-  override onYouLoseEffect(id: string):void {
-    if (id === EffectId.Fugetsu) {
+  override onYouLoseEffect(id: string): void {
+    if (id === EffectId.Fuka) {
       this.fuka.duration = 0;
       this.player.speedBuffs.fuka = false;
     }
-    if (id === EffectId.Fuka)
+    if (id === EffectId.Fugetsu)
       this.fugetsu.duration = 0;
   }
 
-  override onUseAbility(id: string) :void {
-    switch (id) {
-      case kAbility.KaeshiHiganbana:
-      case kAbility.KaeshiGoken:
-      case kAbility.KaeshiSetsugekka:
-        this.tsubameGaeshi.duration = 60;
-        break;
-    }
+  override onUseAbility(id: string, matches: PartialFieldMatches<'Ability'>): void {
+    if (this.ffxivVersion < 700)
+      switch (id) {
+        case kAbility.KaeshiHiganbana:
+        case kAbility.KaeshiGoken:
+        case kAbility.KaeshiSetsugekka:
+          if (this.player.level >= 84) {
+            if (matches.targetIndex === '0') {
+              // Avoid multiple call in AOE
+              this.tsubameGaeshi.duration = 60 + this.tsubameGaeshi.value;
+              this.lastTsubameGaeshiTimestamp = matches.timestamp;
+            }
+          } else
+            this.tsubameGaeshi.duration = 60;
+
+          break;
+      }
+    else
+      switch (id) {
+        // In DawnTrail, Tsubame Gaeshi no longer have cooldown.
+        // spare this box for Ikishoten, while keep its name for easy compatibility.
+        case kAbility.Ikishoten:
+          this.tsubameGaeshi.duration = 120;
+          break;
+      }
   }
 
-  override onMobGainsEffectFromYou(id:string) :void {
-    if (id === EffectId.Higanbana)
+  override onMobGainsEffectFromYou(id: string): void {
+    if (id === EffectId.Higanbana_4CC)
       this.higanbana.duration = 60 - 0.5; // -0.5s for log line delay
   }
 
-  override onStatChange({ gcdSkill }:{ gcdSkill: number }): void {
-    this.fuka.valuescale = gcdSkill;
+  override onStatChange({ gcdSkill }: { gcdSkill: number }): void {
     this.fuka.threshold = gcdSkill * 6;
-    this.fugetsu.valuescale = gcdSkill;
     this.fugetsu.threshold = gcdSkill * 6;
-    this.tsubameGaeshi.valuescale = gcdSkill;
-    this.tsubameGaeshi.threshold = gcdSkill * 4;
-    this.higanbana.valuescale = gcdSkill;
+    this.tsubameGaeshi.threshold = this.ffxivVersion < 700 ? gcdSkill * 4 : gcdSkill + 1;
     this.higanbana.threshold = gcdSkill * 4;
   }
 
@@ -159,4 +158,3 @@ export class SAMComponent extends BaseComponent {
     this.higanbana.duration = 0;
   }
 }
-

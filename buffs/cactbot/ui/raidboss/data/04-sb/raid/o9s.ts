@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import Outputs from '../../../../../resources/outputs';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
@@ -17,6 +16,7 @@ export interface Data extends RaidbossData {
 
 // O9S - Alphascape 1.0 Savage
 const triggerSet: TriggerSet<Data> = {
+  id: 'AlphascapeV10Savage',
   zoneId: ZoneId.AlphascapeV10Savage,
   timelineFile: 'o9s.txt',
   triggers: [
@@ -24,23 +24,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O9S Chaotic Dispersion',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3170', source: 'Chaos' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3170', source: 'Chaos' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3170', source: 'Chaos' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3170', source: 'カオス' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3170', source: '卡奥斯' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3170', source: '카오스' }),
+      netRegex: { id: '3170', source: 'Chaos' },
       response: Responses.tankBuster(),
     },
     {
       id: 'O9S Longitudinal Implosion',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3172', source: 'Chaos', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3172', source: 'Chaos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3172', source: 'Chaos', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3172', source: 'カオス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3172', source: '卡奥斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3172', source: '카오스', capture: false }),
+      netRegex: { id: '3172', source: 'Chaos', capture: false },
       alertText: (data, _matches, output) => {
         if (data.primordialCrust)
           return output.dieOnFrontBack!();
@@ -53,7 +43,7 @@ const triggerSet: TriggerSet<Data> = {
         sides: {
           en: 'Sides -> Front/Back',
           de: 'Seiten -> Vorne/Hinten',
-          fr: 'Côtés puis Devant/Derrière',
+          fr: 'Côtés -> Devant/Derrière',
           ja: '横 -> 縦',
           cn: '左右 -> 前后',
           ko: '양옆 -> 앞뒤',
@@ -61,7 +51,7 @@ const triggerSet: TriggerSet<Data> = {
         dieOnFrontBack: {
           en: 'Die on Front/Back -> Sides',
           de: 'Stirb Vorne/Hinten -> Seiten',
-          fr: 'Devant/Derrière puis Côtés',
+          fr: 'Mourrez devant/derrière -> Côtés',
           ja: '縦 -> 横で死ぬ',
           cn: '死：前后 -> 左右',
           ko: '앞뒤 -> 양옆 (디버프)',
@@ -71,12 +61,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O9S Latitudinal Implosion',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3173', source: 'Chaos', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3173', source: 'Chaos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3173', source: 'Chaos', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3173', source: 'カオス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3173', source: '卡奥斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3173', source: '카오스', capture: false }),
+      netRegex: { id: '3173', source: 'Chaos', capture: false },
       alertText: (data, _matches, output) => {
         if (data.primordialCrust)
           return output.dieOnSides!();
@@ -89,7 +74,7 @@ const triggerSet: TriggerSet<Data> = {
         frontBack: {
           en: 'Front/Back -> Sides',
           de: 'Vorne/Hinten -> Seiten',
-          fr: 'Devant/Derrière puis Côtés',
+          fr: 'Devant/Derrière -> Côtés',
           ja: '縦 -> 横',
           cn: '前后 -> 左右',
           ko: '앞뒤 -> 양옆',
@@ -97,7 +82,7 @@ const triggerSet: TriggerSet<Data> = {
         dieOnSides: {
           en: 'Die on Sides -> Front/Back',
           de: 'Stirb an Seiten -> Vorne/Hinten',
-          fr: 'Devant/Derrière puis Côtés',
+          fr: 'Mourrez sur les côtés -> Devant/Derrière',
           ja: '横 -> 縦で死ぬ',
           cn: '死：左右 -> 前后',
           ko: '양옆 -> 앞뒤 (디버프)',
@@ -107,36 +92,26 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O9S Damning Edict',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3171', source: 'Chaos', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3171', source: 'Chaos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3171', source: 'Chaos', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3171', source: 'カオス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3171', source: '卡奥斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3171', source: '카오스', capture: false }),
+      netRegex: { id: '3171', source: 'Chaos', capture: false },
       response: Responses.getBehind(),
     },
     {
       id: 'O9S Orbs Fiend',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '317D', source: 'Chaos', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '317D', source: 'Chaos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '317D', source: 'Chaos', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '317D', source: 'カオス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '317D', source: '卡奥斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '317D', source: '카오스', capture: false }),
+      netRegex: { id: '317D', source: 'Chaos', capture: false },
       alarmText: (data, _matches, output) => {
         if (data.role === 'tank')
           return output.orbTethers!();
       },
       infoText: (data, _matches, output) => {
-        if (data.role === 'healer')
+        if (data.role === 'healer' || data.job === 'BLU')
           return output.orbTethers!();
       },
       outputStrings: {
         orbTethers: {
           en: 'Orb Tethers',
           de: 'Kugel-Verbindungen',
-          fr: 'Récupérez l\'orbe',
+          fr: 'Liens orbes',
           ja: '線出たよ',
           cn: '坦克接线注意治疗',
           ko: '구슬 연결',
@@ -147,12 +122,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O9S Fire Phase Tracking',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3186', source: 'Chaos', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3186', source: 'Chaos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3186', source: 'Chaos', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3186', source: 'カオス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3186', source: '卡奥斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3186', source: '카오스', capture: false }),
+      netRegex: { id: '3186', source: 'Chaos', capture: false },
       run: (data) => {
         if (data.phaseType !== 'enrage')
           data.phaseType = 'fire';
@@ -161,7 +131,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O9S Entropy Spread',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '640' }),
+      netRegex: { effectId: '640' },
       condition: Conditions.targetIsYou(),
       preRun: (data) => {
         data.entropyCount = (data.entropyCount ?? 0) + 1;
@@ -190,7 +160,7 @@ const triggerSet: TriggerSet<Data> = {
         spreadAndStay: {
           en: 'Spread and Stay',
           de: 'Verteilen und bleiben',
-          fr: 'Écartez-vous et restez',
+          fr: 'Dispersez-vous et restez',
           ja: '散開して待機',
           cn: '分散并停留',
           ko: '산개하고 가만히',
@@ -198,7 +168,7 @@ const triggerSet: TriggerSet<Data> = {
         stackAndStayOut: {
           en: 'Stack and Stay Out',
           de: 'Stack und Bleiben',
-          fr: 'Packez-vous et restez',
+          fr: 'Packez-vous et restez à l\'extérieur',
           ja: '中央に集合',
           cn: '中间集合',
           ko: '산개하고 바깥에 있기',
@@ -208,7 +178,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O9S Entropy Avoid Hit',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '640' }),
+      netRegex: { effectId: '640' },
       condition: (data, matches) => matches.target === data.me && data.phaseType === 'fire',
       delaySeconds: (_data, matches) => {
         // Folks get either the 24 second or the 10 second.
@@ -225,7 +195,7 @@ const triggerSet: TriggerSet<Data> = {
         text: {
           en: 'Hide Middle',
           de: 'Zur Mitte',
-          fr: 'Allez au centre',
+          fr: 'Cachez-vous au milieu',
           ja: '中央へ',
           cn: '中间躲避',
           ko: '중앙으로 모이기',
@@ -235,12 +205,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O9S Fire Big Bang',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3180', source: 'Chaos', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3180', source: 'Chaos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3180', source: 'Chaos', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3180', source: 'カオス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3180', source: '卡奥斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3180', source: '카오스', capture: false }),
+      netRegex: { id: '3180', source: 'Chaos', capture: false },
       condition: (data) => data.phaseType === 'fire',
       // Each big bang has its own cast, so suppress.
       suppressSeconds: 1,
@@ -249,7 +214,7 @@ const triggerSet: TriggerSet<Data> = {
         text: {
           en: 'Hide Middle',
           de: 'Zur Mitte',
-          fr: 'Allez au centre',
+          fr: 'Cachez-vous au milieu',
           ja: '中央へ',
           cn: '中间躲避',
           ko: '중앙으로 모이기',
@@ -260,12 +225,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O9S Water Phase Tracking',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3187', source: 'Chaos', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3187', source: 'Chaos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3187', source: 'Chaos', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3187', source: 'カオス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3187', source: '卡奥斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3187', source: '카오스', capture: false }),
+      netRegex: { id: '3187', source: 'Chaos', capture: false },
       run: (data) => {
         if (data.phaseType !== 'enrage')
           data.phaseType = 'water';
@@ -274,7 +234,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O9S Dynamic Fluid 1',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '641', capture: false }),
+      netRegex: { effectId: '641', capture: false },
       condition: (data) => data.phaseType === 'water',
       delaySeconds: 5,
       suppressSeconds: 1,
@@ -284,7 +244,7 @@ const triggerSet: TriggerSet<Data> = {
         text: {
           en: 'Stack Donut',
           de: 'Sammeln Donut',
-          fr: 'Packez-vous',
+          fr: 'Packez-vous, donut',
           ja: 'スタック',
           cn: '集合放月环',
           ko: '도넛 쉐어',
@@ -294,7 +254,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O9S Dynamic Fluid 2',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '641', capture: false }),
+      netRegex: { effectId: '641', capture: false },
       condition: (data) => data.phaseType === 'water',
       // T/H get 10s & DPS get 17s
       delaySeconds: 12,
@@ -304,7 +264,7 @@ const triggerSet: TriggerSet<Data> = {
         text: {
           en: 'Stack Donut',
           de: 'Sammeln Donut',
-          fr: 'Packez-vous',
+          fr: 'Packez-vous, donut',
           ja: 'スタック',
           cn: '集合放月环',
           ko: '도넛 쉐어',
@@ -314,7 +274,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O9S Dynamic Fluid 3',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '641', capture: false }),
+      netRegex: { effectId: '641', capture: false },
       condition: (data) => data.phaseType === 'enrage',
       // enrage -> 6s
       delaySeconds: 1,
@@ -324,7 +284,7 @@ const triggerSet: TriggerSet<Data> = {
         text: {
           en: 'Stack Donut',
           de: 'Sammeln Donut',
-          fr: 'Packez-vous',
+          fr: 'Packez-vous, donut',
           ja: 'スタック',
           cn: '集合放月环',
           ko: '도넛 쉐어',
@@ -334,7 +294,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O9S Knock Down Marker',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0057' }),
+      netRegex: { id: '0057' },
       condition: Conditions.targetIsYou(),
       alertText: (data, _matches, output) => {
         if (data.phaseType === 'water')
@@ -346,7 +306,7 @@ const triggerSet: TriggerSet<Data> = {
         dropOutside: {
           en: 'Drop Outside',
           de: 'Gehe Nord / Süd',
-          fr: 'Allez au Nord/Sud',
+          fr: 'Déposez à l\'extérieur',
           ja: 'メテオ捨てて',
           cn: '远离放点名',
           ko: '바깥으로 빼기',
@@ -354,7 +314,7 @@ const triggerSet: TriggerSet<Data> = {
         dropOutsideKnockback: {
           en: 'Drop Outside + Knockback',
           de: 'Geh nächste Ecke nah am Tornado',
-          fr: 'Déposez dans les coins + Poussée',
+          fr: 'Déposez à l\'extérieur + Poussée',
           ja: 'メテオ捨てて + ノックバック',
           cn: '远离放点名 + 冲回人群',
           ko: '바깥으로 빼기 + 넉백',
@@ -365,12 +325,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O9S Wind Phase Tracking',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3188', source: 'Chaos', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3188', source: 'Chaos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3188', source: 'Chaos', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3188', source: 'カオス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3188', source: '卡奥斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3188', source: '카오스', capture: false }),
+      netRegex: { id: '3188', source: 'Chaos', capture: false },
       run: (data) => {
         if (data.phaseType !== 'enrage')
           data.phaseType = 'wind';
@@ -379,26 +334,21 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O9S Headwind',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '642' }),
+      netRegex: { effectId: '642' },
       condition: Conditions.targetIsYou(),
       run: (data) => data.wind = 'head',
     },
     {
       id: 'O9S Tailwind',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '643' }),
+      netRegex: { effectId: '643' },
       condition: Conditions.targetIsYou(),
       run: (data) => data.wind = 'tail',
     },
     {
       id: 'O9S Cyclone Knockback',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '318F', source: 'Chaos', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '318F', source: 'Chaos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '318F', source: 'Chaos', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '318F', source: 'カオス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '318F', source: '卡奥斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '318F', source: '카오스', capture: false }),
+      netRegex: { id: '318F', source: 'Chaos', capture: false },
       alarmText: (data, _matches, output) => {
         if (data.wind === 'head')
           return output.backToTornado!();
@@ -411,7 +361,7 @@ const triggerSet: TriggerSet<Data> = {
         backToTornado: {
           en: 'Back to Tornado',
           de: 'Rücken zum Tornado',
-          fr: 'Regardez vers l\'extérieur',
+          fr: 'Derrière la tornade',
           ja: '竜巻を見ない',
           cn: '背对龙卷风',
           ko: '토네이도 뒤돌기',
@@ -430,12 +380,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O9S Earth Phase Tracking',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3189', source: 'Chaos', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3189', source: 'Chaos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3189', source: 'Chaos', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3189', source: 'カオス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3189', source: '卡奥斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3189', source: '카오스', capture: false }),
+      netRegex: { id: '3189', source: 'Chaos', capture: false },
       run: (data) => {
         if (data.phaseType !== 'enrage')
           data.phaseType = 'earth';
@@ -444,8 +389,8 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O9S Accretion',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '644', capture: false }),
-      condition: (data) => data.role === 'healer',
+      netRegex: { effectId: '644', capture: false },
+      condition: (data) => data.role === 'healer' || data.job === 'BLU',
       suppressSeconds: 10,
       infoText: (data, _matches, output) => {
         if (data.phaseType !== 'earth')
@@ -457,7 +402,7 @@ const triggerSet: TriggerSet<Data> = {
         healAllToFull: {
           en: 'Heal All to Full',
           de: 'Alle vollheilen',
-          fr: 'Soignez tout le monde complètement',
+          fr: 'Soignez l\'équipe complètement',
           ja: 'HP戻して',
           cn: '奶满全队',
           ko: '전원 체력 풀피로',
@@ -475,7 +420,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O9S Primordial Crust',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '645' }),
+      netRegex: { effectId: '645' },
       condition: (data, matches) => data.me === matches.target && data.phaseType !== 'orb',
       infoText: (_data, _matches, output) => output.text!(),
       run: (data) => data.primordialCrust = true,
@@ -483,7 +428,7 @@ const triggerSet: TriggerSet<Data> = {
         text: {
           en: 'Die on next mechanic',
           de: 'An nächster Mechanik tödlichen Schaden nehmen',
-          fr: 'Mourrez sur la prochaine mécanique',
+          fr: 'Mourrez sur la mécanique suivante',
           ja: '次のギミックで死んでね',
           cn: '想办法找死',
           ko: '다음 기믹에 맞기 (디버프)',
@@ -493,7 +438,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O9S Primordial Crust Cleanup',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '645' }),
+      netRegex: { effectId: '645' },
       condition: Conditions.targetIsYou(),
       delaySeconds: 30,
       run: (data) => delete data.primordialCrust,
@@ -501,14 +446,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O9S Earth Stack Marker',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '003E', capture: false }),
+      netRegex: { id: '003E', capture: false },
       suppressSeconds: 10,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'Stack with partner',
           de: 'Stacks verteilen',
-          fr: 'Packez-vous en binôme',
+          fr: 'Packez-vous avec votre partenaire',
           ja: '相手と頭割り',
           cn: '与伙伴重合',
           ko: '파트너랑 모이기',
@@ -520,18 +465,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O9S Orb Phase Tracking',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '318A', source: 'Chaos', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '318A', source: 'Chaos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '318A', source: 'Chaos', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '318A', source: 'カオス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '318A', source: '卡奥斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '318A', source: '카오스', capture: false }),
+      netRegex: { id: '318A', source: 'Chaos', capture: false },
       preRun: (data) => data.phaseType = 'orb',
     },
     {
       id: 'O9S Orb Entropy',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '640' }),
+      netRegex: { effectId: '640' },
       condition: (data, matches) => matches.target !== data.me && data.phaseType === 'orb',
       delaySeconds: (_data, matches) => parseFloat(matches.duration) - 3,
       suppressSeconds: 10,
@@ -544,7 +484,7 @@ const triggerSet: TriggerSet<Data> = {
         text: {
           en: 'Back to DPS',
           de: 'Rücken zum DPS',
-          fr: 'Dos au DPS',
+          fr: 'Derrière les DPS',
           ja: 'DPSの後ろへ',
           cn: '背对DPS',
           ko: '딜러한테서 뒤돌기',
@@ -554,7 +494,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O9S Orb Dynamic Fluid',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '641' }),
+      netRegex: { effectId: '641' },
       condition: (data, matches) => matches.target === data.me && data.phaseType === 'orb',
       delaySeconds: (_data, matches) => parseFloat(matches.duration) - 5,
       infoText: (_data, _matches, output) => output.text!(),
@@ -562,7 +502,7 @@ const triggerSet: TriggerSet<Data> = {
         text: {
           en: 'Hit DPS with Water',
           de: 'töte deinen DPS',
-          fr: 'Tuez les DPS',
+          fr: 'Touchez les DPS avec l\'eau',
           ja: '水当てて',
           cn: '水环害死DPS',
           ko: '딜러 물 맞기',
@@ -574,12 +514,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O9S Enrage Phase Tracking',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3186', source: 'Chaos', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3186', source: 'Chaos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3186', source: 'Chaos', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3186', source: 'カオス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3186', source: '卡奥斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3186', source: '카오스', capture: false }),
+      netRegex: { id: '3186', source: 'Chaos', capture: false },
       run: (data) => {
         data.blazeCount = (data.blazeCount ?? 0) + 1;
         if (data.blazeCount >= 3)
@@ -620,6 +555,7 @@ const triggerSet: TriggerSet<Data> = {
         'Chaos': 'Chaos',
       },
       'replaceText': {
+        '\\?': ' ?',
         'Big Bang': 'Saillie',
         'Blaze': 'Flammes',
         'Bowels of Agony': 'Entrailles de l\'agonie',
@@ -629,7 +565,7 @@ const triggerSet: TriggerSet<Data> = {
         'Earthquake': 'Grand séisme',
         'Fiendish Orbs': 'Ordre de poursuite',
         'Knock(?! )': 'Impact',
-        'Long/Lat Implosion': 'Implosion Hz/Vert',
+        'Long/Lat Implosion': 'Implosion horizontale/verticale',
         'Soul of Chaos': 'Âme du chaos',
         'Stray Earth': 'Terre du chaos',
         'Stray Flames': 'Flammes du chaos',

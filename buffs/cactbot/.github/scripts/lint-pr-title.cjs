@@ -1,7 +1,7 @@
 /**
  * This Script can be tested locally with
  *
- * export GH_TOKEN=**** GITHUB_REPOSITORY=quisquous/cactbot PR_NUMBER=$NUM
+ * export GH_TOKEN=**** GITHUB_REPOSITORY=OverlayPlugin/cactbot PR_NUMBER=$NUM
  * node ./.github/scripts/lint-pr-title.cjs
  */
 'use strict';
@@ -20,7 +20,6 @@ const validScope = [
   'config',
   'dps',
   'eureka',
-  'fisher',
   'jobs',
   'oopsy',
   'pullcounter',
@@ -38,6 +37,8 @@ const validScope = [
   'resources', // code in resources/
   'test', // code in test/ or ui/test/
   'util', // code in util/
+
+  'type',
 ];
 
 const validPrefix = [
@@ -140,7 +141,7 @@ const checkTitle = async (octokit, owner, repo, pullNumber) => {
   });
   const { title, user } = pullRequest;
   const userName = user?.login;
-  const m = /^(?<prefix>(?:[\w\[\]]*\s+)!?)?(?<scope>[^:]+):\s?(?<description>.+)$/.exec(title);
+  const m = /^(?<prefix>(?:[\w\[\]]*\s+)!?)?(?<scope>[^:]+): (?<description>.+)$/.exec(title);
   const lengthValid = title.length <= maxLength;
   let formatValid = false;
 

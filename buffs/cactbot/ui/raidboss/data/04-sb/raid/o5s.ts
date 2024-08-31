@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -9,6 +8,7 @@ export type Data = RaidbossData;
 
 // O5S - Sigmascape 1.0 Savage
 const triggerSet: TriggerSet<Data> = {
+  id: 'SigmascapeV10Savage',
   zoneId: ZoneId.SigmascapeV10Savage,
   timelineFile: 'o5s.txt',
   resetWhenOutOfCombat: false,
@@ -16,51 +16,31 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O5S Stop Combat',
       type: 'RemovedCombatant',
-      netRegex: NetRegexes.removingCombatant({ name: 'Phantom Train', capture: false }),
-      netRegexDe: NetRegexes.removingCombatant({ name: 'Phantomzug', capture: false }),
-      netRegexFr: NetRegexes.removingCombatant({ name: 'Train Fantôme', capture: false }),
-      netRegexJa: NetRegexes.removingCombatant({ name: '魔列車', capture: false }),
-      netRegexCn: NetRegexes.removingCombatant({ name: '魔列车', capture: false }),
-      netRegexKo: NetRegexes.removingCombatant({ name: '마열차', capture: false }),
+      netRegex: { name: 'Phantom Train', capture: false },
       run: (data) => data.StopCombat(),
     },
     {
       id: 'O5S Doom Strike',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '28B1', source: 'Phantom Train' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '28B1', source: 'Phantomzug' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '28B1', source: 'Train Fantôme' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '28B1', source: '魔列車' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '28B1', source: '魔列车' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '28B1', source: '마열차' }),
+      netRegex: { id: '28B1', source: 'Phantom Train' },
       response: Responses.tankBuster(),
     },
     {
       id: 'O5S Head On',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '28A4', source: 'Phantom Train', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '28A4', source: 'Phantomzug', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '28A4', source: 'Train Fantôme', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '28A4', source: '魔列車', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '28A4', source: '魔列车', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '28A4', source: '마열차', capture: false }),
+      netRegex: { id: '28A4', source: 'Phantom Train', capture: false },
       response: Responses.getOut(),
     },
     {
       id: 'O5S Diabolic Headlamp',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '28B2', source: 'Phantom Train', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '28B2', source: 'Phantomzug', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '28B2', source: 'Train Fantôme', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '28B2', source: '魔列車', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '28B2', source: '魔列车', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '28B2', source: '마열차', capture: false }),
+      netRegex: { id: '28B2', source: 'Phantom Train', capture: false },
       response: Responses.stackMiddle(),
     },
     {
       id: 'O5S Diabolic Light',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0001' }),
+      netRegex: { id: '0001' },
       condition: Conditions.targetIsYou(),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -77,7 +57,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O5S Diabolic Wind',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0046' }),
+      netRegex: { id: '0046' },
       condition: Conditions.targetIsYou(),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -94,12 +74,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O5S Remorse',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatant({ name: 'Remorse', capture: false }),
-      netRegexDe: NetRegexes.addedCombatant({ name: 'Melancholisch(?:e|er|es|en) Geist', capture: false }),
-      netRegexFr: NetRegexes.addedCombatant({ name: 'Fantôme Mélancolique', capture: false }),
-      netRegexJa: NetRegexes.addedCombatant({ name: '未練のゴースト', capture: false }),
-      netRegexCn: NetRegexes.addedCombatant({ name: '留恋幽灵', capture: false }),
-      netRegexKo: NetRegexes.addedCombatant({ name: '미련이 남은 유령', capture: false }),
+      netRegex: { name: 'Remorse', capture: false },
       response: Responses.knockback(),
     },
   ],
@@ -133,7 +108,6 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       'locale': 'fr',
-      'missingTranslations': true,
       'replaceSync': {
         'Agony': 'Fantôme Souffrant',
         'Malice': 'Malveillance',
@@ -144,7 +118,7 @@ const triggerSet: TriggerSet<Data> = {
       'replaceText': {
         ' Ghosts': ' Fantômes',
         'Acid Rain': 'Pluie acide',
-        'Add Wave': 'Vague d\'Adds',
+        'Add Wave': 'Vague d\'adds',
         'All In The Mind': 'Force de volonté',
         'Crossing Whistle': 'Sifflet traversée',
         'Diabolic Headlamp': 'Phare diabolique',
@@ -152,10 +126,11 @@ const triggerSet: TriggerSet<Data> = {
         'Diabolic Wind': 'Vent diabolique',
         'Doom Strike': 'Frappe létale',
         'Encumber': 'Encombrement',
-        'Ghosts spawn': 'Pop des Fantômes',
+        'Ghosts spawn': 'Apparition des Fantômes',
         'Head On': 'Plein fouet',
+        'Knockback Whistle': 'Poussée sifflet',
         'Saintly Beam': 'Faisceaux sacrés',
-        'Tether Whistle': 'Sifflet liens',
+        'Tether Whistle': 'Liens sifflet',
       },
     },
     {

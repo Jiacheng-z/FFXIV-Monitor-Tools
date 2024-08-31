@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import Outputs from '../../../../../resources/outputs';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
@@ -13,6 +12,7 @@ export interface Data extends RaidbossData {
 
 // O2N - Deltascape 2.0 Normal
 const triggerSet: TriggerSet<Data> = {
+  id: 'DeltascapeV20',
   zoneId: ZoneId.DeltascapeV20,
   timelineFile: 'o2n.txt',
   timelineTriggers: [
@@ -27,26 +27,26 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O2N Levitation Gain',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '556' }),
+      netRegex: { effectId: '556' },
       condition: Conditions.targetIsYou(),
       run: (data) => data.levitating = true,
     },
     {
       id: 'O2N Levitation Lose',
       type: 'LosesEffect',
-      netRegex: NetRegexes.losesEffect({ effectId: '556' }),
+      netRegex: { effectId: '556' },
       condition: Conditions.targetIsYou(),
       run: (data) => data.levitating = false,
     },
     {
       id: 'O2N Gravitational Manipulation Stack',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0071' }),
+      netRegex: { id: '0071' },
       alertText: (data, matches, output) => {
         if (data.me === matches.target)
           return output.stackMarkerOnYou!();
 
-        return output.stackOn!({ player: data.ShortName(matches.target) });
+        return output.stackOn!({ player: data.party.member(matches.target) });
       },
       outputStrings: {
         stackMarkerOnYou: {
@@ -63,7 +63,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O2N Gravitational Manipulation Float',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0071' }),
+      netRegex: { id: '0071' },
       condition: (data, matches) => !data.levitating && Conditions.targetIsNotYou()(data, matches),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -80,23 +80,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O2N Evilsphere',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '250F', source: 'Catastrophe' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '250F', source: 'Katastroph' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '250F', source: 'Catastrophe' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '250F', source: 'カタストロフィー' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '250F', source: '灾变者' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '250F', source: '카타스트로피' }),
+      netRegex: { id: '250F', source: 'Catastrophe' },
       response: Responses.tankBuster(),
     },
     {
       id: 'O2N -100Gs',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '24FF', source: 'Catastrophe', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '24FF', source: 'Katastroph', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '24FF', source: 'Catastrophe', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '24FF', source: 'カタストロフィー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '24FF', source: '灾变者', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '24FF', source: '카타스트로피', capture: false }),
+      netRegex: { id: '24FF', source: 'Catastrophe', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -112,23 +102,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O2N Demon Eye',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '250D', source: 'Catastrophe', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '250D', source: 'Katastroph', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '250D', source: 'Catastrophe', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '250D', source: 'カタストロフィー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '250D', source: '灾变者', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '250D', source: '카타스트로피', capture: false }),
+      netRegex: { id: '250D', source: 'Catastrophe', capture: false },
       response: Responses.lookAway(),
     },
     {
       id: 'O2N Earthquake',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2512', source: 'Catastrophe', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2512', source: 'Katastroph', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2512', source: 'Catastrophe', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2512', source: 'カタストロフィー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2512', source: '灾变者', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2512', source: '카타스트로피', capture: false }),
+      netRegex: { id: '2512', source: 'Catastrophe', capture: false },
       alertText: (data, _matches, output) => {
         if (!data.levitating)
           return output.levitate!();
@@ -159,18 +139,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O2N Gravitational Wave',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2510', source: 'Catastrophe', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2510', source: 'Katastroph', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2510', source: 'Catastrophe', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2510', source: 'カタストロフィー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2510', source: '灾变者', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2510', source: '카타스트로피', capture: false }),
+      netRegex: { id: '2510', source: 'Catastrophe', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'O2N Six Fulms Under',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '237' }),
+      netRegex: { effectId: '237' },
       condition: Conditions.targetIsYou(),
       delaySeconds: 5,
       suppressSeconds: 10,
@@ -213,12 +188,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O2N Antilight',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2502', source: 'Catastrophe', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2502', source: 'Katastroph', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2502', source: 'Catastrophe', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2502', source: 'カタストロフィー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2502', source: '灾变者', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2502', source: '카타스트로피', capture: false }),
+      netRegex: { id: '2502', source: 'Catastrophe', capture: false },
       preRun: (data) => data.antiCounter ??= 0,
       durationSeconds: (data) => {
         if (data.antiCounter === 0 && data.levitating)

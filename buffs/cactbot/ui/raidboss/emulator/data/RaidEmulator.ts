@@ -2,6 +2,7 @@ import { UnreachableCode } from '../../../../resources/not_reached';
 import { RaidbossOptions } from '../../raidboss_options';
 import EventBus from '../EventBus';
 import RaidEmulatorPopupText from '../overrides/RaidEmulatorPopupText';
+import RaidEmulatorWatchCombatantsOverride from '../overrides/RaidEmulatorWatchCombatantsOverride';
 
 import AnalyzedEncounter from './AnalyzedEncounter';
 import Encounter from './Encounter';
@@ -28,25 +29,36 @@ export default class RaidEmulator extends EventBus {
     this.encounters.push(encounter);
   }
 
-  private setCurrent(enc: Encounter): void {
+  private setCurrent(
+    enc: Encounter,
+    watchCombatantsOverride: RaidEmulatorWatchCombatantsOverride,
+  ): void {
     // If language was autodetected from the encounter, set the current ParserLanguage
     // appropriately
-    if (enc.language)
+    if (enc.language) {
       this.options.ParserLanguage = enc.language;
+      this.popupText?.setParserLanguage(enc.language);
+    }
 
-    this.currentEncounter = new AnalyzedEncounter(this.options, enc, this);
+    // Clear our current timestamp early to prevent issues with double seek on load
+    this.currentLogTime = undefined;
+
+    this.currentEncounter = new AnalyzedEncounter(this.options, enc, this, watchCombatantsOverride);
     void this.dispatch('preCurrentEncounterChanged', this.currentEncounter);
     void this.currentEncounter.analyze().then(() => {
       void this.dispatch('currentEncounterChanged', this.currentEncounter);
     });
   }
 
-  setCurrentByID(id: number): boolean {
+  setCurrentByID(
+    id: number,
+    watchCombatantsOverride: RaidEmulatorWatchCombatantsOverride,
+  ): boolean {
     const enc = this.encounters.find((v) => v.id === id);
     if (!enc)
       return false;
 
-    this.setCurrent(enc);
+    this.setCurrent(enc, watchCombatantsOverride);
     return true;
   }
 
@@ -86,7 +98,7 @@ export default class RaidEmulator extends EventBus {
   }
 
   async seek(timeOffset: number): Promise<void> {
-    if (!this.currentEncounter || !this.currentEncounter.encounter)
+    if (!this.currentEncounter)
       throw new UnreachableCode();
 
     const seekTimestamp = this.currentEncounter.encounter.startTimestamp + timeOffset;
@@ -94,7 +106,7 @@ export default class RaidEmulator extends EventBus {
   }
 
   async seekTo(seekTimestamp: number): Promise<void> {
-    if (!this.currentEncounter || !this.currentEncounter.encounter)
+    if (!this.currentEncounter)
       throw new UnreachableCode();
 
     await this.dispatch('preSeek', seekTimestamp);
@@ -142,8 +154,7 @@ export default class RaidEmulator extends EventBus {
   async tick(): Promise<void> {
     if (
       this.currentLogLineIndex === undefined || !this.currentEncounter ||
-      this.lastTickTime === undefined || this.currentLogTime === undefined ||
-      !this.currentEncounter.encounter
+      this.lastTickTime === undefined || this.currentLogTime === undefined
     )
       throw new UnreachableCode();
     if (this.currentLogLineIndex + 1 >= this.currentEncounter.encounter.logLines.length) {

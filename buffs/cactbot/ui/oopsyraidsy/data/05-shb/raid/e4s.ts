@@ -51,7 +51,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
     {
       id: 'E4S Fault Line',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '411E', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '411E', ...playerDamageFields }),
       condition: (data, matches) => data.faultLineTarget !== matches.target,
       mistake: (_data, matches) => {
         return {
@@ -61,7 +61,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
           text: {
             en: 'Run Over',
             de: 'Wurde überfahren',
-            fr: 'A été écrasé(e)',
+            fr: 'Écrasé(e)',
             ja: '突進に当たる',
             cn: '被碾了',
             ko: '돌진 맞음',

@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -9,53 +8,39 @@ export type Data = RaidbossData;
 
 // Byakko Normal
 const triggerSet: TriggerSet<Data> = {
+  id: 'TheJadeStoa',
   zoneId: ZoneId.TheJadeStoa,
   timelineFile: 'byakko.txt',
   triggers: [
     {
       id: 'Byakko Storm Pulse',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Byakko', id: '2A2F', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Byakko', id: '2A2F', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Byakko', id: '2A2F', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: '白虎', id: '2A2F', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '白虎', id: '2A2F', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '백호', id: '2A2F', capture: false }),
+      netRegex: { source: 'Byakko', id: '2A2F', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Byakko Heavenly Strike',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Byakko', id: '2A2D' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Byakko', id: '2A2D' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Byakko', id: '2A2D' }),
-      netRegexJa: NetRegexes.startsUsing({ source: '白虎', id: '2A2D' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '白虎', id: '2A2D' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '백호', id: '2A2D' }),
+      netRegex: { source: 'Byakko', id: '2A2D' },
       response: Responses.tankBuster(),
     },
     {
       // TODO: we could not call this out for the person who was caught by Clutch (27E1).
       id: 'Byakko Highest Stakes',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Byakko', id: '27E2', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Byakko', id: '27E2', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Byakko', id: '27E2', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: '白虎', id: '27E2', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '白虎', id: '27E2', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '백호', id: '27E2', capture: false }),
+      netRegex: { source: 'Byakko', id: '27E2', capture: false },
       response: Responses.stackMarker(),
     },
     {
       id: 'Byakko White Herald',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0057' }),
+      netRegex: { id: '0057' },
       response: Responses.awayFrom(),
     },
     {
       id: 'Byakko Bombogenesis',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0065' }),
+      netRegex: { id: '0065' },
       condition: Conditions.targetIsYou(),
       response: Responses.spread(),
     },
@@ -123,7 +108,6 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       'locale': 'ja',
-      'missingTranslations': true,
       'replaceSync': {
         'Aratama Force': '荒弾',
         'Byakko': '白虎',

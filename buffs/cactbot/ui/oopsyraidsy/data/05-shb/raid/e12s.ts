@@ -88,10 +88,15 @@ const triggerSet: OopsyTriggerSet<Data> = {
       // This can be shielded through as long as that person doesn't stack.
       id: 'E12S Icicle Impact',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '4E5A', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '4E5A', ...playerDamageFields }),
       condition: (data, matches) => data.DamageFromMatches(matches) > 0,
       mistake: (_data, matches) => {
-        return { type: 'warn', blame: matches.target, reportId: matches.targetId, text: matches.ability };
+        return {
+          type: 'warn',
+          blame: matches.target,
+          reportId: matches.targetId,
+          text: matches.ability,
+        };
       },
     },
     {
@@ -117,7 +122,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
       // use the "Classical Sculpture" ability and end up on the arena for real.
       id: 'E12S Promise Chiseled Sculpture Classical Sculpture',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ source: 'Chiseled Sculpture', id: '58B2' }),
+      netRegex: NetRegexes.ability({ source: 'Chiseled Sculpture', id: '58B2' }),
       run: (data, matches) => {
         // This will run per person that gets hit by the same sculpture, but that's fine.
         // Record the y position of each sculpture so we can use it for better text later.
@@ -193,10 +198,11 @@ const triggerSet: OopsyTriggerSet<Data> = {
         }
 
         const owner = owners[0];
-        const ownerNick = data.ShortName(owner);
+        const ownerNick = data.party.member(owner).toString();
         let text = {
           en: `${matches.ability} (from ${ownerNick}, #${number})`,
           de: `${matches.ability} (von ${ownerNick}, #${number})`,
+          fr: `${matches.ability} (de ${ownerNick}, #${number})`,
           ja: `${matches.ability} (${ownerNick}から、#${number})`,
           cn: `${matches.ability} (来自${ownerNick}，#${number})`,
           ko: `${matches.ability} (대상자 "${ownerNick}", ${number}번)`,
@@ -205,6 +211,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
           text = {
             en: `${matches.ability} (from ${ownerNick}, #${number} north)`,
             de: `${matches.ability} (von ${ownerNick}, #${number} norden)`,
+            fr: `${matches.ability} (de ${ownerNick}, #${number} nord)`,
             ja: `${matches.ability} (北の${ownerNick}から、#${number})`,
             cn: `${matches.ability} (来自北方${ownerNick}，#${number})`,
             ko: `${matches.ability} (대상자 "${ownerNick}", ${number}번 북쪽)`,
@@ -213,6 +220,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
           text = {
             en: `${matches.ability} (from ${ownerNick}, #${number} south)`,
             de: `${matches.ability} (von ${ownerNick}, #${number} Süden)`,
+            fr: `${matches.ability} (de ${ownerNick}, #${number} sud)`,
             ja: `${matches.ability} (南の${ownerNick}から、#${number})`,
             cn: `${matches.ability} (来自南方${ownerNick}，#${number})`,
             ko: `${matches.ability} (대상자 "${ownerNick}", ${number}번 남쪽)`,
@@ -247,7 +255,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
         return matches.target !== data.pillarIdToOwner[matches.sourceId];
       },
       mistake: (data, matches) => {
-        const pillarOwner = data.ShortName(data.pillarIdToOwner?.[matches.sourceId]);
+        const pillarOwner = data.party.member(data.pillarIdToOwner?.[matches.sourceId]).toString();
         return {
           type: 'fail',
           blame: matches.target,
@@ -300,18 +308,18 @@ const triggerSet: OopsyTriggerSet<Data> = {
     {
       id: 'E12S Promise Small Lion Lionsblaze',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ source: 'Beastly Sculpture', id: '58B9' }),
-      netRegexDe: NetRegexes.abilityFull({ source: 'Abbild Eines Löwen', id: '58B9' }),
-      netRegexFr: NetRegexes.abilityFull({ source: 'Création Léonine', id: '58B9' }),
-      netRegexJa: NetRegexes.abilityFull({ source: '創られた獅子', id: '58B9' }),
-      netRegexCn: NetRegexes.abilityFull({ source: '被创造的狮子', id: '58B9' }),
+      netRegex: NetRegexes.ability({ source: 'Beastly Sculpture', id: '58B9' }),
+      netRegexDe: NetRegexes.ability({ source: 'Abbild Eines Löwen', id: '58B9' }),
+      netRegexFr: NetRegexes.ability({ source: 'Création Léonine', id: '58B9' }),
+      netRegexJa: NetRegexes.ability({ source: '創られた獅子', id: '58B9' }),
+      netRegexCn: NetRegexes.ability({ source: '被创造的狮子', id: '58B9' }),
       mistake: (data, matches) => {
         // Folks baiting the big lion second can take the first small lion hit,
         // so it's not sufficient to check only the owner.
         if (!data.smallLionOwners)
           return;
         const owner = data.smallLionIdToOwner?.[matches.sourceId.toUpperCase()];
-        if (!owner)
+        if (owner === undefined)
           return;
         if (matches.target === owner)
           return;
@@ -322,7 +330,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
         const hasFireDebuff = data.fire && data.fire[matches.target];
 
         if (hasSmallLion || hasFireDebuff) {
-          const ownerNick = data.ShortName(owner);
+          const ownerNick = data.party.member(owner).toString();
 
           const centerY = -75;
           const x = parseFloat(matches.x);
@@ -360,7 +368,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
     {
       id: 'E12S Promise North Big Lion',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatantFull({ name: 'Regal Sculpture' }),
+      netRegex: NetRegexes.addedCombatant({ name: 'Regal Sculpture' }),
       run: (data, matches) => {
         const y = parseFloat(matches.y);
         const centerY = -75;
@@ -387,6 +395,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
         const northBigLion: LocaleText = {
           en: 'north big lion',
           de: 'Nordem, großer Löwe',
+          fr: 'Grand lion du nord',
           ja: '大ライオン(北)',
           cn: '北方大狮子',
           ko: '북쪽 큰 사자',
@@ -394,6 +403,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
         const southBigLion: LocaleText = {
           en: 'south big lion',
           de: 'Süden, großer Löwe',
+          fr: 'Grand lion du sud',
           ja: '大ライオン(南)',
           cn: '南方大狮子',
           ko: '남쪽 큰 사자',
@@ -401,6 +411,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
         const shared: LocaleText = {
           en: 'shared',
           de: 'geteilt',
+          fr: 'Partagé(e)',
           ja: '重ねた',
           cn: '重叠',
           ko: '같이 맞음',
@@ -408,6 +419,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
         const fireDebuff: LocaleText = {
           en: 'had fire',
           de: 'hatte Feuer',
+          fr: 'A eu(e) le feu',
           ja: '炎付き',
           cn: '火Debuff',
           ko: '화염 디버프 받음',
@@ -416,7 +428,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
         const labels = [];
         const lang: Lang = data.options.ParserLanguage;
 
-        if (data.northBigLion) {
+        if (data.northBigLion !== undefined) {
           if (data.northBigLion === matches.sourceId)
             labels.push(northBigLion[lang] ?? northBigLion['en']);
           else
@@ -450,7 +462,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
           text: {
             en: 'Knocked off',
             de: 'Runtergefallen',
-            fr: 'A été assommé(e)',
+            fr: 'Renversé(e)',
             ja: 'ノックバック',
             cn: '击退坠落',
             ko: '넉백',
@@ -461,10 +473,15 @@ const triggerSet: OopsyTriggerSet<Data> = {
     {
       id: 'E12S Oracle Shadoweye',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '58D2', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '58D2', ...playerDamageFields }),
       condition: (data, matches) => data.DamageFromMatches(matches) > 0,
       mistake: (_data, matches) => {
-        return { type: 'fail', blame: matches.target, reportId: matches.targetId, text: matches.ability };
+        return {
+          type: 'fail',
+          blame: matches.target,
+          reportId: matches.targetId,
+          text: matches.ability,
+        };
       },
     },
   ],

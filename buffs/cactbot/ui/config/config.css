@@ -56,7 +56,7 @@ html {
   margin-bottom: 20px;
 }
 
-.collapsed > div:not(:first-child) {
+.collapsed > :not(:first-child) {
   display: none;
 }
 
@@ -76,7 +76,7 @@ html {
 }
 
 .overlay-header::before {
-  content: '';
+  content: "";
   box-sizing: border-box;
   margin-right: 5px;
   width: 10px;
@@ -131,7 +131,7 @@ html {
 }
 
 .trigger-expansion-header::before {
-  content: '';
+  content: "";
   box-sizing: border-box;
   margin-right: 5px;
   width: 6px;
@@ -165,7 +165,7 @@ html {
 }
 
 .trigger-file-header::before {
-  content: '';
+  content: "";
   box-sizing: border-box;
   margin-right: 5px;
   width: 6px;
@@ -187,6 +187,115 @@ html {
   margin-right: 20px;
 }
 
+.timeline-edit-container {
+  margin: 12px 0 12px 12px;
+  grid-column-end: span 2;
+}
+
+.timeline-edit-header {
+  background-color: #ebebeb;
+  padding: 5px;
+  border: 1px solid black;
+  cursor: pointer;
+
+  /* use grid to vertically center */
+  display: grid;
+  grid-template-columns: repeat(1, auto 1fr);
+  justify-items: left;
+  align-items: center;
+}
+
+.timeline-edit-header::before {
+  content: "";
+  box-sizing: border-box;
+  margin-right: 5px;
+  width: 6px;
+  height: 6px;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-top: 6px solid black;
+}
+
+.collapsed .timeline-edit-header::before {
+  border-top: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  border-left: 6px solid black;
+  border-right: none;
+}
+
+.timeline-text-container {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  grid-gap: 5px;
+  margin: 24px 0 24px 24px;
+  align-items: center;
+  font-weight: normal;
+}
+
+.timeline-text-container > div:nth-child(-n + 3) {
+  font-weight: bold;
+}
+
+.timeline-text-enable {
+  justify-self: center;
+}
+
+.timeline-text-edit {
+  max-width: 300px;
+  width: auto !important;
+  text-align: left !important;
+}
+
+.timeline-listing-header {
+  margin: 12px 0 0 24px;
+  font-weight: bold;
+}
+
+.timeline-scroller {
+  overflow: auto;
+  resize: both;
+  height: 300px;
+  border: solid black 1px;
+  margin: 12px 0 24px 24px;
+  padding: 8px;
+  background-color: #ebebeb;
+}
+
+.timeline-add-header {
+  margin: 12px 0 0 24px;
+  font-weight: bold;
+}
+
+.timeline-add-container {
+  display: grid;
+  grid-template-columns: repeat(4, min-content);
+  grid-gap: 5px;
+  margin: 12px 0 0 24px;
+}
+
+.timeline-add-container > div:nth-child(-n + 4) {
+  align-self: end;
+}
+
+.timeline-add-row-time {
+  width: 80px !important;
+  text-align: right !important;
+}
+
+.timeline-add-row-text {
+  width: 300px !important;
+  text-align: left !important;
+}
+
+.timeline-add-row-duration {
+  width: 40px !important;
+  text-align: left !important;
+}
+
+.timeline-add-button {
+  margin: 12px 0 0 24px;
+}
+
 .trigger-file-options {
   display: grid;
   margin: 12px;
@@ -206,8 +315,7 @@ html {
 .trigger-details {
   display: grid;
   grid-template-columns: repeat(1, auto 1fr);
-  grid-column-gap: 10px;
-  grid-row-gap: 3px;
+  grid-gap: 3px 10px;
 }
 
 .trigger-label {
@@ -223,7 +331,7 @@ html {
 }
 
 .trigger-outputstring-label::before {
-  content: '\1F514';
+  content: "\1F514";
   color: dimgrey;
 }
 
@@ -234,6 +342,21 @@ html {
 
 .trigger-source {
   justify-content: flex-end;
+}
+
+.comment {
+  margin-top: 8px;
+  margin-left: 8px;
+  font-size: 12px;
+  max-width: calc(18em + 8px);
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+.comment > * {
+  display: inline-block;
+  margin-right: 8px;
+  margin-bottom: 8px;
 }
 
 .alarm-text {
@@ -267,32 +390,42 @@ html {
   align-items: center;
 }
 
-input[type=text] {
+input[type="text"] {
   padding: 3px;
   width: 40px;
   text-align: right;
 }
 
-.trigger-duration > input[type=text] {
+.trigger-duration > input[type="text"] {
   width: 75px;
   text-align: left;
 }
 
-.trigger-before-seconds > input[type=text] {
+.trigger-before-seconds > input[type="text"] {
   width: 60px;
   text-align: left;
 }
 
-.trigger-outputstring > input[type=text] {
+.trigger-outputstring > input[type="text"] {
   width: 200px;
   text-align: left;
 }
 
-input[type=submit] {
+input[type="text"].input-string-field {
+  width: min(200px, 100%);
+  text-align: left;
+}
+
+input[type="submit"] {
   padding: 3px;
 }
 
 select {
   padding: 3px;
   width: fit-content;
+}
+
+input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
 }

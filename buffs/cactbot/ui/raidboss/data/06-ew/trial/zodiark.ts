@@ -1,4 +1,3 @@
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -14,25 +13,20 @@ import { TriggerSet } from '../../../../../types/trigger';
 export type Data = RaidbossData;
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'TheDarkInside',
   zoneId: ZoneId.TheDarkInside,
   timelineFile: 'zodiark.txt',
   triggers: [
     {
       id: 'Zodiark Ania',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '6B62', source: 'Zodiark' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '6B62', source: 'Zodiark' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '6B62', source: 'Zordiarche' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '6B62', source: 'ゾディアーク' }),
+      netRegex: { id: '6B62', source: 'Zodiark' },
       response: Responses.tankBuster(),
     },
     {
       id: 'Zodiark Algedon NE',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '67D1', source: 'Zodiark', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '67D1', source: 'Zodiark', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '67D1', source: 'Zordiarche', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '67D1', source: 'ゾディアーク', capture: false }),
+      netRegex: { id: '67D1', source: 'Zodiark', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       // Warn about knockback just as a precaution in case players don't make it.
       // Also, technically NE/SW is safe, but having all players run together is better.
@@ -42,7 +36,7 @@ const triggerSet: TriggerSet<Data> = {
           de: 'Geh nach NO (Rückstoß)',
           fr: 'Allez au NE (poussée)',
           ja: '北東へ (ノックバック)',
-          cn: '去右上(东北)',
+          cn: '去右上 (东北)',
           ko: '북동쪽으로 (넉백)',
         },
       },
@@ -50,10 +44,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Zodiark Algedon NW',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '67D2', source: 'Zodiark', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '67D2', source: 'Zodiark', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '67D2', source: 'Zordiarche', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '67D2', source: 'ゾディアーク', capture: false }),
+      netRegex: { id: '67D2', source: 'Zodiark', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -61,7 +52,7 @@ const triggerSet: TriggerSet<Data> = {
           de: 'Geh nach NW (Rückstoß)',
           fr: 'Allez au NO (poussée)',
           ja: '北西へ (ノックバック)',
-          cn: '去左上(西北)',
+          cn: '去左上 (西北)',
           ko: '북서쪽으로 (넉백)',
         },
       },
@@ -163,6 +154,67 @@ const triggerSet: TriggerSet<Data> = {
         'Styx': 'ステュクス',
         'Trimorphos Exoterikos': 'トライ・エクソーテリコス',
         'Triple Esoteric Ray': 'トライ・エソテリックレイ',
+      },
+    },
+    {
+      'locale': 'cn',
+      'replaceSync': {
+        'Arcane Sigil': '秘纹',
+        'Behemoth': '贝希摩斯',
+        'Python': '大蟒',
+        'Zodiark': '佐迪亚克',
+      },
+      'replaceText': {
+        'Adikia': '不义',
+        'Algedon': '痛苦',
+        'Ania': '悲伤',
+        'Astral Eclipse': '星蚀',
+        'Astral Flow': '星极超流',
+        'Complete Control': '完全控制',
+        'Esoteric Dyad': '神秘二分',
+        '(?<!Triple )Esoteric Ray': '神秘光线',
+        'Esoteric Sect': '神秘切割',
+        '(?<!Trimorphos )Exoterikos': '外纹',
+        'Explosion': '爆炸',
+        'Kokytos': '悲痛',
+        'Meteoros Eidolon': '陨石幻影',
+        'Opheos Eidolon': '巨蛇幻影',
+        'Paradeigma': '范式',
+        'Phlegethon': '冥火',
+        'Styx': '仇恨',
+        'Trimorphos Exoterikos': '三重外纹',
+        'Triple Esoteric Ray': '三重神秘光线',
+      },
+    },
+    {
+      'locale': 'ko',
+      'replaceSync': {
+        'Arcane Sigil': '비문',
+        'Behemoth': '베히모스',
+        'Python': '퓌톤',
+        'Zodiark': '조디아크',
+      },
+      'replaceText': {
+        'Adikia': '불의',
+        'Algedon': '아픔',
+        'Ania': '핍박',
+        'Astral Eclipse': '별들의 식',
+        'Astral Flow': '천상의 흐름',
+        'Complete Control': '완전 접속',
+        'Esoteric Dyad(?!/)': '내밀한 양면',
+        'Esoteric Dyad/Esoteric Sect': '내밀한 양면/종파',
+        '(?<!/)Esoteric Sect': '내밀한 종파',
+        'Explosion': '폭산',
+        'Kokytos': '코퀴토스',
+        'Meteoros Eidolon': '허깨비 운석',
+        'Opheos Eidolon': '허깨비 뱀',
+        'Paradeigma': '시범',
+        'Phlegethon': '플레게톤',
+        'Styx': '스틱스',
+        'Trimorphos Exoterikos': '삼중 엑소테리코스',
+        'Triple Esoteric Ray': '내밀한 삼중 광선',
+        '(?<!Triple )Esoteric Ray': '내밀한 광선',
+        '(?<!Trimorphos )Exoterikos': '엑소테리코스',
       },
     },
   ],

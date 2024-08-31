@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import Outputs from '../../../../../resources/outputs';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
@@ -20,6 +19,7 @@ export interface Data extends RaidbossData {
 
 // O3S - Deltascape 3.0 Savage
 const triggerSet: TriggerSet<Data> = {
+  id: 'DeltascapeV30Savage',
   zoneId: ZoneId.DeltascapeV30Savage,
   timelineFile: 'o3s.txt',
   timelineTriggers: [
@@ -43,12 +43,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O3S Panel Swap Phase Counter',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2304', source: 'Halicarnassus', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2304', source: 'Halikarnassos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2304', source: 'Halicarnasse', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2304', source: 'ハリカルナッソス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2304', source: '哈利卡纳苏斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2304', source: '할리카르나소스', capture: false }),
+      netRegex: { id: '2304', source: 'Halicarnassus', capture: false },
       run: (data) => {
         data.phase = (data.phase ?? 0) + 1;
         delete data.seenHolyThisPhase;
@@ -57,24 +52,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O3S Critical Hit',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '22EB', source: 'Halicarnassus' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '22EB', source: 'Halikarnassos' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '22EB', source: 'Halicarnasse' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '22EB', source: 'ハリカルナッソス' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '22EB', source: '哈利卡纳苏斯' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '22EB', source: '할리카르나소스' }),
+      netRegex: { id: '22EB', source: 'Halicarnassus' },
       // "Use Awareness!! <se.6>"
       response: Responses.tankBuster(),
     },
     {
       id: 'O3S Dimensional Wave',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '22F6', source: 'Halicarnassus', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '22F6', source: 'Halikarnassos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '22F6', source: 'Halicarnasse', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '22F6', source: 'ハリカルナッソス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '22F6', source: '哈利卡纳苏斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '22F6', source: '할리카르나소스', capture: false }),
+      netRegex: { id: '22F6', source: 'Halicarnassus', capture: false },
       response: Responses.aoe(),
     },
     {
@@ -82,12 +67,7 @@ const triggerSet: TriggerSet<Data> = {
       // books message in the library phase can be ignored.
       id: 'O3S Spellblade Holy Counter',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '22EF', source: 'Halicarnassus', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: '22EF', source: 'Halikarnassos', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: '22EF', source: 'Halicarnasse', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: '22EF', source: 'ハリカルナッソス', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: '22EF', source: '哈利卡纳苏斯', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: '22EF', source: '할리카르나소스', capture: false }),
+      netRegex: { id: '22EF', source: 'Halicarnassus', capture: false },
       run: (data) => {
         // In case something went awry, clean up any holy targets
         // so the next spellblade holy can start afresh.
@@ -107,7 +87,7 @@ const triggerSet: TriggerSet<Data> = {
       // So, #2 is the person everybody should stack on.
       id: 'O3S Spellblade Holy',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: ['0064', '0065'] }),
+      netRegex: { id: ['0064', '0065'] },
       condition: (data, matches) => {
         // Library phase stack markers behave differently.
         if (data.phase === 3)
@@ -146,9 +126,9 @@ const triggerSet: TriggerSet<Data> = {
         } else {
           if (data.holyTargets.includes(data.me)) {
             ret.alertText = output.spread!();
-            ret.infoText = output.othersStackOnHoly!({ player: data.ShortName(stackTarget) });
+            ret.infoText = output.othersStackOnHoly!({ player: data.party.member(stackTarget) });
           } else {
-            ret.infoText = output.stackOnHoly!({ player: data.ShortName(stackTarget) });
+            ret.infoText = output.stackOnHoly!({ player: data.party.member(stackTarget) });
           }
         }
         return ret;
@@ -159,7 +139,7 @@ const triggerSet: TriggerSet<Data> = {
       // Library phase spellblade holy with 2 stacks / 4 preys / 2 unmarked.
       id: 'O3S Library Spellblade',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: ['0064', '0065'] }),
+      netRegex: { id: ['0064', '0065'] },
       condition: (data, matches) => {
         // This is only for library phase.
         if (data.phase !== 3)
@@ -218,7 +198,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O3S Right Face',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '510' }),
+      netRegex: { effectId: '510' },
       condition: Conditions.targetIsYou(),
       durationSeconds: 8,
       infoText: (_data, _matches, output) => output.text!(),
@@ -236,7 +216,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O3S Forward March',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '50D' }),
+      netRegex: { effectId: '50D' },
       condition: Conditions.targetIsYou(),
       durationSeconds: 8,
       infoText: (_data, _matches, output) => output.text!(),
@@ -254,7 +234,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O3S Left Face',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '50F' }),
+      netRegex: { effectId: '50F' },
       condition: Conditions.targetIsYou(),
       durationSeconds: 8,
       infoText: (_data, _matches, output) => output.text!(),
@@ -272,7 +252,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O3S About Face',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '50E' }),
+      netRegex: { effectId: '50E' },
       condition: Conditions.targetIsYou(),
       durationSeconds: 8,
       infoText: (_data, _matches, output) => output.text!(),
@@ -290,34 +270,19 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O3S Ribbit',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '22F7', source: 'Halicarnassus', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '22F7', source: 'Halikarnassos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '22F7', source: 'Halicarnasse', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '22F7', source: 'ハリカルナッソス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '22F7', source: '哈利卡纳苏斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '22F7', source: '할리카르나소스', capture: false }),
+      netRegex: { id: '22F7', source: 'Halicarnassus', capture: false },
       response: Responses.getBehind(),
     },
     {
       id: 'O3S Oink',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '22F9', source: 'Halicarnassus', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '22F9', source: 'Halikarnassos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '22F9', source: 'Halicarnasse', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '22F9', source: 'ハリカルナッソス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '22F9', source: '哈利卡纳苏斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '22F9', source: '할리카르나소스', capture: false }),
+      netRegex: { id: '22F9', source: 'Halicarnassus', capture: false },
       response: Responses.doritoStack(),
     },
     {
       id: 'O3S Squelch',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '22F8', source: 'Halicarnassus', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '22F8', source: 'Halikarnassos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '22F8', source: 'Halicarnasse', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '22F8', source: 'ハリカルナッソス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '22F8', source: '哈利卡纳苏斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '22F8', source: '할리카르나소스', capture: false }),
+      netRegex: { id: '22F8', source: 'Halicarnassus', capture: false },
       response: Responses.lookAway(),
     },
     {
@@ -328,7 +293,7 @@ const triggerSet: TriggerSet<Data> = {
       // 6724, 7400 = Great Dragon
       // 6056, 7401 = Apanda
       // There are a bunch of 6056, 7404 Apandas that get added at the beginning.
-      netRegex: NetRegexes.addedCombatantFull({ npcNameId: ['5626', '6724', '6056'], npcBaseId: ['7399', '7400', '7401'] }),
+      netRegex: { npcNameId: ['5626', '6724', '6056'], npcBaseId: ['7399', '7400', '7401'] },
       infoText: (_data, matches, output) => output.kill!({ name: matches.name }),
       outputStrings: {
         kill: {
@@ -344,7 +309,7 @@ const triggerSet: TriggerSet<Data> = {
       id: 'O3S Iron Giant',
       type: 'AddedCombatant',
       // 5636 = Iron Giant
-      netRegex: NetRegexes.addedCombatantFull({ npcNameId: '5636', capture: false }),
+      netRegex: { npcNameId: '5636', capture: false },
       infoText: (_data, _matches, output) => output.kill!(),
       outputStrings: {
         kill: {
@@ -359,12 +324,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O3S The Queen\'s Waltz: Books',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '230E', source: 'Halicarnassus', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '230E', source: 'Halikarnassos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '230E', source: 'Halicarnasse', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '230E', source: 'ハリカルナッソス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '230E', source: '哈利卡纳苏斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '230E', source: '할리카르나소스', capture: false }),
+      netRegex: { id: '230E', source: 'Halicarnassus', capture: false },
       condition: (data) => {
         // Deliberately skip printing the waltz message for the
         // spellblade holy -> waltz that ends the library phase.
@@ -397,12 +357,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O3S The Queen\'s Waltz: Clock',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2306', source: 'Halicarnassus', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2306', source: 'Halikarnassos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2306', source: 'Halicarnasse', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2306', source: 'ハリカルナッソス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2306', source: '哈利卡纳苏斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2306', source: '할리카르나소스', capture: false }),
+      netRegex: { id: '2306', source: 'Halicarnassus', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -418,12 +373,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O3S The Queen\'s Waltz: Crystal Square',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '230A', source: 'Halicarnassus', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '230A', source: 'Halikarnassos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '230A', source: 'Halicarnasse', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '230A', source: 'ハリカルナッソス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '230A', source: '哈利卡纳苏斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '230A', source: '할리카르나소스', capture: false }),
+      netRegex: { id: '230A', source: 'Halicarnassus', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -439,12 +389,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O3S The Queen\'s Waltz: Tethers',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2308', source: 'Halicarnassus', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2308', source: 'Halikarnassos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2308', source: 'Halicarnasse', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2308', source: 'ハリカルナッソス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2308', source: '哈利卡纳苏斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2308', source: '할리카르나소스', capture: false }),
+      netRegex: { id: '2308', source: 'Halicarnassus', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -460,12 +405,12 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O3S The Queen\'s Waltz: Tethers You',
       type: 'Tether',
-      netRegex: NetRegexes.tether({ id: '0012' }),
+      netRegex: { id: '0012' },
       infoText: (data, matches, output) => {
         if (data.me === matches.target)
-          return output.breakTether!({ player: data.ShortName(matches.source) });
+          return output.breakTether!({ player: data.party.member(matches.source) });
         else if (data.me === matches.source)
-          return output.breakTether!({ player: data.ShortName(matches.target) });
+          return output.breakTether!({ player: data.party.member(matches.target) });
       },
       outputStrings: {
         breakTether: {
@@ -480,7 +425,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O3S Soul Reaper',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatantFull({ npcNameId: '5634' }),
+      netRegex: { npcNameId: '5634' },
       alertText: (data, matches, output) => {
         data.reapers ??= [];
         data.reapers.push(matches);
@@ -672,7 +617,6 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       'locale': 'ja',
-      'missingTranslations': true,
       'replaceSync': {
         'Halicarnassus': 'ハリカルナッソス',
         'Apanda': 'アパンダ',

@@ -1,6 +1,6 @@
 import './raidboss_config';
-
-import { isLang, Lang, langMap } from '../../resources/languages';
+import DTFuncs from '../../resources/datetime';
+import { browserLanguagesToLang, Lang, langMap } from '../../resources/languages';
 import { UnreachableCode } from '../../resources/not_reached';
 import { callOverlayHandler } from '../../resources/overlay_plugin_api';
 import UserConfig from '../../resources/user_config';
@@ -13,7 +13,7 @@ import Encounter from './emulator/data/Encounter';
 import LineEvent from './emulator/data/network_log_converter/LineEvent';
 import Persistor from './emulator/data/Persistor';
 import RaidEmulator from './emulator/data/RaidEmulator';
-import EmulatorCommon, {
+import {
   getTemplateChild,
   querySelectorAllSafe,
   querySelectorSafe,
@@ -22,6 +22,7 @@ import RaidEmulatorOverlayApiHook from './emulator/overrides/RaidEmulatorOverlay
 import RaidEmulatorPopupText from './emulator/overrides/RaidEmulatorPopupText';
 import RaidEmulatorTimelineController from './emulator/overrides/RaidEmulatorTimelineController';
 import RaidEmulatorTimelineUI from './emulator/overrides/RaidEmulatorTimelineUI';
+import RaidEmulatorWatchCombatantsOverride from './emulator/overrides/RaidEmulatorWatchCombatantsOverride';
 import {
   emulatorTemplateTranslations,
   emulatorTooltipTranslations,
@@ -52,6 +53,7 @@ declare global {
       emulatedPartyInfo: EmulatedPartyInfo;
       emulatedWebSocket: RaidEmulatorOverlayApiHook;
       timelineUI: RaidEmulatorTimelineUI;
+      emulatorWatchCombatantsOverride: RaidEmulatorWatchCombatantsOverride;
     };
   }
 }
@@ -81,14 +83,14 @@ const hideModal = (selector = '.modal.show'): HTMLElement => {
 
 const applyTranslation = (lang: Lang) => {
   for (const [key, value] of Object.entries(emulatorTranslations)) {
-    querySelectorAllSafe(document, '.translate' + key).forEach(
+    querySelectorAllSafe(document, `.translate${key}`).forEach(
       (elem) => {
         elem.innerHTML = translate(lang, value);
       },
     );
   }
   for (const [key, value] of Object.entries(emulatorTooltipTranslations)) {
-    querySelectorAllSafe(document, '.translate' + key).forEach(
+    querySelectorAllSafe(document, `.translate${key}`).forEach(
       (elem) => {
         elem.title = translate(lang, value);
       },
@@ -97,7 +99,7 @@ const applyTranslation = (lang: Lang) => {
   for (const [sel, trans] of Object.entries(emulatorTemplateTranslations)) {
     const template = getTemplateChild(document, sel);
     for (const [key, value] of Object.entries(trans)) {
-      querySelectorAllSafe(template, '.translate' + key).forEach(
+      querySelectorAllSafe(template, `.translate${key}`).forEach(
         (elem) => {
           elem.innerHTML = translate(lang, value);
         },
@@ -120,12 +122,12 @@ const raidEmulatorOnLoad = async () => {
   if (window.location.href.indexOf('OVERLAY_WS') > 0) {
     // Give the websocket 500ms to connect, then abort.
     websocketConnected = await Promise.race<Promise<boolean>>([
-      new Promise((res) => {
+      new Promise<boolean>((res) => {
         void callOverlayHandler({ call: 'cactbotRequestState' }).then(() => {
           res(true);
         });
       }),
-      new Promise((res) => {
+      new Promise<boolean>((res) => {
         window.setTimeout(() => {
           res(false);
         }, 500);
@@ -136,6 +138,9 @@ const raidEmulatorOnLoad = async () => {
         UserConfig.getUserConfigLocation('raidboss', defaultOptions, () => {
           // Update options from anything changed via getUserConfigLocation.
           options = { ...defaultOptions };
+          // If DisplayLanguage isn't English, switch to correct lang for emulator display
+          if (options.DisplayLanguage !== 'en')
+            applyTranslation(options.DisplayLanguage);
           querySelectorSafe(document, '.websocketConnected').classList.remove('d-none');
           querySelectorSafe(document, '.websocketDisconnected').classList.add('d-none');
           res();
@@ -146,13 +151,9 @@ const raidEmulatorOnLoad = async () => {
 
   if (!websocketConnected) {
     // Find the most appropriate lang code to use based on browser language priority
-    const browserLang = [...navigator.languages, 'en']
-      .map((l) => l.substr(0, 2))
-      // Remap `zh` to `cn` to match cactbot languages
-      .map((l) => l === 'zh' ? 'cn' : l)
-      .filter((l) => ['en', 'de', 'fr', 'ja', 'cn', 'ko'].includes(l))[0];
-    options.ParserLanguage = isLang(browserLang) ? browserLang : 'en';
-    options.DisplayLanguage = isLang(browserLang) ? browserLang : 'en';
+    const browserLang = browserLanguagesToLang(navigator.languages);
+    options.ParserLanguage = browserLang;
+    options.DisplayLanguage = browserLang;
     // Default options
     options.IsRemoteRaidboss = true;
     options.TextAlertsEnabled = true;
@@ -161,10 +162,6 @@ const raidEmulatorOnLoad = async () => {
     options.GroupSpokenAlertsEnabled = false;
   }
 
-  // If DisplayLanguage isn't English, switch to correct lang for emulator display
-  if (options.DisplayLanguage !== 'en')
-    applyTranslation(options.DisplayLanguage);
-
   const emulator = new RaidEmulator(options);
   const progressBar = new ProgressBar(emulator);
   const encounterTab = new EncounterTab(persistor);
@@ -172,6 +169,7 @@ const raidEmulatorOnLoad = async () => {
   const emulatedWebSocket = new RaidEmulatorOverlayApiHook(emulator);
   emulatedWebSocket.connected = websocketConnected;
   const logConverterWorker = new Worker(
+    /* webpackEntryOptions: { filename: "ui/raidboss/raidemulator.worker.js" } */
     new URL('./emulator/data/NetworkLogConverter.worker.ts', import.meta.url),
   );
 
@@ -195,6 +193,11 @@ const raidEmulatorOnLoad = async () => {
 
   emulator.setPopupText(popupText);
 
+  const emulatorWatchCombatantsOverride = new RaidEmulatorWatchCombatantsOverride(
+    emulator,
+    emulatedWebSocket,
+  );
+
   // Listen for the user to click a player in the party list on the right
   // and persist that over to the emulator
   emulatedPartyInfo.on('selectPerspective', (id: string) => {
@@ -213,12 +216,12 @@ const raidEmulatorOnLoad = async () => {
   // Listen for the user to attempt to load an encounter from the encounters pane
   encounterTab.on('load', (id: number) => {
     // Attempt to set the current emulated encounter
-    if (!emulator.setCurrentByID(id)) {
+    if (!emulator.setCurrentByID(id, emulatorWatchCombatantsOverride)) {
       // If that encounter isn't loaded, load it
       void persistor.loadEncounter(id).then((enc?: Encounter) => {
         if (enc) {
           emulator.addEncounter(enc);
-          emulator.setCurrentByID(id);
+          emulator.setCurrentByID(id, emulatorWatchCombatantsOverride);
         }
       });
     }
@@ -278,7 +281,7 @@ const raidEmulatorOnLoad = async () => {
       showModal('.introModal');
     } else {
       let lastEncounter: string | number | null = window.localStorage.getItem('currentEncounter');
-      if (lastEncounter) {
+      if (lastEncounter !== null) {
         lastEncounter = parseInt(lastEncounter);
         const matchedEncounters = encounters.filter((e) => e.id === lastEncounter);
         if (matchedEncounters.length)
@@ -305,7 +308,7 @@ const raidEmulatorOnLoad = async () => {
       });
     } else {
       // Assume it's a log file
-      const importModal = showModal('.importProgressModal');
+      const importModal = showModal('.import-progress-modal');
       const bar = querySelectorSafe(importModal, '.progress-bar');
       bar.style.width = '0px';
       const label = querySelectorSafe(importModal, '.label');
@@ -318,7 +321,7 @@ const raidEmulatorOnLoad = async () => {
         throw new UnreachableCode();
       doneButton.disabled = true;
 
-      const doneButtonTimeout = querySelectorSafe(doneButton, '.doneBtnTimeout');
+      const doneButtonTimeout = querySelectorSafe(doneButton, '.done-btn-timeout');
 
       let promise: Promise<unknown> | undefined;
 
@@ -326,8 +329,8 @@ const raidEmulatorOnLoad = async () => {
         switch (msg.data.type) {
           case 'progress':
             {
-              const percent = ((msg.data.bytes / msg.data.totalBytes) * 100).toFixed(2);
-              bar.style.width = percent + '%';
+              const percent = (msg.data.bytes / msg.data.totalBytes * 100).toFixed(2);
+              bar.style.width = `${percent}%`;
               label.innerText =
                 `${msg.data.bytes}/${msg.data.totalBytes} bytes, ${msg.data.lines} lines (${percent}%)`;
             }
@@ -346,14 +349,14 @@ const raidEmulatorOnLoad = async () => {
                 .toString();
               querySelectorSafe(encLabel, '.end').innerText = new Date(enc.endTimestamp).toString();
 
-              const duration = EmulatorCommon.timeToString(
+              const duration = DTFuncs.timeToString(
                 enc.endTimestamp - enc.startTimestamp,
                 false,
               )
                 .split(':');
               const durationMins = duration[0] ?? '0';
               const durationSecs = duration[1] ?? '00';
-              const pullDuration = EmulatorCommon.timeToString(
+              const pullDuration = DTFuncs.timeToString(
                 enc.endTimestamp - enc.initialTimestamp,
                 false,
               )
@@ -395,7 +398,7 @@ const raidEmulatorOnLoad = async () => {
                 doneButtonTimeout.innerText = ` (${seconds})`;
                 if (seconds === 0) {
                   window.clearInterval(interval);
-                  hideModal('.importProgressModal');
+                  hideModal('.import-progress-modal');
                 }
               }, 1000);
             });
@@ -437,7 +440,7 @@ const raidEmulatorOnLoad = async () => {
   // Auto initialize all collapse elements on the page
   document.querySelectorAll('[data-toggle="collapse"]').forEach((n) => {
     const targetSel = n.getAttribute('data-target');
-    if (!targetSel)
+    if (targetSel === null)
       throw new UnreachableCode();
     const target = querySelectorSafe(document, targetSel);
     n.addEventListener('click', () => {
@@ -496,7 +499,7 @@ const raidEmulatorOnLoad = async () => {
         target = target.parentElement ?? target;
 
       if (target !== document.body)
-        hideModal('.' + [...target.classList].join('.'));
+        hideModal(`.${[...target.classList].join('.')}`);
     });
   });
 
@@ -534,6 +537,7 @@ const raidEmulatorOnLoad = async () => {
     emulatedPartyInfo: emulatedPartyInfo,
     emulatedWebSocket: emulatedWebSocket,
     timelineUI: timelineUI,
+    emulatorWatchCombatantsOverride: emulatorWatchCombatantsOverride,
   };
 };
 

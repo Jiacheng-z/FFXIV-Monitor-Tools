@@ -1,5 +1,25 @@
-const t = require('@babel/types');
+const { ASTUtils: t } = require('@typescript-eslint/utils');
 const textProps = ['alarmText', 'alertText', 'infoText', 'tts'];
+
+const isSpreadElement = (node) => {
+  return node.type === 'SpreadElement';
+};
+
+const isMemberExpression = (node) => {
+  return node.type === 'MemberExpression';
+};
+
+const isObjectExpression = (node) => {
+  return node.type === 'ObjectExpression';
+};
+
+const isLiteral = (node) => {
+  return node.type === 'Literal';
+};
+
+const isBinaryExpression = (node) => {
+  return node.type === 'BinaryExpression';
+};
 
 /**
  * @type {import('eslint').Rule.RuleModule}
@@ -11,7 +31,8 @@ const ruleModule = {
       description: 'suggest outputStrings in cactbot',
       category: 'Stylistic Issues',
       recommended: true,
-      url: 'https://github.com/quisquous/cactbot/blob/main/docs/RaidbossGuide.md#trigger-elements',
+      url:
+        'https://github.com/OverlayPlugin/cactbot/blob/main/docs/RaidbossGuide.md#trigger-properties',
     },
     fixable: 'code',
     schema: [],
@@ -20,8 +41,7 @@ const ruleModule = {
       notFoundProperty: 'no \'{{prop}}\' in \'{{outputParam}}\'',
       notFoundTemplate: '`output.{{prop}}(...)` doesn\'t have template \'{{template}}\'.',
       missingTemplateValue: 'template \'{{prop}}\' is missing in function call',
-      tooManyParams: 'function `output.{{call}}()` takes only 1 parameter',
-      typeError: 'function `output.{{call}}(...) only takes an object as a parameter',
+      incorrectObjectKey: 'template \'{{prop}}\' specifies an object key with too many parts',
     },
   },
   create: function(context) {
@@ -33,7 +53,7 @@ const ruleModule = {
     };
     /**
      * get all keys name from object literal expression
-     * @param {(t.Property|t.SpreadElement)[]} props
+     * @param props
      * @return {string[]}
      */
     const getAllKeys = (props) => {
@@ -44,11 +64,12 @@ const ruleModule = {
 
       props.forEach((prop) => {
         if (prop.type === 'Property') {
-          if (t.isIdentifier(prop.key))
+          if (t.isIdentifier(prop.key)) {
             propKeys.push(prop.key.name);
-          else if (t.isLiteral(prop.key))
+          } else if (prop.key.type === 'Literal') {
             propKeys.push(prop.key.value);
-        } else if (t.isSpreadElement(prop)) {
+          }
+        } else if (isSpreadElement(prop)) {
           if (t.isIdentifier(prop.argument)) {
             (globalVars.get(prop.argument.name) || [])
               .forEach((name) => propKeys.push(name));
@@ -59,7 +80,6 @@ const ruleModule = {
     };
 
     /**
-     *
      * @param node {t.ObjectExpression}
      */
     const extractTemplate = function(node) {
@@ -68,7 +88,7 @@ const ruleModule = {
       const outputTemplateKey = {};
       for (
         const outputString of node.properties.filter((s) =>
-          !t.isSpreadElement(s) && !t.isMemberExpression(s.value)
+          !isSpreadElement(s) && !isMemberExpression(s.value)
         )
       ) {
         // For each outputString...
@@ -77,8 +97,30 @@ const ruleModule = {
         if (!properties)
           return;
 
-        const values = properties.map((x) => x.value.value)
-          .filter((x) => x !== undefined) || [];
+        const values = properties.map((x) => x.value)
+          .map((x) => {
+            if (isLiteral(x)) {
+              return x.value;
+            }
+
+            if (isBinaryExpression(x)) {
+              /*
+                  outputStrings: {
+                     text: {
+                       en: Outputs.killAdds.en + '(back first)',
+                       de: Outputs.killAdds.de + '(hinten zuerst)',
+                       fr: Outputs.killAdds.fr + '(derrière en premier)',
+                       ja: Outputs.killAdds.ja + '(下の雑魚から)',
+                       cn: Outputs.killAdds.cn + '(先打后方的)',
+                       ko: Outputs.killAdds.ko + '(아래쪽 먼저)',
+                     },
+                   },
+               */
+              return x.right.value;
+            }
+
+            throw new Error('unexpected outputStrings format', x.loc);
+          }).filter((x) => x !== undefined) || [];
 
         const templateIds = values
           .map((x) => Array.from(x.matchAll(/\${\s*([^}\s]+)\s*}/g)))
@@ -95,12 +137,16 @@ const ruleModule = {
     };
 
     return {
-      /**
-       *
-       * @param node {t.ObjectExpression}
-       */
       'Program > VariableDeclaration > VariableDeclarator > ObjectExpression'(node) {
         globalVars.set(node.parent.id.name, getAllKeys(node.properties));
+      },
+      'Program > VariableDeclaration > VariableDeclarator > TSAsExpression > ObjectExpression'(
+        node,
+      ) {
+        /**
+         * const eclipseOutputStrings = { ... } as const;
+         */
+        globalVars.set(node.parent.parent.id.name, getAllKeys(node.properties));
       },
       [`Property[key.name=/${textProps.join('|')}/] > :function`](node) {
         const props = getAllKeys(node.parent.parent.properties);
@@ -112,7 +158,7 @@ const ruleModule = {
           ).value;
           stack.outputTemplates = extractTemplate(outputValue);
           stack.outputProperties = t.isIdentifier(outputValue)
-            ? (globalVars.get(outputValue.name) || [])
+            ? globalVars.get(outputValue.name) || []
             : getAllKeys(outputValue.properties);
           stack.triggerID = node.parent.parent.properties.find((prop) =>
             prop.key && prop.key.name === 'id'
@@ -133,14 +179,15 @@ const ruleModule = {
           stack.outputTemplates = {};
         }
       },
-      /**
-       *
-       * @param node {t.MemberExpression}
-       */
+
       [
-        `Property[key.name=/${
-          textProps.join('|')
-        }/] > :function[params.length=3] CallExpression > MemberExpression`
+        `Property[key.name=/alarmText|alertTex|infoText|tts/] > :function[params.length=3] CallExpression > ChainExpression > MemberExpression`
+      ](node) {
+        // TODO: raise a error about using `?.` to call output
+      },
+
+      [
+        `Property[key.name=/alarmText|alertTex|infoText|tts/] > :function[params.length=3] CallExpression > TSNonNullExpression > MemberExpression`
       ](node) {
         if (
           node.object.name === stack.outputParam &&
@@ -158,7 +205,7 @@ const ruleModule = {
           });
         }
         if (t.isIdentifier(node.property) && stack.outputProperties.includes(node.property.name)) {
-          const args = node.parent.callee.parent.arguments;
+          const args = node.parent.parent.callee.parent.arguments;
           const outputOfTriggerId = stack.outputTemplates ?? {};
           const outputTemplate = outputOfTriggerId?.[node.property.name];
 
@@ -175,7 +222,7 @@ const ruleModule = {
               }
             }
           } else if (args.length === 1) {
-            if (t.isObjectExpression(args[0])) {
+            if (isObjectExpression(args[0])) {
               const passedKeys = getAllKeys(args[0].properties);
               if (outputTemplate === null && passedKeys.length !== 0) {
                 context.report({
@@ -187,25 +234,28 @@ const ruleModule = {
                   },
                 });
               }
-            } else if (t.isLiteral(args[0])) {
-              context.report({
-                node,
-                messageId: 'typeError',
-                data: {
-                  call: node.property.name,
-                },
-              });
             }
 
             const keysInParams = getAllKeys(args[0].properties);
             if (outputTemplate !== null && outputTemplate !== undefined) {
               for (const key of outputTemplate) {
-                if (!t.isIdentifier(args[0]) && !keysInParams.includes(key)) {
+                const keyParts = key.split('.');
+                if (keyParts.length > 2) {
+                  context.report({
+                    node,
+                    messageId: 'incorrectObjectKey',
+                    data: {
+                      prop: key,
+                    },
+                  });
+                }
+                const trimmedKey = keyParts[0];
+                if (!t.isIdentifier(args[0]) && !keysInParams.includes(trimmedKey)) {
                   context.report({
                     node,
                     messageId: 'missingTemplateValue',
                     data: {
-                      prop: key,
+                      prop: trimmedKey,
                     },
                   });
                 }
@@ -224,15 +274,6 @@ const ruleModule = {
                 }
               }
             }
-          } else {
-            // args.length > 1
-            context.report({
-              node,
-              messageId: 'tooManyParams',
-              data: {
-                call: node.property.name,
-              },
-            });
           }
         }
       },

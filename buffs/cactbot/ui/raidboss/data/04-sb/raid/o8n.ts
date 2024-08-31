@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -9,63 +8,39 @@ export type Data = RaidbossData;
 
 // O8N - Sigmascape 4.0 Normal
 const triggerSet: TriggerSet<Data> = {
+  id: 'SigmascapeV40',
   zoneId: ZoneId.SigmascapeV40,
   timelineFile: 'o8n.txt',
   triggers: [
     {
       id: 'O8N Hyper Drive',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '292E', source: 'Kefka' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '292E', source: 'Kefka' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '292E', source: 'Kefka' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '292E', source: 'ケフカ' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '292E', source: '凯夫卡' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '292E', source: '케프카' }),
+      netRegex: { id: '292E', source: 'Kefka' },
       response: Responses.tankBuster(),
     },
     {
       id: 'O8N Shockwave',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2927', source: 'Graven Image', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2927', source: 'Heilig(?:e|er|es|en) Statue', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2927', source: 'Statue Divine', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2927', source: '神々の像', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2927', source: '众神之像', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2927', source: '신들의 상', capture: false }),
+      netRegex: { id: '2927', source: 'Graven Image', capture: false },
       delaySeconds: 5,
       response: Responses.knockback(),
     },
     {
       id: 'O8N Gravitational Wave',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2929', source: 'Graven Image', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2929', source: 'Heilig(?:e|er|es|en) Statue', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2929', source: 'Statue Divine', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2929', source: '神々の像', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2929', source: '众神之像', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2929', source: '신들의 상', capture: false }),
+      netRegex: { id: '2929', source: 'Graven Image', capture: false },
       response: Responses.goEast(),
     },
     {
       id: 'O8N Intemperate Will',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '292A', source: 'Graven Image', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '292A', source: 'Heilig(?:e|er|es|en) Statue', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '292A', source: 'Statue Divine', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '292A', source: '神々の像', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '292A', source: '众神之像', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '292A', source: '신들의 상', capture: false }),
+      netRegex: { id: '292A', source: 'Graven Image', capture: false },
       response: Responses.goWest(),
     },
     {
       id: 'O8N Ave Maria',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '292B', source: 'Graven Image', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '292B', source: 'Heilig(?:e|er|es|en) Statue', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '292B', source: 'Statue Divine', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '292B', source: '神々の像', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '292B', source: '众神之像', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '292B', source: '신들의 상', capture: false }),
+      netRegex: { id: '292B', source: 'Graven Image', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -81,12 +56,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O8N Indolent Will',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '292C', source: 'Graven Image', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '292C', source: 'Heilig(?:e|er|es|en) Statue', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '292C', source: 'Statue Divine', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '292C', source: '神々の像', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '292C', source: '众神之像', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '292C', source: '신들의 상', capture: false }),
+      netRegex: { id: '292C', source: 'Graven Image', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -102,18 +72,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O8N Timely Teleport',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2921', source: 'Kefka', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2921', source: 'Kefka', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2921', source: 'Kefka', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2921', source: 'ケフカ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2921', source: '凯夫卡', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2921', source: '케프카', capture: false }),
+      netRegex: { id: '2921', source: 'Kefka', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'Get Outside Destination',
           de: 'Geh aus dem Zielkreis raus',
-          fr: 'Placez-vous à l\'extérieur du cercle d\'arrivée',
+          fr: 'Allez à côté du cercle extérieur',
           cn: '去传送目的地的外圈',
           ko: '마법진 바깥쪽으로 이동',
         },
@@ -122,18 +87,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O8N Aero Assault',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2924', source: 'Kefka', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2924', source: 'Kefka', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2924', source: 'Kefka', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2924', source: 'ケフカ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2924', source: '凯夫卡', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2924', source: '케프카', capture: false }),
+      netRegex: { id: '2924', source: 'Kefka', capture: false },
       response: Responses.knockback(),
     },
     {
       id: 'O8N Flagrant Fire Single',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0017' }),
+      netRegex: { id: '0017' },
       condition: Conditions.targetIsYou(),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -150,18 +110,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O8N Flagrant Fire Stack',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '003E' }),
+      netRegex: { id: '003E' },
       response: Responses.stackMarkerOn(),
     },
     {
       id: 'O8N Thrumming Thunder Real',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '291D', source: 'Kefka', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '291D', source: 'Kefka', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '291D', source: 'Kefka', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '291D', source: 'ケフカ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '291D', source: '凯夫卡', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '291D', source: '케프카', capture: false }),
+      netRegex: { id: '291D', source: 'Kefka', capture: false },
       suppressSeconds: 1,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -178,12 +133,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O8N Thrumming Thunder Fake',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '291B', source: 'Kefka', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '291B', source: 'Kefka', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '291B', source: 'Kefka', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '291B', source: 'ケフカ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '291B', source: '凯夫卡', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '291B', source: '케프카', capture: false }),
+      netRegex: { id: '291B', source: 'Kefka', capture: false },
       suppressSeconds: 1,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -200,12 +150,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O8N Blizzard Fake Donut',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2916', source: 'Kefka', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2916', source: 'Kefka', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2916', source: 'Kefka', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2916', source: 'ケフカ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2916', source: '凯夫卡', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2916', source: '케프카', capture: false }),
+      netRegex: { id: '2916', source: 'Kefka', capture: false },
       suppressSeconds: 1,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -222,19 +167,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O8N Blizzard True Donut',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2919', source: 'Kefka', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2919', source: 'Kefka', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2919', source: 'Kefka', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2919', source: 'ケフカ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2919', source: '凯夫卡', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2919', source: '케프카', capture: false }),
+      netRegex: { id: '2919', source: 'Kefka', capture: false },
       suppressSeconds: 1,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'True Ice: Get in',
           de: 'Wahre Eis: Reingehen',
-          fr: 'Vraie glace : Allez à l\'intérieur',
+          fr: 'Vraie glace : À l\'intérieur',
           ja: '真ブリザガ: 入る',
           cn: '真冰：靠近',
           ko: '진실 블리자가: 안으로',
@@ -244,19 +184,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O8N Blizzard Fake Near',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2914', source: 'Kefka', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2914', source: 'Kefka', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2914', source: 'Kefka', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2914', source: 'ケフカ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2914', source: '凯夫卡', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2914', source: '케프카', capture: false }),
+      netRegex: { id: '2914', source: 'Kefka', capture: false },
       suppressSeconds: 1,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'Fake Ice: Get in',
           de: 'Falsches Eis: Reingehen',
-          fr: 'Fausse glace: Allez à l\'intérieur',
+          fr: 'Fausse glace: À l\'intérieur',
           ja: '偽ブリザガ: 入る',
           cn: '假冰：靠近',
           ko: '거짓 블리자가: 안으로',
@@ -266,12 +201,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O8N Blizzard True Near',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2918', source: 'Kefka', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2918', source: 'Kefka', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2918', source: 'Kefka', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2918', source: 'ケフカ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2918', source: '凯夫卡', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2918', source: '케프카', capture: false }),
+      netRegex: { id: '2918', source: 'Kefka', capture: false },
       suppressSeconds: 1,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -288,12 +218,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O8N Ultima Upsurge',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '292D', source: 'Kefka', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '292D', source: 'Kefka', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '292D', source: 'Kefka', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '292D', source: 'ケフカ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '292D', source: '凯夫卡', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '292D', source: '케프카', capture: false }),
+      netRegex: { id: '292D', source: 'Kefka', capture: false },
       response: Responses.aoe(),
     },
   ],
@@ -301,7 +226,8 @@ const triggerSet: TriggerSet<Data> = {
     {
       'locale': 'de',
       'replaceSync': {
-        'Destroy! Destroy! Destroy! I will destroy it all!': 'Nichts wird mir standhalten, nichts! Alles will ich vernichten!',
+        'Destroy! Destroy! Destroy! I will destroy it all!':
+          'Nichts wird mir standhalten, nichts! Alles will ich vernichten!',
         'Graven Image': 'heilig(?:e|er|es|en) Statue',
         'Kefka': 'Kefka',
       },
@@ -323,9 +249,10 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       'locale': 'fr',
-      'missingTranslations': true,
       'replaceSync': {
         'Graven Image': 'Statue divine',
+        'Destroy! Destroy! Destroy! I will destroy it all!':
+          'Je détruirai le monde entier ! Plus personne ne pourra rêver !',
         'Kefka': 'Kefka',
       },
       'replaceText': {
@@ -347,7 +274,8 @@ const triggerSet: TriggerSet<Data> = {
     {
       'locale': 'ja',
       'replaceSync': {
-        'Destroy! Destroy! Destroy! I will destroy it all!': 'どれもこれもゼ～ンブ、ハカイ、ハカイ、ハカイ！\\s*ゼ～ンブ、ハカイだ！！',
+        'Destroy! Destroy! Destroy! I will destroy it all!':
+          'どれもこれもゼ～ンブ、ハカイ、ハカイ、ハカイ！\\s*ゼ～ンブ、ハカイだ！！',
         'Graven Image': '神々の像',
         'Kefka': 'ケフカ',
       },

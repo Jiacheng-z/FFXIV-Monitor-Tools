@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -10,18 +9,14 @@ export interface Data extends RaidbossData {
 }
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'TheForbiddenLandEurekaAnemos',
   zoneId: ZoneId.TheForbiddenLandEurekaAnemos,
   resetWhenOutOfCombat: false,
   triggers: [
     {
       id: 'Eureka Garm Dragon Voice',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2AD5', source: 'Void Garm', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2AD5', source: 'Nichts-Garm', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2AD5', source: 'Garm Du Néant', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2AD5', source: 'ヴォイドガルム', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2AD5', source: '虚无加姆', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2AD5', source: '보이드 가름', capture: false }),
+      netRegex: { id: '2AD5', source: 'Void Garm', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -37,23 +32,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Eureka Sabotender Stack Marker',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '29EB', source: 'Sabotender Corrido' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '29EB', source: 'Sabotender Corrido' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '29EB', source: 'Pampa Corrido' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '29EB', source: 'サボテンダー・コリード' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '29EB', source: '科里多仙人刺' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '29EB', source: '사보텐더 춤꾼' }),
+      netRegex: { id: '29EB', source: 'Sabotender Corrido' },
       response: Responses.stackMarkerOn(),
     },
     {
       id: 'Eureka Poly Swipe',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2A71', source: 'Polyphemus', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2A71', source: 'Polyphemus', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2A71', source: 'Polyphemus', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2A71', source: 'ポリュペモス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2A71', source: '波吕斐摩斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2A71', source: '폴리페모스', capture: false }),
+      netRegex: { id: '2A71', source: 'Polyphemus', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -69,23 +54,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Eureka Poly Swing',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2A6E', source: 'Polyphemus', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2A6E', source: 'Polyphemus', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2A6E', source: 'Polyphemus', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2A6E', source: 'ポリュペモス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2A6E', source: '波吕斐摩斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2A6E', source: '폴리페모스', capture: false }),
+      netRegex: { id: '2A6E', source: 'Polyphemus', capture: false },
       response: Responses.getOut(),
     },
     {
       id: 'Eureka Poly Eye',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2A73', source: 'Polyphemus', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2A73', source: 'Polyphemus', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2A73', source: 'Polyphemus', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2A73', source: 'ポリュペモス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2A73', source: '波吕斐摩斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2A73', source: '폴리페모스', capture: false }),
+      netRegex: { id: '2A73', source: 'Polyphemus', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -101,12 +76,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Eureka Poly Glower',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2A72', source: 'Polyphemus', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2A72', source: 'Polyphemus', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2A72', source: 'Polyphemus', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2A72', source: 'ポリュペモス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2A72', source: '波吕斐摩斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2A72', source: '폴리페모스', capture: false }),
+      netRegex: { id: '2A72', source: 'Polyphemus', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -122,34 +92,19 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Eureka Caym Eye',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2A64', source: 'Caym', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2A64', source: 'Caym', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2A64', source: 'Caym', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2A64', source: 'カイム', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2A64', source: '盖因', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2A64', source: '카임', capture: false }),
+      netRegex: { id: '2A64', source: 'Caym', capture: false },
       response: Responses.lookAway(),
     },
     {
       id: 'Eureka Fafnir Terror',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '29B7', source: 'Fafnir', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '29B7', source: 'Fafnir', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '29B7', source: 'Fafnir', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '29B7', source: 'ファヴニル', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '29B7', source: '法夫纳', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '29B7', source: '파프니르', capture: false }),
+      netRegex: { id: '29B7', source: 'Fafnir', capture: false },
       response: Responses.lookAway(),
     },
     {
       id: 'Eureka Voidscale Ice',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '29C3', source: 'Voidscale' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '29C3', source: 'Nichtsschuppe' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '29C3', source: 'Vidécailles' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '29C3', source: 'ヴォイドスケイル' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '29C3', source: '虚无鳞龙' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '29C3', source: '보이드비늘' }),
+      netRegex: { id: '29C3', source: 'Voidscale' },
       condition: Conditions.targetIsYou(),
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -166,46 +121,26 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Eureka Pazuzu Dread Wind',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2899', source: 'Pazuzu', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2899', source: 'Pazuzu', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2899', source: 'Pazuzu', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2899', source: 'パズズ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2899', source: '帕祖祖', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2899', source: '파주주', capture: false }),
+      netRegex: { id: '2899', source: 'Pazuzu', capture: false },
       response: Responses.getOut(),
     },
     {
       id: 'Eureka Pazuzu Camisado',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '289F', source: 'Pazuzu' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '289F', source: 'Pazuzu' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '289F', source: 'Pazuzu' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '289F', source: 'パズズ' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '289F', source: '帕祖祖' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '289F', source: '파주주' }),
+      netRegex: { id: '289F', source: 'Pazuzu' },
       condition: Conditions.targetIsYou(),
       response: Responses.tankBuster(),
     },
     {
       id: 'Eureka Pazuzu Cloud of Locust',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2897', source: 'Pazuzu', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2897', source: 'Pazuzu', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2897', source: 'Pazuzu', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2897', source: 'パズズ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2897', source: '帕祖祖', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2897', source: '파주주', capture: false }),
+      netRegex: { id: '2897', source: 'Pazuzu', capture: false },
       response: Responses.outOfMelee(),
     },
     {
       id: 'Eureka Pazuzu Plague of Locust',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2896', source: 'Pazuzu', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2896', source: 'Pazuzu', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2896', source: 'Pazuzu', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2896', source: 'パズズ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2896', source: '帕祖祖', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2896', source: '파주주', capture: false }),
+      netRegex: { id: '2896', source: 'Pazuzu', capture: false },
       alarmText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -221,12 +156,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Eureka Wraith Count',
       type: 'WasDefeated',
-      netRegex: NetRegexes.wasDefeated({ target: 'Shadow Wraith', capture: false }),
-      netRegexDe: NetRegexes.wasDefeated({ target: 'Schatten-Geist', capture: false }),
-      netRegexFr: NetRegexes.wasDefeated({ target: 'Spectre Des Ombres', capture: false }),
-      netRegexJa: NetRegexes.wasDefeated({ target: 'シャドウ・レイス', capture: false }),
-      netRegexCn: NetRegexes.wasDefeated({ target: '暗影幽灵', capture: false }),
-      netRegexKo: NetRegexes.wasDefeated({ target: '그림자 망령', capture: false }),
+      netRegex: { target: 'Shadow Wraith', capture: false },
       soundVolume: 0,
       infoText: (data, _matches, output) => {
         data.wraithCount = (data.wraithCount ?? 0) + 1;
@@ -246,24 +176,91 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Eureka Pazuzu Pop',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatant({ name: 'Pazuzu', capture: false }),
-      netRegexDe: NetRegexes.addedCombatant({ name: 'Pazuzu', capture: false }),
-      netRegexFr: NetRegexes.addedCombatant({ name: 'Pazuzu', capture: false }),
-      netRegexJa: NetRegexes.addedCombatant({ name: 'パズズ', capture: false }),
-      netRegexCn: NetRegexes.addedCombatant({ name: '帕祖祖', capture: false }),
-      netRegexKo: NetRegexes.addedCombatant({ name: '파주주', capture: false }),
+      netRegex: { name: 'Pazuzu', capture: false },
       run: (data) => data.wraithCount = 0,
     },
+    // https://xivapi.com/LogMessage/916
+    // en: 7 minutes have elapsed since your last activity. [...]
+    // There is no network packet for these log lines; so have to use GameLog.
     {
       id: 'Eureka Falling Asleep',
       type: 'GameLog',
-      netRegex: NetRegexes.gameLog({ line: '7 minutes have elapsed since your last activity..*?', capture: false }),
-      netRegexDe: NetRegexes.gameLog({ line: 'Seit deiner letzten Aktivität sind 7 Minuten vergangen..*?', capture: false }),
-      netRegexFr: NetRegexes.gameLog({ line: 'Votre personnage est inactif depuis 7 minutes.*?', capture: false }),
-      netRegexJa: NetRegexes.gameLog({ line: '操作がない状態になってから7分が経過しました。.*?', capture: false }),
-      netRegexCn: NetRegexes.gameLog({ line: '已经7分钟没有进行任何操作.*?', capture: false }),
-      netRegexKo: NetRegexes.gameLog({ line: '7분 동안 아무 조작을 하지 않았습니다..*?', capture: false }),
+      netRegex: { line: '7 minutes have elapsed since your last activity..*?', capture: false },
       response: Responses.wakeUp(),
+    },
+  ],
+  timelineReplace: [
+    {
+      'locale': 'de',
+      'replaceSync': {
+        '7 minutes have elapsed since your last activity..*?':
+          'Seit deiner letzten Aktivität sind 7 Minuten vergangen.',
+        'Caym': 'Caym',
+        'Fafnir': 'Fafnir',
+        'Pazuzu': 'Pazuzu',
+        'Polyphemus': 'Polyphemus',
+        'Sabotender Corrido': 'Sabotender Corrido',
+        'Shadow Wraith': 'Schatten-Geist',
+        'Void Garm': 'Nichts-Garm',
+        'Voidscale': 'Nichtsschuppe',
+      },
+    },
+    {
+      'locale': 'fr',
+      'replaceSync': {
+        '7 minutes have elapsed since your last activity.':
+          'Votre personnage est inactif depuis 7 minutes',
+        'Caym': 'Caym',
+        'Fafnir': 'Fafnir',
+        'Pazuzu': 'Pazuzu',
+        'Polyphemus': 'Polyphemus',
+        'Sabotender Corrido': 'pampa corrido',
+        'Shadow Wraith': 'spectre des ombres',
+        'Void Garm': 'garm du néant',
+        'Voidscale': 'vidécailles',
+      },
+    },
+    {
+      'locale': 'ja',
+      'replaceSync': {
+        '7 minutes have elapsed since your last activity.': '操作がない状態になってから7分が経過しました。',
+        'Caym': 'カイム',
+        'Fafnir': 'ファヴニル',
+        'Pazuzu': 'パズズ',
+        'Polyphemus': 'ポリュペモス',
+        'Sabotender Corrido': '賞金首：サボテンダー・コリード',
+        'Shadow Wraith': 'シャドウ・レイス',
+        'Void Garm': 'ヴォイドガルム',
+        'Voidscale': 'ヴォイドスケイル',
+      },
+    },
+    {
+      'locale': 'cn',
+      'replaceSync': {
+        '7 minutes have elapsed since your last activity.': '已经7分钟没有进行任何操作',
+        'Caym': '盖因',
+        'Fafnir': '法夫纳',
+        'Pazuzu': '帕祖祖',
+        'Polyphemus': '波吕斐摩斯',
+        'Sabotender Corrido': '悬赏魔物：科里多仙人刺',
+        'Shadow Wraith': '暗影幽灵',
+        'Void Garm': '虚无加姆',
+        'Voidscale': '虚无鳞龙',
+      },
+    },
+    {
+      'locale': 'ko',
+      'replaceSync': {
+        '7 minutes have elapsed since your last activity..*?': '7분 동안 아무 조작을 하지 않았습니다',
+        'Caym': '카임',
+        'Fafnir': '파프니르',
+        'Pazuzu': '파주주',
+        'Polyphemus': '폴리페모스',
+        'Sabotender Corrido': '현상수배: 사보텐더 코리도',
+        'Shadow Wraith': '그림자 망령',
+        'Void Garm': '보이드 가름',
+        'Voidscale': '보이드비늘',
+      },
     },
   ],
 };

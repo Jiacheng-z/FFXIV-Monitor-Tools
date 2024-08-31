@@ -37,9 +37,8 @@ export default class Persistor extends Dexie {
 
                   Object.setPrototypeOf(obj, Encounter.prototype);
 
-                  obj.logLines.forEach((l) => {
-                    Object.setPrototypeOf(l, LineEvent.prototype);
-                  });
+                  for (const line of obj.logLines)
+                    Object.setPrototypeOf(line, LineEvent.prototype);
 
                   // Check for encounter upgrade, re-save encounter if it's upgraded.
                   if (obj.upgrade(obj.version)) {
@@ -60,11 +59,11 @@ export default class Persistor extends Dexie {
   }
 
   public async loadEncounter(id: number): Promise<Encounter | undefined> {
-    return new Promise<Encounter | undefined>((res) => {
-      void this.transaction('readwrite', [this.encounters, this.encounterSummaries], async () => {
-        res(await this.encounters.get(id));
-      });
+    let enc: Encounter | undefined;
+    await this.transaction('readwrite', [this.encounters, this.encounterSummaries], async () => {
+      enc = await this.encounters.get(id);
     });
+    return enc;
   }
 
   public async persistEncounter(baseEncounter: Encounter): Promise<unknown> {

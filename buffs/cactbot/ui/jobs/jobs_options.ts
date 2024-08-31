@@ -9,6 +9,7 @@ export interface JobsNonConfigOptions {
   LowerOpacityOutOfCombat: boolean;
   OpacityOutOfCombat: number;
   PlayCountdownSound: boolean;
+  CountdownSoundVolume: number;
   HideWellFedAboveSeconds: number;
   ShowMPTickerOutOfCombat: boolean;
   MidHealthThresholdPercent: number;
@@ -31,8 +32,6 @@ export interface JobsConfigOptions {
   ShowMPNumber: Job[];
   ShowMPTicker: Job[];
 
-  MaxLevel: number;
-
   PerBuffOptions: {
     [s: string]: Partial<BuffInfo>;
   };
@@ -53,6 +52,7 @@ const defaultJobsNonConfigOptions: JobsNonConfigOptions = {
   LowerOpacityOutOfCombat: true,
   OpacityOutOfCombat: 0.5,
   PlayCountdownSound: true,
+  CountdownSoundVolume: 0.3,
   HideWellFedAboveSeconds: 15 * 60,
   ShowMPTickerOutOfCombat: false,
   MidHealthThresholdPercent: 0.8,
@@ -72,12 +72,10 @@ const defaultJobsNonConfigOptions: JobsNonConfigOptions = {
 
 // See user/jobs-example.js for documentation.
 const defaultJobsConfigOptions: JobsConfigOptions = {
-  ShowHPNumber: ['PLD', 'WAR', 'DRK', 'GNB', 'WHM', 'SCH', 'AST', 'BLU'],
-  ShowMPNumber: ['PLD', 'DRK', 'WHM', 'SCH', 'AST', 'BLM', 'BLU'],
+  ShowHPNumber: ['PLD', 'WAR', 'DRK', 'GNB', 'WHM', 'SCH', 'AST', 'SGE', 'BLU'],
+  ShowMPNumber: ['PLD', 'DRK', 'WHM', 'SCH', 'AST', 'SGE', 'BLM', 'BLU'],
 
   ShowMPTicker: ['BLM'],
-
-  MaxLevel: 80,
 
   PerBuffOptions: {
     // This is noisy since it's more or less permanently on you.
@@ -88,9 +86,13 @@ const defaultJobsConfigOptions: JobsConfigOptions = {
   },
 
   FarThresholdOffence: 24,
-  PldMediumMPThreshold: 9400,
-  PldLowMPThreshold: 3600,
+  // cannot cast more spell before Requiescat combo.
+  PldMediumMPThreshold: 5399,
+  // cannot complete Requiescat combo.
+  PldLowMPThreshold: 3599,
+  // Only one MP consuming abilities cast allowed.
   DrkMediumMPThreshold: 5999,
+  // cannot cast MP consuming abilities.
   DrkLowMPThreshold: 2999,
   // One more fire IV and then despair.
   BlmMediumMPThreshold: 3999,

@@ -72,6 +72,7 @@ export type OopsyTriggerField<Data extends OopsyData, MatchType extends NetAnyMa
 
 export type BaseOopsyTrigger<Data extends OopsyData, Type extends TriggerTypes> = {
   id: string;
+  comment?: Partial<LocaleText>;
   condition?: OopsyTriggerField<Data, NetMatches[Type], boolean>;
   delaySeconds?: OopsyTriggerField<Data, NetMatches[Type], number>;
   suppressSeconds?: OopsyTriggerField<Data, NetMatches[Type], number>;
@@ -104,8 +105,17 @@ export type OopsyTrigger<Data extends OopsyData> =
 
 type MistakeMap = { [mistakeId: string]: string };
 
-type SimpleOopsyTriggerSet = {
-  zoneId: ZoneIdType | ZoneIdType[];
+export type DataInitializeFunc<Data extends OopsyData> = () => Omit<Data, keyof OopsyData>;
+
+// This helper takes all of the properties in Type and checks to see if they can be assigned to a
+// blank object, and if so excludes them from the returned union. The `-?` syntax removes the
+// optional modifier from the attribute which prevents `undefined` from being included in the union
+// See also: https://www.typescriptlang.org/docs/handbook/2/mapped-types.html#mapping-modifiers
+type RequiredFieldsAsUnion<Type> = {
+  [key in keyof Type]-?: Record<string, never> extends Pick<Type, key> ? never : key;
+}[keyof Type];
+
+export type OopsyMistakeMapFields = {
   damageWarn?: MistakeMap;
   damageFail?: MistakeMap;
   gainsEffectWarn?: MistakeMap;
@@ -116,9 +126,21 @@ type SimpleOopsyTriggerSet = {
   soloFail?: MistakeMap;
 };
 
-export type OopsyTriggerSet<Data extends OopsyData> = SimpleOopsyTriggerSet & {
+type SimpleOopsyTriggerSet<Data extends OopsyData> = {
+  zoneId: ZoneIdType | ZoneIdType[];
+  zoneLabel?: LocaleText;
   triggers?: OopsyTrigger<Data>[];
-};
+} & OopsyMistakeMapFields;
+
+// If Data contains required properties that are not on OopsyData, require initData
+export type OopsyTriggerSet<Data extends OopsyData = OopsyData> =
+  & SimpleOopsyTriggerSet<Data>
+  & (RequiredFieldsAsUnion<Data> extends RequiredFieldsAsUnion<OopsyData> ? {
+      initData?: DataInitializeFunc<Data>;
+    }
+    : {
+      initData: DataInitializeFunc<Data>;
+    });
 
 export type LooseOopsyTrigger = Partial<
   BaseOopsyTrigger<OopsyData, 'None'> & OopsyTriggerRegex<'None'>

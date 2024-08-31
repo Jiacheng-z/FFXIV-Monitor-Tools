@@ -1,0 +1,180 @@
+### P11S: Anabaseios: The Eleventh Circle (Savage)
+# -ii 8218 8234 822F 8230 8231 8232 81E8 81E9 81EA 81EB 81F2 81F3 81F6 81F7 81F0 81F1 8786 8787 8788 8789 821A 821B 821D 821E 821F 8205 8206 8208 87B6 87B7 87B8 87D0 87D1 8220 820A 822A 81EF 81FF 8200
+
+hideall "--Reset--"
+hideall "--sync--"
+
+0.0 "--Reset--" ActorControl { command: "4000000F" } window 0,100000 jump 0
+
+0.0 "--sync--" InCombat { inGameCombat: "1" } window 0,1
+11.0 "--sync--" StartsUsing { id: "822B", source: "Themis" } window 12,10
+16.0 "Eunomia" Ability { id: "822B", source: "Themis" }
+26.1 "Dike 1" Ability { id: "822D", source: "Themis" }
+29.2 "Dike 2" Ability { id: "822E", source: "Themis" }
+
+42.3 "Jury Overruling" Ability { id: ["81E6", "81E7"], source: "Themis" }
+48.3 "Inevitable Law/Inevitable Sentence" Ability { id: ["81FC", "81FD"], source: "Themis" }
+
+61.7 "Upheld Overruling" Ability { id: ["87D3", "87D4"], source: "Themis" }
+66.3 "Inevitable Law/Inevitable Sentence" Ability { id: ["81FC", "81FD"], source: "Themis" }
+
+70.3 "--middle--" Ability { id: "867F", source: "Themis" }
+79.9 "Divisive Overruling" Ability { id: ["81EC", "81ED"], source: "Themis" }
+84.5 "Inevitable Law/Inevitable Sentence" Ability { id: ["81FC", "81FD"], source: "Themis" }
+
+93.7 "Styx x5" Ability { id: "8217", source: "Themis" } duration 4.4
+
+105.2 "--middle--" Ability { id: "867F", source: "Themis" }
+113.3 "Arcane Revelation" Ability { id: ["820D", "820E"], source: "Themis" }
+120.4 "Dismissal Overruling" Ability { id: ["8784", "8785"], source: "Themis" }
+122.8 "Arche" Ability { id: ["8213", "8214"], source: "Arcane Sphere" }
+125.8 "Inevitable Law/Inevitable Sentence" Ability { id: ["81FC", "81FD"], source: "Themis" }
+
+145.5 "--middle--" Ability { id: "867F", source: "Themis" }
+152.6 "Shadowed Messengers" Ability { id: "8219", source: "Themis" }
+166.9 "Divisive Ruling" Ability { id: "821C", source: "Illusory Themis" }
+169.6 "Divisive Overruling" Ability { id: ["87B3", "87B4"], source: "Themis" }
+174.1 "Inevitable Law/Inevitable Sentence" Ability { id: ["81FC", "81FD"], source: "Themis" }
+179.5 "Upheld Ruling" Ability { id: "8221", source: "Illusory Themis" }
+183.5 "Lightburst" Ability { id: "8224", source: "Illusory Themis" }
+183.5 "Dark Perimeter" Ability { id: "8225", source: "Illusory Themis" }
+
+189.2 "Jury Overruling" Ability { id: ["81E6", "81E7"], source: "Themis" }
+195.2 "Inevitable Law/Inevitable Sentence" Ability { id: ["81FC", "81FD"], source: "Themis" }
+
+203.3 "Styx x6" Ability { id: "8217", source: "Themis" } duration 5.5
+
+220.9 "Lightstream (cast)" Ability { id: "8203", source: "Themis" }
+230.6 "--sync--" Ability { id: "867F", source: "Themis" }
+233.2 "Lightstream x7" Ability { id: "8207", source: "Arcane Cylinder" } duration 6.1
+
+240.1 "Divisive Overruling" Ability { id: ["81EC", "81ED"], source: "Themis" }
+244.7 "Inevitable Law/Inevitable Sentence" Ability { id: ["81FC", "81FD"], source: "Themis" }
+
+256.8 "Eunomia" Ability { id: "822B", source: "Themis" }
+271.2 "Upheld Overruling" Ability { id: ["87D3", "87D4"], source: "Themis" }
+275.6 "Inevitable Law/Inevitable Sentence" Ability { id: ["81FC", "81FD"], source: "Themis" }
+
+286.6 "--middle--" Ability { id: "867F", source: "Themis" }
+293.9 "Dark and Light" Ability { id: "81FE", source: "Themis" }
+307.0 "Arcane Revelation" Ability { id: ["820F", "8210"], source: "Themis" }
+316.7 "Unlucky Lot" Ability { id: ["8215", "8216"], source: "Arcane Sphere" }
+323.1 "Jury Overruling" Ability { id: ["81E6", "81E7"], source: "Themis" }
+329.1 "Inevitable Law/Inevitable Sentence" Ability { id: ["81FC", "81FD"], source: "Themis" }
+341.5 "Divisive Overruling" Ability { id: ["81EC", "81ED"], source: "Themis" }
+346.1 "Inevitable Law/Inevitable Sentence" Ability { id: ["81FC", "81FD"], source: "Themis" }
+353.2 "Emissary's Will" Ability { id: "8202", source: "Themis" }
+
+361.4 "Styx x7" Ability { id: "8217", source: "Themis" } duration 6.6
+
+380.2 "Dike 1" Ability { id: "822D", source: "Themis" }
+383.3 "Dike 2" Ability { id: "822E", source: "Themis" }
+
+395.4 "--middle--" Ability { id: "867F", source: "Themis" }
+402.5 "Dark Current (cast)" Ability { id: "8204", source: "Themis" }
+410.6 "Dark Current x8" Ability { id: "8209", source: "Themis" } duration 7
+412.5 "Blinding Light" Ability { id: "8229", source: "Themis" }
+
+426.6 "Jury Overruling" Ability { id: ["81E6", "81E7"], source: "Themis" }
+432.6 "Inevitable Law/Inevitable Sentence" Ability { id: ["81FC", "81FD"], source: "Themis" }
+446.0 "Upheld Overruling" Ability { id: ["87D3", "87D4"], source: "Themis" }
+450.4 "Inevitable Law/Inevitable Sentence" Ability { id: ["81FC", "81FD"], source: "Themis" }
+
+456.4 "--middle--" Ability { id: "867F", source: "Themis" }
+466.2 "Divisive Overruling" Ability { id: ["81EC", "81ED"], source: "Themis" }
+470.8 "Inevitable Law/Inevitable Sentence" Ability { id: ["81FC", "81FD"], source: "Themis" }
+483.9 "Eunomia" Ability { id: "822B", source: "Themis" }
+
+503.1 "--middle--" Ability { id: "867F", source: "Themis" }
+510.2 "Letter of the Law" Ability { id: "87D2", source: "Themis" }
+517.3 "Twofold Revelation" Ability { id: ["8211", "8212"], source: "Themis" }
+526.4 "Heart of Judgment" Ability { id: "8226", source: "Themis" }
+527.0 "Arche" Ability { id: ["8213", "8214"], source: "Arcane Sphere" }
+527.0 "Unlucky Lot" Ability { id: ["8215", "8216"], source: "Arcane Sphere" }
+529.5 "Upheld Ruling" Ability { id: "8221", source: "Illusory Themis" }
+533.5 "Lightburst" Ability { id: "8224", source: "Illusory Themis" }
+533.5 "Dark Perimeter" Ability { id: "8225", source: "Illusory Themis" }
+538.4 "Explosion" Ability { id: "8227", source: "Themis" }
+541.8 "Divisive Ruling" Ability { id: "821C", source: "Illusory Themis" }
+
+547.4 "Dismissal Overruling" Ability { id: ["8784", "8785"], source: "Themis" }
+553.0 "Inevitable Law/Inevitable Sentence" Ability { id: ["81FC", "81FD"], source: "Themis" }
+
+561.6 "Styx x8" Ability { id: "8217", source: "Themis" } duration 7.7
+
+580.4 "Lightstream (cast)" Ability { id: "8203", source: "Themis" }
+589.5 "--sync--" Ability { id: "867F", source: "Themis" }
+592.6 "Lightstream x7" Ability { id: "8207", source: "Arcane Cylinder" } duration 6.1
+
+598.9 "Divisive Overruling" Ability { id: ["81EC", "81ED"], source: "Themis" }
+603.4 "Inevitable Law/Inevitable Sentence" Ability { id: ["81FC", "81FD"], source: "Themis" }
+
+619.5 "Dike 1" Ability { id: "822D", source: "Themis" }
+622.6 "Dike 2" Ability { id: "822E", source: "Themis" }
+
+638.7 "Jury Overruling" Ability { id: ["81E6", "81E7"], source: "Themis" }
+644.7 "Inevitable Law/Inevitable Sentence" Ability { id: ["81FC", "81FD"], source: "Themis" }
+655.8 "Eunomia" Ability { id: "822B", source: "Themis" }
+
+662.5 "--sync--" StartsUsing { id: "822C", source: "Themis" } window 30,10
+672.5 "Ultimate Verdict (enrage)" Ability { id: "822C", source: "Themis" }
+
+
+# Abilities, ignored and not
+#
+# Themis:8218 Styx share damage
+# Themis:8234 auto
+# Themis:822F Dike MT hit 1
+# Themis:8230 Dike OT hit 1
+# Themis:8231 Dike (new) MT hit 2
+# Themis:8232 Dike (new) OT hit 2
+# Themis:81EA Illusory Glare light puddle during Jury Overruling
+# Themis:81EB Illusory Gloom dark donuts during Jury Overruling
+# Themis:81FC Inevitable Law healer stacks during Jury Overruling, Upheld Overruling
+# Themis:81FD Inevitable Sentence partner stacks during Jury Overruling, Upheld Overruling
+# Themis:81F2 Upheld Overruling light party stack damage
+# Themis:81F3 Upheld Overruling dark tank solo damage
+# Themis:81F6 Lightburst large circle during Upheld Overruling light
+# Themis:81F7 Dark Permimeter large donut during Upheld Overruling dark
+# Themis:81EE Divisive Overruling dividing line light and dark (normally)
+# Themis:87B5 Divisive Overruling dividing line light and dark during Messengers
+# Themis:81EF Divine Ruination expanding line during Divisive Overruling light
+# Themis:81F0 Ripples of Gloom large line (one side) during Divisive Overruling dark
+# Themis:81F1 Ripples of Gloom large line (other side) during Divisive Overruling dark
+# Themis:87B6 Divine Ruination expanding line during Divisive Overruling light Messengers
+# Themis:87B7 Ripples of Gloom large line (one side) during Divisive Overruling dark Messengers
+# Themis:87B8 Ripples of Gloom large line (other side) during Divisive Overruling dark Messengers
+# Themis:8786 Dismissal Overruling light knockback
+# Themis:8787 Dismissal Overruling dark knockback
+# Themis:8788 Inner Light large circle during Dismissal Overruling light
+# Themis:8789 Outer Dark large donut during Dismissal Overruling dark
+# Themis:8205 unknown unnamed ability (Lightstream)
+# Themis:8206 unknown unnamed ability (Dark Current)
+# Themis:8209 Dark Current initial circles
+# Themis:820A Dark Current rotating circles
+# Themis:822A Blinding Light spread damage during Dark Current
+# Themis:81FF Katakrisis light tether failure damage
+# Themis:8200 Katakrisis dark tether failure damage
+#
+# Illusory Themis:81E8 Jury Overruling light protean damage
+# Illusory Themis:81E9 Jury Overruling dark protean damage
+# Illusory Themis:821A Divisive Ruling (light?) clone self-targeted cast during Messengers/Letter
+# Illusory Themis:821B Divisive Ruling (dark?) clone self-targeted cast during Messengers/Letter
+# Illusory Themis:821C Divisive Ruling damage from initial clone lines during Messengers/Letter
+# Illusory Themis:821D Divine Ruination light line expansion clone line during Messengers/Letter
+# Illusory Themis:821E Ripples of Gloom large line (one side) dark clone during Messengers/Letter
+# Illusory Themis:821F Ripples of Gloom large line (other side) dark clone during Messengers/Letter
+# Illusory Themis:87D0 Upheld Ruling clone self-targeted cast during Messengers/Letter
+# Illusory Themis:87D1 Upheld Ruling clone self-targeted cast during Messengers/Letter
+# Illusory Themis:8220 Upheld Overruling light party stack damage from clone during Messengers/Letter
+# Illusory Themis:8221 Upheld Overruling dark tank solo damage from clone during Messengers/Letter
+# Illusory Themis:8224 Lightburst large circle during Upheld Overruling light from clone during Messengers/Letter
+# Illusory Themis:8225 Dark Permimeter large donut during Upheld Overruling dark from clone during Messengers/Letter
+#
+# Arcane Sphere:8213 Arche light portal lasers
+# Arcane Sphere:8214 Arche dark portal lasers
+# Arcane Sphere:8215 Unlucky Lot light sphere explosion
+# Arcane Sphere:8216 Unlucky Lot dark sphere explosion
+#
+# Arcane Cylinder:8207 Lightstream initial ground aoes
+# Arcane Cylinder:8208 Lightstream rotating lasers

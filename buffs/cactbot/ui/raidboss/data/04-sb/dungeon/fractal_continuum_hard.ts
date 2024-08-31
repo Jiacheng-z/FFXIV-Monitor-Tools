@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -10,6 +9,7 @@ export interface Data extends RaidbossData {
 }
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'TheFractalContinuumHard',
   zoneId: ZoneId.TheFractalContinuumHard,
   timelineFile: 'fractal_continuum_hard.txt',
   timelineTriggers: [
@@ -26,12 +26,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Fractal Hard Swipe Servo',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2AE5', source: 'Servomechanical Minotaur', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2AE5', source: 'Servomechanisch(?:e|er|es|en) Minotaurus', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2AE5', source: 'Minotaure Servomécanique', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2AE5', source: 'サーヴォ・ミノタウロス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2AE5', source: '自控化弥诺陶洛斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2AE5', source: '자동제어 미노타우로스', capture: false }),
+      netRegex: { id: '2AE5', source: 'Servomechanical Minotaur', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -47,12 +42,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Fractal Hard Swipe Bio',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '29A2', source: 'Biomanufactured Minotaur', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '29A2', source: 'Biotech-Minotaurus', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '29A2', source: 'Minotaure Biologique', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '29A2', source: 'バイオ・ミノタウロス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '29A2', source: '生化弥诺陶洛斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '29A2', source: '양산체 미노타우로스', capture: false }),
+      netRegex: { id: '29A2', source: 'Biomanufactured Minotaur', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -68,12 +58,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Fractal Hard Swing Servo',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2AE4', source: 'Servomechanical Minotaur', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2AE4', source: 'Servomechanisch(?:e|er|es|en) Minotaurus', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2AE4', source: 'Minotaure Servomécanique', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2AE4', source: 'サーヴォ・ミノタウロス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2AE4', source: '自控化弥诺陶洛斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2AE4', source: '자동제어 미노타우로스', capture: false }),
+      netRegex: { id: '2AE4', source: 'Servomechanical Minotaur', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -89,12 +74,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Fractal Hard Swing Bio',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '29A1', source: 'Biomanufactured Minotaur', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '29A1', source: 'Biotech-Minotaurus', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '29A1', source: 'Minotaure Biologique', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '29A1', source: 'バイオ・ミノタウロス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '29A1', source: '生化弥诺陶洛斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '29A1', source: '양산체 미노타우로스', capture: false }),
+      netRegex: { id: '29A1', source: 'Biomanufactured Minotaur', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -110,12 +90,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Fractal Hard Dragon Voice',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '861', source: 'Servomechanical Chimera', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '861', source: 'Servomechanisch(?:e|er|es|en) Chimära', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '861', source: 'Chimère Servomécanique', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '861', source: 'サーヴォ・キマイラ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '861', source: '自控化奇美拉', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '861', source: '자동제어 키마이라', capture: false }),
+      netRegex: { id: '861', source: 'Servomechanical Chimera', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -131,12 +106,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Fractal Hard Ram Voice Servo',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '860', source: 'Servomechanical Chimera', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '860', source: 'Servomechanisch(?:e|er|es|en) Chimära', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '860', source: 'Chimère Servomécanique', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '860', source: 'サーヴォ・キマイラ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '860', source: '自控化奇美拉', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '860', source: '자동제어 키마이라', capture: false }),
+      netRegex: { id: '860', source: 'Servomechanical Chimera', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -152,12 +122,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Fractal Hard Ram Voice Proto',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '860', source: 'Proto-Chimera', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '860', source: 'Proto-Chimära', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '860', source: 'protochimère', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '860', source: 'プロトキマイラ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '860', source: '原型奇美拉', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '860', source: '프로토 키마이라', capture: false }),
+      netRegex: { id: '860', source: 'Proto-Chimera', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -173,51 +138,31 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Fractal Hard Citadel Buster Motherbit',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '27A5', source: 'Motherbit', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '27A5', source: 'Mutterdrohne', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '27A5', source: 'Drone Mère', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '27A5', source: 'マザービット', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '27A5', source: '浮游炮主板', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '27A5', source: '마더 비트', capture: false }),
+      netRegex: { id: '27A5', source: 'Motherbit', capture: false },
       response: Responses.getBehind(),
     },
     {
       id: 'Fractal Hard Aetheroplasm',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2793', source: 'The Ultima Warrior' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2793', source: 'Ultimativ(?:e|er|es|en) Krieger' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2793', source: 'Ultima-Guerrier' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2793', source: 'アルテマウォリアー' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2793', source: '究极战士' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2793', source: '알테마 워리어' }),
+      netRegex: { id: '2793', source: 'The Ultima Warrior' },
       response: Responses.tankBuster(),
     },
     {
       id: 'Fractal Hard Citadel Buster Warrior',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2792', source: 'The Ultima Warrior', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2792', source: 'Ultimativ(?:e|er|es|en) Krieger', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2792', source: 'Ultima-Guerrier', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2792', source: 'アルテマウォリアー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2792', source: '究极战士', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2792', source: '알테마 워리어', capture: false }),
+      netRegex: { id: '2792', source: 'The Ultima Warrior', capture: false },
       response: Responses.awayFromFront(),
     },
     {
       id: 'Fractal Hard Ceruleum Vent',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2794', source: 'The Ultima Warrior', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2794', source: 'Ultimativ(?:e|er|es|en) Krieger', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2794', source: 'Ultima-Guerrier', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2794', source: 'アルテマウォリアー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2794', source: '究极战士', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2794', source: '알테마 워리어', capture: false }),
+      netRegex: { id: '2794', source: 'The Ultima Warrior', capture: false },
       response: Responses.knockback(),
     },
     {
       id: 'Fractal Hard Ratzon',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0046' }),
+      netRegex: { id: '0046' },
       condition: Conditions.targetIsYou(),
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -234,7 +179,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Fractal Hard Dischord Collect',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: ['004D', '004E'] }),
+      netRegex: { id: ['004D', '004E'] },
       run: (data, matches) => {
         data.dischord ??= {};
         data.dischord[matches.id] = matches.target;
@@ -243,16 +188,16 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Fractal Hard Dischord Resolve',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: ['004D', '004E'] }),
+      netRegex: { id: ['004D', '004E'] },
       condition: Conditions.targetIsYou(),
       delaySeconds: 0.5,
       infoText: (data, matches, output) => {
         const partnerId = matches.id === '004D' ? '004E' : '004D';
         // If for some reason there is no partner, we get a vulnerability or bleed and are sad.
         const partner = data.dischord?.[partnerId];
-        if (!partner)
+        if (partner === undefined)
           return;
-        return output.text!({ player: data.ShortName(partner) });
+        return output.text!({ player: data.party.member(partner) });
       },
       outputStrings: {
         text: {
@@ -268,7 +213,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Fractal Hard Dischord Cleanup',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: ['004D', '004F'], capture: false }),
+      netRegex: { id: ['004D', '004F'], capture: false },
       delaySeconds: 2,
       suppressSeconds: 2,
       run: (data) => {
@@ -278,14 +223,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Fractal Hard Mass Aetheroplasm',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '003E' }),
+      netRegex: { id: '003E' },
       response: Responses.stackMarkerOn(),
     },
     {
       // 477 is Infinite Fire, 478 is Infinite Ice
       id: 'Fractal Hard Infinite Elements',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: ['477', '478'] }),
+      netRegex: { effectId: ['477', '478'] },
       condition: Conditions.targetIsYou(),
       // The circles don't come up until the Ceruleum Vent cast.
       // Rather than doing collection nonsense to be used on the Ceruleum cast,
@@ -320,51 +265,31 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Fractal Hard Death Spin',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['27AD', '27AE'], source: 'The Ultima Beast', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: ['27AD', '27AE'], source: 'Ultimativ(?:e|er|es|en) Bestie', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: ['27AD', '27AE'], source: 'Ultima-Monstre', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: ['27AD', '27AE'], source: 'アルテマビースト', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: ['27AD', '27AE'], source: '究极神兽', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: ['27AD', '27AE'], source: '알테마 비스트', capture: false }),
+      netRegex: { id: ['27AD', '27AE'], source: 'The Ultima Beast', capture: false },
       response: Responses.outOfMelee(),
     },
     {
       id: 'Fractal Hard Aether Bend',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['27AF', '27B0'], source: 'The Ultima Beast', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: ['27AF', '27B0'], source: 'Ultimativ(?:e|er|es|en) Bestie', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: ['27AF', '27B0'], source: 'Ultima-Monstre', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: ['27AF', '27B0'], source: 'アルテマビースト', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: ['27AF', '27B0'], source: '究极神兽', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: ['27AF', '27B0'], source: '알테마 비스트', capture: false }),
+      netRegex: { id: ['27AF', '27B0'], source: 'The Ultima Beast', capture: false },
       response: Responses.getIn(),
     },
     {
       id: 'Fractal Hard Allagan Gravity',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '27B5', source: 'The Ultima Beast', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '27B5', source: 'Ultimativ(?:e|er|es|en) Bestie', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '27B5', source: 'Ultima-Monstre', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '27B5', source: 'アルテマビースト', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '27B5', source: '究极神兽', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '27B5', source: '알테마 비스트', capture: false }),
+      netRegex: { id: '27B5', source: 'The Ultima Beast', capture: false },
       response: Responses.spread(),
     },
     {
       id: 'Fractal Hard Demi Ultima',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '27B2', source: 'The Ultima Beast', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '27B2', source: 'Ultimativ(?:e|er|es|en) Bestie', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '27B2', source: 'Ultima-Monstre', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '27B2', source: 'アルテマビースト', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '27B2', source: '究极神兽', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '27B2', source: '알테마 비스트', capture: false }),
+      netRegex: { id: '27B2', source: 'The Ultima Beast', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Fractal Hard Allagan Flare',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0057' }),
+      netRegex: { id: '0057' },
       response: Responses.awayFrom(),
     },
   ],
@@ -380,7 +305,8 @@ const triggerSet: TriggerSet<Data> = {
         'The Ultima Beast': 'ultimativ(?:e|er|es|en) Bestie',
         'The Ultima Warrior': 'ultimativ(?:e|er|es|en) Krieger',
         'The reality augmentation bay': 'Dilatationskammer',
-        'This humanoid prototype can perfectly replicate': 'Als Referenz wurde die Kraft der Ikonen herangezogen',
+        'This humanoid prototype can perfectly replicate':
+          'Als Referenz wurde die Kraft der Ikonen herangezogen',
         'Utilizing our data on Sophia': 'Nun folgt die Emulierung von Sophia',
         'Vocal Guidance System': 'Stimmleitsystem',
         'Servomechanical Minotaur': 'servomechanisch(?:e|er|es|en) Minotaurus',
@@ -424,8 +350,10 @@ const triggerSet: TriggerSet<Data> = {
         'The Ultima Beast': 'Ultima-monstre',
         'The Ultima Warrior': 'Ultima-guerrier',
         'The reality augmentation bay': 'Salle de distorsion de la réalité',
-        'This humanoid prototype can perfectly replicate': 'Ce modèle exceptionnel est basé sur les non moins exceptionnelles divinités guerrières',
-        'Utilizing our data on Sophia': 'Quoi de mieux pour dominer les divinités guerrières que de retourner leur puissance contre elles?♪',
+        'This humanoid prototype can perfectly replicate':
+          'Ce modèle exceptionnel est basé sur les non moins exceptionnelles divinités guerrières',
+        'Utilizing our data on Sophia':
+          'Quoi de mieux pour dominer les divinités guerrières que de retourner leur puissance contre elles?♪',
         'Vocal Guidance System': 'système de guidage vocal',
         'Servomechanical Minotaur': 'minotaure servomécanique',
         'Servomechanical Chimera': 'chimère servomécanique',

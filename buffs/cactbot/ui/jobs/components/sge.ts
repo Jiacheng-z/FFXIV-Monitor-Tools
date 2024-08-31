@@ -1,43 +1,38 @@
 import EffectId from '../../../resources/effect_id';
-import TimerBar from '../../../resources/timerbar';
 import TimerBox from '../../../resources/timerbox';
 import { JobDetail } from '../../../types/event';
+import { ResourceBox } from '../bars';
 import { kAbility } from '../constants';
 import { PartialFieldMatches } from '../event_emitter';
 
 import { BaseComponent, ComponentInterface } from './base';
 
 export class SGEComponent extends BaseComponent {
-  adderTimer: TimerBar;
+  stacksContainer: HTMLDivElement;
   addersgallStacks: HTMLDivElement[];
   adderstingStacks: HTMLDivElement[];
+  adderTimerBox: ResourceBox;
   eukrasianDosis: TimerBox;
+  phlegma: TimerBox;
   rhizomata: TimerBox;
   lucidDream: TimerBox;
 
   constructor(o: ComponentInterface) {
     super(o);
 
-    this.adderTimer = this.bars.addTimerBar({
-      id: 'sge-timer-addersgall',
-      fgColor: 'sge-color-adder',
-    });
-    this.adderTimer.toward = 'right';
-    this.adderTimer.stylefill = 'fill';
-
     // addersgall and addersting stacks
-    const stacksContainer = document.createElement('div');
-    stacksContainer.id = 'sge-stacks';
-    stacksContainer.classList.add('stacks');
-    this.bars.addJobBarContainer().appendChild(stacksContainer);
+    this.stacksContainer = document.createElement('div');
+    this.stacksContainer.id = 'sge-stacks';
+    this.stacksContainer.classList.add('stacks');
+    this.bars.addJobBarContainer().appendChild(this.stacksContainer);
 
     const addersgallStacksConstainer = document.createElement('div');
     addersgallStacksConstainer.id = 'sge-stacks-addersgall';
-    stacksContainer.appendChild(addersgallStacksConstainer);
+    this.stacksContainer.appendChild(addersgallStacksConstainer);
 
     const adderstingStacksConstainer = document.createElement('div');
     adderstingStacksConstainer.id = 'sge-stacks-addersting';
-    stacksContainer.appendChild(adderstingStacksConstainer);
+    this.stacksContainer.appendChild(adderstingStacksConstainer);
 
     this.addersgallStacks = [];
     this.adderstingStacks = [];
@@ -57,6 +52,11 @@ export class SGEComponent extends BaseComponent {
       notifyWhenExpired: true,
     });
 
+    this.phlegma = this.bars.addProcBox({
+      id: 'sge-proc-phlegma',
+      fgColor: 'sge-color-phlegma',
+    });
+
     this.rhizomata = this.bars.addProcBox({
       id: 'sge-proc-rhizomata',
       fgColor: 'sge-color-rhizomata',
@@ -67,6 +67,9 @@ export class SGEComponent extends BaseComponent {
       fgColor: 'sge-color-lucid',
     });
 
+    this.adderTimerBox = this.bars.addResourceBox({
+      classList: ['sge-color-adder'],
+    });
     this.reset();
   }
 
@@ -75,47 +78,63 @@ export class SGEComponent extends BaseComponent {
       elements[i]?.classList.toggle('active', i < stacks);
   }
 
-  override onUseAbility(id: string): void {
-    if (id === kAbility.LucidDreaming)
-      this.lucidDream.duration = 60;
-    else if (id === kAbility.Rhizomata)
-      this.rhizomata.duration = 90;
+  override onUseAbility(id: string, matches: PartialFieldMatches<'Ability'>): void {
+    switch (id) {
+      case kAbility.Phlegma:
+      case kAbility.Phlegma2:
+      case kAbility.Phlegma3:
+        if (matches.targetIndex === '0') { // Avoid multiple call in AOE
+          this.phlegma.duration = 40 + this.phlegma.value;
+        }
+        break;
+      case kAbility.Rhizomata:
+        this.rhizomata.duration = 90;
+        break;
+      case kAbility.LucidDreaming:
+        this.lucidDream.duration = 60;
+        break;
+    }
   }
 
   override onMobGainsEffectFromYou(id: string, matches: PartialFieldMatches<'GainsEffect'>): void {
     switch (id) {
       case EffectId.EukrasianDosis:
       case EffectId.EukrasianDosisIi:
-      case EffectId.EukrasianDosisIii:
-        this.eukrasianDosis.duration = parseInt(matches.duration ?? '0', 10);
+      case EffectId.EukrasianDosisIii_A38:
+      case EffectId.EukrasianDyskrasia:
+        this.eukrasianDosis.duration = parseInt(matches.duration ?? '0', 10) - 0.5;
         break;
     }
   }
 
   override onJobDetailUpdate(jobDetail: JobDetail['SGE']): void {
-    const adder = jobDetail.addersgall;
-    this._addActiveOnStacks(this.addersgallStacks, adder);
-
+    this._addActiveOnStacks(this.addersgallStacks, jobDetail.addersgall);
     this._addActiveOnStacks(this.adderstingStacks, jobDetail.addersting);
 
-    const adderMs = jobDetail.addersgallMilliseconds;
-    if (adderMs === 0 && adder === 3)
-      this.adderTimer.duration = 0;
-    if (Math.abs(this.adderTimer.elapsed - adderMs / 1000) > 0) {
-      this.adderTimer.duration = 20;
-      this.adderTimer.elapsed = adderMs / 1000;
-    }
+    const adderCountdown = Math.ceil((20000 - jobDetail.addersgallMilliseconds) / 1000);
+    this.adderTimerBox.innerText = jobDetail.addersgall === 3 ? '' : adderCountdown.toString();
+    this.adderTimerBox.parentNode.classList.toggle(
+      'exceed',
+      jobDetail.addersgall === 2 && adderCountdown < 6 || jobDetail.addersgall === 3,
+    );
   }
 
   override onStatChange({ gcdSpell }: { gcdSpell: number }): void {
-    this.eukrasianDosis.valuescale = gcdSpell;
     this.eukrasianDosis.threshold = gcdSpell + 1;
-    this.lucidDream.valuescale = gcdSpell;
+    this.phlegma.threshold = gcdSpell + 1;
+    this.rhizomata.threshold = gcdSpell + 1;
     this.lucidDream.threshold = gcdSpell + 1;
+    // Due to unknown reason, if you sync to below lv45,
+    // addersgall is not availble but memory still says you have 3 addersgall.
+    // To avoid confusing, hide stacksContainer below lv45.
+    // FIXME: return lv0 when loaded without status change, default show.
+    this.stacksContainer.classList.toggle('hide', this.player.level < 45 && this.player.level > 0);
   }
 
   override reset(): void {
-    this.adderTimer.duration = 0;
     this.eukrasianDosis.duration = 0;
+    this.phlegma.duration = 0;
+    this.rhizomata.duration = 0;
+    this.lucidDream.duration = 0;
   }
 }

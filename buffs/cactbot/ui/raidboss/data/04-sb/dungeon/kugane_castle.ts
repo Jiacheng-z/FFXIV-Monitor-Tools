@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -8,6 +7,7 @@ import { TriggerSet } from '../../../../../types/trigger';
 export type Data = RaidbossData;
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'KuganeCastle',
   zoneId: ZoneId.KuganeCastle,
   timelineFile: 'kugane_castle.txt',
   timelineTriggers: [
@@ -28,18 +28,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Kugane Castle Kenki Release',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1E93', source: 'Zuiko-Maru', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1E93', source: 'Zuiko-Maru', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1E93', source: 'Zuiko Maru', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1E93', source: 'ズイコウ丸', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1E93', source: '瑞光丸', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1E93', source: '즈이코우마루', capture: false }),
+      netRegex: { id: '1E93', source: 'Zuiko-Maru', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Kugane Castle Helm Crack',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '003E' }),
+      netRegex: { id: '003E' },
       response: Responses.stackMarkerOn(),
     },
     {
@@ -47,7 +42,7 @@ const triggerSet: TriggerSet<Data> = {
       // but the Harakiri Koshu uses Cordage on the tether target after about 4 seconds.
       id: 'Kugane Castle Cordage',
       type: 'Tether',
-      netRegex: NetRegexes.tether({ id: '0011' }),
+      netRegex: { id: '0011' },
       condition: Conditions.targetIsYou(),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -64,19 +59,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Kugane Castle Clockwork Raiton',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '005F' }),
+      netRegex: { id: '005F' },
       condition: Conditions.targetIsYou(),
       response: Responses.spread(),
     },
     {
       id: 'Kugane Castle Gratuity',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '1EAE', source: 'Kageyama', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: '1EAE', source: 'Kageyama', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: '1EAE', source: 'Kageyama', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: '1EAE', source: 'カゲヤマ', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: '1EAE', source: '景山', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: '1EAE', source: '카게야마', capture: false }),
+      netRegex: { id: '1EAE', source: 'Kageyama', capture: false },
       suppressSeconds: 15, // No point in notifying repeatedly
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -93,12 +83,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Kugane Castle Dragons Lair',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '1EA6', source: 'Yojimbo', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: '1EA6', source: 'Yojinbo', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: '1EA6', source: 'Yojimbo', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: '1EA6', source: 'ヨウジンボウ', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: '1EA6', source: '保镖', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: '1EA6', source: '요우진보', capture: false }),
+      netRegex: { id: '1EA6', source: 'Yojimbo', capture: false },
       response: Responses.killAdds(),
     },
   ],

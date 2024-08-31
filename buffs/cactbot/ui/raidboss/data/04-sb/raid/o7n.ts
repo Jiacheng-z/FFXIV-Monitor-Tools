@@ -1,4 +1,3 @@
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -10,6 +9,7 @@ export type Data = RaidbossData;
 
 // O7N - Sigmascape 3.0 Normal
 const triggerSet: TriggerSet<Data> = {
+  id: 'SigmascapeV30',
   zoneId: ZoneId.SigmascapeV30,
   timelineFile: 'o7n.txt',
   timelineTriggers: [
@@ -34,52 +34,32 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O7N Diffractive Plasma',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '276E', source: 'Guardian', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '276E', source: 'Wächter', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '276E', source: 'Gardien', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '276E', source: 'ガーディアン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '276E', source: '守护者', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '276E', source: '가디언', capture: false }),
+      netRegex: { id: '276E', source: 'Guardian', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'O7N Magitek Ray',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '276B', source: 'Guardian', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '276B', source: 'Wächter', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '276B', source: 'Gardien', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '276B', source: 'ガーディアン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '276B', source: '守护者', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '276B', source: '가디언', capture: false }),
+      netRegex: { id: '276B', source: 'Guardian', capture: false },
       response: Responses.awayFromFront(),
     },
     {
       id: 'O7N Arm And Hammer',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '276C', source: 'Guardian' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '276C', source: 'Wächter' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '276C', source: 'Gardien' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '276C', source: 'ガーディアン' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '276C', source: '守护者' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '276C', source: '가디언' }),
+      netRegex: { id: '276C', source: 'Guardian' },
       response: Responses.tankBuster(),
     },
     {
       id: 'O7N Shockwave',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2766', source: 'Guardian', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2766', source: 'Wächter', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2766', source: 'Gardien', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2766', source: 'ガーディアン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2766', source: '守护者', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2766', source: '가디언', capture: false }),
+      netRegex: { id: '2766', source: 'Guardian', capture: false },
       response: Responses.knockback(),
     },
     {
       id: 'O7N Diffractive Laser',
       type: 'GainsEffect',
       // Air Force Simulation effect happens ~3 seconds before Diffractive Laser (2761) starts casting.
-      netRegex: NetRegexes.gainsEffect({ effectId: '5D2', capture: false }),
+      netRegex: { effectId: '5D2', capture: false },
       // All of the various hidden Guardian adds all get this effect.
       suppressSeconds: 5,
       response: Responses.getOut(),
@@ -87,18 +67,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O7N Prey',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '001E' }),
+      netRegex: { id: '001E' },
       response: Responses.preyOn('info'),
     },
     {
       id: 'O7N Bomb Deployment',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2762', source: 'Guardian', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2762', source: 'Wächter', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2762', source: 'Gardien', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2762', source: 'ガーディアン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2762', source: '守护者', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2762', source: '가디언', capture: false }),
+      netRegex: { id: '2762', source: 'Guardian', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -113,12 +88,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O7N Demon Simulation',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2752', source: 'Guardian', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2752', source: 'Wächter', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2752', source: 'Gardien', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2752', source: 'ガーディアン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2752', source: '守护者', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2752', source: '가디언', capture: false }),
+      netRegex: { id: '2752', source: 'Guardian', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -137,8 +107,8 @@ const triggerSet: TriggerSet<Data> = {
       // 7110 = Dadaluma
       // 7111 = Ultros
       // 7113 = Bibliotaph
-      netRegex: NetRegexes.addedCombatantFull({ npcNameId: ['7018', '7110', '7111', '7113'] }),
-      infoText: (data, matches, output) => {
+      netRegex: { npcNameId: ['7018', '7110', '7111', '7113'] },
+      infoText: (_data, matches, output) => {
         return output.kill!({ name: matches.name });
       },
       outputStrings: {
@@ -203,7 +173,7 @@ const triggerSet: TriggerSet<Data> = {
         'Arm And Hammer': 'Marteau stratégique',
         'Aura Cannon': 'Rayon d\'aura',
         'Bomb Deployment': 'Déploiement de bombes',
-        'Burst/Darkness': 'Explosion Magique',
+        'Burst/Darkness': 'Explosion/Aura',
         'Chain Cannon': 'Canon automatique',
         'Chakra Burst': 'Explosion d\'aura',
         'Demon Simulation': 'Chargement : démon',

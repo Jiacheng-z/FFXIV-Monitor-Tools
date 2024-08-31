@@ -1,12 +1,12 @@
 // TODO: Fix import/order
 /* eslint-disable import/order */
-import { CactbotConfigurator } from '../ui/config/config';
-import { isLang, Lang, langToLocale } from './languages';
 import { BaseOptions } from '../types/data';
 import { CactbotLoadUserRet, SavedConfig, SavedConfigEntry } from '../types/event';
 import { LocaleObject, LocaleText } from '../types/trigger';
-import { addOverlayListener, callOverlayHandler } from './overlay_plugin_api';
+import { CactbotConfigurator } from '../ui/config/config';
+import { isLang, Lang, langToLocale } from './languages';
 import { UnreachableCode } from './not_reached';
+import { addOverlayListener, callOverlayHandler } from './overlay_plugin_api';
 
 // TODO:
 // The convention of "import X as _X; const X = _X;" is currently
@@ -27,8 +27,9 @@ import { Responses as _Responses } from './responses';
 const Responses = _Responses;
 import _Outputs from './outputs';
 const Outputs = _Outputs;
-import _Util from './util';
+import _Util, { Directions as _Directions } from './util';
 const Util = _Util;
+const Directions = _Directions;
 import _ZoneId from './zone_id';
 const ZoneId = _ZoneId;
 import _ZoneInfo from './zone_info';
@@ -36,10 +37,16 @@ const ZoneInfo = _ZoneInfo;
 
 // Convince TypeScript and eslint that these are used.  TypeScript doesn't have a great way
 // to disable individual rules, so this is safer than disabling all rules.
-console.assert(
-  Conditions && ContentType && NetRegexes && Regexes &&
-    Responses && Outputs && Util && ZoneId && ZoneInfo,
-);
+console.assert(Conditions);
+console.assert(ContentType);
+console.assert(NetRegexes);
+console.assert(Regexes);
+console.assert(Responses);
+console.assert(Outputs);
+console.assert(Util);
+console.assert(Directions);
+console.assert(ZoneId);
+console.assert(ZoneInfo);
 
 // TODO: move all of these to config.js?
 export type UserFileCallback = (
@@ -51,20 +58,39 @@ export type UserFileCallback = (
 export type ConfigValue = string | number | boolean;
 export type ConfigEntry = {
   id: string;
+  comment?: Partial<LocaleText>;
   name: LocaleText;
-  type: 'checkbox' | 'select' | 'float' | 'integer' | 'directory' | 'html';
+  type: 'checkbox' | 'select' | 'float' | 'integer' | 'string' | 'directory' | 'html';
   html?: LocaleText;
-  default: ConfigValue;
+  // This must be a valid option even if there is a setterFunc, as `_getOptionLeafHelper`
+  // for the config ui reads from the SavedConfig directly rather than post-setterFunc.
+  default: ConfigValue | ((options: BaseOptions) => ConfigValue);
   debug?: boolean;
   debugOnly?: boolean;
   // For select.
   options?: LocaleObject<{ [selectText: string]: string }>;
-  setterFunc?: (options: BaseOptions, value: SavedConfigEntry) => void;
+  // An optional function to transform a saved/default value into the final value.
+  // `value` is the saved/default value.  `isDefault` is true if `value` is implicitly the default.
+  // The data flow here is `default` -> ui -> `setterFunc` -> final data in one direction only.
+  // `setterFunc` should be used for one setting -> multiple options, or for select option
+  // renaming, or for data cleanup if needed.
+  setterFunc?: (
+    value: SavedConfigEntry,
+    options: BaseOptions,
+    isDefault: boolean,
+  ) => ConfigValue | void | undefined;
 };
+
+export interface NamedConfigEntry<NameUnion> extends Omit<ConfigEntry, 'id'> {
+  id: NameUnion;
+}
 
 export type OptionsTemplate = {
   buildExtraUI?: (base: CactbotConfigurator, container: HTMLElement) => void;
-  processExtraOptions?: (options: BaseOptions, savedConfig: SavedConfigEntry) => void;
+  processExtraOptions?: (
+    options: BaseOptions,
+    savedConfig: SavedConfigEntry,
+  ) => void;
   options: ConfigEntry[];
 };
 
@@ -82,6 +108,14 @@ class UserConfig {
       SoundAlertsEnabled: true,
       SpokenAlertsEnabled: false,
       GroupSpokenAlertsEnabled: false,
+      SystemInfo: {
+        cactbotVersion: '0.0.0.0',
+        overlayPluginVersion: '0.0.0.0',
+        ffxivPluginVersion: '0.0.0.0',
+        actVersion: '0.0.0.0',
+        gameRegion: 'International',
+      },
+      Debug: false,
     };
   }
 
@@ -218,7 +252,7 @@ class UserConfig {
     this.loadUserFiles(overlayName, options, callback);
   }
 
-  loadUserFiles(overlayName: string, options: BaseOptions, callback: () => void) {
+  loadUserFiles(overlayName: string, options: BaseOptions, callback: () => void, loadCss = true) {
     const readOptions = callOverlayHandler({
       call: 'cactbotLoadData',
       overlay: 'options',
@@ -228,18 +262,29 @@ class UserConfig {
       // The basePath isn't using for anything other than cosmetic printing of full paths,
       // so replace any slashes here for uniformity.  In case anybody is using cactbot on
       // Linux (?!?), support any style of slashes elsewhere.
-      const basePath = e.detail.userLocation.replace(/[/\\]*$/, '') + '\\';
+      const basePath = `${e.detail.userLocation.replace(/[/\\]*$/, '')}\\`;
       const localFiles = e.detail.localUserFiles;
+
+      options.SystemInfo = {
+        cactbotVersion: e.detail.cactbotVersion,
+        overlayPluginVersion: e.detail.overlayPluginVersion,
+        ffxivPluginVersion: e.detail.ffxivPluginVersion,
+        actVersion: e.detail.actVersion,
+        gameRegion: e.detail.gameRegion,
+      };
 
       // The plugin auto-detects the language, so set this first.
       // If options files want to override it, they can for testing.
 
       // Backward compatibility (language is now separated to three types.)
+      /* eslint-disable deprecation/deprecation */
       if (e.detail.language) {
         options.ParserLanguage = e.detail.language;
         options.ShortLocale = e.detail.language;
         options.DisplayLanguage = e.detail.language;
       }
+      /* eslint-enable deprecation/deprecation */
+
       // Parser Language
       if (e.detail.parserLanguage) {
         options.ParserLanguage = e.detail.parserLanguage;
@@ -249,7 +294,7 @@ class UserConfig {
       // System Language
       if (e.detail.systemLocale) {
         options.SystemLocale = e.detail.systemLocale;
-        let shortLocale = e.detail.systemLocale.substring(0, 2);
+        let shortLocale = e.detail.systemLocale.slice(0, 2);
         if (shortLocale === 'zh')
           shortLocale = 'cn';
         if (isLang(shortLocale))
@@ -274,15 +319,27 @@ class UserConfig {
       // processOptions needs to be called whether or not there are
       // any userOptions saved, as it sets up the defaults.
       this.savedConfig = (await readOptions)?.data ?? {};
-      this.processOptions(
-        options,
-        this.savedConfig[overlayName] ?? {},
-        this.optionTemplates[overlayName],
-      );
+
+      const template = this.optionTemplates[overlayName];
+      if (template !== undefined) {
+        const savedConfig = this.savedConfig[overlayName] ?? {};
+        this.processOptions(
+          options,
+          options,
+          savedConfig,
+          template.options,
+        );
+
+        // For things like raidboss that build extra UI, also give them a chance
+        // to handle anything that has been set on that UI.
+        if (template.processExtraOptions)
+          template.processExtraOptions(options, savedConfig);
+      }
 
       // If the overlay has a "Debug" setting, set to true via the config tool,
       // then also print out user files that have been loaded.
-      const printUserFile = options.Debug ? (x: string) => console.log(x) : () => {/* noop */};
+      const debug = options.Debug !== undefined && options.Debug !== false;
+      const printUserFile = debug ? (x: string) => console.log(x) : () => {/* noop */};
 
       // With user files being arbitrary javascript, and having multiple files
       // in user folders, it's possible for later files to accidentally remove
@@ -303,13 +360,13 @@ class UserConfig {
       // and so we use `any` here.  The only operation done on this field is a !==
       // for change detection to see if the the user file has modified it.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const variableTracker: { [fieldName: string]: any } = {};
+      const variableTracker: { [fieldName: string]: unknown } = {};
 
       if (localFiles) {
         // localFiles may be null if there is no valid user directory.
         const sortedFiles = this.sortUserFiles(Object.keys(localFiles));
         const jsFiles = this.filterUserFiles(sortedFiles, overlayName, '.js');
-        const cssFiles = this.filterUserFiles(sortedFiles, overlayName, '.css');
+        const cssFiles = loadCss ? this.filterUserFiles(sortedFiles, overlayName, '.css') : [];
 
         for (const jsFile of jsFiles) {
           try {
@@ -317,7 +374,8 @@ class UserConfig {
             this.evalUserFile(localFiles[jsFile] ?? '', options);
 
             for (const field of warnOnVariableResetMap[overlayName] ?? []) {
-              if (variableTracker[field] && variableTracker[field] !== options[field]) {
+              const value = variableTracker[field];
+              if (value !== null && value !== undefined && value !== options[field]) {
                 // Ideally users should do something like `Options.Triggers.push([etc]);`
                 // instead of `Options.Triggers = [etc];`
                 console.log(
@@ -338,14 +396,14 @@ class UserConfig {
         // This is a bit awkward to handle skin settings here, but
         // doing it after user config files and before user css files
         // allows user css to override skin-specific css as well.
-        if (options.Skin)
+        if (options.Skin !== undefined)
           this.handleSkin(options.Skin);
 
         for (const cssFile of cssFiles) {
           printUserFile(`local user file: ${basePath}${cssFile}`);
           const userCssText = document.createElement('style');
           const contents = localFiles[cssFile];
-          if (contents)
+          if (contents !== undefined)
             userCssText.innerText = contents;
           const head = document.getElementsByTagName('head')[0];
           if (head)
@@ -354,8 +412,7 @@ class UserConfig {
       }
 
       // Post this callback so that the js and css can be executed first.
-      if (callback)
-        callback();
+      callback();
 
       void callOverlayHandler({ call: 'cactbotRequestState' });
     };
@@ -379,15 +436,8 @@ class UserConfig {
   handleSkin(skinName: string) {
     if (!skinName || skinName === 'default')
       return;
-
-    let basePath = document.location.toString();
-    const slashIdx = basePath.lastIndexOf('/');
-    if (slashIdx !== -1)
-      basePath = basePath.substr(0, slashIdx);
-    if (basePath.slice(-1) !== '/')
-      basePath += '/';
-    const skinHref = basePath + 'skins/' + skinName + '/' + skinName + '.css';
-    this.appendCSSLink(skinHref);
+    const skinCSSRelativeHref = `skins/${skinName}/${skinName}.css`;
+    this.appendCSSLink(skinCSSRelativeHref);
   }
   appendJSLink(src: string) {
     const userJS = document.createElement('script');
@@ -407,26 +457,40 @@ class UserConfig {
     if (head)
       head.appendChild(userCSS);
   }
-  processOptions(options: BaseOptions, savedConfig: SavedConfigEntry, template?: OptionsTemplate) {
+  processOptions(
+    options: BaseOptions,
+    output: { [key: string]: unknown },
+    savedConfig: SavedConfigEntry,
+    templateOptions?: ConfigEntry[],
+  ) {
     // Take options from the template, find them in savedConfig,
     // and apply them to options. This also handles setting
     // defaults for anything in the template, even if it does not
     // exist in savedConfig.
 
     // Not all overlays have option templates.
-    if (!template)
+    if (templateOptions === undefined)
       return;
 
-    const templateOptions = template.options || [];
     for (const opt of templateOptions) {
       // Grab the saved value or the default to set in options.
 
-      let value: SavedConfigEntry = opt.default;
+      let value: SavedConfigEntry;
+      if (typeof opt.default === 'function')
+        value = opt.default(options);
+      else
+        value = opt.default;
+
+      let isDefault = true;
       if (typeof savedConfig === 'object' && !Array.isArray(savedConfig)) {
         if (opt.id in savedConfig) {
           const newValue = savedConfig[opt.id];
-          if (newValue !== undefined)
+          // Empty strings are always treated as default values.
+          // This means that the user has entered something and then cleared it.
+          if (newValue !== undefined && newValue !== '') {
             value = newValue;
+            isDefault = false;
+          }
         }
       }
 
@@ -434,26 +498,23 @@ class UserConfig {
       // If this doesn't exist, just set the value directly.
       // Option template ids are identical to field names on Options.
       if (opt.setterFunc) {
-        opt.setterFunc(options, value);
+        const setValue = opt.setterFunc(value, options, isDefault);
+        if (setValue !== undefined)
+          output[opt.id] = setValue;
       } else if (opt.type === 'integer') {
         if (typeof value === 'number')
-          options[opt.id] = Math.floor(value);
+          output[opt.id] = Math.floor(value);
         else if (typeof value === 'string')
-          options[opt.id] = parseInt(value);
+          output[opt.id] = parseInt(value);
       } else if (opt.type === 'float') {
         if (typeof value === 'number')
-          options[opt.id] = value;
+          output[opt.id] = value;
         else if (typeof value === 'string')
-          options[opt.id] = parseFloat(value);
+          output[opt.id] = parseFloat(value);
       } else {
-        options[opt.id] = value;
+        output[opt.id] = value;
       }
     }
-
-    // For things like raidboss that build extra UI, also give them a chance
-    // to handle anything that has been set on that UI.
-    if (template.processExtraOptions)
-      template.processExtraOptions(options, savedConfig);
   }
   addUnlockText(lang: Lang) {
     const unlockText = {
@@ -486,8 +547,8 @@ if (typeof document !== 'undefined') {
   document.addEventListener('onOverlayStateUpdate', (e) => {
     const docClassList = document.documentElement.classList;
     if (e.detail.isLocked)
-      docClassList.remove('resizeHandle', 'unlocked');
+      docClassList.remove('resize-handle', 'unlocked');
     else
-      docClassList.add('resizeHandle', 'unlocked');
+      docClassList.add('resize-handle', 'unlocked');
   });
 }

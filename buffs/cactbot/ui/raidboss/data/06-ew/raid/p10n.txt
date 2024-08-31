@@ -1,0 +1,81 @@
+### P10N: Anabaseios: The Tenth Circle
+#
+# -ii 825E 825F 8261 8263 8277 8279 825B 825C 8266 8269 8271 8273 8274 826B 826C 826D 826E 86B5 86B6 86B7 86B8
+#
+# Ignored Ids:
+# 825[EF] - 'Bury' action/damage from Pandaemoniac Pillars
+# 8261      'Imprisonment' extra
+# 8263      'Cannonspawn' extra
+# 8277      'Pandaemonic Meldown' extra
+# 8279      'Soul Grasp' extra
+# 825[BC]   'Entangling Web' extra
+# 8266      'Pandaemonic Ray' extra
+# 8269      'Touchdown' extra
+# 8271      'Parted Plumes' blades
+# 827[34]   'Wicked Step' individual towers
+# 826[B-E]  Supplemental AoE damage from 'Harrowing Hell'
+# 86B[5-8]  Supplemental AoE damage from 'Harrowing Hell'
+
+# Note: The boss's name has a Unicode character (æ)  which is causing syncs to fail.
+# The character is manually escaped in the syncs with the correct codepoint (U+00E6).
+# Entry names use "ae" as separate characters to ensure proper UI display.
+
+hideall "--Reset--"
+hideall "--sync--"
+
+0.0 "--Reset--" ActorControl { command: "4000000F" } window 0,100000 jump 0
+
+0.0 "--sync--" InCombat { inGameCombat: "1" } window 0,1
+7.9 "--sync--" StartsUsing { id: "8259", source: "Pand\\u00e6monium" } window 15,15
+10.9 "Silkspit (marked)" Ability { id: "8259", source: "Pand\\u00e6monium" }
+23.0 "Silkspit (resolves)" Ability { id: "825A", source: "Pand\\u00e6monium" }
+35.4 "Pandaemoniac Pillars" Ability { id: "825D", source: "Pand\\u00e6monium" }
+43.4 "Imprisonment" Ability { id: "8262", source: "Pand\\u00e6monium" }
+50.1 "Ultima" Ability { id: "827B", source: "Pand\\u00e6monium" }
+59.9 "Pandaemoniac Pillars" Ability { id: "825D", source: "Pand\\u00e6monium" }
+67.8 "Cannonspawn" Ability { id: "8264", source: "Pand\\u00e6monium" }
+74.6 "--sync--" Ability { id: "87A2", source: "Pand\\u00e6monium" }
+80.0 "Pandaemoniac Meltdown" Ability { id: "8276", source: "Pand\\u00e6monium" }
+90.1 "Soul Grasp" Ability { id: "8278", source: "Pand\\u00e6monium" }
+101.3 "Entangling Web" Ability { id: "8721", source: "Pand\\u00e6monium" }
+114.7 "Silkspit (marked)" Ability { id: "8259", source: "Pand\\u00e6monium" }
+126.7 "Silkspit (resolves)" Ability { id: "825A", source: "Pand\\u00e6monium" }
+140.4 "Pandaemoniac Ray" Ability { id: "826[57]", source: "Pand\\u00e6monium" }
+150.6 "Parted Plumes" Ability { id: "8270", source: "Pand\\u00e6monium" } duration 11
+165.2 "--sync--" Ability { id: "87A2", source: "Pand\\u00e6monium" }
+170.5 "Pandaemoniac Meltdown" Ability { id: "8276", source: "Pand\\u00e6monium" }
+179.7 "Soul Grasp" Ability { id: "8278", source: "Pand\\u00e6monium" }
+191.0 "Entangling Web" Ability { id: "8721", source: "Pand\\u00e6monium" }
+210.5 "Pandaemoniac Ray" Ability { id: "826[57]", source: "Pand\\u00e6monium" }
+224.6 "Touchdown" Ability { id: "8268", source: "Pand\\u00e6monium" }
+233.8 "Ultima" Ability { id: "827B", source: "Pand\\u00e6monium" }
+245.7 "Pandaemoniac Pillars" Ability { id: "825D", source: "Pand\\u00e6monium" }
+253.5 "Imprisonment/Cannonspawn" Ability { id: "826[24]", source: "Pand\\u00e6monium" }
+259.3 "--sync--" Ability { id: "87A2", source: "Pand\\u00e6monium" }
+264.7 "Pandaemoniac Meltdown" Ability { id: "8276", source: "Pand\\u00e6monium" }
+272.8 "Harrowing Hell (x8)" Ability { id: "826A", source: "Pand\\u00e6monium" } duration 12
+289.0 "Harrowing Hell (knockback)" Ability { id: "826F", source: "Pand\\u00e6monium" }
+304.2 "Parted Plumes" Ability { id: "8270", source: "Pand\\u00e6monium" } duration 11
+322.7 "Wicked Step" Ability { id: "8272", source: "Pand\\u00e6monium" }
+
+# Loop begins here
+339.5 "Pandaemoniac Pillars" Ability { id: "825D", source: "Pand\\u00e6monium" }
+347.4 "Imprisonment/Cannonspawn" Ability { id: "826[24]", source: "Pand\\u00e6monium" }
+353.2 "Entangling Web" Ability { id: "8721", source: "Pand\\u00e6monium" }
+374.4 "Touchdown" Ability { id: "8268", source: "Pand\\u00e6monium" }
+380.5 "--sync--" Ability { id: "87A2", source: "Pand\\u00e6monium" }
+385.8 "Pandaemoniac Meltdown" Ability { id: "8276", source: "Pand\\u00e6monium" }
+392.0 "Silkspit (marked)" Ability { id: "8259", source: "Pand\\u00e6monium" }
+404.0 "Silkspit (resolves)" Ability { id: "825A", source: "Pand\\u00e6monium" }
+417.7 "Pandaemoniac Ray" Ability { id: "826[57]", source: "Pand\\u00e6monium" }
+423.8 "Parted Plumes" Ability { id: "8270", source: "Pand\\u00e6monium" } duration 11
+442.4 "Soul Grasp" Ability { id: "8278", source: "Pand\\u00e6monium" }
+457.6 "Ultima" Ability { id: "827B", source: "Pand\\u00e6monium" }
+
+# Repeat
+485.0 "Pandaemoniac Pillars" Ability { id: "825D", source: "Pand\\u00e6monium" } window 50,50 jump 339.5
+492.9 "Imprisonment/Cannonspawn" Ability { id: "826[24]", source: "Pand\\u00e6monium" }
+498.7 "Entangling Web" Ability { id: "8721", source: "Pand\\u00e6monium" }
+519.9 "Touchdown" Ability { id: "8268", source: "Pand\\u00e6monium" }
+525.9 "--sync--" Ability { id: "87A2", source: "Pand\\u00e6monium" }
+531.3 "Pandaemoniac Meltdown" Ability { id: "8276", source: "Pand\\u00e6monium" }

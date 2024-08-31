@@ -39,7 +39,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
     {
       id: 'SuzakuEx Ruthless Refrain',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '32DB', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '32DB', ...playerDamageFields }),
       deathReason: (_data, matches) => {
         return {
           id: matches.targetId,
@@ -47,7 +47,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
           text: {
             en: 'Knocked off',
             de: 'Runtergefallen',
-            fr: 'A été assommé(e)',
+            fr: 'Renversé(e)',
             ja: 'ノックバック',
             cn: '击退坠落',
             ko: '넉백',
@@ -58,7 +58,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
     {
       id: 'SuzakuEx Mesmerizing Melody',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '32DA', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '32DA', ...playerDamageFields }),
       deathReason: (_data, matches) => {
         return {
           id: matches.targetId,
@@ -66,7 +66,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
           text: {
             en: 'Knocked off',
             de: 'Runtergefallen',
-            fr: 'A été assommé(e)',
+            fr: 'Renversé(e)',
             ja: 'ノックバック',
             cn: '击退坠落',
             ko: '넉백',

@@ -13,11 +13,111 @@ export class DRKComponent extends BaseComponent {
   darksideBox: TimerBox;
   comboTimer: TimerBar;
   bloodWeapon: TimerBox;
+  saltedEarth: TimerBox;
+  livingShadow: TimerBox;
+
+  constructor(o: ComponentInterface) {
+    super(o);
+    this.bloodBox = this.bars.addResourceBox({
+      classList: ['drk-color-blood'],
+    });
+
+    this.darksideBox = this.bars.addProcBox({
+      fgColor: 'drk-color-darkside',
+      threshold: 10,
+    });
+
+    this.comboTimer = this.bars.addTimerBar({
+      id: 'drk-timers-combo',
+      fgColor: 'combo-color',
+    });
+
+    this.bloodWeapon = this.bars.addProcBox({
+      id: 'drk-procs-bloodweapon',
+      fgColor: 'drk-color-bloodweapon',
+    });
+
+    this.saltedEarth = this.bars.addProcBox({
+      id: 'drk-procs-saltedearth',
+      fgColor: 'drk-color-saltedearth',
+    });
+
+    this.livingShadow = this.bars.addProcBox({
+      id: 'drk-procs-livingshadow',
+      fgColor: 'drk-color-livingshadow',
+    });
+
+    this.reset();
+  }
+
+  override onStatChange({ gcdSkill }: { gcdSkill: number }): void {
+    this.bloodWeapon.threshold = gcdSkill + 1;
+    this.saltedEarth.threshold = gcdSkill + 1;
+    this.livingShadow.threshold = gcdSkill + 1;
+  }
+
+  override onJobDetailUpdate(jobDetail: JobDetail['DRK']): void {
+    const blood = jobDetail.blood;
+    if (this.bloodBox.innerText !== blood.toString()) {
+      this.bloodBox.innerText = blood.toString();
+      const p = this.bloodBox.parentNode;
+      if (blood < 50) {
+        p.classList.add('low');
+        p.classList.remove('pulse');
+      } else if (blood < 80) {
+        p.classList.remove('low');
+        p.classList.remove('pulse');
+      } else {
+        p.classList.remove('low');
+        p.classList.add('pulse');
+      }
+    }
+
+    const seconds = jobDetail.darksideMilliseconds / 1000.0;
+    if (!this.darksideBox.duration || seconds > this.darksideBox.value)
+      this.darksideBox.duration = seconds;
+  }
+
+  override onCombo(skill: string, combo: ComboTracker): void {
+    this.comboTimer.duration = 0;
+    if (combo.isFinalSkill)
+      return;
+    if (skill)
+      this.comboTimer.duration = this.comboDuration;
+  }
+
+  override onUseAbility(id: string): void {
+    switch (id) {
+      case kAbility.BloodWeapon:
+      case kAbility.Delirium:
+        this.bloodWeapon.duration = 60;
+        break;
+      case kAbility.SaltedEarth:
+        this.saltedEarth.duration = 90;
+        break;
+      case kAbility.LivingShadow:
+        this.livingShadow.duration = 120;
+        break;
+    }
+  }
+
+  override reset(): void {
+    this.comboTimer.duration = 0;
+    this.bloodWeapon.duration = 0;
+    this.saltedEarth.duration = 0;
+    this.livingShadow.duration = 0;
+    this.darksideBox.duration = 0;
+  }
+}
+
+export class DRK6xComponent extends BaseComponent {
+  bloodBox: ResourceBox;
+  darksideBox: TimerBox;
+  comboTimer: TimerBar;
+  bloodWeapon: TimerBox;
   delirium: TimerBox;
   livingShadow: TimerBox;
   tid1 = 0;
-  tid2 = 0;
-  tid3 = 0;
 
   constructor(o: ComponentInterface) {
     super(o);
@@ -53,6 +153,12 @@ export class DRKComponent extends BaseComponent {
     this.reset();
   }
 
+  override onStatChange({ gcdSkill }: { gcdSkill: number }): void {
+    this.bloodWeapon.threshold = gcdSkill + 1;
+    this.delirium.threshold = gcdSkill + 1;
+    this.livingShadow.threshold = gcdSkill * 4 + 1;
+  }
+
   override onJobDetailUpdate(jobDetail: JobDetail['DRK']): void {
     const blood = jobDetail.blood;
     if (this.bloodBox.innerText !== blood.toString()) {
@@ -86,55 +192,15 @@ export class DRKComponent extends BaseComponent {
   override onUseAbility(id: string): void {
     switch (id) {
       case kAbility.BloodWeapon: {
-        this.bloodWeapon.duration = 10;
-        this.bloodWeapon.threshold = 10;
-        this.bloodWeapon.fg = computeBackgroundColorFrom(
-          this.bloodWeapon,
-          'drk-color-bloodweapon.active',
-        );
-        this.tid1 = window.setTimeout(() => {
-          this.bloodWeapon.duration = 50;
-          this.bloodWeapon.threshold = this.player.gcdSkill * 2;
-          this.bloodWeapon.fg = computeBackgroundColorFrom(
-            this.bloodWeapon,
-            'drk-color-bloodweapon',
-          );
-        }, 10000);
+        this.bloodWeapon.duration = 60;
         break;
       }
-      case kAbility.Delirium: {
-        if (this.is5x) {
-          this.delirium.duration = 10.5;
-          this.delirium.threshold = 20;
-          this.delirium.fg = computeBackgroundColorFrom(this.delirium, 'drk-color-delirium.active');
-          this.tid2 = window.setTimeout(() => {
-            this.delirium.duration = 79.5;
-            this.delirium.threshold = this.player.gcdSkill * 2;
-            this.delirium.fg = computeBackgroundColorFrom(this.delirium, 'drk-color-delirium');
-          }, 10000);
-          break;
-        } else {
-          this.delirium.duration = 60;
-          break;
-        }
-      }
-      case kAbility.LivingShadow: {
-        this.livingShadow.duration = 24;
-        this.livingShadow.threshold = 24;
-        this.livingShadow.fg = computeBackgroundColorFrom(
-          this.livingShadow,
-          'drk-color-livingshadow.active',
-        );
-        this.tid3 = window.setTimeout(() => {
-          this.livingShadow.duration = 96;
-          this.livingShadow.threshold = this.player.gcdSkill * 4;
-          this.livingShadow.fg = computeBackgroundColorFrom(
-            this.livingShadow,
-            'drk-color-livingshadow',
-          );
-        }, 24000);
+      case kAbility.Delirium:
+        this.delirium.duration = 60;
         break;
-      }
+      case kAbility.LivingShadow:
+        this.livingShadow.duration = 120;
+        break;
     }
   }
 
@@ -144,14 +210,8 @@ export class DRKComponent extends BaseComponent {
     this.bloodWeapon.threshold = this.player.gcdSkill * 2;
     this.bloodWeapon.fg = computeBackgroundColorFrom(this.bloodWeapon, 'drk-color-bloodweapon');
     this.delirium.duration = 0;
-    this.delirium.threshold = this.player.gcdSkill * 2;
-    this.delirium.fg = computeBackgroundColorFrom(this.delirium, 'drk-color-delirium');
     this.livingShadow.duration = 0;
-    this.livingShadow.threshold = this.player.gcdSkill * 4;
-    this.livingShadow.fg = computeBackgroundColorFrom(this.livingShadow, 'drk-color-livingshadow');
     this.darksideBox.duration = 0;
     window.clearTimeout(this.tid1);
-    window.clearTimeout(this.tid2);
-    window.clearTimeout(this.tid3);
   }
 }

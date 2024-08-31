@@ -1,6 +1,5 @@
 import logDefinitions from '../../resources/netlog_defs';
-import NetRegexes from '../../resources/netregexes';
-import { addOverlayListener } from '../../resources/overlay_plugin_api';
+import NetRegexes, { commonNetRegex } from '../../resources/netregexes';
 import PartyTracker from '../../resources/party';
 import { PlayerChangedDetail } from '../../resources/player_override';
 import Regexes from '../../resources/regexes';
@@ -14,6 +13,7 @@ import { Job, Role } from '../../types/job';
 import { Matches, NetMatches } from '../../types/net_matches';
 import { CactbotBaseRegExp } from '../../types/net_trigger';
 import {
+  DataInitializeFunc,
   LooseOopsyTrigger,
   LooseOopsyTriggerSet,
   MistakeMap,
@@ -38,14 +38,15 @@ import {
   kFieldFlags,
   kShiftFlagValues,
   playerDamageFields,
-  ShortNamify,
+  playerTargetFields,
   Translate,
   UnscrambleDamage,
 } from './oopsy_common';
 import { OopsyOptions } from './oopsy_options';
 import { PlayerStateTracker } from './player_state_tracker';
 
-const actorControlFadeInCommand = '40000010';
+const actorControlFadeInCommandPre62 = '40000010';
+const actorControlFadeInCommand = '4000000F';
 
 const partyWipeText = {
   en: 'Party Wipe',
@@ -75,7 +76,7 @@ const latePullText = {
 };
 
 // Internal trigger id for early pull
-const earlyPullTriggerId = 'General Early Pull';
+export const earlyPullTriggerId = 'General Early Pull';
 
 const isOopsyMistake = (x: OopsyMistake | OopsyDeathReason): x is OopsyMistake => 'type' in x;
 
@@ -93,13 +94,13 @@ export class DamageTracker {
   private ignoreZone = false;
   private timers: number[] = [];
   private triggers: ProcessedOopsyTrigger[] = [];
-  private partyTracker: PartyTracker;
   private playerStateTracker: PlayerStateTracker;
   private countdownEngageRegex: RegExp;
   private countdownStartRegex: RegExp;
   private countdownCancelRegex: RegExp;
-  private abilityFullRegex: CactbotBaseRegExp<'Ability'>;
+  private abilityRegex: CactbotBaseRegExp<'Ability'>;
   private wipeCactbotEcho: CactbotBaseRegExp<'GameLog'>;
+  private wipeEndEcho: CactbotBaseRegExp<'GameLog'>;
   private combatState = new CombatState(this);
   private engageTime?: number;
   private firstPuller?: string;
@@ -113,39 +114,37 @@ export class DamageTracker {
 
   private job: Job = 'NONE';
   private role: Role = 'none';
-  private me?: string;
+  private me = '';
   private zoneName?: string;
   private zoneId: ZoneIdType = ZoneId.MatchAll;
   private contentType = 0;
+  protected dataInitializers: {
+    file: string;
+    func: DataInitializeFunc<OopsyData>;
+  }[] = [];
 
   constructor(
     private options: OopsyOptions,
     private collector: MistakeCollector,
+    partyTracker: PartyTracker,
     private dataFiles: OopsyFileData,
   ) {
-    this.partyTracker = new PartyTracker();
-    addOverlayListener('PartyChanged', (e) => {
-      this.partyTracker.onPartyChanged(e);
-      this.playerStateTracker.OnPartyChanged();
-    });
     const timestampCallback = (timestamp: number, callback: (timestamp: number) => void) =>
       this.OnRequestTimestampCallback(timestamp, callback);
     this.playerStateTracker = new PlayerStateTracker(
       this.options,
-      this.partyTracker,
       this.collector,
+      partyTracker,
       timestampCallback,
     );
 
     const lang = this.options.ParserLanguage;
-    this.countdownEngageRegex = LocaleNetRegex.countdownEngage[lang] ||
-      LocaleNetRegex.countdownEngage['en'];
-    this.countdownStartRegex = LocaleNetRegex.countdownStart[lang] ||
-      LocaleNetRegex.countdownStart['en'];
-    this.countdownCancelRegex = LocaleNetRegex.countdownCancel[lang] ||
-      LocaleNetRegex.countdownCancel['en'];
-    this.abilityFullRegex = NetRegexes.abilityFull();
-    this.wipeCactbotEcho = NetRegexes.echo({ line: 'cactbot wipe.*?' });
+    this.countdownEngageRegex = LocaleNetRegex.countdownEngage[lang];
+    this.countdownStartRegex = LocaleNetRegex.countdownStart[lang];
+    this.countdownCancelRegex = LocaleNetRegex.countdownCancel[lang];
+    this.abilityRegex = NetRegexes.ability();
+    this.wipeCactbotEcho = commonNetRegex.cactbotWipeEcho;
+    this.wipeEndEcho = commonNetRegex.userWipeEcho;
 
     this.data = this.GetDataObject();
     this.Reset();
@@ -161,13 +160,20 @@ export class DamageTracker {
   }
 
   GetDataObject(): OopsyData {
-    return {
-      me: this.me ?? '',
+    const data: OopsyData = {
+      me: this.me,
       job: this.job,
       role: this.role,
-      party: this.partyTracker,
+      party: this.playerStateTracker.partyTracker,
       inCombat: this.inCombat,
-      ShortName: (name?: string) => ShortNamify(name, this.options.PlayerNicks),
+      IsImmune: (targetId?: string) => {
+        // 52 = hallowed, 199 = holmgang, 32A = living, 32B = walking, 72C = bolide
+        const invulnIds = ['52', '199', '32A', '32B', '72C'];
+        if (this.playerStateTracker.HasEffect(targetId, invulnIds))
+          return true;
+        return false;
+      },
+      ShortName: (name?: string) => this.playerStateTracker.partyTracker.member(name).toString(),
       IsPlayerId: IsPlayerId,
       DamageFromMatches: (matches: NetMatches['Ability']) => UnscrambleDamage(matches?.damage),
       options: this.options,
@@ -175,6 +181,23 @@ export class DamageTracker {
       // Deprecated.
       ParseLocaleFloat: parseFloat,
     };
+
+    let triggerData = {};
+
+    for (const initObj of this.dataInitializers) {
+      const init = initObj.func;
+      const initData = init();
+      if (typeof initData === 'object') {
+        triggerData = {
+          ...triggerData,
+          ...initData,
+        };
+      } else {
+        console.log(`Error in file: ${initObj.file}: these triggers may not work;
+        initData function returned invalid object: ${init.toString()}`);
+      }
+    }
+    return { ...triggerData, ...data };
   }
 
   // TODO: this shouldn't clear timers and triggers
@@ -191,7 +214,7 @@ export class DamageTracker {
   private OnEngage(timestamp: number) {
     this.engageTime = timestamp;
 
-    if (!this.firstPuller || !this.combatState.startTime)
+    if (this.firstPuller === undefined || !this.combatState.startTime)
       return;
 
     const seconds = (timestamp - this.combatState.startTime) / 1000;
@@ -211,7 +234,7 @@ export class DamageTracker {
 
   private UpdateLastTimestamp(splitLine: string[]): void {
     const timeField = splitLine[logDefinitions.None.fields.timestamp];
-    if (timeField)
+    if (timeField !== undefined)
       this.lastTimestamp = new Date(timeField).getTime();
   }
 
@@ -247,8 +270,8 @@ export class DamageTracker {
         }
         if (this.countdownStartRegex.test(line) || this.countdownCancelRegex.test(line))
           this.combatState.Reset();
-        if (this.wipeCactbotEcho.test(line))
-          this.OnPartyWipeEvent(this.lastTimestamp);
+        if (this.wipeCactbotEcho.test(line) || this.wipeEndEcho.test(line))
+          this.Wipe(this.lastTimestamp);
         break;
       case logDefinitions.ChangeZone.type:
         {
@@ -257,6 +280,9 @@ export class DamageTracker {
           if (name !== undefined && id !== undefined)
             this.SetZone(this.lastTimestamp, name, parseInt(id, 16));
         }
+        break;
+      case logDefinitions.PartyList.type:
+        this.playerStateTracker.OnPartyList(line, splitLine);
         break;
       case logDefinitions.ChangedPlayer.type:
         this.playerStateTracker.OnChangedPlayer(line, splitLine);
@@ -282,8 +308,11 @@ export class DamageTracker {
         this.playerStateTracker.OnHoTDoT(line, splitLine);
         break;
       case logDefinitions.ActorControl.type:
-        if (splitLine[logDefinitions.ActorControl.fields.command] === actorControlFadeInCommand) {
-          this.OnPartyWipeEvent(this.lastTimestamp);
+        if (
+          splitLine[logDefinitions.ActorControl.fields.command] === actorControlFadeInCommand ||
+          splitLine[logDefinitions.ActorControl.fields.command] === actorControlFadeInCommandPre62
+        ) {
+          this.Wipe(this.lastTimestamp);
           this.playerStateTracker.OnWipe(line, splitLine);
         }
         break;
@@ -299,13 +328,13 @@ export class DamageTracker {
   }
 
   private OnAbilityEvent(line: string, splitLine: string[]): void {
-    if (this.firstPuller || this.combatState.startTime)
+    if (this.firstPuller !== undefined || this.combatState.startTime)
       return;
 
     // This is kind of obnoxious to have to regex match every ability line that's already split.
     // But, it turns it into a usable match object.
     // TODO: use log definitions here??
-    const lineMatches = this.abilityFullRegex.exec(line);
+    const lineMatches = this.abilityRegex.exec(line);
     if (!lineMatches || !lineMatches.groups)
       return;
 
@@ -315,15 +344,15 @@ export class DamageTracker {
     // Plenary Indulgence also appears to prepend confession stacks.
     // UNKNOWN: Can these two happen at the same time?
     const origFlags = splitLine[kFieldFlags];
-    if (origFlags && kShiftFlagValues.includes(origFlags)) {
+    if (origFlags !== undefined && kShiftFlagValues.includes(origFlags)) {
       matches.flags = splitLine[kFieldFlags + 2] ?? matches.flags;
       matches.damage = splitLine[kFieldFlags + 3] ?? matches.damage;
     }
 
     // Length 1 or 2.
-    let lowByte = matches.flags.substr(-2);
+    let lowByte = matches.flags.slice(-2);
     if (lowByte.length === 1)
-      lowByte = '0' + lowByte;
+      lowByte = `0${lowByte}`;
 
     if (!kAttackFlags.includes(lowByte))
       return;
@@ -340,7 +369,7 @@ export class DamageTracker {
       this.firstPuller = '???';
 
     if (this.engageTime) {
-      const seconds = ((Date.now() - this.engageTime) / 1000);
+      const seconds = (Date.now() - this.engageTime) / 1000;
       if (seconds >= this.options.MinimumTimeForPullMistake) {
         const mistakeStr = Translate(this.options.DisplayLanguage, latePullText) ?? '';
         const text = `${mistakeStr} (${seconds.toFixed(1)}s)`;
@@ -376,9 +405,9 @@ export class DamageTracker {
     let matches: Matches = {};
     // If using named groups, treat matches.groups as matches
     // so triggers can do things like matches.target.
-    if (execMatches?.groups) {
+    if (execMatches.groups) {
       matches = execMatches.groups;
-    } else if (execMatches) {
+    } else {
       // If there are no matching groups, reproduce the old js logic where
       // groups ended up as the original RegExpExecArray object
       execMatches.forEach((value, idx) => {
@@ -386,7 +415,7 @@ export class DamageTracker {
       });
     }
 
-    if (trigger.id) {
+    if (trigger.id !== undefined) {
       if (!IsTriggerEnabled(this.options, trigger.id))
         return;
 
@@ -402,27 +431,30 @@ export class DamageTracker {
       f: OopsyTriggerField<OopsyData, Matches, OopsyField>,
       matches: Matches,
     ) => {
-      return (typeof f === 'function') ? f(this.data, matches) : f;
+      return typeof f === 'function' ? f(this.data, matches) : f;
     };
 
     if ('condition' in trigger) {
       const condition = ValueOrFunction(trigger.condition, matches);
-      if (!condition)
+      if (condition === undefined || condition === null || condition === false)
         return;
     }
 
     const delayField = 'delaySeconds' in trigger
       ? ValueOrFunction(trigger.delaySeconds, matches)
       : 0;
-    const delaySeconds = !delayField || typeof delayField !== 'number' ? 0 : delayField;
+    const delaySeconds = delayField === undefined || delayField === null || delayField === false ||
+        typeof delayField !== 'number'
+      ? 0
+      : delayField;
 
     const suppress = 'suppressSeconds' in trigger
       ? ValueOrFunction(trigger.suppressSeconds, matches)
       : 0;
-    if (trigger.id && typeof suppress === 'number' && suppress > 0)
-      this.triggerSuppress[trigger.id] = triggerTime + (suppress * 1000);
+    if (trigger.id !== undefined && typeof suppress === 'number' && suppress > 0)
+      this.triggerSuppress[trigger.id] = triggerTime + suppress * 1000;
 
-    const f = (() => {
+    const f = () => {
       if ('mistake' in trigger) {
         const m = ValueOrFunction(trigger.mistake, matches);
         if (typeof m === 'object') {
@@ -437,14 +469,14 @@ export class DamageTracker {
       }
       if ('deathReason' in trigger) {
         const ret = ValueOrFunction(trigger.deathReason, matches);
-        if (ret && typeof ret === 'object' && !Array.isArray(ret)) {
+        if (ret !== null && typeof ret === 'object' && !Array.isArray(ret)) {
           if (!isOopsyMistake(ret))
             this.playerStateTracker.OnDeathReason(timestamp, ret);
         }
       }
       if ('run' in trigger)
         ValueOrFunction(trigger.run, matches);
-    });
+    };
 
     if (delaySeconds <= 0)
       f();
@@ -452,7 +484,7 @@ export class DamageTracker {
       this.timers.push(window.setTimeout(f, delaySeconds * 1000));
   }
 
-  OnPartyWipeEvent(timestamp: number): void {
+  Wipe(timestamp: number): void {
     this.playerStateTracker.OnMistakeObj(timestamp, {
       type: 'wipe',
       text: partyWipeText,
@@ -479,6 +511,7 @@ export class DamageTracker {
     const zoneInfo = ZoneInfo[this.zoneId];
     this.contentType = zoneInfo?.contentType ?? 0;
 
+    this.combatState.StopCombat(timestamp);
     this.combatState.Reset();
     this.playerStateTracker.ClearTriggerSets();
     this.playerStateTracker.OnChangeZone(timestamp, zoneName, zoneId);
@@ -511,7 +544,7 @@ export class DamageTracker {
       const trigger: OopsyTrigger<OopsyData> = {
         id: key,
         type: 'Ability',
-        netRegex: NetRegexes.abilityFull({ id: id, ...playerDamageFields }),
+        netRegex: NetRegexes.ability({ id: id, ...playerDamageFields }),
         mistake: (_data, matches) => {
           return {
             type: type,
@@ -534,7 +567,7 @@ export class DamageTracker {
       const trigger: OopsyTrigger<OopsyData> = {
         id: key,
         type: 'GainsEffect',
-        netRegex: NetRegexes.gainsEffect({ effectId: id }),
+        netRegex: NetRegexes.gainsEffect({ effectId: id, ...playerTargetFields }),
         mistake: (_data, matches) => {
           return {
             type: type,
@@ -559,14 +592,19 @@ export class DamageTracker {
       const trigger: OopsyTrigger<OopsyData> = {
         id: key,
         type: 'Ability',
-        netRegex: NetRegexes.abilityFull({ type: '22', id: id, ...playerDamageFields }),
+        netRegex: NetRegexes.ability({ type: '22', id: id, ...playerDamageFields }),
         mistake: (_data, matches) => {
+          // Some single target damage is still marked as AOEActionEffect type 22, so check
+          // the number of targets that it hits.
+          const numTargets = parseInt(matches.targetCount);
+          if (numTargets === 1 || isNaN(numTargets))
+            return;
           return {
             type: type,
             blame: matches.target,
             reportId: matches.targetId,
             triggerType: 'Share',
-            text: GetShareMistakeText(matches.ability),
+            text: GetShareMistakeText(matches.ability, numTargets),
           };
         },
       };
@@ -582,7 +620,7 @@ export class DamageTracker {
       const trigger: OopsyTrigger<OopsyData> = {
         id: key,
         type: 'Ability',
-        netRegex: NetRegexes.abilityFull({ type: '21', id: id, ...playerDamageFields }),
+        netRegex: NetRegexes.ability({ type: '21', id: id, ...playerDamageFields }),
         mistake: (_data, matches) => {
           return {
             type: type,
@@ -601,7 +639,7 @@ export class DamageTracker {
     this.ProcessDataFiles();
 
     // Wait for datafiles / jobs / zone events / localization.
-    if (!this.triggerSets || !this.me || !this.zoneName)
+    if (!this.triggerSets || this.zoneName === undefined)
       return;
 
     this.Reset();
@@ -653,10 +691,19 @@ export class DamageTracker {
       }
 
       if (this.options.Debug) {
-        if (set.filename)
+        if (set.filename !== undefined)
           console.log(`Loading ${set.filename}`);
         else
           console.log('Loading user triggers for zone');
+      }
+
+      const setFilename = set.filename ?? 'Unknown';
+
+      if (set.initData) {
+        this.dataInitializers.push({
+          file: setFilename,
+          func: set.initData,
+        });
       }
 
       this.AddDamageTriggers('warn', set.damageWarn);
@@ -706,25 +753,23 @@ export class DamageTracker {
     // Only run this once.
     if (this.triggerSets)
       return;
-    if (!this.me)
-      return;
 
     this.triggerSets = this.options.Triggers;
     for (const [filename, json] of Object.entries<LooseOopsyTriggerSet>(this.dataFiles)) {
       if (typeof json !== 'object') {
-        console.error('Unexpected JSON from ' + filename + ', expected an object');
+        console.error(`Unexpected JSON from ${filename}, expected an object`);
         continue;
       }
       const hasZoneRegex = 'zoneRegex' in json;
       const hasZoneId = 'zoneId' in json;
       if (!hasZoneRegex && !hasZoneId || hasZoneRegex && hasZoneId) {
-        console.error('Unexpected JSON from ' + filename + ', need one of zoneRegex/zoneID');
+        console.error(`Unexpected JSON from ${filename}, need one of zoneRegex/zoneID`);
         continue;
       }
 
       if ('triggers' in json) {
         if (typeof json.triggers !== 'object' || !(json.triggers.length >= 0)) {
-          console.error('Unexpected JSON from ' + filename + ', expected triggers to be an array');
+          console.error(`Unexpected JSON from ${filename}, expected triggers to be an array`);
           continue;
         }
       }

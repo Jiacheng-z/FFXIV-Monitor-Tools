@@ -1,3 +1,4 @@
+import NetRegexes from '../../resources/netregexes';
 import { addOverlayListener, callOverlayHandler } from '../../resources/overlay_plugin_api';
 
 import '../../resources/defaults.css';
@@ -11,9 +12,9 @@ addOverlayListener('ChangeZone', (e) => {
 addOverlayListener('onInCombatChangedEvent', (e) => {
   const inCombat = document.getElementById('inCombat');
   if (inCombat) {
-    inCombat.innerText = `inCombat: act: ${
-      e.detail.inACTCombat ? 'yes' : 'no'
-    } game: ${(e.detail.inGameCombat ? 'yes' : 'no')}`;
+    inCombat.innerText = `inCombat: act: ${e.detail.inACTCombat ? 'yes' : 'no'} game: ${
+      e.detail.inGameCombat ? 'yes' : 'no'
+    }`;
   }
 });
 
@@ -55,7 +56,7 @@ addOverlayListener('onPlayerChangedEvent', (e) => {
       jobInfo.innerText =
         `${detail.jobDetail.blood} | ${detail.jobDetail.darksideMilliseconds} | ${detail.jobDetail.darkArts.toString()} | ${detail.jobDetail.livingShadowMilliseconds}`;
     } else if (detail.job === 'GNB' && detail.jobDetail) {
-      jobInfo.innerText = `${detail.jobDetail.cartridges}${detail.jobDetail.continuationState}`;
+      jobInfo.innerText = `${detail.jobDetail.cartridges} | ${detail.jobDetail.continuationState}`;
     } else if (detail.job === 'PLD' && detail.jobDetail) {
       jobInfo.innerText = detail.jobDetail.oath.toString();
     } else if (detail.job === 'BRD' && detail.jobDetail) {
@@ -68,13 +69,13 @@ addOverlayListener('onPlayerChangedEvent', (e) => {
         detail.jobDetail.steps.join(', ')
       }] | ${detail.jobDetail.currentStep}`;
     } else if (detail.job === 'NIN' && detail.jobDetail) {
-      jobInfo.innerText = `${detail.jobDetail.hutonMilliseconds} | ${detail.jobDetail.ninkiAmount}`;
+      jobInfo.innerText = `${detail.jobDetail.ninkiAmount} | ${detail.jobDetail.kazematoi}`;
     } else if (detail.job === 'DRG' && detail.jobDetail) {
       jobInfo.innerText =
-        `${detail.jobDetail.bloodMilliseconds} | ${detail.jobDetail.lifeMilliseconds} | ${detail.jobDetail.eyesAmount}`;
+        `${detail.jobDetail.bloodMilliseconds} | ${detail.jobDetail.lifeMilliseconds} | ${detail.jobDetail.eyesAmount} | ${detail.jobDetail.firstmindsFocus}`;
     } else if (detail.job === 'BLM' && detail.jobDetail) {
       jobInfo.innerText =
-        `${detail.jobDetail.umbralStacks} (${detail.jobDetail.umbralMilliseconds}) | ${detail.jobDetail.umbralHearts} | ${detail.jobDetail.polyglot} ${detail.jobDetail.enochian.toString()} (${detail.jobDetail.nextPolyglotMilliseconds}) | ${detail.jobDetail.paradox.toString()}`;
+        `${detail.jobDetail.umbralStacks} (${detail.jobDetail.umbralMilliseconds}) | ${detail.jobDetail.umbralHearts} | ${detail.jobDetail.polyglot} ${detail.jobDetail.enochian.toString()} (${detail.jobDetail.nextPolyglotMilliseconds}) | ${detail.jobDetail.paradox.toString()} | ${detail.jobDetail.astralSoulStacks}`;
     } else if (detail.job === 'THM' && detail.jobDetail) {
       jobInfo.innerText =
         `${detail.jobDetail.umbralStacks} (${detail.jobDetail.umbralMilliseconds})`;
@@ -82,26 +83,26 @@ addOverlayListener('onPlayerChangedEvent', (e) => {
       jobInfo.innerText =
         `${detail.jobDetail.lilyStacks} (${detail.jobDetail.lilyMilliseconds}) | ${detail.jobDetail.bloodlilyStacks}`;
     } else if (detail.job === 'SMN' && detail.jobDetail) {
-      // TODO: remove if-check after CN/KR patch 6.0 released.
-      if ('bahamutStance' in detail.jobDetail) {
-        jobInfo.innerText =
-          `${detail.jobDetail.aetherflowStacks} | ${detail.jobDetail.dreadwyrmStacks} | ${detail.jobDetail.bahamutStance} | ${detail.jobDetail.bahamutSummoned} (${detail.jobDetail.stanceMilliseconds}) | ${detail.jobDetail.phoenixReady}`;
-      } else if ('tranceMilliseconds' in detail.jobDetail) {
-        jobInfo.innerText =
-          `${detail.jobDetail.aetherflowStacks} | ${detail.jobDetail.tranceMilliseconds} | ${detail.jobDetail.attunement} | ${detail.jobDetail.attunementMilliseconds} | ${detail
-            .jobDetail.activePrimal ?? '-'} | [${
-            detail.jobDetail.usableArcanum.join(', ')
-          }] | ${detail.jobDetail.nextSummoned}`;
-      }
+      jobInfo.innerText =
+        `${detail.jobDetail.aetherflowStacks} | ${detail.jobDetail.tranceMilliseconds} | ${detail.jobDetail.attunement} | ${detail.jobDetail.attunementMilliseconds} | ${
+          detail
+            .jobDetail.activePrimal ?? '-'
+        } | [${
+          detail.jobDetail.usableArcanum.join(', ')
+        }] | ${detail.jobDetail.nextSummoned} | ${detail.jobDetail.summonStatus.toString()}`;
     } else if (detail.job === 'SCH' && detail.jobDetail) {
       jobInfo.innerText =
         `${detail.jobDetail.aetherflowStacks} | ${detail.jobDetail.fairyGauge} | ${detail.jobDetail.fairyStatus} (${detail.jobDetail.fairyMilliseconds})`;
     } else if (detail.job === 'ACN' && detail.jobDetail) {
       jobInfo.innerText = detail.jobDetail.aetherflowStacks.toString();
     } else if (detail.job === 'AST' && detail.jobDetail) {
-      jobInfo.innerText = `${detail.jobDetail.heldCard} [${detail.jobDetail.arcanums.join(', ')}]`;
+      jobInfo.innerText =
+        `${detail.jobDetail.card1} | ${detail.jobDetail.card2} | ${detail.jobDetail.card3} | ${detail.jobDetail.card4} | ${detail.jobDetail.nextdraw}`;
     } else if (detail.job === 'MNK' && detail.jobDetail) {
-      jobInfo.innerText = `${detail.jobDetail.chakraStacks}`;
+      jobInfo.innerText =
+        `${detail.jobDetail.chakraStacks} | ${detail.jobDetail.lunarNadi.toString()} | ${detail.jobDetail.solarNadi.toString()} | [${
+          detail.jobDetail.beastChakra.join(', ')
+        }] | ${detail.jobDetail.opoopoFury} | ${detail.jobDetail.raptorFury} | ${detail.jobDetail.coeurlFury}`;
     } else if (detail.job === 'MCH' && detail.jobDetail) {
       jobInfo.innerText =
         `${detail.jobDetail.heat} (${detail.jobDetail.overheatMilliseconds}) | ${detail.jobDetail.battery} (${detail.jobDetail.batteryMilliseconds}) | last: ${detail.jobDetail.lastBatteryAmount} | ${detail.jobDetail.overheatActive.toString()} | ${detail.jobDetail.robotActive.toString()}`;
@@ -111,6 +112,25 @@ addOverlayListener('onPlayerChangedEvent', (e) => {
     } else if (detail.job === 'SGE' && detail.jobDetail) {
       jobInfo.innerText =
         `${detail.jobDetail.addersgall} (${detail.jobDetail.addersgallMilliseconds}) | ${detail.jobDetail.addersting} | ${detail.jobDetail.eukrasia.toString()}`;
+    } else if (detail.job === 'RPR' && detail.jobDetail) {
+      jobInfo.innerText =
+        `${detail.jobDetail.soul} | ${detail.jobDetail.shroud} | ${detail.jobDetail.enshroudMilliseconds} | ${detail.jobDetail.lemureShroud} | ${detail.jobDetail.voidShroud}`;
+    } else if (detail.job === 'VPR' && detail.jobDetail) {
+      jobInfo.innerText =
+        `${detail.jobDetail.rattlingCoilStacks} | ${detail.jobDetail.anguineTribute} | ${detail.jobDetail.serpentOffering} | ${detail.jobDetail.advancedCombo} | ${detail.jobDetail.reawakenedTimer}`;
+    } else if (detail.job === 'PCT' && detail.jobDetail) {
+      jobInfo.innerText =
+        `${detail.jobDetail.paletteGauge} | ${detail.jobDetail.paint} | (${detail.jobDetail.creatureMotif} | ${
+          detail.jobDetail.weaponMotif ? 'Weapon' : 'None'
+        } | ${detail.jobDetail.landscapeMotif ? 'Landscape' : 'None'}) | (${
+          detail.jobDetail.depictions.join('+') || 'None'
+        }) | ${
+          detail.jobDetail.mooglePortrait
+            ? 'Moogle'
+            : detail.jobDetail.madeenPortrait
+            ? 'Madeen'
+            : 'None'
+        }`;
     } else {
       jobInfo.innerText = '';
     }
@@ -125,9 +145,6 @@ addOverlayListener('onPlayerChangedEvent', (e) => {
   const rotation = document.getElementById('rotation');
   if (rotation)
     rotation.innerText = e.detail.rotation.toString();
-  const bait = document.getElementById('bait');
-  if (bait)
-    bait.innerText = e.detail.bait.toString();
 });
 
 addOverlayListener('EnmityTargetData', (e) => {
@@ -150,25 +167,26 @@ addOverlayListener('onGameActiveChangedEvent', (_e) => {
   // console.log("Game active: " + e.detail.active);
 });
 
-addOverlayListener('onLogEvent', (e) => {
-  e.detail.logs.forEach((log) => {
-    // Match "/echo tts:<stuff>"
-    const r = /00:0038:tts:(.*)/.exec(log);
-    if (r && r[1]) {
-      void callOverlayHandler({
-        call: 'cactbotSay',
-        text: r[1],
-      });
-    }
-  });
+const ttsEchoRegex = NetRegexes.echo({ line: 'tts:.*?' });
+addOverlayListener('LogLine', (e) => {
+  // Match "/echo tts:<stuff>"
+  const line = ttsEchoRegex.exec(e.rawLine)?.groups?.line;
+  if (line === undefined)
+    return;
+  const colon = line.indexOf(':');
+  if (colon === -1)
+    return;
+  const text = line.slice(colon);
+  if (text !== undefined) {
+    void callOverlayHandler({
+      call: 'cactbotSay',
+      text: text,
+    });
+  }
 });
 
 addOverlayListener('onUserFileChanged', (e) => {
   console.log(`User file ${e.file} changed!`);
-});
-
-addOverlayListener('FileChanged', (e) => {
-  console.log(`File ${e.file} changed!`);
 });
 
 void callOverlayHandler({ call: 'cactbotRequestState' });

@@ -7,17 +7,6 @@ const path = require('path');
 const rulesDirPlugin = require('eslint-plugin-rulesdir');
 rulesDirPlugin.RULES_DIR = path.join(__dirname, 'eslint');
 
-// lineWidth specified depending on file location.
-const dprintConfig = {
-  'bracePosition': 'maintain',
-  'indentWidth': 2,
-  'newLineKind': 'crlf',
-  'nextControlFlowPosition': 'maintain',
-  'operatorPosition': 'maintain',
-  'quoteStyle': 'alwaysSingle',
-  'useBraces': 'maintain',
-};
-
 const settings = {
   'env': {
     'browser': true,
@@ -27,6 +16,7 @@ const settings = {
     'eslint:recommended',
     'google',
     'plugin:import/errors',
+    'plugin:deprecation/recommended',
   ],
   'ignorePatterns': [
     // Do not ignore dot files.  /o\
@@ -41,12 +31,13 @@ const settings = {
     'publish/',
     'resources/lib/',
   ],
+  'parser': '@typescript-eslint/parser',
   'parserOptions': {
-    'ecmaVersion': 2020,
+    'ecmaVersion': 2022,
     'sourceType': 'module',
   },
   'plugins': [
-    'dprint',
+    'deprecation',
     'import',
     'rulesdir',
   ],
@@ -64,23 +55,8 @@ const settings = {
   },
 };
 
-const dprintRule = (width) => {
-  return {
-    'dprint/dprint': [
-      'warn',
-      {
-        config: {
-          ...dprintConfig,
-          'lineWidth': width,
-        },
-      },
-    ],
-  };
-};
-
 // General rules for all files.
 const rules = {
-  ...dprintRule(100),
   'arrow-spacing': [
     'warn',
     {
@@ -97,9 +73,9 @@ const rules = {
   // Handled by dprint.
   'comma-dangle': 'off',
   'curly': [
-    'warn',
-    'multi-or-nest',
-    'consistent',
+    'off',
+    // 'multi-or-nest',
+    // 'consistent',
   ],
   'eqeqeq': 'error',
   'guard-for-in': 'off',
@@ -114,6 +90,7 @@ const rules = {
       'caseSensitive': true,
     },
   ],
+  'import/no-useless-path-segments': 'error',
   'import/no-webpack-loader-syntax': 'error',
   // Handled by dprint.
   'indent': 'off',
@@ -171,11 +148,21 @@ const rules = {
       'allowAllPropertiesOnSameLine': true,
     },
   ],
-  'operator-linebreak': 'error',
+  'operator-linebreak': [
+    'error',
+    'after',
+    {
+      'overrides': {
+        ':': 'before',
+        '?': 'before',
+      },
+    },
+  ],
   'prefer-arrow-callback': 'error',
   'prefer-const': 'error',
   'prefer-regex-literals': 'error',
   'prefer-rest-params': 'off',
+  'prefer-template': 'error',
   'quotes': [
     'error',
     'single',
@@ -209,6 +196,7 @@ const rules = {
     'error',
     'never',
   ],
+  'unicorn/prefer-string-slice': 'error',
   'valid-jsdoc': 'off',
 };
 
@@ -224,7 +212,7 @@ const tsOverrides = {
     'project': ['./tsconfig.json'],
     'tsconfigRootDir': __dirname,
   },
-  'plugins': ['@typescript-eslint', 'prefer-arrow'],
+  'plugins': ['@typescript-eslint', 'prefer-arrow', 'unicorn'],
   'rules': {
     '@typescript-eslint/consistent-type-assertions': [
       'error',
@@ -252,8 +240,14 @@ const tsOverrides = {
     '@typescript-eslint/no-invalid-this': 'error',
     '@typescript-eslint/no-non-null-assertion': 'error',
     '@typescript-eslint/no-unsafe-argument': 'error',
-    '@typescript-eslint/no-unused-vars': ['warn', { 'argsIgnorePattern': '^_\\w+' }],
+    '@typescript-eslint/no-unused-vars': ['warn', { 'args': 'all', 'argsIgnorePattern': '^_\\w?' }],
     '@typescript-eslint/object-curly-spacing': ['warn', 'always'],
+    '@typescript-eslint/prefer-string-starts-ends-with': 'error',
+    '@typescript-eslint/strict-boolean-expressions': ['error', {
+      // @TODO: Remove these keys over time, setting them back to default
+      'allowNullableBoolean': true,
+      'allowNullableNumber': true,
+    }],
     'func-style': ['error', 'expression', { 'allowArrowFunctions': true }],
     'import/order': [
       'error',
@@ -280,9 +274,8 @@ const overrides = [
     },
   },
   {
-    'files': ['**/oopsyraidsy/data/**/*', '**/raidboss/data/**/*'],
+    'files': ['**/oopsyraidsy/data/**/*.ts', '**/raidboss/data/**/*.ts'],
     'rules': {
-      ...dprintRule(300),
       // Raidboss data files always export a trigger set, and explicit types are noisy.
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       // Only meant to be used for `output` parameters!
@@ -297,12 +290,6 @@ const overrides = [
       'rulesdir/cactbot-output-strings': 'error',
       'rulesdir/cactbot-response-default-severities': 'error',
       'rulesdir/cactbot-timeline-triggers': 'error',
-    },
-  },
-  {
-    'files': ['**/oopsyraidsy/data/**/*.js', '**/raidboss/data/**/*.js'],
-    'rules': {
-      'no-unused-vars': ['warn', { 'args': 'all', 'argsIgnorePattern': '^_\\w+' }],
     },
   },
   {

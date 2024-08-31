@@ -16,12 +16,12 @@ export interface Data extends OopsyData {
 
 const noOrb = (str: string) => {
   return {
-    en: str + ' (no orb)',
-    de: str + ' (kein Orb)',
-    fr: str + ' (pas d\'orbe)',
-    ja: str + ' (雷玉無し)',
-    cn: str + ' (没吃球)',
-    ko: str + ' (구슬 없음)',
+    en: `${str} (no orb)`,
+    de: `${str} (kein Orb)`,
+    fr: `${str} (pas d'orbe)`,
+    ja: `${str} (雷玉無し)`,
+    cn: `${str} (没吃球)`,
+    ko: `${str} (구슬 없음)`,
   };
 };
 
@@ -66,34 +66,49 @@ const triggerSet: OopsyTriggerSet<Data> = {
     {
       id: 'E5S Divine Judgement Volts',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '4BB7', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '4BB7', ...playerDamageFields }),
       condition: (data, matches) => !data.hasOrb || !data.hasOrb[matches.target],
       mistake: (_data, matches) => {
-        return { type: 'fail', blame: matches.target, reportId: matches.targetId, text: noOrb(matches.ability) };
+        return {
+          type: 'fail',
+          blame: matches.target,
+          reportId: matches.targetId,
+          text: noOrb(matches.ability),
+        };
       },
     },
     {
       id: 'E5S Volt Strike Orb',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '4BC3', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '4BC3', ...playerDamageFields }),
       condition: (data, matches) => !data.hasOrb || !data.hasOrb[matches.target],
       mistake: (_data, matches) => {
-        return { type: 'fail', blame: matches.target, reportId: matches.targetId, text: noOrb(matches.ability) };
+        return {
+          type: 'fail',
+          blame: matches.target,
+          reportId: matches.targetId,
+          text: noOrb(matches.ability),
+        };
       },
     },
     {
       id: 'E5S Deadly Discharge Big Knockback',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '4BB2', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '4BB2', ...playerDamageFields }),
       condition: (data, matches) => !data.hasOrb || !data.hasOrb[matches.target],
       mistake: (_data, matches) => {
-        return { type: 'fail', blame: matches.target, reportId: matches.targetId, text: noOrb(matches.ability) };
+        return {
+          type: 'fail',
+          blame: matches.target,
+          reportId: matches.targetId,
+          text: noOrb(matches.ability),
+        };
       },
     },
     {
       id: 'E5S Lightning Bolt',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '4BB9', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '4BB9', ...playerDamageFields }),
       condition: (data, matches) => {
         // Having a non-idempotent condition function is a bit <_<
         // Only consider lightning bolt damage if you have a debuff to clear.
@@ -104,7 +119,12 @@ const triggerSet: OopsyTriggerSet<Data> = {
         return false;
       },
       mistake: (_data, matches) => {
-        return { type: 'warn', blame: matches.target, reportId: matches.targetId, text: matches.ability };
+        return {
+          type: 'warn',
+          blame: matches.target,
+          reportId: matches.targetId,
+          text: matches.ability,
+        };
       },
     },
     {
@@ -129,7 +149,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
       // This ability is seen only if players stacked the clouds instead of spreading them.
       id: 'E5S The Parting Clouds',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '4BBA', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '4BBA', ...playerDamageFields }),
       suppressSeconds: 30,
       mistake: (data, matches) => {
         for (const name of data.cloudMarkers ?? []) {

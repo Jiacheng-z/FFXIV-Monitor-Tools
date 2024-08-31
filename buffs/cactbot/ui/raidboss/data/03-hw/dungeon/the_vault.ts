@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -11,6 +10,7 @@ export interface Data extends RaidbossData {
 
 // The Vault
 const triggerSet: TriggerSet<Data> = {
+  id: 'TheVault',
   zoneId: ZoneId.TheVault,
   timelineFile: 'the_vault.txt',
   timelineTriggers: [
@@ -47,7 +47,6 @@ const triggerSet: TriggerSet<Data> = {
       id: 'The Vault Altar Candle',
       regex: /Altar Candle/,
       beforeSeconds: 5,
-      condition: (data) => data.role !== 'dps',
       response: Responses.tankBuster(),
     },
   ],
@@ -55,26 +54,16 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'The Vault Holiest of Holy',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '101E', source: 'Ser Adelphel', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '101E', source: 'Adelphel', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '101E', source: 'Sire Adelphel', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '101E', source: '聖騎士アデルフェル', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '101E', source: '圣骑士阿代尔斐尔', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '101E', source: '성기사 아델펠', capture: false }),
+      netRegex: { id: '101E', source: 'Ser Adelphel', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'The Vault Holy Shield Bash',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '101F', source: 'Ser Adelphel' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '101F', source: 'Adelphel' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '101F', source: 'Sire Adelphel' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '101F', source: '聖騎士アデルフェル' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '101F', source: '圣骑士阿代尔斐尔' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '101F', source: '성기사 아델펠' }),
+      netRegex: { id: '101F', source: 'Ser Adelphel' },
       condition: (data) => data.role === 'healer',
       alertText: (data, matches, output) => {
-        return output.text!({ player: data.ShortName(matches.target) });
+        return output.text!({ player: data.party.member(matches.target) });
       },
       outputStrings: {
         text: {
@@ -90,41 +79,26 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'The Vault Execution',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0020' }),
+      netRegex: { id: '0020' },
       response: Responses.awayFrom(),
     },
     {
       id: 'The Vault Black Nebula',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1042', source: 'Face Of The Hero' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1042', source: 'Gesicht Des Helden' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1042', source: 'Visage Du Héros' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1042', source: 'フェイス・オブ・ヒーロー' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1042', source: '英雄之相' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1042', source: '영웅의 형상' }),
+      netRegex: { id: '1042', source: 'Face Of The Hero' },
       condition: (data) => data.CanStun(),
       response: Responses.stun(),
     },
     {
       id: 'The Vault Faith Unmoving',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1027', source: 'Ser Grinnaux', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1027', source: 'Grinnaux', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1027', source: 'Sire Grinnaux', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1027', source: '聖騎士グリノー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1027', source: '圣骑士格里诺', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1027', source: '성기사 그리노', capture: false }),
+      netRegex: { id: '1027', source: 'Ser Grinnaux', capture: false },
       response: Responses.knockback(),
     },
     {
       id: 'The Vault Dimensional Torsion',
       type: 'Tether',
-      netRegex: NetRegexes.tether({ id: '0001', source: 'Aetherial Tear' }),
-      netRegexDe: NetRegexes.tether({ id: '0001', source: 'Ätherspalt' }),
-      netRegexFr: NetRegexes.tether({ id: '0001', source: 'Déchirure Dimensionnelle' }),
-      netRegexJa: NetRegexes.tether({ id: '0001', source: '次元の裂け目' }),
-      netRegexCn: NetRegexes.tether({ id: '0001', source: '次元裂缝' }),
-      netRegexKo: NetRegexes.tether({ id: '0001', source: '차원의 틈새' }),
+      netRegex: { id: '0001', source: 'Aetherial Tear' },
       condition: Conditions.targetIsYou(),
       suppressSeconds: 5,
       alarmText: (_data, _matches, output) => output.text!(),
@@ -135,25 +109,20 @@ const triggerSet: TriggerSet<Data> = {
           fr: 'Éloignez-vous des déchirures',
           ja: '裂け目から離れる',
           cn: '远离黑圈',
-          ko: '장판 피하기',
+          ko: '균열에서 멀리 떨어지기',
         },
       },
     },
     {
       id: 'The Vault Altar Pyre',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1035', source: 'Ser Charibert', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1035', source: 'Charibert', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1035', source: 'Sire Charibert', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1035', source: '聖騎士シャリベル', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1035', source: '圣骑士沙里贝尔', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1035', source: '성기사 샤리베르', capture: false }),
+      netRegex: { id: '1035', source: 'Ser Charibert', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'The Vault Holy Chains',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0061' }),
+      netRegex: { id: '0061' },
       condition: Conditions.targetIsYou(),
       response: Responses.breakChains(),
     },
@@ -161,19 +130,14 @@ const triggerSet: TriggerSet<Data> = {
       // This prevents out-of-combat activation for the March trigger during Charibert's spawn-in.
       id: 'The Vault Knights Activation',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0061', capture: false }),
+      netRegex: { id: '0061', capture: false },
       condition: (data) => !data.knightsActive,
       run: (data) => data.knightsActive = true,
     },
     {
       id: 'The Vault Knights March',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatant({ name: ['Dawn Knight', 'Dusk Knight'], capture: false }),
-      netRegexDe: NetRegexes.addedCombatant({ name: ['Dämmerross', 'Morgenross'], capture: false }),
-      netRegexFr: NetRegexes.addedCombatant({ name: ['Cavalier De L\'Aube', 'Cavalier Du Crépuscule'], capture: false }),
-      netRegexJa: NetRegexes.addedCombatant({ name: ['ドーン・オートナイト', 'ダスク・オートナイト'], capture: false }),
-      netRegexCn: NetRegexes.addedCombatant({ name: ['拂晓骑士', '黄昏骑士'], capture: false }),
-      netRegexKo: NetRegexes.addedCombatant({ name: ['여명의 자동기사', '황혼의 자동기사'], capture: false }),
+      netRegex: { name: ['Dawn Knight', 'Dusk Knight'], capture: false },
       condition: (data) => data.knightsActive,
       suppressSeconds: 4,
       infoText: (_data, _matches, output) => output.text!(),

@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import Outputs from '../../../../../resources/outputs';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
@@ -11,22 +10,22 @@ export interface Data extends RaidbossData {
 }
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'AsphodelosTheThirdCircle',
   zoneId: ZoneId.AsphodelosTheThirdCircle,
   timelineFile: 'p3n.txt',
   triggers: [
     {
       id: 'P3N Experimental Fireplume Rotating',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '6698', source: 'Phoinix', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '6698', source: 'Phoinix', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '6698', source: 'Protophénix', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '6698', source: 'フェネクス', capture: false }),
+      netRegex: { id: '6698', source: 'Phoinix', capture: false },
       infoText: (_data, _matches, output) => output.startMiddle!(),
       outputStrings: {
         startMiddle: {
           en: 'Start Middle',
           de: 'Starte mittig',
           fr: 'Commencez au milieu',
+          ja: '中央から',
+          cn: '从中间开始',
           ko: '가운데에 있다가 밖으로',
         },
       },
@@ -35,19 +34,16 @@ const triggerSet: TriggerSet<Data> = {
       id: 'P3N Experimental Fireplume Out',
       type: 'StartsUsing',
       // This is Experimental Fireplume (6696) into Fireplume (6697), which is an 11s warning.
-      netRegex: NetRegexes.startsUsing({ id: '6696', source: 'Phoinix', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '6696', source: 'Phoinix', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '6696', source: 'Protophénix', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '6696', source: 'フェネクス', capture: false }),
+      netRegex: { id: '6696', source: 'Phoinix', capture: false },
       durationSeconds: 8,
       infoText: (_data, _matches, output) => output.outOfMiddle!(),
       outputStrings: {
         outOfMiddle: {
           en: 'Out Of Middle Soon',
           de: 'Bald raus aus der Mitte',
-          fr: 'Sortez de la mêlée bientôt',
-          ja: '横へ', // FIXME
-          cn: '远离中间', // FIXME
+          fr: 'Sortez du milieu bientôt',
+          ja: '中央から離れて',
+          cn: '远离中间',
           ko: '맵 바깥쪽으로',
         },
       },
@@ -55,26 +51,20 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'P3N Scorched Exaltation',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '66B8', source: 'Phoinix', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '66B8', source: 'Phoinix', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '66B8', source: 'Protophénix', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '66B8', source: 'フェネクス', capture: false }),
+      netRegex: { id: '66B8', source: 'Phoinix', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'P3N Heat of Condemnation',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '66B2', source: 'Phoinix' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '66B2', source: 'Phoinix' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '66B2', source: 'Protophénix' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '66B2', source: 'フェネクス' }),
+      netRegex: { id: '66B2', source: 'Phoinix' },
       suppressSeconds: 1,
       response: Responses.tankCleave('alert'),
     },
     {
       id: 'P3N Darkened Fire Aoe',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '010[C-F]' }),
+      netRegex: { id: '010[C-F]' },
       condition: Conditions.targetIsYou(),
       alertText: (_data, _matches, output) => {
         return output.text!();
@@ -83,7 +73,9 @@ const triggerSet: TriggerSet<Data> = {
         text: {
           en: 'Stand on Darkened Fire',
           de: 'Auf einer Schwarzen Lohe stehen',
-          fr: 'Placez-vous sur la flamme sombre',
+          fr: 'Placez-vous sur une flamme sombre',
+          ja: '黒い炎の上へ',
+          cn: '站在黑色火焰',
           ko: '불꽃 위에 서기',
         },
       },
@@ -91,29 +83,20 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'P3N Right Cinderwing',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '66B4', source: 'Phoinix', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '66B4', source: 'Phoinix', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '66B4', source: 'Protophénix', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '66B4', source: 'フェネクス', capture: false }),
+      netRegex: { id: '66B4', source: 'Phoinix', capture: false },
       response: Responses.goLeft(),
     },
     {
       id: 'P3N Left Cinderwing',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '66B5', source: 'Phoinix', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '66B5', source: 'Phoinix', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '66B5', source: 'Protophénix', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '66B5', source: 'フェネクス', capture: false }),
+      netRegex: { id: '66B5', source: 'Phoinix', capture: false },
       response: Responses.goRight(),
     },
     {
       // Could check the log line's x y coordinate to determine from where to where it charges, npc at charge target casts 66AF?
       id: 'P3N Trail of Condemnation',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '66AD', source: 'Phoinix', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '66AD', source: 'Phoinix', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '66AD', source: 'Protophénix', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '66AD', source: 'フェネクス', capture: false }),
+      netRegex: { id: '66AD', source: 'Phoinix', capture: false },
       alertText: (_data, _matches, output) => {
         return output.avoidCharge!();
       },
@@ -131,13 +114,10 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'P3N Sunbird Spawn',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatant({ name: 'Sunbird', capture: false }),
-      netRegexDe: NetRegexes.addedCombatant({ name: 'Spross Des Phoinix', capture: false }),
-      netRegexFr: NetRegexes.addedCombatant({ name: 'Oiselet Étincelant', capture: false }),
-      netRegexJa: NetRegexes.addedCombatant({ name: '陽炎鳥', capture: false }),
+      netRegex: { name: 'Sunbird', capture: false },
       suppressSeconds: 1,
       alertText: (data, _matches, output) => {
-        if (data.role === 'tank')
+        if (data.role === 'tank' || data.job === 'BLU')
           return output.tank!();
         return output.text!();
       },
@@ -146,6 +126,8 @@ const triggerSet: TriggerSet<Data> = {
           en: 'Pull add circles apart',
           de: 'Zieh die Kreise der Adds auseinander',
           fr: 'Attaquez les adds séparément',
+          ja: '雑魚を離れさせる',
+          cn: '拉开小怪',
           ko: '원 끼리 겹치지 않게 하기',
         },
         text: Outputs.killAdds,
@@ -154,19 +136,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'P3N Dead Rebirth',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '66A9', source: 'Phoinix', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '66A9', source: 'Phoinix', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '66A9', source: 'Protophénix', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '66A9', source: 'フェネクス', capture: false }),
+      netRegex: { id: '66A9', source: 'Phoinix', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'P3N Ashen Eye',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '66AB', source: 'Sparkfledged' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '66AB', source: 'Saat Des Phoinix' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '66AB', source: 'Oiselet De Feu' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '66AB', source: '火霊鳥' }),
+      netRegex: { id: '66AB', source: 'Sparkfledged' },
       alertText: (data, matches, output) => {
         if (!data.ashenEyeDirections)
           data.ashenEyeDirections = [];
@@ -229,10 +205,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'P3N Devouring Brand',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '669E', source: 'Phoinix', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '669E', source: 'Phoinix', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '669E', source: 'Protophénix', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '669E', source: 'フェネクス', capture: false }),
+      netRegex: { id: '669E', source: 'Phoinix', capture: false },
       alertText: (_data, _matches, output) => {
         return output.text!();
       },
@@ -241,6 +214,8 @@ const triggerSet: TriggerSet<Data> = {
           en: 'Split Intercardinals',
           de: 'Interkardinal aufteilen',
           fr: 'Dispersez-vous en intercardinal',
+          ja: 'フィールド十字分断',
+          cn: '分割场地',
           ko: '대각선 쪽으로 나눠 자리잡기',
         },
       },
@@ -248,7 +223,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'P3N Spread Marker',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '008B' }),
+      netRegex: { id: '008B' },
       condition: Conditions.targetIsYou(),
       response: Responses.spread(),
     },
@@ -293,13 +268,14 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       'locale': 'fr',
-      'missingTranslations': true,
       'replaceSync': {
         'Phoinix': 'protophénix',
         'Sparkfledged': 'oiselet de feu',
-        'Sunbird': 'Spross Des Phoinix',
+        'Sunbird': 'oiselet étincelant',
       },
       'replaceText': {
+        '--fire expands--': '--élargissement du feu--',
+        '--giant fireplume\\?--': '--immolation de feu géant ?--',
         'Ashen Eye': 'Œil sombre',
         'Blazing Rain': 'Pluie brûlante',
         'Brightened Fire': 'Flamme de lumière',
@@ -314,8 +290,7 @@ const triggerSet: TriggerSet<Data> = {
         'Fledgling Flight': 'Nuée ailée',
         'Heat of Condemnation': 'Bourrasque infernale',
         'Joint Pyre': 'Combustion résonnante',
-        'Left Cinderwing': 'Incinération senestre',
-        'Right Cinderwing': 'Incinération dextre',
+        'Left Cinderwing/Right Cinderwing': 'Incinération senestre/dextre',
         'Scorched Exaltation': 'Flamme calcinante',
         'Searing Breeze': 'Jet incandescent',
         'Trail of Condemnation': 'Embrasement infernal',
@@ -349,6 +324,67 @@ const triggerSet: TriggerSet<Data> = {
         'Scorched Exaltation': '灰燼の炎',
         'Searing Breeze': '熱噴射',
         'Trail of Condemnation': '獄炎の焔',
+      },
+    },
+    {
+      'locale': 'cn',
+      'replaceSync': {
+        'Phoinix': '菲尼克司',
+        'Sparkfledged': '火灵鸟',
+        'Sunbird': '阳炎鸟',
+      },
+      'replaceText': {
+        '--fire expands--': '--火焰扩大--',
+        '--giant fireplume\\?--': '--巨大火柱?--',
+        'Ashen Eye': '暗之瞳',
+        'Blazing Rain': '炎之雨',
+        'Brightened Fire': '光之炎',
+        '(?<!\\w )Charplume': '暗之劫火焚天',
+        'Darkened Fire': '暗之炎',
+        'Dead Rebirth': '黑暗不死鸟',
+        'Devouring Brand': '十字地火',
+        'Experimental Charplume': '魔力炼成：暗之劫火焚天',
+        'Experimental Fireplume': '魔力炼成：劫火焚天',
+        'Flames of Undeath': '返魂之炎',
+        'Flare of Condemnation': '狱炎火击',
+        'Fledgling Flight': '群鸟飞翔',
+        'Heat of Condemnation': '狱炎炎击',
+        'Joint Pyre': '共燃',
+        'Left Cinderwing': '左翼焚烧',
+        'Right Cinderwing': '右翼焚烧',
+        'Scorched Exaltation': '灰烬火焰',
+        'Searing Breeze': '热喷射',
+        'Trail of Condemnation': '狱炎之焰',
+      },
+    },
+    {
+      'locale': 'ko',
+      'replaceSync': {
+        'Phoinix': '페넥스',
+        'Sparkfledged': '화령조',
+        'Sunbird': '양염조',
+      },
+      'replaceText': {
+        '--fire expands--': '--불장판 커짐--',
+        '--giant fireplume\\?--': '--특대 장판?--',
+        'Ashen Eye': '어둠의 눈동자',
+        'Blazing Rain': '불비',
+        'Brightened Fire': '빛의 불꽃',
+        '(?<!\\w )Charplume': '어둠의 겁화천초',
+        'Darkened Fire': '어둠의 불꽃',
+        'Dead Rebirth': '검은 불사조',
+        'Devouring Brand': '십자 불길',
+        'Experimental Charplume': '마력 연성: 어둠의 겁화천초',
+        'Experimental Fireplume': '마력 연성: 겁화천초',
+        'Flames of Undeath': '반혼의 불꽃',
+        'Flare of Condemnation': '지옥불 화격',
+        'Fledgling Flight': '새떼 비상',
+        'Heat of Condemnation': '지옥불 염격',
+        'Joint Pyre': '동반 연소',
+        'Left Cinderwing/Right Cinderwing': '왼/오른날개 소각',
+        'Scorched Exaltation': '잿더미 화염',
+        'Searing Breeze': '열 분사',
+        'Trail of Condemnation': '지옥불 불길',
       },
     },
   ],

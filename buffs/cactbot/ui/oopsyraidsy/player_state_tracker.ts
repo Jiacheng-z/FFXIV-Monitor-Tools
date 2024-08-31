@@ -1,6 +1,7 @@
 import logDefinitions from '../../resources/netlog_defs';
 import { UnreachableCode } from '../../resources/not_reached';
 import PartyTracker from '../../resources/party';
+import { Party } from '../../types/event';
 import {
   DeathReportData,
   OopsyDeathReason,
@@ -22,13 +23,7 @@ import {
   RequestTimestampCallback,
 } from './missed_buff_collector';
 import { MistakeCollector } from './mistake_collector';
-import {
-  GetShareMistakeText,
-  GetSoloMistakeText,
-  IsPlayerId,
-  ShortNamify,
-  Translate,
-} from './oopsy_common';
+import { GetShareMistakeText, GetSoloMistakeText, IsPlayerId, Translate } from './oopsy_common';
 import { OopsyOptions } from './oopsy_options';
 
 const emptyId = 'E0000000';
@@ -88,6 +83,7 @@ export class PlayerStateTracker {
   private triggerSets: ProcessedOopsyTriggerSet[] = [];
   private partyIds: Set<string> = new Set();
   private deadIds: Set<string> = new Set();
+  private idToPartyInfo: { [combatantId: string]: Party } = {};
   private petIdToOwnerId: { [petId: string]: string } = {};
   private abilityIdToBuff: { [abilityId: string]: MissableAbility } = {};
   private effectIdToBuff: { [effectId: string]: MissableEffect } = {};
@@ -110,8 +106,8 @@ export class PlayerStateTracker {
 
   constructor(
     private options: OopsyOptions,
-    private partyTracker: PartyTracker,
     private collector: MistakeCollector,
+    public partyTracker: PartyTracker,
     requestTimestampCallback: RequestTimestampCallback,
   ) {
     this.missedBuffCollector = new MissedBuffCollector(
@@ -181,13 +177,14 @@ export class PlayerStateTracker {
     const arr = [...this.partyTracker.partyIds];
 
     // Include the player in the party for mistakes even if there is no party.
-    if (this.myPlayerId && !arr.includes(this.myPlayerId))
+    if (this.myPlayerId !== undefined && !arr.includes(this.myPlayerId))
       arr.push(this.myPlayerId);
 
     this.partyIds = new Set(arr);
   }
 
   private Reset(): void {
+    // Deliberately do not clear idToPartyInfo here.
     this.petIdToOwnerId = {};
     this.deadIds.clear();
     this.trackedEvents = [];
@@ -196,22 +193,68 @@ export class PlayerStateTracker {
 
   OnChangeZone(timestamp: number, zoneName: string, zoneId: number): void {
     this.Reset();
+    // combatants and party info are re-sent on zone change, so clear here
+    // to periodically trim this.
+    this.idToPartyInfo = {};
     this.collector.OnChangeZone(timestamp, zoneName, zoneId);
   }
 
-  OnAddedCombatant(line: string, splitLine: string[]): void {
+  OnAddedCombatant(_line: string, splitLine: string[]): void {
+    const id = splitLine[logDefinitions.AddedCombatant.fields.id];
+    const name = splitLine[logDefinitions.AddedCombatant.fields.name];
+    const worldIdStr = splitLine[logDefinitions.AddedCombatant.fields.worldId];
+    const jobStr = splitLine[logDefinitions.AddedCombatant.fields.job];
+    if (
+      id !== undefined && name !== undefined &&
+      worldIdStr !== undefined && jobStr !== undefined
+    ) {
+      // Generate the party info we would get from OverlayPlugin via logs.
+      const worldId = parseInt(worldIdStr, 16);
+      const job = parseInt(jobStr, 16);
+      // Consider everybody in the party for now and we'll figure it out later.
+      const inParty = true;
+      this.idToPartyInfo[id] = { id, name, worldId, job, inParty };
+    }
+
+    // Track pet owners as well.
     const petId = splitLine[logDefinitions.AddedCombatant.fields.id];
     const ownerId = splitLine[logDefinitions.AddedCombatant.fields.ownerId];
-    if (petId === undefined || ownerId === undefined || ownerId === '0')
+    if (petId === undefined || ownerId === undefined)
+      return;
+    if (ownerId === '0' || ownerId === '0000')
       return;
 
     // Fix any lowercase ids.
     this.petIdToOwnerId[petId.toUpperCase()] = ownerId.toUpperCase();
   }
 
-  OnChangedPlayer(line: string, splitLine: string[]): void {
+  OnPartyList(_line: string, splitLine: string[]): void {
+    // So that party lists can be used from logs, we will fake `onPartyChanged` events
+    // using log information.  AddedCombatant seems to come before PartyList lines,
+    // so we accumulate those and then generate the party info from here.
+
+    // Start from id0 and drop the hash at the end.
+    const count = parseInt(splitLine[logDefinitions.PartyList.fields.partyCount] ?? '');
+    if (isNaN(count))
+      return;
+
+    const ids = splitLine.slice(logDefinitions.PartyList.fields.id0, -1);
+    const party: Party[] = [];
+    ids.forEach((id, idx) => {
+      const p = this.idToPartyInfo[id];
+      if (!p)
+        return;
+      // count is 1-indexed and idx is 0-indexed.
+      p.inParty = idx < count;
+      party.push(p);
+    });
+    this.partyTracker.onPartyChanged({ party });
+    this.OnPartyChanged();
+  }
+
+  OnChangedPlayer(_line: string, splitLine: string[]): void {
     const id = splitLine[logDefinitions.ChangedPlayer.fields.id];
-    if (id)
+    if (id !== undefined)
       this.SetPlayerId(id);
   }
 
@@ -234,7 +277,7 @@ export class PlayerStateTracker {
     return this.partyIds.has(id);
   }
 
-  OnAbility(line: string, splitLine: string[]): void {
+  OnAbility(_line: string, splitLine: string[]): void {
     // Abilities can not miss everybody (e.g. Battle Voice never hitting the source)
     // so check both target and source.
     const targetId = splitLine[logDefinitions.Ability.fields.targetId];
@@ -273,11 +316,11 @@ export class PlayerStateTracker {
       this.missedBuffCollector.OnAbilityBuff(splitLine, buff);
   }
 
-  OnGainsEffect(line: string, splitLine: string[]): void {
+  OnGainsEffect(_line: string, splitLine: string[]): void {
     const targetId = splitLine[logDefinitions.GainsEffect.fields.targetId];
     // Do not consider pets gaining effects here.
     // Summoner pets (e.g. Demi-Phoenix) gain party buffs (e.g. Embolden), with no sourceId/source.
-    if (!targetId || !this.IsPlayerInParty(targetId))
+    if (targetId === undefined || !this.IsPlayerInParty(targetId))
       return;
 
     const effectId = splitLine[logDefinitions.GainsEffect.fields.effectId];
@@ -318,9 +361,9 @@ export class PlayerStateTracker {
       this.missedBuffCollector.OnEffectBuff(splitLine, buff);
   }
 
-  OnLosesEffect(line: string, splitLine: string[]): void {
+  OnLosesEffect(_line: string, splitLine: string[]): void {
     const targetId = splitLine[logDefinitions.GainsEffect.fields.targetId];
-    if (!targetId || !this.IsPlayerInParty(targetId))
+    if (targetId === undefined || !this.IsPlayerInParty(targetId))
       return;
 
     const effectId = splitLine[logDefinitions.GainsEffect.fields.effectId];
@@ -337,13 +380,28 @@ export class PlayerStateTracker {
     delete this.trackedEffectMap[targetId]?.[effectId];
   }
 
+  HasEffect(targetId: string | undefined, effectId: string | string[] | undefined): boolean {
+    if (targetId === undefined || effectId === undefined)
+      return false;
+    if (typeof effectId === 'string') {
+      if (this.trackedEffectMap[targetId]?.[effectId])
+        return true;
+    } else {
+      for (const effect of effectId) {
+        if (this.trackedEffectMap[targetId]?.[effect])
+          return true;
+      }
+    }
+    return false;
+  }
+
   OnDeathReason(timestamp: number, reason: OopsyDeathReason): void {
     const targetId = reason.id;
     if (!targetId || !IsPlayerId(targetId))
       return;
 
     const text = Translate(this.options.DisplayLanguage, reason.text);
-    if (!text)
+    if (text === undefined)
       return;
     this.trackedEvents.push({
       timestamp: timestamp,
@@ -357,7 +415,7 @@ export class PlayerStateTracker {
     this.collector.OnMistakeObj(timestamp, mistake);
 
     const targetId = mistake.reportId;
-    if (!targetId || !IsPlayerId(targetId))
+    if (targetId === undefined || !IsPlayerId(targetId))
       return;
 
     this.trackedEvents.push({
@@ -369,9 +427,9 @@ export class PlayerStateTracker {
   }
 
   // Returns an event for why this person died.
-  OnDefeated(line: string, splitLine: string[]): void {
+  OnDefeated(_line: string, splitLine: string[]): void {
     const targetId = splitLine[logDefinitions.WasDefeated.fields.targetId];
-    if (!targetId || !IsPlayerId(targetId))
+    if (targetId === undefined || !IsPlayerId(targetId))
       return;
 
     const targetInParty = this.IsInParty(targetId);
@@ -389,11 +447,15 @@ export class PlayerStateTracker {
       if (event.type !== 'Ability')
         continue;
       const id = event.splitLine[logDefinitions.Ability.fields.id];
-      if (!id)
+      if (id === undefined)
         continue;
 
       const type = event.splitLine[logDefinitions.None.fields.type];
-      const isSharedDamage = type === logDefinitions.NetworkAOEAbility.type;
+      const targetCountStr = event.splitLine[logDefinitions.Ability.fields.targetCount];
+      const targetCount = parseInt(targetCountStr ?? '1');
+      // Some abilities (e.g. Kampeos Harma 6826) are AOE Ability types but only hit one person.
+      // The reverse (Ability.type but targetCount > 1) is not possible.
+      const isSharedDamage = type === logDefinitions.NetworkAOEAbility.type && targetCount !== 1;
 
       // Combining share/solo mistake lines with ability damage lines is a bit of
       // duplication, but unless PlayerStateTracker generated share/solo/damage mistakes
@@ -404,7 +466,10 @@ export class PlayerStateTracker {
       } else if (isSharedDamage && id in this.mistakeShareMap) {
         event.mistake = this.mistakeShareMap[id];
         const ability = event.splitLine[logDefinitions.Ability.fields.ability] ?? '???';
-        event.mistakeText = Translate(this.options.DisplayLanguage, GetShareMistakeText(ability));
+        event.mistakeText = Translate(
+          this.options.DisplayLanguage,
+          GetShareMistakeText(ability, targetCount),
+        );
       } else if (!isSharedDamage && id in this.mistakeSoloMap) {
         event.mistake = this.mistakeSoloMap[id];
         const ability = event.splitLine[logDefinitions.Ability.fields.ability] ?? '???';
@@ -426,9 +491,9 @@ export class PlayerStateTracker {
     this.collector.OnMistakeObj(timestamp, mistake);
   }
 
-  OnHoTDoT(line: string, splitLine: string[]): void {
+  OnHoTDoT(_line: string, splitLine: string[]): void {
     const targetId = splitLine[logDefinitions.NetworkDoT.fields.id];
-    if (!targetId || !this.IsInParty(targetId))
+    if (targetId === undefined || !this.IsInParty(targetId))
       return;
 
     this.trackedEvents.push({
@@ -453,7 +518,8 @@ export class PlayerStateTracker {
     const blameId = ownerId ?? collected.sourceId;
     const sourceName = this.partyTracker.nameFromId(blameId);
     if (sourceName === undefined) {
-      console.error(`Couldn't find name for ${blameId} (owner: ${ownerId ?? 'none'})`);
+      const line = JSON.stringify(collected.splitLine);
+      console.error(`Couldn't find name for ${blameId} (owner: ${ownerId ?? 'none'}), ${line}`);
       return;
     }
 
@@ -490,15 +556,17 @@ export class PlayerStateTracker {
 
     const missedNames = missedIds.map((id) => {
       const name = this.partyTracker.nameFromId(id);
-      if (!name)
-        console.error(`Couldn't find name for ${id}`);
+      if (name === undefined) {
+        const line = JSON.stringify(collected.splitLine);
+        console.error(`Couldn't find name for ${id}, ${line}`);
+      }
       return name ?? '???';
     });
 
     // TODO: oopsy could really use mouseover popups for details.
     if (missedNames.length < 4) {
       const nameList = missedNames.map((name) => {
-        return ShortNamify(name, this.options.PlayerNicks);
+        return this.partyTracker.member(name).toString();
       }).join(', ');
 
       // As a TrackedLineEvent has been pushed for each person missed already,

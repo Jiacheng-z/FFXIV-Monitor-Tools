@@ -1,0 +1,479 @@
+### Dragonsong's Reprise Ultimate
+# phase 1 logs: -p 62D4:10 62E1:500
+# -p 63C8:553 6708:1000 717A:1500 62E1:2000 6B86:3000 6667:3500 71E4:4000
+# -ii 6F73 6F74 62D3 63EE 62CE 62CF 63EC 62E3 63DC 63CF 63C9 63E2 6FAF 6FB0 63D0 63E7 63E9 737C 6FEB 63C2 6715 6716 670C 6318 72A2 63CB 62DF 6D22 6D25 6D28 6D2C 6D2E 6D2A 6D32 6D41 6D43 6D44 6D9D 6D96 6D97 6D94 6D95 6DD2 6DD3 68C7
+
+
+# TODO: should we include something for P1 62CE/62CF Shining Blade/Bright Flare stuff?
+
+hideall "--Reset--"
+hideall "--sync--"
+
+0.0 "--Reset--" ActorControl { command: "4000000F" } window 0,100000 jump 0
+
+### Phase 1: Adelphel, Grinnaux and Charibert
+
+# No engage sync, due to checkpoint.
+0.0 "Start"
+6.0 "--sync--" StartsUsing { id: "62D4", source: "Ser Adelphel" } window 10,10
+10.0 "Holiest of Holy" Ability { id: "62D4", source: "Ser Adelphel" }
+23.2 "Empty Dimension" Ability { id: "62DA", source: "Ser Grinnaux" }
+23.2 "Holy Shield Bash" Ability { id: "62D1", source: "Ser Adelphel" }
+23.9 "--sync--" Ability { id: "63EB", source: "Ser Adelphel" }
+25.3 "Holy Bladedance" Ability { id: "62D2", source: "Ser Adelphel" } duration 2.5
+28.2 "Heavensblaze" Ability { id: "62DD", source: "Ser Charibert" }
+36.5 "--middle--" Ability { id: "62E9", source: "Ser Grinnaux" }
+38.4 "--untargetable--"
+43.6 "--sync--" Ability { id: "62D6", source: "Ser Grinnaux" }
+# These slashes come from Ser Grinnaux, but sometimes name updates are sloppy.
+44.8 "Hyperdimensional Slash 1" Ability { id: "62D7", source: ["Ser Grinnaux", "Ser Charibert"] }
+50.7 "--sync--" Ability { id: "6315", source: "Ser Grinnaux" }
+51.9 "Hyperdimensional Slash 2" Ability { id: "62D7", source: ["Ser Grinnaux", "Ser Charibert"] }
+54.8 "--targetable--"
+59.8 "Faith Unmoving" Ability { id: "62DC", source: "Ser Grinnaux" }
+60.9 "Holiest of Holy" Ability { id: "62D4", source: "Ser Adelphel" }
+67.5 "--untargetable--"
+69.1 "Execution" Ability { id: "62D5", source: "Ser Adelphel" }
+70.8 "--targetable--"
+86.2 "Faith Unmoving" Ability { id: "62DC", source: "Ser Grinnaux" }
+88.2 "Heavensflame" Ability { id: "62DE", source: "Ser Charibert" }
+102.2 "Holiest of Holy" Ability { id: "62D4", source: "Ser Adelphel" }
+104.2 "Empty Dimension/Full Dimension" Ability { id: ["62DA", "62DB"], source: "Ser Grinnaux" }
+122.2 "Holiest of Holy" Ability { id: "62D4", source: "Ser Adelphel" }
+# "soft" enrage
+127.4 "The Bull's Steel" Ability { id: "62CD", source: "Ser Grinnaux" }
+127.4 "Brightblade's Steel" Ability { id: "62CC", source: "Ser Adelphel" }
+133.6 "Faith Unmoving" Ability { id: "62DC", source: "Ser Grinnaux" }
+133.6 "Holiest of Holy" Ability { id: "62D4", source: "Ser Adelphel" }
+# ???
+
+
+### Phase 1.5: Haurchefant v1, a time loop better suits a hero
+500.0 "Planar Prison" Ability { id: "62E1", source: "Ser Grinnaux" } window 500,0
+500.0 "Pure of Heart" StartsUsing { id: "62E4", source: "Ser Charibert" } duration 36
+500.0 "Brightwinged Flight" Ability { id: "6316", source: "Ser Adelphel" }
+510.0 "Spear of the Fury" Ability { id: "62E2", source: "Ser Zephirin" }
+515.9 "Brightwing 1" Ability { id: "6319", source: "Ser Charibert" }
+520.9 "Brightwing 2" Ability { id: "6319", source: "Ser Charibert" }
+523.8 "Skyblind 1" Ability { id: "631A", source: "Ser Charibert" }
+525.9 "Brightwing 3" Ability { id: "6319", source: "Ser Charibert" }
+528.8 "Skyblind 2" Ability { id: "631A", source: "Ser Charibert" }
+530.9 "Brightwing 4" Ability { id: "6319", source: "Ser Charibert" }
+533.8 "Skyblind 3" Ability { id: "631A", source: "Ser Charibert" }
+535.9 "Pure of Heart" Ability { id: "62E4", source: "Ser Charibert" }
+537.8 "--untargetable--"
+538.8 "Skyblind 4" Ability { id: "631A", source: "Ser Charibert" }
+# Enrage?? (or just die to Pure of Heart?)
+
+
+### Phase 2: King Thordan
+541.5 "--targetable--"
+550.0 "--sync--" StartsUsing { id: "63C8", source: "King Thordan" } window 600,10
+553.0 "Ascalon's Mercy Concealed" Ability { id: "63C8", source: "King Thordan" }
+554.6 "--sync--" Ability { id: "63C9", source: "King Thordan" }
+556.2 "Ascalon's Might 1" #Ability { id: "63C5", source: "King Thordan" }
+557.8 "Ascalon's Might 2" #Ability { id: "63C5", source: "King Thordan" }
+559.4 "Ascalon's Might 3" #Ability { id: "63C5", source: "King Thordan" }
+562.2 "--sync--" Ability { id: "63C4", source: "King Thordan" }
+563.3 "Knights of the Round" Ability { id: "63ED", source: "King Thordan" }
+570.4 "Strength of the Ward" Ability { id: "63D3", source: "King Thordan" }
+573.5 "--untargetable--"
+581.3 "--sync--" Ability { id: "63D5", source: "Ser Guerrique" } # self-targeted Heavy Impact
+582.7 "Lightning Storm" Ability { id: "63CC", source: "King Thordan" }
+583.0 "Heavy Impact 1" Ability { id: "63D6", source: "Ser Guerrique" }
+583.0 "Spiral Thrust" Ability { id: "63D4", source: "Ser Ignasse" }
+584.9 "Heavy Impact 2" Ability { id: "63D7", source: "Ser Guerrique" }
+586.8 "Heavy Impact 3" Ability { id: "63D8", source: "Ser Guerrique" }
+588.1 "Ascalon's Mercy Concealed" Ability { id: "63C8", source: "King Thordan" }
+588.7 "Heavy Impact 4" Ability { id: "63D9", source: "Ser Guerrique" }
+589.7 "--sync--" Ability { id: "63C9", source: "King Thordan" }
+590.3 "--sync--" Ability { id: "63C4", source: "King Thordan" }
+590.6 "Heavy Impact 5" Ability { id: "63DA", source: "Ser Guerrique" }
+598.1 "Dimensional Collapse" Ability { id: "63DB", source: "Ser Grinnaux" }
+598.1 "The Dragon's Rage" Ability { id: "63CE", source: "King Thordan" }
+599.0 "Skyward Leap" #Ability { id: "63DD", source: "Ser Ignasse" }
+599.4 "Holy Shield Bash" Ability { id: "62D1", source: "Ser Adelphel" }
+599.9 "--sync--" Ability { id: "63DE", source: "Ser Hermenost" } # Conviction, self-casted
+600.1 "--sync--" Ability { id: "63EB", source: "Ser Janlenoux" } # Holy Shield Bash line aoe
+601.5 "Holy Bladedance" Ability { id: "62D2", source: "Ser Adelphel" }
+602.5 "--sync--" Ability { id: "63C4", source: "King Thordan" }
+602.8 "Conviction" Ability { id: "63DF", source: "Ser Hermenost" }
+
+604.9 "--targetable--"
+611.0 "Ancient Quaga" Ability { id: "63C6", source: "King Thordan" }
+621.2 "Heavenly Heel" Ability { id: "63C7", source: "King Thordan" }
+624.4 "Ascalon's Might 1" #Ability { id: "63C5", source: "King Thordan" }
+626.0 "Ascalon's Might 2" #Ability { id: "63C5", source: "King Thordan" }
+627.7 "Ascalon's Might 3" #Ability { id: "63C5", source: "King Thordan" }
+
+630.5 "--sync--" Ability { id: "63C4", source: "King Thordan" }
+631.6 "Knights of the Round" Ability { id: "63ED", source: "King Thordan" }
+638.7 "Sanctity of the Ward" Ability { id: "63E1", source: "King Thordan" }
+641.8 "--untargetable--"
+652.2 "Sacred Sever 1" #Ability { id: "63E3", source: "Ser Zephirin" }
+652.4 "The Dragon's Glory" Ability { id: "63D2", source: "King Thordan" }
+652.4 "The Dragon's Gaze" Ability { id: "63D1", source: "King Thordan" }
+654.0 "Sacred Sever 2" #Ability { id: "63E3", source: "Ser Zephirin" }
+655.8 "Sacred Sever 3" #Ability { id: "63E3", source: "Ser Zephirin" }
+657.6 "Sacred Sever 4" #Ability { id: "63E3", source: "Ser Zephirin" }
+658.5 "--sync--" Ability { id: "63C4", source: "King Thordan" }
+669.8 "Heavens' Stake" Ability { id: "6FAE", source: "Ser Charibert" }
+669.8 "Hiemal Storm" Ability { id: "63E6", source: "Ser Haumeric" }
+671.9 "Conviction 1" Ability { id: "737B", source: "Ser Hermenost" }
+674.7 "--sync--" Ability { id: "63E8", source: "Ser Noudenet" }
+675.6 "Holy Comet 1" #Ability { id: "63E9", source: "Holy Comet" }
+677.0 "Holy Comet 2" #Ability { id: "63E9", source: "Holy Comet" }
+678.4 "Holy Comet 3" #Ability { id: "63E9", source: "Holy Comet" }
+679.8 "Holy Comet 4" #Ability { id: "63E9", source: "Holy Comet" }
+681.2 "Holy Comet 5" #Ability { id: "63E9", source: "Holy Comet" }
+682.6 "Holy Comet 6" #Ability { id: "63E9", source: "Holy Comet" }
+684.0 "Holy Comet 7" #Ability { id: "63E9", source: "Holy Comet" }
+
+685.1 "Faith Unmoving" Ability { id: "62DC", source: "Ser Grinnaux" }
+685.2 "Conviction 2" Ability { id: "6FEA", source: "Ser Hermenost" }
+692.5 "--targetable--"
+
+692.6 "--sync--" Ability { id: "63BC", source: "King Thordan" }
+697.7 "--sync--" Ability { id: "63BD", source: "King Thordan" } window 20,20
+706.1 "Ultimate End" Ability { id: "63BE", source: "King Thordan" }
+
+711.8 "--sync--" Ability { id: "63BF", source: "King Thordan" }
+718.4 "Broad Swing 1" Ability { id: "63C[01]", source: "King Thordan" }
+726.9 "Broad Swing 2" Ability { id: "63C[01]", source: "King Thordan" }
+732.0 "--sync--" StartsUsing { id: "63C3", source: "King Thordan" } window 30,10
+738.0 "Aetheric Burst Enrage" Ability { id: "63C3", source: "King Thordan" }
+
+
+### Phase 3: Nidhogg
+# Tower ability notes:
+# 670E = Dark High Jump (circle marker)
+# 670F = Dark Spineshatter Dive (upward/forwards arrow)
+# 6710 = Dark Elusive Jump (downward/backwards arrow)
+# 6711, 6717, 6178, 6719, 671B = Darkdragon Dive (taking a tower, unsure why different)
+
+# If Aetheric Burst gets interrupted, then we can sync earlier,
+# but if you kill it before then, there's less indication of when to sync.
+993.1 "--sync--" NetworkCancelAbility { id: "63C3", source: "King Thordan" } window 300,0
+1000.0 "--sync--" Ability { id: "6708", source: "Nidhogg" } window 1000,0
+1002.3 "--targetable--"
+1002.3 "Final Chorus" Ability { id: "6709", source: "Nidhogg" }
+1020.5 "Dive from Grace" Ability { id: "670D", source: "Nidhogg" }
+1030.2 "Lash and Gnash/Gnash and Lash" Ability { id: "671[23]", source: "Nidhogg" }
+1030.4 "Tower 1" Ability { id: ["670E", "670F", "6710"], source: "Nidhogg" }
+1030.5 "Eye of the Tyrant" Ability { id: "6714", source: "Nidhogg" }
+1036.9 "Darkdragon Dive" Ability { id: "671[1789B]", source: "Nidhogg" }
+1040.3 "Tower 2" Ability { id: ["670E", "670F", "6710"], source: "Nidhogg" }
+1044.0 "Geirskogul" Ability { id: "670A", source: "Nidhogg" }
+1046.9 "Darkdragon Dive" Ability { id: "671[1789B]", source: "Nidhogg" }
+1051.3 "Tower 3" Ability { id: ["670E", "670F", "6710"], source: "Nidhogg" }
+1051.7 "Lash and Gnash/Gnash and Lash" Ability { id: "671[23]", source: "Nidhogg" }
+1052.0 "Eye of the Tyrant" Ability { id: "6714", source: "Nidhogg" }
+1054.0 "Geirskogul" Ability { id: "670A", source: "Nidhogg" }
+1057.9 "Darkdragon Dive" Ability { id: "671[1789B]", source: "Nidhogg" }
+1064.9 "Geirskogul" Ability { id: "670A", source: "Nidhogg" }
+1069.9 "Drachenlance" Ability { id: "670B", source: "Nidhogg" }
+1073.0 "Tower x4" # TODO: can this be better timed?
+1077.0 "Darkdragon Dive" Ability { id: "671[1789B]", source: "Nidhogg" }
+1084.0 "Soul Tether x2" Ability { id: "671C", source: "Nidhogg" }
+1084.0 "Geirskogul" Ability { id: "670A", source: "Nidhogg" }
+1107.8 "Drachenlance" Ability { id: "670B", source: "Nidhogg" }
+1120.9 "Revenge of the Horde Enrage" Ability { id: "7436", source: "Nidhogg" }
+
+
+### Phase 4: The Eyes
+1500.0 "--sync--" Ability { id: "717A", source: "Right Eye" } window 500,0
+1502.9 "--targetable--"
+1503.0 "Soul of Devotion" Ability { id: "68C6", source: "Ysayle" }
+1503.0 "Soul of Friendship" Ability { id: "68C5", source: "Haurchefant" }
+1510.2 "Resentment" Ability { id: "68BA", source: "Estinien" }
+1518.6 "Hatebound" Ability { id: "68BE", source: "Right Eye" }
+
+# These times are very roughly when it has grown enough and you can pop it.
+1526.4 "Flare Nova x2" #Ability { id: "68C1", source: "The Gilded Price" }
+1532.4 "Flare Star x4" #Ability { id: "68BF", source: "The Azure Price" }
+
+1544.7 "--sync--" Ability { id: "68C3", source: "Right Eye" }
+1545.5 "Mirage Dive 1" #Ability { id: "68C4", source: "Nidhogg" }
+1550.6 "Mirage Dive 2" #Ability { id: "68C4", source: "Nidhogg" }
+1555.7 "Mirage Dive 3" #Ability { id: "68C4", source: "Nidhogg" }
+1560.8 "Mirage Dive 4" #Ability { id: "68C4", source: "Nidhogg" }
+1570.6 "Steep in Rage" #Ability { id: "68BD", source: "Right Eye" }
+1577.9 "--untargetable--"
+1590.1 "Revenge of the Horde Enrage" Ability { id: "6722", source: "Nidhogg" }
+
+
+### Phase 4.5: Haurchefant v2
+2000.0 "Planar Prison" Ability { id: "62E1", source: "Ser Grinnaux" } window 500,0
+2000.0 "Brightwinged Flight" Ability { id: "6316", source: "Ser Adelphel" }
+2010.0 "Spear of the Fury" Ability { id: "62E2", source: "Ser Zephirin" }
+2015.9 "Brightwing 1" Ability { id: "6319", source: "Ser Charibert" }
+2021.0 "Brightwing 2" Ability { id: "6319", source: "Ser Charibert" }
+2024.0 "Skyblind 1" Ability { id: "631A", source: "Ser Charibert" }
+2026.1 "Brightwing 3" Ability { id: "6319", source: "Ser Charibert" }
+2029.0 "Skyblind 2" Ability { id: "631A", source: "Ser Charibert" }
+2031.1 "Brightwing 4" Ability { id: "6319", source: "Ser Charibert" }
+2034.1 "Skyblind 3" Ability { id: "631A", source: "Ser Charibert" }
+2036.3 "Pure of Heart" Ability { id: "62E4", source: "Ser Charibert" }
+2038.3 "--targetable--"
+2039.3 "Skyblind 4" Ability { id: "631A", source: "Ser Charibert" }
+2041.0 "--sync--" StartsUsing { id: "69B5", source: "Spear of the Fury" } window 10,10
+2052.0 "Pierce Enrage" Ability { id: "69B5", source: "Spear of the Fury" }
+
+# Ascalon's Mercy Concealed cast from King Thordan if Haurchefant dies and it loops.
+2055.9 "--sync--" StartsUsing { id: "63C8", source: "King Thordan" } window 60,200 jump 550
+
+
+
+### Phase 5: King Thordan II
+2980.8 "--sync--" Ability { id: "6317", source: "Haurchefant" } window 1000,0
+2995.9 "--targetable--"
+2996.0 "--sync--" StartsUsing { id: "6B86", source: "King Thordan" } window 1000,10
+3000.0 "Incarnation" Ability { id: "6B86", source: "King Thordan" }
+3006.2 "The Dragon's Eye" Ability { id: "6B87", source: "King Thordan" }
+3016.7 "--sync--" Ability { id: "63C4", source: "King Thordan" }
+
+3017.8 "Knights of the Round" Ability { id: "63ED", source: "King Thordan" }
+3024.9 "Wrath of the Heavens" Ability { id: "6B89", source: "King Thordan" }
+3028.0 "--untargetable--"
+3034.4 "Chain Lightning" Ability { id: "6B8F", source: "Darkscale" }
+3036.8 "Twisting Dive" Ability { id: "6B8B", source: "Vedrfolnir" }
+3036.8 "Skyward Leap" #Ability { id: "72A2", source: "Ser Paulecrain" }
+3036.8 "Spiral Pierce" #Ability { id: "6B8A", source: "Ser Ignasse" }
+3042.2 "Ascalon's Mercy Revealed" Ability { id: "63CA", source: "King Thordan" }
+3043.1 "Liquid Heaven 1" #Ability { id: "6B91", source: "Vedrfolnir" }
+3044.3 "Liquid Heaven 2" #Ability { id: "6B91", source: "Vedrfolnir" }
+3045.5 "Liquid Heaven 3" #Ability { id: "6B91", source: "Vedrfolnir" }
+3046.6 "--sync--" Ability { id: "63E4", source: "Ser Charibert" }
+3046.7 "Liquid Heaven 4" #Ability { id: "6B91", source: "Vedrfolnir" }
+3047.1 "Altar Flare 1" #Ability { id: "63E5", source: "Ser Charibert" }
+3047.9 "Liquid Heaven 5" #Ability { id: "6B91", source: "Vedrfolnir" }
+3048.7 "Altar Flare 2" #Ability { id: "63E5", source: "Ser Charibert" }
+3050.1 "Cauterize" Ability { id: "6B8D", source: "Darkscale" }
+3050.2 "Altar Flare 3" #Ability { id: "63E5", source: "Ser Charibert" }
+3050.3 "Empty Dimension" Ability { id: "62DA", source: "Ser Grinnaux" }
+3051.4 "--targetable--"
+3051.7 "Altar Flare 4" #Ability { id: "63E5", source: "Ser Charibert" }
+
+3057.4 "Ancient Quaga" Ability { id: "63C6", source: "King Thordan" }
+3067.8 "Heavenly Heel" Ability { id: "63C7", source: "King Thordan" }
+3071.0 "Ascalon's Might 1" #Ability { id: "63C5", source: "King Thordan" }
+3072.6 "Ascalon's Might 2" #Ability { id: "63C5", source: "King Thordan" }
+3074.2 "Ascalon's Might 3" #Ability { id: "63C5", source: "King Thordan" }
+
+3077.0 "--sync--" Ability { id: "63C4", source: "King Thordan" }
+3078.1 "Knights of the Round" Ability { id: "63ED", source: "King Thordan" }
+3085.2 "Death of the Heavens" Ability { id: "6B92", source: "King Thordan" }
+3088.3 "--untargetable--"
+3092.2 "Deathstorm" Ability { id: "6B94", source: "Darkscale" }
+3100.4 "Heavy Impact 1" Ability { id: "63D6", source: "Ser Guerrique" }
+3102.0 "Lightning Storm" Ability { id: "63CC", source: "King Thordan" }
+3102.3 "Twisting Dive" #Ability { id: "6B8B", source: "Vedrfolnir" }
+3102.3 "Cauterize" Ability { id: "6B8D", source: "Darkscale" }
+3102.3 "Spear of the Fury" #Ability { id: "6B93", source: "Ser Zephirin" }
+3102.3 "Heavy Impact 2" #Ability { id: "63D7", source: "Ser Guerrique" }
+3102.4 "Lightning Storm" #Ability { id: "63CD", source: "King Thordan" }
+3104.1 "Heavy Impact 3" Ability { id: "63D8", source: "Ser Guerrique" }
+3106.0 "Heavy Impact 4" Ability { id: "63D9", source: "Ser Guerrique" }
+3107.9 "Heavy Impact 5" Ability { id: "63DA", source: "Ser Guerrique" }
+3115.5 "Faith Unmoving" #Ability { id: "62DC", source: "Ser Grinnaux" }
+3115.5 "The Dragon's Gaze" #Ability { id: "63D1", source: "King Thordan" }
+3115.5 "The Dragon's Glory" #Ability { id: "63D2", source: "King Thordan" }
+3117.4 "Heavensflame" Ability { id: "62DE", source: "Ser Charibert" }
+3119.7 "Holy Meteor" Ability { id: "6B97", source: "Ser Noudenet" }
+
+# Meteors targetable
+3120.7 "--targetable--"
+3135.4 "Meteor Impact?" Ability { id: "6B98", source: "Meteor Circle" }
+
+# skip to here when meteors are killed
+3200.0 "--targetable--"
+3202.1 "--sync--" StartsUsing { id: "63C6", source: "King Thordan" } window 80,10
+3208.1 "Ancient Quaga" Ability { id: "63C6", source: "King Thordan" }
+3218.3 "Heavenly Heel" Ability { id: "63C7", source: "King Thordan" }
+3221.4 "Ascalon's Might 1" #Ability { id: "63C5", source: "King Thordan" }
+3223.0 "Ascalon's Might 2" #Ability { id: "63C5", source: "King Thordan" }
+3224.6 "Ascalon's Might 3" #Ability { id: "63C5", source: "King Thordan" }
+3229.5 "--sync--" StartsUsing { id: "6B88", source: "King Thordan" }
+3235.5 "Aetheric Burst Enrage" Ability { id: "6B88", source: "King Thordan" }
+
+
+# Phase 6: Nidhogg v2
+# 6D23 => 6D25 Head Down, Left Wing
+# 6D24 => 6D25 Head Up, Left Wing
+# 6D26 => 6D28 Head Down, Right Wing
+# 6D27 => 6D28 Head Up, Right Wing
+# 6D2D => 6D2E Hot Tail
+# 6D2B => 6D2C Hot Wing
+3500.0 "--sync--" Ability { id: "6667", source: "King Thordan" } window 500,0
+3517.3 "--targetable--"
+3535.0 "Great Wyrmsbreath" Ability { id: "6D35", source: "Hraesvelgr" }
+3535.0 "Dread Wyrmsbreath" #Ability { id: "6D33", source: "Nidhogg" }
+3535.7 "Swirling Blizzard" #Ability { id: "6D38", source: "Hraesvelgr" }
+3535.8 "Ice Breath" #Ability { id: "6D37", source: "Hraesvelgr" }
+3535.8 "Holy Breath" #Ability { id: "6D3C", source: "Hraesvelgr" }
+3535.8 "Flame Breath" #Ability { id: "6D36", source: "Nidhogg" }
+3535.8 "Staggering Breath" #Ability { id: "6D3D", source: "Nidhogg" }
+3543.0 "Mortal Vow" Ability { id: "6D30", source: "Nidhogg" }
+3554.3 "Akh Afah" Ability { id: "6D42", source: "Hraesvelgr" }
+3558.3 "--untargetable--"
+3559.5 "--targetable--"
+3567.4 "Hallowed Wings" Ability { id: ["6D23", "6D24", "6D26", "6D27"], source: "Hraesvelgr" }
+3568.2 "Hallowed Plume" #Ability { id: "6D29", source: "Hraesvelgr" }
+3568.5 "Cauterize" Ability { id: "6D3E", source: "Nidhogg" }
+3568.8 "--untargetable--"
+3571.9 "--targetable--"
+3577.0 "Mortal Vow" Ability { id: "6D31", source: "Nidhogg" }
+3582.4 "Wroth Flames" Ability { id: "6D45", source: "Nidhogg" }
+3583.3 "--untargetable--"
+3584.5 "--targetable--"
+3593.2 "Akh Morn 1" Ability { id: "6D46", source: "Nidhogg" }
+3593.3 "Cauterize" Ability { id: "6D3F", source: "Hraesvelgr" }
+3593.8 "--untargetable--"
+3594.9 "Akh Morn 2" #Ability { id: "6D47", source: "Nidhogg" }
+3596.5 "Akh Morn 3" #Ability { id: "6D47", source: "Nidhogg" }
+3598.1 "Akh Morn 4" #Ability { id: "6D47", source: "Nidhogg" }
+3599.1 "--targetable--"
+3605.2 "Hot Tail/Hot Wing" Ability { id: ["6D2D", "6D2B"], source: "Nidhogg" }
+3607.2 "Spreading Flames" #Ability { id: "742B", source: "Nidhogg" }
+3607.2 "Entangled Flames" #Ability { id: "742C", source: "Nidhogg" }
+3607.2 "Spreading Flames" #Ability { id: "742B", source: "Nidhogg" }
+3607.2 "Entangled Flames" #Ability { id: "742C", source: "Nidhogg" }
+3611.1 "Mortal Vow" Ability { id: "6D31", source: "Nidhogg" }
+3623.4 "Akh Afah" Ability { id: "6D42", source: "Hraesvelgr" }
+3635.4 "Hallowed Wings" Ability { id: ["6D23", "6D24", "6D26", "6D27"], source: "Hraesvelgr" }
+3635.4 "Hot Tail/Hot Wing" #Ability { id: ["6D2D", "6D2B"], source: "Nidhogg" }
+3635.5 "Hallowed Plume" #Ability { id: "6D29", source: "Hraesvelgr" }
+3645.1 "Mortal Vow" Ability { id: "6D31", source: "Nidhogg" }
+3655.1 "Great Wyrmsbreath" Ability { id: "6D35", source: "Hraesvelgr" }
+3655.1 "Dread Wyrmsbreath" #Ability { id: "6D33", source: "Nidhogg" }
+3655.8 "Swirling Blizzard" #Ability { id: "6D38", source: "Hraesvelgr" }
+3655.9 "Ice Breath" #Ability { id: "6D37", source: "Hraesvelgr" }
+3655.9 "Holy Orb" #Ability { id: "6D3A", source: "Hraesvelgr" }
+3655.9 "Flame Breath" #Ability { id: "6D36", source: "Nidhogg" }
+3655.9 "Dark Orb" #Ability { id: "6D39", source: "Nidhogg" }
+3661.2 "--untargetable--"
+3662.4 "--targetable--"
+3668.4 "Cauterize" Ability { id: "6D3F", source: "Hraesvelgr" }
+3668.7 "--untargetable--"
+3674.5 "--sync--" Ability { id: "6D40", source: "Hraesvelgr" }
+3675.4 "Touchdown" Ability { id: "70E7", source: ["Hraesvelgr", "Nidhogg"] }
+3675.7 "--targetable--"
+3679.1 "Mortal Vow" Ability { id: "6D31", source: "Nidhogg" }
+3701.8 "Revenge of the Horde (enrage)" Ability { id: "6D21", source: ["Hraesvelgr", "Nidhogg"] }
+
+3711.8 "Resentment?"
+3718.8 "Shockwave?" #Ability { id: "71E4", source: ["King Thordan", "Nidhogg"] }
+3744.6 "Alternative End?" #Ability { id: "7438", source: "Dragon-king Thordan" }
+
+
+# Phase 6.5: Eyes v2
+# Note: Shockwave could come from King Thordan or Nidhogg
+3809.5 "--sync--" Ability { id: "717A", source: "Right Eye" } window 200,0
+3809.5 "Resentment"
+3826.5 "Shockwave?" #Ability { id: "71E4", source: ["King Thordan", "Nidhogg"] }
+3828.3 "--sync--" #Ability { id: "63F3", source: "Left Eye" }
+3828.5 "--sync--" #Ability { id: "63F3", source: "Right Eye" }
+3842.3 "Alternative End?" #Ability { id: "7438", source: "Dragon-king Thordan" }
+
+
+# Phase 7: Dragon-king Thordan
+# Note: Nidhogg seems to get named for the first Chariot
+# Note: King Thordan can appear as one of the Exaflare casters in the first set
+# Note: Many of these spells are not named in garland db, so here is a name mapping:
+# Exaflare's Edge Spells:
+#   6D9B = Cast
+#   69DC = First Exaflare
+#   6D9D = Subsequent Exaflares
+# Akh Morn's Edge Spells:
+#  69D3 = Cast
+#  730C = 3 player tower (First hit)
+#  730D = 3 player tower (First hit)
+#  730E = 2 player tower (First hit)
+#  6D96 = 3 player tower (after first hit)
+#  6D97 = 2 player tower (after first hit)
+#  6D94 = Cast that checks if player is in towers?
+#  6D95 = Last cast in the Akh Morn in the sets in place of 6D94
+#  ???? = Raidwide spellid(s) if miss a tower
+# Trinity Spells:
+#  6D9E = Cast
+#  6D9F = Highest Emnity
+#  6DA0 = Second Highest Emnity
+#  6DA1 = Nearest Player
+# Gigaflare Spells:
+#  6D99 = Cast
+#  6D9A = First Proximity AoE
+#  6DD2 = Second Proximity AoE
+#  6DD3 = Third Proximity AoE
+# 6D91 = Flames of Ascalon (Out/Chariot)
+# 6D92 = Ice of Ascalon (In/Dynamo)
+4000.0 "Shockwave" Ability { id: "71E4", source: ["King Thordan", "Nidhogg"] } window 400,0
+4001.8 "--sync--" Ability { id: "63F3", source: "Left Eye" }
+4002.0 "--sync--" #Ability { id: "63F3", source: "Right Eye" }
+4015.8 "Alternative End" Ability { id: "7438", source: "Dragon-king Thordan" }
+4024.8 "--targetable--"
+4035.1 "--sync--" Ability { id: "6D9B", source: "Dragon-king Thordan" }
+4036.0 "Exaflare's Edge" duration 9.3 #Ability { id: "6D9C", source: "Dragon-king Thordan" }
+4036.2 "Ice of Ascalon/Flames of Ascalon" Ability { id: ["6D92", "6D91"], source: ["Nidhogg", "Dragon-king Thordan"] }
+4043.2 "--sync--" Ability { id: "6D9E", source: "Dragon-king Thordan" }
+4044.3 "Trinity 1" #Ability { id: ["6D9F", "6DA0", "6DA1"], source: "Dragon-king Thordan" }
+4047.3 "--sync--" Ability { id: "6D9E", source: "Dragon-king Thordan" }
+4048.4 "Trinity 2" #Ability { id: ["6D9F", "6DA0", "6DA1"], source: "Dragon-king Thordan" }
+4056.3 "--sync--" Ability { id: "6D93", source: "Dragon-king Thordan" }
+4057.0 "Akh Morn's Edge x5" duration 5.5 #Ability { id: ["730C", "730D", "730E"], source: "Dragon-king Thordan" }
+4057.1 "Ice of Ascalon/Flames of Ascalon" Ability { id: ["6D92", "6D91"], source: "Dragon-king Thordan" }
+4067.8 "--sync--" Ability { id: "6D9E", source: "Dragon-king Thordan" }
+4068.9 "Trinity 3" #Ability { id: ["6D9F", "6DA0", "6DA1"], source: "Dragon-king Thordan" }
+4071.9 "--sync--" Ability { id: "6D9E", source: "Dragon-king Thordan" }
+4073.0 "Trinity 4" #Ability { id: ["6D9F", "6DA0", "6DA1"], source: "Dragon-king Thordan" }
+4082.9 "--sync--" Ability { id: "6D99", source: "Dragon-king Thordan" }
+4083.9 "Gigaflare's Edge x3" duration 7.9 #Ability { id: "6D9A", source: "Dragon-king Thordan" }
+4084.0 "Ice of Ascalon/Flames of Ascalon" Ability { id: ["6D92", "6D91"], source: "Dragon-king Thordan" }
+4100.9 "--sync--" Ability { id: "6D9E", source: "Dragon-king Thordan" }
+4102.0 "Trinity 5" #Ability { id: ["6D9F", "6DA0", "6DA1"], source: "Dragon-king Thordan" }
+4104.9 "--sync--" Ability { id: "6D9E", source: "Dragon-king Thordan" }
+4106.0 "Trinity 6" #Ability { id: ["6D9F", "6DA0", "6DA1"], source: "Dragon-king Thordan" }
+4113.9 "--sync--" Ability { id: "6D9B", source: "Dragon-king Thordan" }
+4114.8 "Exaflare's Edge" duration 9.3 #Ability { id: "6D9C", source: "Dragon-king Thordan" }
+4115.0 "Ice of Ascalon/Flames of Ascalon" Ability { id: ["6D92", "6D91"], source: "Dragon-king Thordan" }
+4121.9 "--sync--" Ability { id: "6D9E", source: "Dragon-king Thordan" }
+4122.9 "Trinity 1" #Ability { id: ["6D9F", "6DA0", "6DA1"], source: "Dragon-king Thordan" }
+4125.8 "--sync--" Ability { id: "6D9E", source: "Dragon-king Thordan" }
+4126.9 "Trinity 2" #Ability { id: ["6D9F", "6DA0", "6DA1"], source: "Dragon-king Thordan" }
+4134.9 "--sync--" Ability { id: "6D93", source: "Dragon-king Thordan" }
+4135.6 "Akh Morn's Edge x6" duration 6.6 #Ability { id: ["730C", "730D", "730E"], source: "Dragon-king Thordan" }
+4135.7 "Ice of Ascalon/Flames of Ascalon" Ability { id: ["6D92", "6D91"], source: "Dragon-king Thordan" }
+4147.5 "--sync--" Ability { id: "6D9E", source: "Dragon-king Thordan" }
+4148.6 "Trinity 3" #Ability { id: ["6D9F", "6DA0", "6DA1"], source: "Dragon-king Thordan" }
+4151.6 "--sync--" Ability { id: "6D9E", source: "Dragon-king Thordan" }
+4152.7 "Trinity 4" #Ability { id: ["6D9F", "6DA0", "6DA1"], source: "Dragon-king Thordan" }
+4162.6 "Gigaflare's Edge x3" Ability { id: "6D99", source: "Dragon-king Thordan" } duration 7.9
+4163.7 "Ice of Ascalon/Flames of Ascalon" Ability { id: ["6D92", "6D91"], source: "Dragon-king Thordan" }
+4180.8 "--sync--" Ability { id: "6D9E", source: "Dragon-king Thordan" }
+4181.9 "Trinity 5" #Ability { id: ["6D9F", "6DA0", "6DA1"], source: "Dragon-king Thordan" }
+4184.9 "--sync--" Ability { id: "6D9E", source: "Dragon-king Thordan" }
+4186.0 "Trinity 6" #Ability { id: ["6D9F", "6DA0", "6DA1"], source: "Dragon-king Thordan" }
+4193.9 "--sync--" Ability { id: "6D9B", source: "Dragon-king Thordan" }
+4194.8 "Exaflare's Edge" duration 9.3 #Ability { id: "6D9C", source: "Dragon-king Thordan" }
+4195.0 "Ice of Ascalon/Flames of Ascalon" Ability { id: ["6D92", "6D91"], source: "Dragon-king Thordan" }
+4201.9 "--sync--" Ability { id: "6D9E", source: "Dragon-king Thordan" }
+4202.9 "Trinity 1" #Ability { id: ["6D9F", "6DA0", "6DA1"], source: "Dragon-king Thordan" }
+4205.8 "--sync--" Ability { id: "6D9E", source: "Dragon-king Thordan" }
+4206.9 "Trinity 2" #Ability { id: ["6D9F", "6DA0", "6DA1"], source: "Dragon-king Thordan" }
+4214.8 "--sync--" Ability { id: "6D93", source: "Dragon-king Thordan" }
+4215.5 "Akh Morn's Edge x7" duration 7.7 #Ability { id: ["730C", "730D", "730E"], source: "Dragon-king Thordan" }
+4215.6 "Ice of Ascalon/Flames of Ascalon" Ability { id: ["6D92", "6D91"], source: "Dragon-king Thordan" }
+4228.5 "--sync--" Ability { id: "6D9E", source: "Dragon-king Thordan" }
+4229.6 "Trinity 3" #Ability { id: ["6D9F", "6DA0", "6DA1"], source: "Dragon-king Thordan" }
+4232.6 "--sync--" Ability { id: "6D9E", source: "Dragon-king Thordan" }
+4233.7 "Trinity 4" #Ability { id: ["6D9F", "6DA0", "6DA1"], source: "Dragon-king Thordan" }
+4245.6 "--sync--" Ability { id: "6E2E", source: "Dragon-king Thordan" }
+4246.3 "Morn Afah's Edge x3" Ability { id: ["730F", "7310", "7311"], source: "Dragon-king Thordan" }
+
+# This seems to loop indefinitely
+# 6E31 will fire if 6E30 does not hit a player
+4248.7 "--sync--" Ability { id: "6E2F", source: "Dragon-king Thordan" }
+4249.5 "Morn Afah's Edge x3" Ability { id: "6E30", source: "Dragon-king Thordan" }
+4251.8 "--sync--" Ability { id: "6E2F", source: "Dragon-king Thordan" } jump 4248.7
+4252.6 "Morn Afah's Edge x3" #Ability { id: "6E30", source: "Dragon-king Thordan" }
+4255.7 "Morn Afah's Edge x3" #Ability { id: "6E30", source: "Dragon-king Thordan" }
+4258.8 "Morn Afah's Edge x3" #Ability { id: "6E30", source: "Dragon-king Thordan" }

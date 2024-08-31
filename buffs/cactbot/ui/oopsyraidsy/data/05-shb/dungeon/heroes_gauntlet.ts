@@ -59,11 +59,16 @@ const triggerSet: OopsyTriggerSet<Data> = {
     {
       id: 'THG Wild Rampage',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '5207', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '5207', ...playerDamageFields }),
       // This is zero damage if you are in the crater.
       condition: (data, matches) => data.DamageFromMatches(matches) > 0,
       mistake: (_data, matches) => {
-        return { type: 'fail', blame: matches.target, reportId: matches.targetId, text: matches.ability };
+        return {
+          type: 'fail',
+          blame: matches.target,
+          reportId: matches.targetId,
+          text: matches.ability,
+        };
       },
     },
   ],

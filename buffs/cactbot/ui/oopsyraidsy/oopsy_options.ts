@@ -3,9 +3,8 @@ import UserConfig from '../../resources/user_config';
 import ZoneId from '../../resources/zone_id';
 import { BaseOptions } from '../../types/data';
 import { LooseOopsyTriggerSet } from '../../types/oopsy';
+import { PartyMemberParamObjectKeys, PartyTrackerOptions } from '../../types/party';
 import { ZoneIdType } from '../../types/trigger';
-
-import { abilityNameMap } from './ability_name_map';
 
 export type DisabledTriggers = { [triggerId: string]: boolean };
 export type TriggerAutoConfig = { enabled: boolean };
@@ -18,7 +17,6 @@ type OopsyNonConfigOptions = {
   // TODO: should content_type export what type it is?
   IgnoreContentTypes: number[];
   IgnoreZoneIds: ZoneIdType[];
-  AbilityIdNameMap: { [id: string]: string };
   PerTriggerAutoConfig: PerTriggerAutoConfig;
 };
 
@@ -37,7 +35,6 @@ const defaultOopsyNonConfigOptions: OopsyNonConfigOptions = {
     ZoneId.Zadnor,
   ],
 
-  AbilityIdNameMap: abilityNameMap,
   PerTriggerAutoConfig: {},
 };
 
@@ -47,22 +44,26 @@ const defaultOopsyNonConfigOptions: OopsyNonConfigOptions = {
 export type DeathReportSide = 'left' | 'right' | 'disabled';
 
 type OopsyConfigOptions = {
-  Debug: boolean;
+  DefaultPlayerLabel: PartyMemberParamObjectKeys;
   NumLiveListItemsInCombat: number;
   MinimumTimeForPullMistake: number;
   TimeToShowDeathReportMs: number;
   DeathReportSide: DeathReportSide;
+  MinimumTimeForOverwrittenMit: number;
 };
 
 const defaultOopsyConfigOptions: OopsyConfigOptions = {
-  Debug: false,
+  // TODO: support DefaultPlayerLabel in oopsy and add it to options
+  DefaultPlayerLabel: 'nick',
   NumLiveListItemsInCombat: 5,
   MinimumTimeForPullMistake: 0.4,
   TimeToShowDeathReportMs: 4000,
   DeathReportSide: 'left',
+  MinimumTimeForOverwrittenMit: 2,
 };
 
-export interface OopsyOptions extends BaseOptions, OopsyNonConfigOptions, OopsyConfigOptions {}
+export interface OopsyOptions
+  extends BaseOptions, OopsyNonConfigOptions, OopsyConfigOptions, PartyTrackerOptions {}
 
 // See user/raidboss-example.js for documentation.
 const Options: OopsyOptions = {

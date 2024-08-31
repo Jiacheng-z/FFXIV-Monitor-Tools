@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -10,6 +9,7 @@ export interface Data extends RaidbossData {
 }
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'TheFinalCoilOfBahamutTurn4',
   zoneId: ZoneId.TheFinalCoilOfBahamutTurn4,
   timelineFile: 't13.txt',
   initData: () => {
@@ -29,12 +29,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'T13 Gigaflare Phase Change',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: 'BB9', source: 'Bahamut Prime', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: 'BB9', source: 'Prim-Bahamut', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: 'BB9', source: 'Primo-Bahamut', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: 'BB9', source: 'バハムート・プライム', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: 'BB9', source: '至尊巴哈姆特', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: 'BB9', source: '바하무트 프라임', capture: false }),
+      netRegex: { id: 'BB9', source: 'Bahamut Prime', capture: false },
       // Only the first two gigas are phase changes, the rest are in final phase.
       condition: (data) => data.gigaflare <= 2,
       sound: 'Long',
@@ -57,12 +52,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'T13 Flatten',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: 'BAE', source: 'Bahamut Prime' }),
-      netRegexDe: NetRegexes.startsUsing({ id: 'BAE', source: 'Prim-Bahamut' }),
-      netRegexFr: NetRegexes.startsUsing({ id: 'BAE', source: 'Primo-Bahamut' }),
-      netRegexJa: NetRegexes.startsUsing({ id: 'BAE', source: 'バハムート・プライム' }),
-      netRegexCn: NetRegexes.startsUsing({ id: 'BAE', source: '至尊巴哈姆特' }),
-      netRegexKo: NetRegexes.startsUsing({ id: 'BAE', source: '바하무트 프라임' }),
+      netRegex: { id: 'BAE', source: 'Bahamut Prime' },
       alertText: (data, matches, output) => {
         if (matches.target === data.me)
           return output.flattenOnYou!();
@@ -70,7 +60,7 @@ const triggerSet: TriggerSet<Data> = {
       infoText: (data, matches, output) => {
         if (matches.target === data.me)
           return;
-        return output.flattenOn!({ player: data.ShortName(matches.target) });
+        return output.flattenOn!({ player: data.party.member(matches.target) });
       },
       outputStrings: {
         flattenOn: {
@@ -94,7 +84,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'T13 Megaflare Share',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0027' }),
+      netRegex: { id: '0027' },
       condition: Conditions.targetIsYou(),
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -110,19 +100,15 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       id: 'T13 Earthshaker',
-      netRegex: NetRegexes.headMarker({ id: '0028' }),
+      type: 'HeadMarker',
+      netRegex: { id: '0028' },
       condition: Conditions.targetIsYou(),
       response: Responses.earthshaker(),
     },
     {
       id: 'T13 Tempest Wing',
       type: 'Tether',
-      netRegex: NetRegexes.tether({ id: '0004', target: 'Bahamut Prime' }),
-      netRegexDe: NetRegexes.tether({ id: '0004', target: 'Prim-Bahamut' }),
-      netRegexFr: NetRegexes.tether({ id: '0004', target: 'Primo-Bahamut' }),
-      netRegexJa: NetRegexes.tether({ id: '0004', target: 'バハムート・プライム' }),
-      netRegexCn: NetRegexes.tether({ id: '0004', target: '至尊巴哈姆特' }),
-      netRegexKo: NetRegexes.tether({ id: '0004', target: '바하무트 프라임' }),
+      netRegex: { id: '0004', target: 'Bahamut Prime' },
       condition: (data, matches) => data.me === matches.source,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -139,19 +125,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'T13 Akh Morn',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: 'BC2', source: 'Bahamut Prime' }),
-      netRegexDe: NetRegexes.startsUsing({ id: 'BC2', source: 'Prim-Bahamut' }),
-      netRegexFr: NetRegexes.startsUsing({ id: 'BC2', source: 'Primo-Bahamut' }),
-      netRegexJa: NetRegexes.startsUsing({ id: 'BC2', source: 'バハムート・プライム' }),
-      netRegexCn: NetRegexes.startsUsing({ id: 'BC2', source: '至尊巴哈姆特' }),
-      netRegexKo: NetRegexes.startsUsing({ id: 'BC2', source: '바하무트 프라임' }),
+      netRegex: { id: 'BC2', source: 'Bahamut Prime' },
       alertText: (data, matches, output) => {
         if (matches.target === data.me)
           return output.akhMornOnYou!();
       },
       infoText: (data, matches, output) => {
         if (matches.target !== data.me)
-          return output.akhMornOn!({ player: data.ShortName(matches.target) });
+          return output.akhMornOn!({ player: data.party.member(matches.target) });
       },
       outputStrings: {
         akhMornOn: {

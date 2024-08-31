@@ -38,12 +38,12 @@ export const langMap: { [lang in Lang]: { [lang in Lang]: string } } = {
     ko: '韓国語',
   },
   cn: {
-    en: '英语',
-    de: '德语',
-    fr: '法语',
-    ja: '日语',
+    en: '英文',
+    de: '德文',
+    fr: '法文',
+    ja: '日文',
     cn: '中文',
-    ko: '韩语',
+    ko: '韩文',
   },
   ko: {
     en: '영어',
@@ -57,7 +57,7 @@ export const langMap: { [lang in Lang]: { [lang in Lang]: string } } = {
 
 export const isLang = (lang?: string): lang is Lang => {
   const langStrs: readonly string[] = languages;
-  if (!lang)
+  if (lang === undefined)
     return false;
   return langStrs.includes(lang);
 };
@@ -71,4 +71,13 @@ export const langToLocale = (lang: Lang): string => {
     cn: 'zh-CN',
     ko: 'ko',
   }[lang];
+};
+
+export const browserLanguagesToLang = (languages: readonly string[]): Lang => {
+  const lang = [...navigator.languages, 'en']
+    .map((l) => l.slice(0, 2))
+    // Remap `zh` to `cn` to match cactbot languages
+    .map((l) => l === 'zh' ? 'cn' : l)
+    .filter((l) => languages.includes(l))[0];
+  return isLang(lang) ? lang : 'en';
 };

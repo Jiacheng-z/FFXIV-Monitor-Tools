@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -9,29 +8,20 @@ export type Data = RaidbossData;
 
 // Innocence Normal
 const triggerSet: TriggerSet<Data> = {
+  id: 'TheCrownOfTheImmaculate',
   zoneId: ZoneId.TheCrownOfTheImmaculate,
   timelineFile: 'innocence.txt',
   triggers: [
     {
       id: 'Inno Realmrazer',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3E9A', source: 'Innocence', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3E9A', source: 'Innozenz', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3E9A', source: 'Innocence', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3E9A', source: 'イノセンス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3E9A', source: '无瑕灵君', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3E9A', source: '이노센스', capture: false }),
+      netRegex: { id: '3E9A', source: 'Innocence', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Inno Enthrall',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3E99', source: 'Innocence', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3E99', source: 'Innozenz', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3E99', source: 'Innocence', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3E99', source: 'イノセンス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3E99', source: '无瑕灵君', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3E99', source: '이노센스', capture: false }),
+      netRegex: { id: '3E99', source: 'Innocence', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -47,12 +37,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Inno Reprobation Swords 2',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3EDC', source: 'Innocence', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3EDC', source: 'Innozenz', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3EDC', source: 'Innocence', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3EDC', source: 'イノセンス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3EDC', source: '无瑕灵君', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3EDC', source: '이노센스', capture: false }),
+      netRegex: { id: '3EDC', source: 'Innocence', capture: false },
       // 3 seconds cast time + 9.5 seconds until next sword.
       delaySeconds: 9.5,
       infoText: (_data, _matches, output) => output.text!(),
@@ -71,34 +56,19 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Inno Shadowreaver',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3EEA', source: 'Innocence', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3EEA', source: 'Innozenz', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3EEA', source: 'Innocence', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3EEA', source: 'イノセンス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3EEA', source: '无瑕灵君', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3EEA', source: '이노센스', capture: false }),
+      netRegex: { id: '3EEA', source: 'Innocence', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Inno Righteous Bolt',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3EA3', source: 'Innocence' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3EA3', source: 'Innozenz' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3EA3', source: 'Innocence' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3EA3', source: 'イノセンス' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3EA3', source: '无瑕灵君' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3EA3', source: '이노센스' }),
+      netRegex: { id: '3EA3', source: 'Innocence' },
       response: Responses.tankBuster(),
     },
     {
       id: 'Inno Charge',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3EC7', source: 'Innocence', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3EC7', source: 'Innozenz', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3EC7', source: 'Innocence', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3EC7', source: 'イノセンス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3EC7', source: '无瑕灵君', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3EC7', source: '이노센스', capture: false }),
+      netRegex: { id: '3EC7', source: 'Innocence', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -114,12 +84,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Inno Light Pillar',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '38FC', source: 'Innocence', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: '38FC', source: 'Innozenz', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: '38FC', source: 'Innocence', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: '38FC', source: 'イノセンス', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: '38FC', source: '无瑕灵君', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: '38FC', source: '이노센스', capture: false }),
+      netRegex: { id: '38FC', source: 'Innocence', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -135,7 +100,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Inno Winged Drop Of Light',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '008A' }),
+      netRegex: { id: '008A' },
       condition: Conditions.targetIsYou(),
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -153,12 +118,7 @@ const triggerSet: TriggerSet<Data> = {
       // TODO: is there a left, or do all normal modes rotate right??
       id: 'Inno Soul And Body Right',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3EB1', source: 'Innocence', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3EB1', source: 'Innozenz', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3EB1', source: 'Innocence', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3EB1', source: 'イノセンス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3EB1', source: '无瑕灵君', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3EB1', source: '이노센스', capture: false }),
+      netRegex: { id: '3EB1', source: 'Innocence', capture: false },
       suppressSeconds: 1,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -231,7 +191,7 @@ const triggerSet: TriggerSet<Data> = {
         'Drop Of Light': 'Goutte de lumière',
         'Daybreak': 'Point du jour',
         'Beatific Vision': 'Vision béatifique',
-        '--add Phase--': '--add phase--',
+        '--add Phase--': '--phase d\'add--',
       },
     },
     {

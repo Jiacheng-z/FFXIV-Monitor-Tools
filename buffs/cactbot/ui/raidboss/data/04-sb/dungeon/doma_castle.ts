@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -10,24 +9,29 @@ export interface Data extends RaidbossData {
 }
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'DomaCastle',
   zoneId: ZoneId.DomaCastle,
   timelineFile: 'doma_castle.txt',
+  timelineTriggers: [
+    {
+      id: 'Doma Castle Magitek Rearguard Cermet Pile',
+      // untelegraphed, instant tank cleave
+      regex: /Cermet Pile/,
+      beforeSeconds: 4,
+      response: Responses.tankCleave(),
+    },
+  ],
   triggers: [
     {
       id: 'Doma Castle Magitek Hexadrone 2-Tonze Magitek Missile',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '003E' }),
+      netRegex: { id: '003E' },
       response: Responses.stackMarkerOn(),
     },
     {
       id: 'Doma Castle Magitek Hexadrone Magitek Missiles',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Magitek Hexadrone', id: '20A4', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Magitek-Hexadrohne', id: '20A4', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Hexadrone Magitek', id: '20A4', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: '魔導ヘキサローラー', id: '20A4', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '魔导六轮装甲', id: '20A4', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '마도 헥사롤러', id: '20A4', capture: false }),
+      netRegex: { source: 'Magitek Hexadrone', id: '20A4', capture: false },
       infoText: (data, _matches, output) => {
         return data.seenTowers ? output.getTowers!() : output.getTower!();
       },
@@ -54,7 +58,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Doma Castle Hypertuned Grynewaht Delay-Action Charge',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0063' }),
+      netRegex: { id: '0063' },
       condition: Conditions.targetIsYou(),
       response: Responses.spread(),
     },
@@ -62,7 +66,7 @@ const triggerSet: TriggerSet<Data> = {
       id: 'Doma Castle Hypertuned Grynewaht Thermobaric Charge',
       type: 'GainsEffect',
       // There's no 0x1B line or 0x14/0x15 target for this prox marker, only the Prey debuff.
-      netRegex: NetRegexes.gainsEffect({ effectId: '4E5' }),
+      netRegex: { effectId: '4E5' },
       condition: Conditions.targetIsYou(),
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -70,6 +74,7 @@ const triggerSet: TriggerSet<Data> = {
           en: 'Drop Charge Away',
           de: 'Lege Markierung weit weg ab',
           fr: 'Déposez la charge au loin',
+          ja: 'マーカーを外に捨てる',
           cn: '将标记放远',
           ko: '징 멀리 두고 오기',
         },
@@ -86,6 +91,7 @@ const triggerSet: TriggerSet<Data> = {
         'Magitek Hexadrone': 'Magitek-Hexadrohne',
         'Magitek Rearguard': 'Magitek-Rückendecker',
         'Rearguard Bit': 'Rückendecker-Drohne',
+        'Retuned Magitek Bit': 'verbessert(?:e|er|es|en) Magitek-Drohne',
         'The Third Armory': 'Dritte Waffenkammer',
         'The Training Grounds': 'Exerzierplatz',
         'The Hall Of The Scarlet Swallow': 'Halle der Blutroten Schwalbe',
@@ -101,6 +107,7 @@ const triggerSet: TriggerSet<Data> = {
         'Garlean Fire': 'Garleischer Brandsatz',
         'Gunsaw': 'Kanonensäge',
         'Hexadrone Bits': 'Hexadrohnen-Module',
+        'Magitek Bits': 'Magitek-Drohnen',
         'Magitek Missiles': 'Magitek-Rakete',
         'Magitek Ray': 'Magitek-Laser',
         'Rearguard Mines': 'Rückendecker-Minen',
@@ -109,7 +116,6 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       'locale': 'fr',
-      'missingTranslations': true,
       'replaceSync': {
         'Hexadrone Bit': 'module d\'hexadrone',
         'Hypertuned Grynewaht': 'Grynewaht hyper-renforcé',
@@ -117,21 +123,26 @@ const triggerSet: TriggerSet<Data> = {
         'Magitek Hexadrone': 'hexadrone magitek',
         'Magitek Rearguard': 'arrière-garde magitek',
         'Rearguard Bit': 'drone d\'arrière-garde',
+        'Retuned Magitek Bit': 'drone magitek reréglé',
         'The Third Armory': 'Arsenal A3',
         'The Training Grounds': 'Terrain de manœuvres',
         'The Hall Of The Scarlet Swallow': 'Salle de l\'Hirondelle écarlate',
       },
       'replaceText': {
         '2-Tonze Magitek Missile': 'Missiles magitek de 2 tonz',
+        'Bits Activate': 'Activation des modules',
         'Cermet Pile': 'Amas de cermet',
         'Chainsaw': 'Tronçonneuse',
         'Circle Of Death': 'Cercle de la mort',
         'Clean Cut': 'Tranchage net',
         'Delay-Action Charge': 'Charge à retardement',
+        'Hexadrone Bits': 'Modules d\'hexadrone',
+        'Magitek Bits': 'Drones magitek',
         'Garlean Fire': 'Feu garlemaldais',
         'Gunsaw': 'Canon-tronçonneur',
         'Magitek Missiles': 'Missiles magitek',
         'Magitek Ray': 'Rayon magitek',
+        'Rearguard Mines': 'Drones d\'arrière-garde',
         'Thermobaric Charge': 'Charge thermobarique',
       },
     },
@@ -145,6 +156,7 @@ const triggerSet: TriggerSet<Data> = {
         'Magitek Hexadrone': '魔導ヘキサローラー',
         'Magitek Rearguard': '魔導リアガード',
         'Rearguard Bit': 'リアガード・ビット',
+        'Retuned Magitek Bit': '魔導ビット改',
         'The Third Armory': '第III兵器庫',
         'The Training Grounds': '練兵場',
         'The Hall Of The Scarlet Swallow': '赤燕の間',
@@ -156,6 +168,8 @@ const triggerSet: TriggerSet<Data> = {
         'Circle Of Death': 'サークル・オブ・デス',
         'Clean Cut': '激突',
         'Delay-Action Charge': '時限爆弾',
+        'Hexadrone Bits': 'ヘキサローラー・ビット',
+        'Magitek Bits': '魔導ビット',
         'Garlean Fire': 'ガレアンファイア',
         'Gunsaw': 'ガンチェーンソー',
         'Magitek Missiles': '魔導ミサイル',
@@ -172,6 +186,7 @@ const triggerSet: TriggerSet<Data> = {
         'Magitek Hexadrone': '魔导六轮装甲',
         'Magitek Rearguard': '魔导后卫',
         'Rearguard Bit': '魔导后卫浮游炮',
+        'Retuned Magitek Bit': '改良版魔导浮游炮',
         'The Third Armory': '第三兵器库',
         'The Training Grounds': '练兵场',
         'The Hall Of The Scarlet Swallow': '赤燕之间',
@@ -187,6 +202,7 @@ const triggerSet: TriggerSet<Data> = {
         'Garlean Fire': '加雷马火炎',
         'Gunsaw': '链锯枪',
         'Hexadrone Bits': '魔导六轮装甲浮游炮',
+        'Magitek Bits': '魔导浮游炮',
         'Magitek Missiles': '魔导飞弹',
         'Magitek Ray': '魔导激光',
         'Rearguard Mines': '魔导后卫炸雷',
@@ -202,6 +218,7 @@ const triggerSet: TriggerSet<Data> = {
         'Magitek Hexadrone': '마도 헥사롤러',
         'Magitek Rearguard': '마도 리어가드',
         'Rearguard Bit': '리어가드 비트',
+        'Retuned Magitek Bit': '개량형 마도 비트',
         'The Third Armory': '제III병기고',
         'The Training Grounds': '연병장',
         'The Hall Of The Scarlet Swallow': '세키엔의 방',
@@ -217,6 +234,7 @@ const triggerSet: TriggerSet<Data> = {
         'Garlean Fire': '갈레안 파이어',
         'Gunsaw': '기관총',
         'Hexadrone Bits': '헥사롤러 비트',
+        'Magitek Bits': '마도 비트',
         'Magitek Missiles': '마도 미사일',
         'Magitek Ray': '마도 레이저',
         'Rearguard Mines': '리어가드 폭뢰',

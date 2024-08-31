@@ -1,12 +1,14 @@
 import { Lang } from '../../resources/languages';
-import UserConfig from '../../resources/user_config';
+import UserConfig, { ConfigValue } from '../../resources/user_config';
 import { BaseOptions, RaidbossData } from '../../types/data';
 import { Matches } from '../../types/net_matches';
+import { PartyMemberParamObjectKeys, PartyTrackerOptions } from '../../types/party';
 import {
   LooseTriggerSet,
   TriggerAutoConfig,
   TriggerField,
   TriggerOutput,
+  TriggerSetAutoConfig,
 } from '../../types/trigger';
 
 // This file defines the base options that raidboss expects to see.
@@ -27,9 +29,18 @@ export type PerTriggerOption = Partial<{
   TTSText: TriggerOutput<RaidbossData, Matches>;
 }>;
 
+export type TimelineConfig = Partial<{
+  Ignore: string[];
+  Rename: { [text: string]: string };
+  Add: { time: number; text: string; duration?: number }[];
+}>;
+
 export type PerTriggerAutoConfig = { [triggerId: string]: TriggerAutoConfig };
+export type PerTriggerSetAutoConfig = { [triggerSetId: string]: TriggerSetAutoConfig };
 export type PerTriggerOptions = { [triggerId: string]: PerTriggerOption };
 export type DisabledTriggers = { [triggerId: string]: boolean };
+export type PerZoneTimelineConfig = { [zoneId: number]: TimelineConfig };
+export type TriggerSetConfig = { [triggerSetId: string]: { [key: string]: ConfigValue } };
 
 type RaidbossNonConfigOptions = {
   PlayerNicks: { [gameName: string]: string };
@@ -41,7 +52,10 @@ type RaidbossNonConfigOptions = {
   AudioAllowed: boolean;
   DisabledTriggers: DisabledTriggers;
   PerTriggerAutoConfig: PerTriggerAutoConfig;
+  PerTriggerSetAutoConfig: PerTriggerSetAutoConfig;
   PerTriggerOptions: PerTriggerOptions;
+  PerZoneTimelineConfig: PerZoneTimelineConfig;
+  TriggerSetConfig: TriggerSetConfig;
   Triggers: LooseTriggerSet[];
   PlayerNameOverride?: string;
   IsRemoteRaidboss: boolean;
@@ -64,7 +78,10 @@ const defaultRaidbossNonConfigOptions: RaidbossNonConfigOptions = {
   DisabledTriggers: {},
 
   PerTriggerAutoConfig: {},
+  PerTriggerSetAutoConfig: {},
   PerTriggerOptions: {},
+  PerZoneTimelineConfig: {},
+  TriggerSetConfig: {},
 
   Triggers: [],
 
@@ -76,16 +93,17 @@ const defaultRaidbossNonConfigOptions: RaidbossNonConfigOptions = {
 // TODO: figure out how to get this type from raidboss_config??
 // These values are overwritten and are just here for typing.
 const defaultRaidbossConfigOptions = {
-  Debug: false,
   DefaultAlertOutput: 'textAndSound',
   AlertsLanguage: undefined as (Lang | undefined),
   TimelineLanguage: undefined as (Lang | undefined),
   TimelineEnabled: true,
   AlertsEnabled: true,
+  DefaultPlayerLabel: 'nick' as PartyMemberParamObjectKeys,
   ShowTimerBarsAtSeconds: 30,
   KeepExpiredTimerBarsForSeconds: 0.7,
   BarExpiresSoonSeconds: 6,
   MaxNumberOfTimerBars: 6,
+  ReverseTimeline: false,
   DisplayAlarmTextForSeconds: 3,
   DisplayAlertTextForSeconds: 3,
   DisplayInfoTextForSeconds: 3,
@@ -94,13 +112,21 @@ const defaultRaidbossConfigOptions = {
   InfoSoundVolume: 1,
   LongSoundVolume: 1,
   PullSoundVolume: 1,
-  cactbotWormholeStrat: false,
-  cactbote8sUptimeKnockbackStrat: false,
+  RumbleEnabled: false,
+  InfoRumbleDuration: 400,
+  InfoRumbleWeak: 0.5,
+  InfoRumbleStrong: 0,
+  AlertRumbleDuration: 500,
+  AlertRumbleWeak: 0,
+  AlertRumbleStrong: 0.5,
+  AlarmRumbleDuration: 750,
+  AlarmRumbleWeak: 0.75,
+  AlarmRumbleStrong: 0.75,
 };
 type RaidbossConfigOptions = typeof defaultRaidbossConfigOptions;
 
 export interface RaidbossOptions
-  extends BaseOptions, RaidbossNonConfigOptions, RaidbossConfigOptions {}
+  extends BaseOptions, RaidbossNonConfigOptions, RaidbossConfigOptions, PartyTrackerOptions {}
 
 // See user/raidboss-example.js for documentation.
 const Options: RaidbossOptions = {

@@ -187,7 +187,7 @@
       same "printed page" as the copyright notice for easier
       identification within third-party archives.
 
-   Copyright 2017-2021 https://github.com/quisquous/cactbot
+   Copyright 2017-2024 https://github.com/OverlayPlugin/cactbot
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -205,8 +205,6 @@
 Bundled projects with different licenses:
     * FFXIVPluginHelper.cs (custom license allowing sublicensing)
         https://github.com/xtuaok/ACT_EnmityPlugin/
-    * FF14 fish tracker app (MIT license)
-        https://github.com/icykoneko/ff14-fish-tracker-app
     * resources/ffxiv: art from Final Fantasy XIV (FINAL FANTASY® XIV Materials Usage License)
         reused non-commercially via https://support.na.square-enix.com/rule.php?id=5382
         FINAL FANTASY is a registered trademark of Square Enix Holdings Co., Ltd.

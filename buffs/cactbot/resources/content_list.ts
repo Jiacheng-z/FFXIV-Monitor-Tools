@@ -7,6 +7,10 @@ import ZoneId from './zone_id';
 //
 // These are not things that cactbot necessarily supports, but things that it
 // theoretically could be supporting in the future with raidboss and oopsy.
+//
+// Miscellaneous things like maps, hunts, carnivale, pvp, eureka
+// should not be added here yet.
+// See: https://github.com/quisquous/cactbot/issues/5069
 
 const contentList: (ZoneIdType)[] = [
   // General (cactbot custom zone id)
@@ -106,30 +110,30 @@ const contentList: (ZoneIdType)[] = [
   ZoneId.TheDeadEnds,
   ZoneId.Smileton,
   ZoneId.TheStigmaDreamscape,
+  ZoneId.AlzadaalsLegacy,
+  ZoneId.TheFellCourtOfTroia,
+  ZoneId.LapisManalis,
+  ZoneId.TheAetherfont,
+  ZoneId.TheLunarSubterrane,
 
-  // Guildhests
-  ZoneId.BasicTrainingEnemyParties,
-  ZoneId.UnderTheArmor,
-  ZoneId.BasicTrainingEnemyStrongholds,
-  ZoneId.HeroOnTheHalfShell,
-  ZoneId.PullingPoisonPosies,
-  ZoneId.StingingBack,
-  ZoneId.AllsWellThatEndsInTheWell,
-  ZoneId.FlickingSticksAndTakingNames,
-  ZoneId.MoreThanAFeeler,
-  ZoneId.AnnoyTheVoid,
-  ZoneId.ShadowAndClaw,
-  ZoneId.LongLiveTheQueen,
-  ZoneId.WardUp,
-  ZoneId.SolemnTrinity,
+  // Dungeons (Dawntrail)
+  ZoneId.Ihuykatumu,
+  ZoneId.WorqorZormor,
+  ZoneId.TheSkydeepCenote,
+  ZoneId.Vanguard,
+  ZoneId.Origenics,
+  ZoneId.Alexandria,
+  ZoneId.TenderValley,
+  ZoneId.TheStrayboroughDeadwalk,
 
   // Trials (A Realm Reborn)
   ZoneId.TheBowlOfEmbers,
   ZoneId.TheNavel,
   ZoneId.TheHowlingEye,
-  ZoneId.CapeWestwind,
+  ZoneId.CapeWestwind, // changed to solo duty in 6.1
+  ZoneId.ThePortaDecumana,
   ZoneId.TheChrysalis,
-  ZoneId.TheStepsOfFaith,
+  ZoneId.TheStepsOfFaith, // changed to solo duty in 6.2
   ZoneId.ARelicRebornTheChimera,
   ZoneId.ARelicRebornTheHydra,
   ZoneId.BattleOnTheBigBridge,
@@ -219,10 +223,34 @@ const contentList: (ZoneIdType)[] = [
   ZoneId.TheDarkInside,
   ZoneId.TheMothercrystal,
   ZoneId.TheFinalDay,
+  ZoneId.StormsCrown,
+  ZoneId.MountOrdeals,
+  ZoneId.TheVoidcastDais,
+  ZoneId.TheAbyssalFracture,
+  ZoneId.TheGildedAraya,
 
   // High-end Trials (Endwalker)
   ZoneId.TheMinstrelsBalladZodiarksFall,
   ZoneId.TheMinstrelsBalladHydaelynsCall,
+  ZoneId.TheMinstrelsBalladEndsingersAria,
+  ZoneId.StormsCrownExtreme,
+  ZoneId.MountOrdealsExtreme,
+  ZoneId.TheVoidcastDaisExtreme,
+  ZoneId.TheAbyssalFractureExtreme,
+  ZoneId.UltimasBaneUnreal,
+  ZoneId.ContainmentBayS1T7Unreal,
+  ZoneId.ContainmentBayP1T6Unreal,
+  ZoneId.ContainmentBayZ1T9Unreal,
+  ZoneId.TheSingularityReactorUnreal,
+
+  // Trials (Dawntrail)
+  ZoneId.WorqorLarDor,
+  ZoneId.Everkeep,
+  ZoneId.TheInterphos,
+
+  // High-end Trials (Dawntrail)
+  ZoneId.WorqorLarDorExtreme,
+  ZoneId.EverkeepExtreme,
 
   // Alliance Raids (A Realm Reborn)
   ZoneId.TheLabyrinthOfTheAncients,
@@ -349,16 +377,70 @@ const contentList: (ZoneIdType)[] = [
   ZoneId.EdensPromiseAnamorphosisSavage,
   ZoneId.EdensPromiseEternitySavage,
 
+  // Alliance Raids (Endwalker)
+  ZoneId.Aglaia,
+  ZoneId.Euphrosyne,
+  ZoneId.Thaleia,
+
   // Normal Raids (Endwalker)
   ZoneId.AsphodelosTheFirstCircle,
   ZoneId.AsphodelosTheSecondCircle,
   ZoneId.AsphodelosTheThirdCircle,
   ZoneId.AsphodelosTheFourthCircle,
+  ZoneId.AbyssosTheFifthCircle,
+  ZoneId.AbyssosTheSixthCircle,
+  ZoneId.AbyssosTheSeventhCircle,
+  ZoneId.AbyssosTheEighthCircle,
+  ZoneId.AnabaseiosTheNinthCircle,
+  ZoneId.AnabaseiosTheTenthCircle,
+  ZoneId.AnabaseiosTheEleventhCircle,
+  ZoneId.AnabaseiosTheTwelfthCircle,
+
+  // Savage Raids (Endwalker)
+  ZoneId.AsphodelosTheFirstCircleSavage,
+  ZoneId.AsphodelosTheSecondCircleSavage,
+  ZoneId.AsphodelosTheThirdCircleSavage,
+  ZoneId.AsphodelosTheFourthCircleSavage,
+  ZoneId.AbyssosTheFifthCircleSavage,
+  ZoneId.AbyssosTheSixthCircleSavage,
+  ZoneId.AbyssosTheSeventhCircleSavage,
+  ZoneId.AbyssosTheEighthCircleSavage,
+  ZoneId.AnabaseiosTheNinthCircleSavage,
+  ZoneId.AnabaseiosTheTenthCircleSavage,
+  ZoneId.AnabaseiosTheEleventhCircleSavage,
+  ZoneId.AnabaseiosTheTwelfthCircleSavage,
+
+  // Alliance Raids (Dawntrail)
+
+  // Normal Raids (Dawntrail)
+  ZoneId.AacLightHeavyweightM1,
+  ZoneId.AacLightHeavyweightM2,
+  ZoneId.AacLightHeavyweightM3,
+  ZoneId.AacLightHeavyweightM4,
+
+  // Savage Raids (Dawntrail)
+  ZoneId.AacLightHeavyweightM1Savage,
+  ZoneId.AacLightHeavyweightM2Savage,
+  ZoneId.AacLightHeavyweightM3Savage,
+  ZoneId.AacLightHeavyweightM4Savage,
+
+  // Variant & Criterion Dungeons
+  ZoneId.TheSildihnSubterrane,
+  ZoneId.AnotherSildihnSubterrane,
+  ZoneId.AnotherSildihnSubterraneSavage,
+  ZoneId.MountRokkon,
+  ZoneId.AnotherMountRokkon,
+  ZoneId.AnotherMountRokkonSavage,
+  ZoneId.AloaloIsland,
+  ZoneId.AnotherAloaloIsland,
+  ZoneId.AnotherAloaloIslandSavage,
 
   // Ultimate Raids
   ZoneId.TheUnendingCoilOfBahamutUltimate,
   ZoneId.TheWeaponsRefrainUltimate,
   ZoneId.TheEpicOfAlexanderUltimate,
+  ZoneId.DragonsongsRepriseUltimate,
+  ZoneId.TheOmegaProtocolUltimate,
 ];
 
 export default contentList;

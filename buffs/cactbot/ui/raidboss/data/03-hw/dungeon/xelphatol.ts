@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -9,6 +8,7 @@ export type Data = RaidbossData;
 
 // Xelphatol
 const triggerSet: TriggerSet<Data> = {
+  id: 'Xelphatol',
   zoneId: ZoneId.Xelphatol,
   timelineFile: 'xelphatol.txt',
   timelineTriggers: [
@@ -39,38 +39,26 @@ const triggerSet: TriggerSet<Data> = {
   triggers: [
     {
       id: 'Xelphatol Long Burst',
-      netRegex: NetRegexes.startsUsing({ id: '19C8', source: 'Nuzal Hueloc', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '19C8', source: 'Nuzal Hueloc', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '19C8', source: 'Nuzal Hueloc', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '19C8', source: '飛天のヌザル・フェロック', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '19C8', source: '飞天枪 奴扎尔·怀罗克', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '19C8', source: '비천의 누잘 후엘록', capture: false }),
+      type: 'StartsUsing',
+      netRegex: { id: '19C8', source: 'Nuzal Hueloc', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Xelphatol Hot Blast',
-      netRegex: NetRegexes.startsUsing({ id: '19CC', source: 'Floating Turret', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '19CC', source: 'Schwebend(?:e|er|es|en) Geschütz', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '19CC', source: 'Tourelle Volante', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '19CC', source: 'バルーンタレット', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '19CC', source: '气球炮塔', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '19CC', source: '기구 포탑', capture: false }),
+      type: 'StartsUsing',
+      netRegex: { id: '19CC', source: 'Floating Turret', capture: false },
       response: Responses.getUnder(),
     },
     {
       id: 'Xelphatol On High',
-      netRegex: NetRegexes.startsUsing({ id: '19CF', source: 'Dotoli Ciloc', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '19CF', source: 'Dotoli Ciloc', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '19CF', source: 'Dotoli Ciloc', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '19CF', source: '旋風のドトリ・シロック', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '19CF', source: '旋风扇 德托里·西罗克', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '19CF', source: '선풍의 도톨리 실록', capture: false }),
+      type: 'StartsUsing',
+      netRegex: { id: '19CF', source: 'Dotoli Ciloc', capture: false },
       response: Responses.knockback(),
     },
     {
       id: 'Xelphatol Dark Wings',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0017' }),
+      netRegex: { id: '0017' },
       condition: Conditions.targetIsYou(),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -86,25 +74,21 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       id: 'Xelphatol Ixali Aero AOE',
-      netRegex: NetRegexes.startsUsing({ id: '19D5', source: 'Tozol Huatotl', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '19D5', source: 'Tozol Huatotl', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '19D5', source: 'Tozol Huatotl', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '19D5', source: '晴嵐のトゾル・ファトトル', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '19D5', source: '晴天霹雳 托佐尔·法托特尔', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '19D5', source: '청풍의 토졸 후아토틀', capture: false }),
+      type: 'StartsUsing',
+      netRegex: { id: '19D5', source: 'Tozol Huatotl', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Xelphatol Bill',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0046' }),
+      netRegex: { id: '0046' },
       condition: Conditions.targetIsYou(),
       response: Responses.spread(),
     },
     {
       id: 'Xelphatol Hawk',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '003E' }),
+      netRegex: { id: '003E' },
       response: Responses.stackMarkerOn(),
     },
   ],
@@ -152,6 +136,7 @@ const triggerSet: TriggerSet<Data> = {
       'replaceSync': {
         'Abalathian Hornbill': 'bucorve d\'Abalathia',
         'Dotoli Ciloc': 'Dotoli Ciloc',
+        'Floating Turret': 'tourelle volante',
         'Garuda': 'Garuda',
         'Nuzal Hueloc': 'Nuzal Hueloc',
         'The Cage': 'Le Nichoir',
@@ -195,6 +180,7 @@ const triggerSet: TriggerSet<Data> = {
         'The Tlachtli': 'タパソリ闘技場',
         'The Vortex': '神前祭壇',
         'Tozol Huatotl': '晴嵐のトゾル・ファトトル',
+        'Floating Turret': 'バルーンタレット',
       },
       'replaceText': {
         '\\(buster\\)': '(タンクバスター)',
@@ -291,7 +277,7 @@ const triggerSet: TriggerSet<Data> = {
         'Summon Garuda': '가루다 소환',
         'Swiftfeather': '깃털 바람',
         'Wicked Wheel': '마녀의 수레바퀴',
-        'Wind Blast': '공기 분출',
+        'Wind Blast': '바람 분출',
       },
     },
   ],

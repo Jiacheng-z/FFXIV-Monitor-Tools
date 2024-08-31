@@ -16,6 +16,7 @@ export class MCHComponent extends BaseComponent {
   batteryGauge: ResourceBox;
   drillBox: TimerBox;
   airAnchorBox: TimerBox;
+  chainSawBox: TimerBox;
   wildFireBox: TimerBox;
   stacksContainer: HTMLDivElement;
 
@@ -24,6 +25,7 @@ export class MCHComponent extends BaseComponent {
   wildFireStacks: HTMLElement[] = [];
   wildFireCounts = 0;
   wildFireActive = false;
+  overheatstack = 0;
 
   constructor(o: ComponentInterface) {
     super(o);
@@ -49,6 +51,11 @@ export class MCHComponent extends BaseComponent {
       fgColor: 'mch-color-airanchor',
     });
 
+    this.chainSawBox = this.bars.addProcBox({
+      id: 'mch-procs-chainsaw',
+      fgColor: 'mch-color-chainsaw',
+    });
+
     this.wildFireBox = this.bars.addProcBox({
       id: 'mch-procs-wildfire',
       fgColor: 'mch-color-wildfire',
@@ -71,6 +78,7 @@ export class MCHComponent extends BaseComponent {
 
     this.reset();
   }
+
   override onCombo(skill: string, combo: ComboTracker): void {
     this.comboTimer.duration = 0;
     if (combo.isFinalSkill)
@@ -83,9 +91,9 @@ export class MCHComponent extends BaseComponent {
     this.heatGauge.innerText = jobDetail.heat.toString();
     this.batteryGauge.innerText = jobDetail.battery.toString();
     // These two seconds are shown by half adjust, not like others' ceil.
-    if (jobDetail.overheatMilliseconds > 0) {
+    if (jobDetail.overheatActive === true) {
       this.heatGauge.parentNode.classList.add('overheat');
-      this.heatGauge.innerText = Math.round(jobDetail.overheatMilliseconds / 1000).toString();
+      this.heatGauge.innerText = this.overheatstack.toString();
     } else {
       this.heatGauge.parentNode.classList.remove('overheat');
       this.heatGauge.innerText = jobDetail.heat.toString();
@@ -114,8 +122,12 @@ export class MCHComponent extends BaseComponent {
     }
   }
 
+  override onYouGainEffect(id: string, matches: PartialFieldMatches<'GainsEffect'>): void {
+    if (id === EffectId.Overheated_A80)
+      this.overheatstack = parseInt(matches.count ?? '0');
+  }
   override onMobGainsEffectFromYou(id: string, matches: PartialFieldMatches<'GainsEffect'>): void {
-    if (id === EffectId.Wildfire) {
+    if (id === EffectId.Wildfire_35D) {
       this.wildFireActive = true;
       this.wildFireCounts = parseInt(matches.count ?? '0');
       this.refreshWildFireGauge();
@@ -124,26 +136,35 @@ export class MCHComponent extends BaseComponent {
   }
 
   override onMobLosesEffectFromYou(id: string): void {
-    if (id === EffectId.Wildfire) {
+    if (id === EffectId.Wildfire_35D) {
       this.wildFireActive = false;
       this.refreshWildFireGauge();
     }
   }
 
-  override onUseAbility(id: string): void {
+  override onUseAbility(id: string, matches: PartialFieldMatches<'Ability'>): void {
     switch (id) {
       case kAbility.Drill:
       case kAbility.Bioblaster:
-        this.drillBox.duration = this.player.getActionCooldown(20000, 'skill');
+        if (matches.targetIndex === '0') {
+          this.drillBox.duration = this.player.getActionCooldown(20000, 'skill') +
+            this.drillBox.value;
+        }
         break;
       case kAbility.AirAnchor:
       case kAbility.HotShot:
         this.airAnchorBox.duration = this.player.getActionCooldown(40000, 'skill');
         break;
+      case kAbility.ChainSaw:
+        this.chainSawBox.duration = this.player.getActionCooldown(60000, 'skill');
+        break;
       case kAbility.WildFire: {
         this.wildFireBox.duration = 10 + 0.9; // animation delay
         this.wildFireBox.threshold = 1000;
-        this.wildFireBox.fg = computeBackgroundColorFrom(this.wildFireBox, 'mch-color-wildfire.active');
+        this.wildFireBox.fg = computeBackgroundColorFrom(
+          this.wildFireBox,
+          'mch-color-wildfire.active',
+        );
         this.tid1 = window.setTimeout(() => {
           this.wildFireBox.duration = 110 - 0.9;
           this.wildFireBox.threshold = this.player.gcdSkill + 1;
@@ -159,11 +180,9 @@ export class MCHComponent extends BaseComponent {
   }
 
   override onStatChange({ gcdSkill }: { gcdSkill: number }): void {
-    this.drillBox.valuescale = gcdSkill;
     this.drillBox.threshold = gcdSkill * 3 + 1;
-    this.airAnchorBox.valuescale = gcdSkill;
     this.airAnchorBox.threshold = gcdSkill * 3 + 1;
-    this.wildFireBox.valuescale = gcdSkill;
+    this.chainSawBox.threshold = gcdSkill * 3 + 1;
     this.wildFireBox.threshold = gcdSkill + 1;
   }
 
@@ -171,6 +190,7 @@ export class MCHComponent extends BaseComponent {
     this.comboTimer.duration = 0;
     this.drillBox.duration = 0;
     this.airAnchorBox.duration = 0;
+    this.chainSawBox.duration = 0;
     this.wildFireCounts = 0;
     this.wildFireActive = false;
     this.refreshWildFireGauge();

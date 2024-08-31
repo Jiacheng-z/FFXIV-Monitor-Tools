@@ -38,6 +38,10 @@ const triggerSet: OopsyTriggerSet<Data> = {
           text: {
             en: 'Tank Tower',
             de: 'Tank-Turm',
+            fr: 'Tour Tank',
+            ja: 'タンク塔',
+            cn: '坦克塔',
+            ko: '탱커 장판',
           },
         };
       },
@@ -55,6 +59,10 @@ const triggerSet: OopsyTriggerSet<Data> = {
           text: {
             en: 'Healer Tower',
             de: 'Heiler-Turm',
+            fr: 'Tour Healer',
+            ja: 'ヒーラ塔',
+            cn: '治疗塔',
+            ko: '힐러 장판',
           },
         };
       },
@@ -72,6 +80,10 @@ const triggerSet: OopsyTriggerSet<Data> = {
           text: {
             en: 'DPS Tower',
             de: 'DD-Turm',
+            fr: 'Tour DPS',
+            ja: 'DPS塔',
+            cn: 'DPS塔',
+            ko: '딜러 장판',
           },
         };
       },
@@ -89,6 +101,10 @@ const triggerSet: OopsyTriggerSet<Data> = {
           text: {
             en: 'Tank Orb',
             de: 'Tank-Orb',
+            fr: 'Orbe Tank',
+            ja: 'タンク玉',
+            cn: '坦克球',
+            ko: '탱커 구슬',
           },
         };
       },
@@ -106,6 +122,10 @@ const triggerSet: OopsyTriggerSet<Data> = {
           text: {
             en: 'Healer Orb',
             de: 'Heiler-Orb',
+            fr: 'Orbe Healer',
+            ja: 'ヒーラ玉',
+            cn: '治疗球',
+            ko: '힐러 구슬',
           },
         };
       },
@@ -123,6 +143,10 @@ const triggerSet: OopsyTriggerSet<Data> = {
           text: {
             en: 'DPS Orb',
             de: 'DD-Orb',
+            fr: 'Orbe DPS',
+            ja: 'DPS玉',
+            cn: 'DPS球',
+            ko: '딜러 구슬',
           },
         };
       },
@@ -143,9 +167,10 @@ const triggerSet: OopsyTriggerSet<Data> = {
           text: {
             en: 'Pushed into wall',
             de: 'Rückstoß in die Wand',
+            fr: 'Poussé(e) dans le mur',
             ja: '壁へノックバック',
             cn: '击退至墙',
-            ko: '넉백',
+            ko: '벽으로 넉백',
           },
         };
       },

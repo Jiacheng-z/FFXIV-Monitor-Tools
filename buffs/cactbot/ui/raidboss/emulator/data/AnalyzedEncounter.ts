@@ -10,11 +10,12 @@ import EventBus from '../EventBus';
 import RaidEmulatorAnalysisTimelineUI from '../overrides/RaidEmulatorAnalysisTimelineUI';
 import RaidEmulatorPopupText from '../overrides/RaidEmulatorPopupText';
 import RaidEmulatorTimelineController from '../overrides/RaidEmulatorTimelineController';
+import RaidEmulatorWatchCombatantsOverride from '../overrides/RaidEmulatorWatchCombatantsOverride';
 
 import Combatant from './Combatant';
 import Encounter from './Encounter';
 import LineEvent from './network_log_converter/LineEvent';
-import PopupTextAnalysis, { Resolver, ResolverStatus } from './PopupTextAnalysis';
+import PopupTextAnalysis, { LineRegExpCache, Resolver, ResolverStatus } from './PopupTextAnalysis';
 import RaidEmulator from './RaidEmulator';
 
 export type PerspectiveTrigger = {
@@ -32,16 +33,18 @@ type Perspectives = { [id: string]: Perspective };
 
 export default class AnalyzedEncounter extends EventBus {
   perspectives: Perspectives = {};
+  regexCache: LineRegExpCache | undefined;
   constructor(
     public options: RaidbossOptions,
     public encounter: Encounter,
     public emulator: RaidEmulator,
+    public watchCombatantsOverride: RaidEmulatorWatchCombatantsOverride,
   ) {
     super();
   }
 
   selectPerspective(id: string, popupText: PopupTextAnalysis | RaidEmulatorPopupText): void {
-    if (this.encounter && this.encounter.combatantTracker) {
+    if (this.encounter.combatantTracker) {
       const selectedPartyMember = this.encounter.combatantTracker.combatants[id];
       if (!selectedPartyMember)
         return;
@@ -51,11 +54,12 @@ export default class AnalyzedEncounter extends EventBus {
           const partyMember = this.encounter?.combatantTracker?.combatants[id];
           if (!partyMember)
             throw new UnreachableCode();
+          const initState = partyMember.nextState(0);
           return {
             id: id,
             worldId: 0,
-            name: partyMember.name,
-            job: Util.jobToJobEnum(partyMember.job ?? 'NONE'),
+            name: initState.Name ?? '',
+            job: initState.Job ?? 0,
             inParty: true,
           };
         }),
@@ -74,20 +78,20 @@ export default class AnalyzedEncounter extends EventBus {
     timestamp: number,
     popupText: PopupTextAnalysis | RaidEmulatorPopupText,
   ): void {
-    const job = combatant.job;
+    const state = combatant.getState(timestamp);
+    const job = state.Job;
     if (!job)
       throw new UnreachableCode();
-    const state = combatant.getState(timestamp);
     popupText?.OnPlayerChange({
       detail: {
-        id: parseInt(combatant.id),
-        name: combatant.name,
-        job: job,
-        level: combatant.level ?? 0,
-        currentHP: state.hp,
-        maxHP: state.maxHp,
-        currentMP: state.mp,
-        maxMP: state.maxMp,
+        id: state.ID ?? 0,
+        name: state.Name ?? '',
+        job: Util.jobEnumToJob(job),
+        level: state.Level ?? 0,
+        currentHP: state.CurrentHP,
+        maxHP: state.MaxHP,
+        currentMP: state.CurrentMP,
+        maxMP: state.MaxMP,
         currentCP: 0,
         maxCP: 0,
         currentGP: 0,
@@ -95,11 +99,11 @@ export default class AnalyzedEncounter extends EventBus {
         currentShield: 0,
         jobDetail: null,
         pos: {
-          x: state.posX,
-          y: state.posY,
-          z: state.posZ,
+          x: state.PosX,
+          y: state.PosY,
+          z: state.PosZ,
         },
-        rotation: state.heading,
+        rotation: state.Heading,
         bait: 0,
         debugJob: '',
       },
@@ -113,6 +117,9 @@ export default class AnalyzedEncounter extends EventBus {
         await this.analyzeFor(id);
     }
 
+    // Free up this memory
+    delete this.regexCache;
+
     return this.dispatch('analyzed');
   }
 
@@ -122,10 +129,19 @@ export default class AnalyzedEncounter extends EventBus {
     let currentLogIndex = 0;
     const partyMember = this.encounter.combatantTracker.combatants[id];
 
+    const getCurLogLine = (): LineEvent => {
+      const line = this.encounter.logLines[currentLogIndex];
+      if (!line)
+        throw new UnreachableCode();
+      return line;
+    };
+
     if (!partyMember)
       return;
 
-    if (!partyMember.job) {
+    const initState = partyMember?.nextState(0);
+
+    if (initState.Job === 0) {
       this.perspectives[id] = {
         initialData: {},
         triggers: [],
@@ -146,6 +162,9 @@ export default class AnalyzedEncounter extends EventBus {
       new TimelineLoader(timelineController),
       raidbossFileData,
     );
+
+    if (this.regexCache)
+      popupText.regexCache = this.regexCache;
 
     const generator = new PopupTextGenerator(popupText);
     timelineUI.SetPopupTextInterface(generator);
@@ -172,17 +191,17 @@ export default class AnalyzedEncounter extends EventBus {
         );
         popupText.triggerResolvers.push(resolver);
 
-        if (!currentLine)
-          throw new UnreachableCode();
-
         popupText.OnTrigger(trigger, matches, currentLine.timestamp);
 
         resolver.setFinal(() => {
+          // Get the current log line when the callback is executed instead of the line
+          // when the trigger initially fires
+          const resolvedLine = getCurLogLine();
           resolver.status.finalData = EmulatorCommon.cloneData(popupText.getData());
           delete resolver.triggerHelper?.resolver;
           if (popupText.callback) {
             popupText.callback(
-              currentLine,
+              resolvedLine,
               resolver.triggerHelper,
               resolver.status,
               popupText.getData(),
@@ -197,14 +216,11 @@ export default class AnalyzedEncounter extends EventBus {
       if (!perspective || !triggerHelper)
         throw new UnreachableCode();
 
-      const delay = currentTriggerStatus.delay ?? 0;
-
       perspective.triggers.push({
         triggerHelper: triggerHelper,
         status: currentTriggerStatus,
         logLine: log,
-        resolvedOffset: (log.timestamp - this.encounter.startTimestamp) +
-          (delay * 1000),
+        resolvedOffset: log.timestamp - this.encounter.startTimestamp,
       });
     };
     popupText.triggerResolvers = [];
@@ -226,9 +242,13 @@ export default class AnalyzedEncounter extends EventBus {
       if (combatant && combatant.hasState(log.timestamp))
         this.updateState(combatant, log.timestamp, popupText);
 
-      await popupText.onEmulatorLog([log]);
+      this.watchCombatantsOverride.tick(log.timestamp);
+      await popupText.onEmulatorLog([log], getCurLogLine);
       timelineController.onEmulatorLogEvent([log]);
     }
+
+    this.watchCombatantsOverride.clear();
     timelineUI.stop();
+    this.regexCache = popupText.regexCache;
   }
 }

@@ -3,6 +3,7 @@ import { Lang } from '../../resources/languages';
 import NetRegexes from '../../resources/netregexes';
 import { UnreachableCode } from '../../resources/not_reached';
 import TimerBar from '../../resources/timerbar';
+import TimerBox from '../../resources/timerbox';
 import TimerIcon from '../../resources/timericon';
 import { LocaleNetRegex } from '../../resources/translations';
 import Util from '../../resources/util';
@@ -14,6 +15,7 @@ import { ToMatches } from '../../types/net_matches';
 import { CactbotBaseRegExp } from '../../types/net_trigger';
 
 import { kLevelMod, kMeleeWithMpJobs } from './constants';
+import { FfxivVersion } from './jobs';
 import { SpeedBuffs } from './player';
 
 const getLocaleRegex = (locale: string, regexes: {
@@ -92,11 +94,12 @@ type PlayerLike = {
 };
 
 // Source: http://theoryjerks.akhmorning.com/guide/speed/
-export const calcGCDFromStat = (player: PlayerLike, stat: number, actionDelay = 2500): number => {
-  // If stats haven't been updated, use a reasonable default value.
-  if (stat === 0)
-    return actionDelay / 1000;
-
+export const calcGCDFromStat = (
+  player: PlayerLike,
+  stat: number,
+  ffxivVersion: FfxivVersion,
+  actionDelay = 2500,
+): number => {
   let type1Buffs = 0;
   let type2Buffs = 0;
   if (player.job === 'BLM') {
@@ -110,10 +113,16 @@ export const calcGCDFromStat = (player: PlayerLike, stat: number, actionDelay = 
       else
         type1Buffs += 10;
     }
+  } else if (player.job === 'VPR') {
+    // FIXME: not sure whether it is type1
+    type1Buffs += player.speedBuffs.swiftscaled ? 15 : 0;
   }
 
   if (player.job === 'NIN') {
-    type2Buffs += player.speedBuffs.huton ? 15 : 0;
+    if (ffxivVersion < 700)
+      type2Buffs += player.speedBuffs.huton ? 15 : 0;
+    else
+      type2Buffs += player.level >= 45 ? 15 : 0;
   } else if (player.job === 'MNK') {
     type2Buffs += 5 * getLightningStacksByLevel(player.level);
   } else if (player.job === 'BRD') {
@@ -136,13 +145,17 @@ export const calcGCDFromStat = (player: PlayerLike, stat: number, actionDelay = 
   // TODO: this probably isn't useful to track
   const astralUmbralMod = 100;
 
-  const mod = kLevelMod[player.level];
-  if (!mod)
-    throw new UnreachableCode();
-  const gcdMs = Math.floor(1000 - Math.floor(130 * (stat - mod[0]) / mod[1])) * actionDelay / 1000;
+  // If stats haven't been updated, use a reasonable default value.
+  let gcdMs = actionDelay;
+  if (stat !== 0 && player.level > 0) {
+    const mod = kLevelMod[player.level];
+    if (!mod)
+      throw new UnreachableCode();
+    gcdMs = Math.floor(1000 - Math.floor(130 * (stat - mod[0]) / mod[1])) * actionDelay / 1000;
+  }
   const a = (100 - type1Buffs) / 100;
   const b = (100 - type2Buffs) / 100;
-  const gcdC = Math.floor(Math.floor((a * b) * gcdMs / 10) * astralUmbralMod / 100);
+  const gcdC = Math.floor(Math.floor(a * b * gcdMs / 10) * astralUmbralMod / 100);
   return gcdC / 100;
 };
 
@@ -249,4 +262,24 @@ export const isPvPZone = (zoneId: number): boolean => {
   if (zoneInfo.contentType === ContentType.Pvp || zoneId === ZoneId.WolvesDenPier)
     return true;
   return false;
+};
+
+export const showDuration = (o: {
+  tid: number;
+  timerbox: TimerBox;
+  duration: number;
+  cooldown: number;
+  threshold: number;
+  activecolor: string;
+  deactivecolor: string;
+}): number => {
+  o.timerbox.duration = o.duration;
+  o.timerbox.threshold = o.duration;
+  o.timerbox.fg = computeBackgroundColorFrom(o.timerbox, o.activecolor);
+  o.tid = window.setTimeout(() => {
+    o.timerbox.duration = o.cooldown - o.duration;
+    o.timerbox.threshold = o.threshold;
+    o.timerbox.fg = computeBackgroundColorFrom(o.timerbox, o.deactivecolor);
+  }, o.duration * 1000);
+  return o.tid;
 };

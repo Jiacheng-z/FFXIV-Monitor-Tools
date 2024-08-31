@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -11,6 +10,7 @@ export interface Data extends RaidbossData {
 
 // O10N - Alphascape 2.0
 const triggerSet: TriggerSet<Data> = {
+  id: 'AlphascapeV20',
   zoneId: ZoneId.AlphascapeV20,
   timelineFile: 'o10n.txt',
   triggers: [
@@ -21,31 +21,21 @@ const triggerSet: TriggerSet<Data> = {
       // 31C8 + 31CB = 31D0 (vert + vert = +)
       id: 'O10N Spin Cleanup',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '31C[78]', source: 'Midgardsormr', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: '31C[78]', source: 'Midgardsormr', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: '31C[78]', source: 'Midgardsormr', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: '31C[78]', source: 'ミドガルズオルム', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: '31C[78]', source: '尘世幻龙', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: '31C[78]', source: '미드가르드오름', capture: false }),
+      netRegex: { id: '31C[78]', source: 'Midgardsormr', capture: false },
       delaySeconds: 10,
       run: (data) => delete data.lastSpinWasHorizontal,
     },
     {
       id: 'O10N Horizontal Spin 1',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '31C7', source: 'Midgardsormr', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: '31C7', source: 'Midgardsormr', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: '31C7', source: 'Midgardsormr', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: '31C7', source: 'ミドガルズオルム', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: '31C7', source: '尘世幻龙', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: '31C7', source: '미드가르드오름', capture: false }),
+      netRegex: { id: '31C7', source: 'Midgardsormr', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       run: (data) => data.lastSpinWasHorizontal = true,
       outputStrings: {
         text: {
           en: 'Next Spin: In or Out',
           de: 'Nächste Drehung: Rein oder raus',
-          fr: 'Tour suivant : Dedans/Dehors',
+          fr: 'Tour suivant : Intérieur ou Extérieur',
           ja: '次: 中/外',
           cn: '下一转:内圈/外圈',
           ko: '다음: 안으로 혹은 밖으로',
@@ -55,19 +45,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O10N Vertical Spin 1',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '31C8', source: 'Midgardsormr', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: '31C8', source: 'Midgardsormr', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: '31C8', source: 'Midgardsormr', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: '31C8', source: 'ミドガルズオルム', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: '31C8', source: '尘世幻龙', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: '31C8', source: '미드가르드오름', capture: false }),
+      netRegex: { id: '31C8', source: 'Midgardsormr', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       run: (data) => data.lastSpinWasHorizontal = false,
       outputStrings: {
         text: {
           en: 'Next Spin: Corners',
           de: 'Nächste Drehung: Ecken',
-          fr: 'Tour suivant : Plus',
+          fr: 'Tour suivant : Coins',
           ja: '次: コーナー',
           cn: '下一转:角落',
           ko: '다음: 모서리로',
@@ -77,12 +62,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O10N Horizontal Spin 2',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '31C9', source: 'Midgardsormr', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: '31C9', source: 'Midgardsormr', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: '31C9', source: 'Midgardsormr', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: '31C9', source: 'ミドガルズオルム', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: '31C9', source: '尘世幻龙', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: '31C9', source: '미드가르드오름', capture: false }),
+      netRegex: { id: '31C9', source: 'Midgardsormr', capture: false },
       condition: (data) => data.lastSpinWasHorizontal !== undefined,
       alertText: (data, _matches, output) => {
         if (data.lastSpinWasHorizontal)
@@ -103,7 +83,7 @@ const triggerSet: TriggerSet<Data> = {
         goToCardinals: {
           en: 'Go To Cardinals',
           de: 'Geh zu den Kanten',
-          fr: 'Allez sur les points cardinaux',
+          fr: 'Allez sur un point cardinal',
           ja: '横や縦へ',
           cn: '去正点',
           ko: '십자 산개',
@@ -113,12 +93,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O10N Vertical Spin 2',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '31CB', source: 'Midgardsormr', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: '31CB', source: 'Midgardsormr', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: '31CB', source: 'Midgardsormr', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: '31CB', source: 'ミドガルズオルム', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: '31CB', source: '尘世幻龙', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: '31CB', source: '미드가르드오름', capture: false }),
+      netRegex: { id: '31CB', source: 'Midgardsormr', capture: false },
       condition: (data) => data.lastSpinWasHorizontal !== undefined,
       alertText: (data, _matches, output) => {
         if (data.lastSpinWasHorizontal)
@@ -130,7 +105,7 @@ const triggerSet: TriggerSet<Data> = {
         getIn: {
           en: 'Get In',
           de: 'Rein da',
-          fr: 'Allez sous le boss',
+          fr: 'Passez en dessous',
           ja: '中へ',
           cn: '靠近',
           ko: '안으로',
@@ -148,7 +123,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O10N Earth Shaker',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0028' }),
+      netRegex: { id: '0028' },
       condition: Conditions.targetIsYou(),
       response: Responses.earthshaker(),
     },
@@ -156,21 +131,21 @@ const triggerSet: TriggerSet<Data> = {
       id: 'O10N Akh Morn',
       type: 'HeadMarker',
       // This corresponds with 316C ability cast (for initial hit).
-      netRegex: NetRegexes.headMarker({ id: '003E' }),
+      netRegex: { id: '003E' },
       response: Responses.stackMarkerOn(),
     },
     {
       id: 'O10N Thunderstorm',
       type: 'HeadMarker',
       // This corresponds with the 31D2 ability cast.
-      netRegex: NetRegexes.headMarker({ id: '00A0' }),
+      netRegex: { id: '00A0' },
       condition: Conditions.targetIsYou(),
       response: Responses.spread(),
     },
     {
       id: 'O10N Dry Ice',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0043' }),
+      netRegex: { id: '0043' },
       condition: Conditions.targetIsYou(),
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -186,23 +161,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O10N Tail End',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '31C5', source: 'Midgardsormr' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '31C5', source: 'Midgardsormr' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '31C5', source: 'Midgardsormr' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '31C5', source: 'ミドガルズオルム' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '31C5', source: '尘世幻龙' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '31C5', source: '미드가르드오름' }),
+      netRegex: { id: '31C5', source: 'Midgardsormr' },
       response: Responses.tankBuster(),
     },
     {
       id: 'O10N Rime Wreath',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '33EF', source: 'Ancient Dragon', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '33EF', source: 'Antik(?:e|er|es|en) Drache', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '33EF', source: 'Dragon Ancien', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '33EF', source: 'エンシェントドラゴン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '33EF', source: '远古之龙', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '33EF', source: '고룡', capture: false }),
+      netRegex: { id: '33EF', source: 'Ancient Dragon', capture: false },
       response: Responses.aoe(),
     },
     {
@@ -211,12 +176,7 @@ const triggerSet: TriggerSet<Data> = {
       // Damage starts hitting ~2s after this ability.
       // Assuming that it locks in on cast and not on starts casting.
       // Technically this is only on DPS, but it's not targeted, so just tell everybody.
-      netRegex: NetRegexes.ability({ id: '3622', source: 'Midgardsormr', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: '3622', source: 'Midgardsormr', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: '3622', source: 'Midgardsormr', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: '3622', source: 'ミドガルズオルム', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: '3622', source: '尘世幻龙', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: '3622', source: '미드가르드오름', capture: false }),
+      netRegex: { id: '3622', source: 'Midgardsormr', capture: false },
       response: Responses.moveAway(),
     },
   ],
@@ -250,13 +210,11 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       'locale': 'fr',
-      'missingTranslations': true,
       'replaceSync': {
         'Ancient Dragon': 'dragon ancien',
         'Midgardsormr': 'Midgardsormr',
       },
       'replaceText': {
-        'ready': 'prêt',
         'Akh Morn': 'Akh Morn',
         'Akh Rhai': 'Akh Rhai',
         'Cauterize': 'Cautérisation',
@@ -264,14 +222,16 @@ const triggerSet: TriggerSet<Data> = {
         'Dry Ice': 'Poussière glaçante',
         'Earth Shaker': 'Secousse',
         'Exaflare': 'ExaBrasier',
-        'Flip': 'Tour vertical',
+        'Flip(?!/)': 'Tour vertical',
+        'Flip/Spin': 'Tour vertical/horizontal',
         'Frost Breath': 'Souffle glacé',
         'Horrid Roar': 'Rugissement horrible',
-        'In/Out': 'Dedans/Dehors',
-        '(?<!/)Out': 'Dehors',
+        '(?<!\\w)In(?!\\w)': 'Intérieur',
         'Northern Cross': 'Croix du nord',
+        '(?<!\\w)Out(?!\\w)': 'Extérieur',
         'Protostar': 'Proto-étoile',
-        'Spin': 'Tour horizontal',
+        'ready': 'prêt',
+        '(?<!/)Spin': 'Tour horizontal',
         'Tail End': 'Pointe de queue',
         'Thunderstorm': 'Tempête de foudre',
       },

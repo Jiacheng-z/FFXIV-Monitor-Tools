@@ -1,7 +1,8 @@
+import DTFuncs from '../../../../resources/datetime';
 import { UnreachableCode } from '../../../../resources/not_reached';
 import AnalyzedEncounter from '../data/AnalyzedEncounter';
 import RaidEmulator from '../data/RaidEmulator';
-import EmulatorCommon, { querySelectorSafe } from '../EmulatorCommon';
+import { querySelectorSafe } from '../EmulatorCommon';
 
 import Tooltip from './Tooltip';
 
@@ -11,7 +12,6 @@ export default class ProgressBar {
   $progressBarDuration: HTMLElement;
   $progress: HTMLElement;
   $progressBar: HTMLElement;
-  $engageIndicator: HTMLElement;
 
   constructor(emulator: RaidEmulator) {
     const progBarContainer = querySelectorSafe(document, '.encounterProgressBar');
@@ -21,18 +21,17 @@ export default class ProgressBar {
     this.$progressBarDuration = querySelectorSafe(document, '.duration-timestamp');
     this.$progress = querySelectorSafe(document, '.encounterProgressBar');
     this.$progressBar = querySelectorSafe(document, '.encounterProgressBar .progress-bar');
-    this.$engageIndicator = querySelectorSafe(document, '.progressBarRow .engageIndicator');
-    new Tooltip(this.$engageIndicator, 'bottom', 'Fight Begins');
     this.$progress.addEventListener('mousemove', (e) => {
       if (emulator.currentEncounter) {
         const target = e.currentTarget;
         if (!(target instanceof HTMLElement))
           throw new UnreachableCode();
         const percent = e.offsetX / target.offsetWidth;
-        const time = Math.floor(emulator.currentEncounter.encounter.duration * percent) -
+        const trimmedDuration = emulator.currentEncounter.encounter.duration -
           emulator.currentEncounter.encounter.initialOffset;
-        this.$progressBarTooltip.offset.x = e.offsetX - (target.offsetWidth / 2);
-        this.$progressBarTooltip.setText(EmulatorCommon.timeToString(time));
+        const time = Math.floor(trimmedDuration * percent);
+        this.$progressBarTooltip.offset.x = e.offsetX - target.offsetWidth / 2;
+        this.$progressBarTooltip.setText(DTFuncs.timeToString(time));
         this.$progressBarTooltip.show();
       }
     });
@@ -42,39 +41,32 @@ export default class ProgressBar {
         if (!(target instanceof HTMLElement))
           throw new UnreachableCode();
         const percent = e.offsetX / target.offsetWidth;
-        const time = Math.floor(emulator.currentEncounter.encounter.duration * percent);
-        void emulator.seek(time);
+        const trimmedDuration = emulator.currentEncounter.encounter.duration -
+          emulator.currentEncounter.encounter.initialOffset;
+        const time = Math.floor(trimmedDuration * percent);
+        void emulator.seek(emulator.currentEncounter.encounter.initialOffset + time);
       }
     });
     emulator.on('currentEncounterChanged', (encounter: AnalyzedEncounter) => {
-      this.$progressBarCurrent.textContent = EmulatorCommon.timeToString(0, false);
-      this.$progressBarDuration.textContent = EmulatorCommon.timeToString(
-        encounter.encounter.duration - encounter.encounter.initialOffset,
-        false,
-      );
+      const trimmedDuration = encounter.encounter.duration - encounter.encounter.initialOffset;
+      this.$progressBarCurrent.textContent = DTFuncs.timeToString(0, false);
+      this.$progressBarDuration.textContent = DTFuncs.timeToString(trimmedDuration, false);
       this.$progressBar.style.width = '0%';
-      this.$progressBar.setAttribute('ariaValueMax', encounter.encounter.duration.toString());
-      if (isNaN(encounter.encounter.initialOffset)) {
-        this.$engageIndicator.classList.add('d-none');
-      } else {
-        const initialPercent = (encounter.encounter.initialOffset / encounter.encounter.duration) *
-          100;
-        this.$engageIndicator.classList.remove('d-none');
-        this.$engageIndicator.style.left = `${initialPercent}%`;
-      }
+      this.$progressBar.setAttribute('ariaValueMax', trimmedDuration.toString());
     });
     emulator.on('tick', (currentLogTime) => {
       const curEnc = emulator.currentEncounter;
       if (!curEnc)
         throw new UnreachableCode();
-      const currentOffset = currentLogTime - curEnc.encounter.startTimestamp;
-      const progPercent = (currentOffset / curEnc.encounter.duration) * 100;
+      const currentOffset = currentLogTime - curEnc.encounter.initialTimestamp;
+      const trimmedDuration = curEnc.encounter.duration - curEnc.encounter.initialOffset;
+      const progPercent = currentOffset / trimmedDuration * 100;
       const progValue = currentLogTime - curEnc.encounter.initialTimestamp;
-      this.$progressBarCurrent.textContent = EmulatorCommon.timeToString(progValue, false);
+      this.$progressBarCurrent.textContent = DTFuncs.timeToString(progValue, false);
       this.$progressBar.style.width = `${progPercent}%`;
     });
-    const $play = querySelectorSafe(document, '.progressBarRow button.play');
-    const $pause = querySelectorSafe(document, '.progressBarRow button.pause');
+    const $play = querySelectorSafe(document, '.progress-bar-row button.play');
+    const $pause = querySelectorSafe(document, '.progress-bar-row button.pause');
     $play.addEventListener('click', () => {
       if (emulator.play()) {
         $play.classList.add('d-none');

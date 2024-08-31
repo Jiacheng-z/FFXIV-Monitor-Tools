@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -27,29 +26,20 @@ const sharedOutputStrings = {
 };
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'TheCloudDeck',
   zoneId: ZoneId.TheCloudDeck,
   timelineFile: 'diamond_weapon.txt',
   triggers: [
     {
       id: 'Diamond Diamond Rain',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'The Diamond Weapon', id: '5FA7', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Diamant-Waffe', id: '5FA7', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Arme Diamant', id: '5FA7', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ダイヤウェポン', id: '5FA7', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '钻石神兵', id: '5FA7', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '다이아몬드 웨폰', id: '5FA7', capture: false }),
+      netRegex: { source: 'The Diamond Weapon', id: '5FA7', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Diamond Claw Swipe East',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'The Diamond Weapon', id: '5F9A', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Diamant-Waffe', id: '5F9A', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Arme Diamant', id: '5F9A', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ダイヤウェポン', id: '5F9A', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '钻石神兵', id: '5F9A', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '다이아몬드 웨폰', id: '5F9A', capture: false }),
+      netRegex: { source: 'The Diamond Weapon', id: '5F9A', capture: false },
       durationSeconds: 10,
       alertText: (_data, _matches, output) => output.teleportWest!(),
       outputStrings: sharedOutputStrings,
@@ -57,12 +47,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Diamond Claw Swipe West',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'The Diamond Weapon', id: '5F9B', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Diamant-Waffe', id: '5F9B', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Arme Diamant', id: '5F9B', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ダイヤウェポン', id: '5F9B', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '钻石神兵', id: '5F9B', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '다이아몬드 웨폰', id: '5F9B', capture: false }),
+      netRegex: { source: 'The Diamond Weapon', id: '5F9B', capture: false },
       durationSeconds: 10,
       alertText: (_data, _matches, output) => output.teleportEast!(),
       outputStrings: sharedOutputStrings,
@@ -70,7 +55,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Diamond Photon Burst',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0057' }),
+      netRegex: { id: '0057' },
       condition: Conditions.targetIsYou(),
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -88,24 +73,14 @@ const triggerSet: TriggerSet<Data> = {
       // There is no head marker for this mechanic, instead Unknown_5779 creates the indicator
       id: 'Diamond Diamond Flash',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'The Diamond Weapon', id: '5779' }),
-      netRegexDe: NetRegexes.ability({ source: 'Diamant-Waffe', id: '5779' }),
-      netRegexFr: NetRegexes.ability({ source: 'Arme Diamant', id: '5779' }),
-      netRegexJa: NetRegexes.ability({ source: 'ダイヤウェポン', id: '5779' }),
-      netRegexCn: NetRegexes.ability({ source: '钻石神兵', id: '5779' }),
-      netRegexKo: NetRegexes.ability({ source: '다이아몬드 웨폰', id: '5779' }),
+      netRegex: { source: 'The Diamond Weapon', id: '5779' },
       durationSeconds: 5,
       response: Responses.stackMarkerOn(),
     },
     {
       id: 'Diamond Auri Cyclone',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'The Diamond Weapon', id: '5FE6', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Diamant-Waffe', id: '5FE6', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Arme Diamant', id: '5FE6', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ダイヤウェポン', id: '5FE6', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '钻石神兵', id: '5FE6', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '다이아몬드 웨폰', id: '5FE6', capture: false }),
+      netRegex: { source: 'The Diamond Weapon', id: '5FE6', capture: false },
       delaySeconds: 0.5,
       durationSeconds: 6,
       response: Responses.knockback(),
@@ -113,41 +88,26 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Diamond Outrage',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'The Diamond Weapon', id: '5FD7', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Diamant-Waffe', id: '5FD7', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Arme Diamant', id: '5FD7', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ダイヤウェポン', id: '5FD7', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '钻石神兵', id: '5FD7', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '다이아몬드 웨폰', id: '5FD7', capture: false }),
+      netRegex: { source: 'The Diamond Weapon', id: '5FD7', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Diamond Auri Doomstead',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'The Diamond Weapon', id: '5FD8' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Diamant-Waffe', id: '5FD8' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Arme Diamant', id: '5FD8' }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ダイヤウェポン', id: '5FD8' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '钻石神兵', id: '5FD8' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '다이아몬드 웨폰', id: '5FD8' }),
+      netRegex: { source: 'The Diamond Weapon', id: '5FD8' },
       response: Responses.tankBuster(),
     },
     {
       id: 'Diamond Vertical Cleave',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'The Diamond Weapon', id: '5FE5', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Diamant-Waffe', id: '5FE5', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Arme Diamant', id: '5FE5', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ダイヤウェポン', id: '5FE5', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '钻石神兵', id: '5FE5', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '다이아몬드 웨폰', id: '5FE5', capture: false }),
+      netRegex: { source: 'The Diamond Weapon', id: '5FE5', capture: false },
       durationSeconds: 5,
       response: Responses.knockback(),
     },
     {
       id: 'Diamond Diamond Shrapnel',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '00C5' }),
+      netRegex: { id: '00C5' },
       condition: Conditions.targetIsYou(),
       durationSeconds: 7,
       alertText: (_data, _matches, output) => output.text!(),
@@ -165,12 +125,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Diamond Articulated Bits',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'The Diamond Weapon', id: '5FA9', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Diamant-Waffe', id: '5FA9', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Arme Diamant', id: '5FA9', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: 'ダイヤウェポン', id: '5FA9', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '钻石神兵', id: '5FA9', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '다이아몬드 웨폰', id: '5FA9', capture: false }),
+      netRegex: { source: 'The Diamond Weapon', id: '5FA9', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -186,12 +141,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Diamond Adamant Sphere',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'The Diamond Weapon', id: '6144', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Diamant-Waffe', id: '6144', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Arme Diamant', id: '6144', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: 'ダイヤウェポン', id: '6144', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '钻石神兵', id: '6144', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '다이아몬드 웨폰', id: '6144', capture: false }),
+      netRegex: { source: 'The Diamond Weapon', id: '6144', capture: false },
       durationSeconds: 8,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -209,12 +159,7 @@ const triggerSet: TriggerSet<Data> = {
       // Diamond Weapon starts using this Adamant Purge ~10 seconds before the head markers
       id: 'Diamond Homing Laser',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'The Diamond Weapon', id: '5F9C', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Diamant-Waffe', id: '5F9C', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Arme Diamant', id: '5F9C', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: 'ダイヤウェポン', id: '5F9C', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '钻石神兵', id: '5F9C', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '다이아몬드 웨폰', id: '5F9C', capture: false }),
+      netRegex: { source: 'The Diamond Weapon', id: '5F9C', capture: false },
       delaySeconds: 3,
       durationSeconds: 7,
       response: Responses.spread(),
@@ -251,12 +196,12 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       'locale': 'fr',
-      'missingTranslations': true,
       'replaceSync': {
         'Articulated Bit': 'bras autonome',
         'The Diamond Weapon': 'Arme Diamant',
       },
       'replaceText': {
+        '\\(Jump\\)': '(Saut)',
         'Adamant Purge': 'Armure adaptative',
         'Adamant Sphere': 'Sphère de diamant',
         'Aetherial Bullet': 'Rayon éthéré',
@@ -279,7 +224,6 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       'locale': 'ja',
-      'missingTranslations': true,
       'replaceSync': {
         'Articulated Bit': 'アームビット',
         'The Diamond Weapon': 'ダイヤウェポン',

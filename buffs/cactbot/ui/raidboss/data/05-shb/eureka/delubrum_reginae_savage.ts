@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { UnreachableCode } from '../../../../../resources/not_reached';
 import Outputs from '../../../../../resources/outputs';
 import { callOverlayHandler } from '../../../../../resources/overlay_plugin_api';
@@ -82,7 +81,7 @@ const tankBusterOnParty = (data: Data, matches: NetMatches['StartsUsing']) => {
 const getHeadmarkerId = (data: Data, matches: NetMatches['HeadMarker']) => {
   if (data.decOffset === undefined) {
     // If we don't know, return garbage to avoid accidentally running other triggers.
-    if (!data.firstUnknownHeadmarker)
+    if (data.firstUnknownHeadmarker === undefined)
       return '0000';
 
     data.decOffset = parseInt(matches.id, 16) - parseInt(data.firstUnknownHeadmarker, 16);
@@ -93,6 +92,7 @@ const getHeadmarkerId = (data: Data, matches: NetMatches['HeadMarker']) => {
 };
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'DelubrumReginaeSavage',
   zoneId: ZoneId.DelubrumReginaeSavage,
   timelineFile: 'delubrum_reginae_savage.txt',
   timelineTriggers: [
@@ -176,36 +176,21 @@ const triggerSet: TriggerSet<Data> = {
       id: 'DelubrumSav Seeker Phase',
       type: 'StartsUsing',
       // Sets the phase when seeing the Verdant Tempest cast.
-      netRegex: NetRegexes.startsUsing({ source: 'Trinity Seeker', id: '5AD3', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Trinität Der Sucher', id: '5AD3', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Trinité Soudée', id: '5AD3', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'トリニティ・シーカー', id: '5AD3', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '求道之三位一体', id: '5AD3', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '탐구의 삼위일체', id: '5AD3', capture: false }),
+      netRegex: { source: 'Trinity Seeker', id: '5AD3', capture: false },
       // Note: this headmarker *could* be skipped, so we will change this later.
       run: (data) => data.firstUnknownHeadmarker = headmarker.mercifulArc,
     },
     {
       id: 'DelubrumSav Seeker Verdant Tempest',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Trinity Seeker', id: '5AD3', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Trinität Der Sucher', id: '5AD3', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Trinité Soudée', id: '5AD3', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'トリニティ・シーカー', id: '5AD3', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '求道之三位一体', id: '5AD3', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '탐구의 삼위일체', id: '5AD3', capture: false }),
+      netRegex: { source: 'Trinity Seeker', id: '5AD3', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'DelubrumSav Seeker Sword Cleanup',
       type: 'StartsUsing',
       // This is on First Mercy, which starts before the first ability.
-      netRegex: NetRegexes.startsUsing({ source: ['Trinity Seeker', 'Seeker Avatar'], id: '5B61', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: ['Trinität Der Sucher', 'Spaltteil Der Sucher'], id: '5B61', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: ['Trinité Soudée', 'Clone De La Trinité Soudée'], id: '5B61', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: ['トリニティ・シーカー', 'シーカーの分体'], id: '5B61', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: ['求道之三位一体', '求道之分身'], id: '5B61', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: ['탐구의 삼위일체', '탐구의 분열체'], id: '5B61', capture: false }),
+      netRegex: { source: ['Trinity Seeker', 'Seeker Avatar'], id: '5B61', capture: false },
       run: (data) => {
         delete data.seekerSwords;
         delete data.calledSeekerSwords;
@@ -215,23 +200,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Seeker First Mercy',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ source: ['Trinity Seeker', 'Seeker Avatar'], id: '5B61' }),
-      netRegexDe: NetRegexes.abilityFull({ source: ['Trinität Der Sucher', 'Spaltteil Der Sucher'], id: '5B61' }),
-      netRegexFr: NetRegexes.abilityFull({ source: ['Trinité Soudée', 'Clone De La Trinité Soudée'], id: '5B61' }),
-      netRegexJa: NetRegexes.abilityFull({ source: ['トリニティ・シーカー', 'シーカーの分体'], id: '5B61' }),
-      netRegexCn: NetRegexes.abilityFull({ source: ['求道之三位一体', '求道之分身'], id: '5B61' }),
-      netRegexKo: NetRegexes.abilityFull({ source: ['탐구의 삼위일체', '탐구의 분열체'], id: '5B61' }),
+      netRegex: { source: ['Trinity Seeker', 'Seeker Avatar'], id: '5B61' },
       run: (data, matches) => data.seekerFirstMercy = matches,
     },
     {
       id: 'DelubrumSav Seeker Mercy Swords',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ target: ['Trinity Seeker', 'Seeker Avatar'], effectId: '808' }),
-      netRegexDe: NetRegexes.gainsEffect({ target: ['Trinität Der Sucher', 'Spaltteil Der Sucher'], effectId: '808' }),
-      netRegexFr: NetRegexes.gainsEffect({ target: ['Trinité Soudée', 'Clone De La Trinité Soudée'], effectId: '808' }),
-      netRegexJa: NetRegexes.gainsEffect({ target: ['トリニティ・シーカー', 'シーカーの分体'], effectId: '808' }),
-      netRegexCn: NetRegexes.gainsEffect({ target: ['求道之三位一体', '求道之分身'], effectId: '808' }),
-      netRegexKo: NetRegexes.gainsEffect({ target: ['탐구의 삼위일체', '탐구의 분열체'], effectId: '808' }),
+      netRegex: { target: ['Trinity Seeker', 'Seeker Avatar'], effectId: '808' },
       condition: (data) => !data.calledSeekerSwords,
       durationSeconds: 10,
       alertText: (data, matches, output) => {
@@ -414,12 +389,7 @@ const triggerSet: TriggerSet<Data> = {
       id: 'DelubrumSav Seeker Baleful Swath',
       type: 'StartsUsing',
       // This is an early warning on the Verdant Path cast.
-      netRegex: NetRegexes.startsUsing({ source: 'Trinity Seeker', id: '5A98', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Trinität Der Sucher', id: '5A98', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Trinité Soudée', id: '5A98', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'トリニティ・シーカー', id: '5A98', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '求道之三位一体', id: '5A98', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '탐구의 삼위일체', id: '5A98', capture: false }),
+      netRegex: { source: 'Trinity Seeker', id: '5A98', capture: false },
       response: Responses.goFrontBack('info'),
       // Merciful arc can be skipped, so if we get here, the next headmarker is burning chains.
       // If we have seen merciful arc, this is a noop.
@@ -429,12 +399,7 @@ const triggerSet: TriggerSet<Data> = {
       id: 'DelubrumSav Seeker Act Of Mercy',
       type: 'StartsUsing',
       // This is an early warning on the Verdant Path cast.
-      netRegex: NetRegexes.startsUsing({ source: 'Trinity Seeker', id: '5A97', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Trinität Der Sucher', id: '5A97', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Trinité Soudée', id: '5A97', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'トリニティ・シーカー', id: '5A97', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '求道之三位一体', id: '5A97', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '탐구의 삼위일체', id: '5A97', capture: false }),
+      netRegex: { source: 'Trinity Seeker', id: '5A97', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -453,12 +418,7 @@ const triggerSet: TriggerSet<Data> = {
       id: 'DelubrumSav Seeker Iron Impact',
       type: 'StartsUsing',
       // This is an early warning on the Verdant Path cast.
-      netRegex: NetRegexes.startsUsing({ source: 'Trinity Seeker', id: '5A99', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Trinität Der Sucher', id: '5A99', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Trinité Soudée', id: '5A99', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'トリニティ・シーカー', id: '5A99', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '求道之三位一体', id: '5A99', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '탐구의 삼위일체', id: '5A99', capture: false }),
+      netRegex: { source: 'Trinity Seeker', id: '5A99', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -474,12 +434,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Seeker Baleful Onslaught Buster',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Trinity Seeker', id: '5AD5', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Trinität Der Sucher', id: '5AD5', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Trinité Soudée', id: '5AD5', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'トリニティ・シーカー', id: '5AD5', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '求道之三位一体', id: '5AD5', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '탐구의 삼위일체', id: '5AD5', capture: false }),
+      netRegex: { source: 'Trinity Seeker', id: '5AD5', capture: false },
       response: (data, _matches, output) => {
         // cactbot-builtin-response
         output.responseOutputStrings = {
@@ -502,12 +457,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Seeker Baleful Onslaught Solo',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Trinity Seeker', id: '5AD6', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Trinität Der Sucher', id: '5AD6', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Trinité Soudée', id: '5AD6', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'トリニティ・シーカー', id: '5AD6', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '求道之三位一体', id: '5AD6', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '탐구의 삼위일체', id: '5AD6', capture: false }),
+      netRegex: { source: 'Trinity Seeker', id: '5AD6', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -523,12 +473,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Seeker Baleful Blade Out',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Trinity Seeker', id: '5ABE', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Trinität Der Sucher', id: '5ABE', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Trinité Soudée', id: '5ABE', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'トリニティ・シーカー', id: '5ABE', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '求道之三位一体', id: '5ABE', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '탐구의 삼위일체', id: '5ABE', capture: false }),
+      netRegex: { source: 'Trinity Seeker', id: '5ABE', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -544,12 +489,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Seeker Baleful Blade Knockback',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Trinity Seeker', id: '5ABF', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Trinität Der Sucher', id: '5ABF', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Trinité Soudée', id: '5ABF', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'トリニティ・シーカー', id: '5ABF', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '求道之三位一体', id: '5ABF', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '탐구의 삼위일체', id: '5ABF', capture: false }),
+      netRegex: { source: 'Trinity Seeker', id: '5ABF', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -566,12 +506,7 @@ const triggerSet: TriggerSet<Data> = {
       id: 'DelubrumSav Seeker Merciful Moon',
       type: 'StartsUsing',
       // No cast time on this in savage, but Merciful Blooms cast is a ~3s warning.
-      netRegex: NetRegexes.startsUsing({ source: 'Trinity Seeker', id: '5ACA', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Trinität Der Sucher', id: '5ACA', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Trinité Soudée', id: '5ACA', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'トリニティ・シーカー', id: '5ACA', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '求道之三位一体', id: '5ACA', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '탐구의 삼위일체', id: '5ACA', capture: false }),
+      netRegex: { source: 'Trinity Seeker', id: '5ACA', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -588,12 +523,7 @@ const triggerSet: TriggerSet<Data> = {
       id: 'DelubrumSav Seeker Merciful Blooms',
       type: 'Ability',
       // Call this on the ability of Merciful Moon, it starts casting much earlier.
-      netRegex: NetRegexes.ability({ source: 'Aetherial Orb', id: '5AC9', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Magiekugel', id: '5AC9', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Amas D\'Éther Élémentaire', id: '5AC9', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: '魔力塊', id: '5AC9', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '魔力块', id: '5AC9', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '마력 덩어리', id: '5AC9', capture: false }),
+      netRegex: { source: 'Aetherial Orb', id: '5AC9', capture: false },
       suppressSeconds: 1,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -611,12 +541,7 @@ const triggerSet: TriggerSet<Data> = {
       id: 'DelubrumSav Seeker Dead Iron',
       type: 'Tether',
       // Headmarkers are randomized, so use the tether instead.
-      netRegex: NetRegexes.tether({ target: 'Trinity Seeker', id: '01DB' }),
-      netRegexDe: NetRegexes.tether({ target: 'Trinität Der Sucher', id: '01DB' }),
-      netRegexFr: NetRegexes.tether({ target: 'Trinité Soudée', id: '01DB' }),
-      netRegexJa: NetRegexes.tether({ target: 'トリニティ・シーカー', id: '01DB' }),
-      netRegexCn: NetRegexes.tether({ target: '求道之三位一体', id: '01DB' }),
-      netRegexKo: NetRegexes.tether({ target: '탐구의 삼위일체', id: '01DB' }),
+      netRegex: { target: 'Trinity Seeker', id: '01DB' },
       condition: (data, matches) => matches.source === data.me,
       alarmText: (_data, _matches, output) => output.earthshaker!(),
       outputStrings: {
@@ -633,12 +558,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Seeker Iron Splitter',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: ['Trinity Seeker', 'Seeker Avatar'], id: '5AC0' }),
-      netRegexDe: NetRegexes.startsUsing({ source: ['Trinität Der Sucher', 'Spaltteil Der Sucher'], id: '5AC0' }),
-      netRegexFr: NetRegexes.startsUsing({ source: ['Trinité Soudée', 'Clone De La Trinité Soudée'], id: '5AC0' }),
-      netRegexJa: NetRegexes.startsUsing({ source: ['トリニティ・シーカー', 'シーカーの分体'], id: '5AC0' }),
-      netRegexCn: NetRegexes.startsUsing({ source: ['求道之三位一体', '求道之分身'], id: '5AC0' }),
-      netRegexKo: NetRegexes.startsUsing({ source: ['탐구의 삼위일체', '탐구의 분열체'], id: '5AC0' }),
+      netRegex: { source: ['Trinity Seeker', 'Seeker Avatar'], id: '5AC0' },
       promise: async (data, matches) => {
         const seekerData = await callOverlayHandler({
           call: 'getCombatants',
@@ -647,10 +567,6 @@ const triggerSet: TriggerSet<Data> = {
 
         if (seekerData === null) {
           console.error(`Iron Splitter: null data`);
-          return;
-        }
-        if (!seekerData.combatants) {
-          console.error(`Iron Splitter: null combatants`);
           return;
         }
         if (seekerData.combatants.length !== 1) {
@@ -704,12 +620,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Seeker Baleful Comet Direction',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ source: 'Seeker Avatar', id: '5AD7' }),
-      netRegexDe: NetRegexes.abilityFull({ source: 'Spaltteil Der Sucher', id: '5AD7' }),
-      netRegexFr: NetRegexes.abilityFull({ source: 'Clone De La Trinité Soudée', id: '5AD7' }),
-      netRegexJa: NetRegexes.abilityFull({ source: 'シーカーの分体', id: '5AD7' }),
-      netRegexCn: NetRegexes.abilityFull({ source: '求道之分身', id: '5AD7' }),
-      netRegexKo: NetRegexes.abilityFull({ source: '탐구의 분열체', id: '5AD7' }),
+      netRegex: { source: 'Seeker Avatar', id: '5AD7' },
       condition: (data, matches) => {
         data.seekerCometIds ??= [];
         data.seekerCometIds.push(parseInt(matches.sourceId, 16));
@@ -729,10 +640,6 @@ const triggerSet: TriggerSet<Data> = {
 
         if (cometData === null) {
           console.error('Baleful Comet: null cometData');
-          return;
-        }
-        if (!cometData.combatants) {
-          console.error('Baleful Comet: null combatants');
           return;
         }
         if (!cometData.combatants.length) {
@@ -789,7 +696,7 @@ const triggerSet: TriggerSet<Data> = {
           'west',
           'northwest',
         ][safeDir];
-        if (!initialDir)
+        if (initialDir === undefined)
           throw new UnreachableCode();
 
         return output.text!({ dir: output[initialDir]!(), rotate: rotateStr });
@@ -833,12 +740,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Seeker Baleful Comet Cleanup',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Seeker Avatar', id: '5AD7', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Spaltteil Der Sucher', id: '5AD7', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Clone De La Trinité Soudée', id: '5AD7', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: 'シーカーの分体', id: '5AD7', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '求道之分身', id: '5AD7', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '탐구의 분열체', id: '5AD7', capture: false }),
+      netRegex: { source: 'Seeker Avatar', id: '5AD7', capture: false },
       delaySeconds: 10,
       suppressSeconds: 10,
       run: (data) => delete data.seekerCometIds,
@@ -846,7 +748,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Seeker Burning Chains',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker(),
+      netRegex: {},
       condition: (data, matches) => {
         if (data.me !== matches.target)
           return false;
@@ -867,26 +769,21 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Seeker Burning Chains Move',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '301' }),
+      netRegex: { effectId: '301' },
       condition: Conditions.targetIsYou(),
       response: Responses.breakChains(),
     },
     {
       id: 'DelubrumSav Seeker Merciful Arc',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker(),
+      netRegex: {},
       condition: (data, matches) => getHeadmarkerId(data, matches) === headmarker.mercifulArc,
       response: Responses.tankCleave(),
     },
     {
       id: 'DelubrumSav Dahu Shockwave',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Dahu', id: ['5770', '576F'] }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Dahu', id: ['5770', '576F'] }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Dahu', id: ['5770', '576F'] }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ダウー', id: ['5770', '576F'] }),
-      netRegexCn: NetRegexes.startsUsing({ source: '大兀', id: ['5770', '576F'] }),
-      netRegexKo: NetRegexes.startsUsing({ source: '다후', id: ['5770', '576F'] }),
+      netRegex: { source: 'Dahu', id: ['5770', '576F'] },
       // There's a 3s slow windup on the first, then a 1s opposite cast.
       suppressSeconds: 10,
       alertText: (_data, matches, output) => {
@@ -916,12 +813,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Dahu Hot Charge',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Dahu', id: '5773', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Dahu', id: '5773', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Dahu', id: '5773', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ダウー', id: '5773', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '大兀', id: '5773', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '다후', id: '5773', capture: false }),
+      netRegex: { source: 'Dahu', id: '5773', capture: false },
       suppressSeconds: 10,
       alertText: (data, _matches, output) => {
         if (data.seenHotCharge)
@@ -954,7 +846,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Dahu Spit Flame',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker(),
+      netRegex: {},
       condition: (data, matches) => {
         if (data.me !== matches.target)
           return false;
@@ -983,18 +875,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Dahu Feral Howl',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Dahu', id: '5767', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Dahu', id: '5767', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Dahu', id: '5767', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ダウー', id: '5767', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '大兀', id: '5767', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '다후', id: '5767', capture: false }),
+      netRegex: { source: 'Dahu', id: '5767', capture: false },
       alertText: (_data, _matches, output) => output.knockback!(),
       outputStrings: {
         knockback: {
           en: 'Knockback to safe spot',
           de: 'Rückstoß in den sicheren Bereich',
-          fr: 'Poussée en zone sûre',
+          fr: 'Poussée en zone safe',
           ja: '安置へノックバック',
           cn: '击退到安全点',
           ko: '안전한 곳으로 넉백되기',
@@ -1004,7 +891,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Dahu Flare',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker(),
+      netRegex: {},
       condition: (data, matches) => {
         if (data.me !== matches.target)
           return false;
@@ -1016,12 +903,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Dahu Hysteric Assault',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Dahu', id: '5778', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Dahu', id: '5778', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Dahu', id: '5778', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ダウー', id: '5778', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '大兀', id: '5778', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '다후', id: '5778', capture: false }),
+      netRegex: { source: 'Dahu', id: '5778', capture: false },
       response: (data, _matches, output) => {
         // cactbot-builtin-response
         output.responseOutputStrings = {
@@ -1054,12 +936,11 @@ const triggerSet: TriggerSet<Data> = {
       type: 'StartsUsing',
       // 5831 from Queen's Warrior
       // 5821 from Queen's Knight
-      netRegex: NetRegexes.startsUsing({ source: ['Queen\'s Warrior', 'Queen\'s Knight'], id: ['5831', '5821'], capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: ['Kriegerin Der Königin', 'Ritter Der Königin'], id: ['5831', '5821'], capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: ['Guerrière De La Reine', 'Chevalier De La Reine'], id: ['5831', '5821'], capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: ['クイーンズ・ウォリアー', 'クイーンズ・ナイト'], id: ['5831', '5821'], capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: ['女王战士', '女王骑士'], id: ['5831', '5821'], capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: ['여왕의 전사', '여왕의 기사'], id: ['5831', '5821'], capture: false }),
+      netRegex: {
+        source: ['Queen\'s Warrior', 'Queen\'s Knight'],
+        id: ['5831', '5821'],
+        capture: false,
+      },
       suppressSeconds: 1,
       response: Responses.aoe(),
     },
@@ -1068,24 +949,18 @@ const triggerSet: TriggerSet<Data> = {
       type: 'StartsUsing',
       // 5854 from Queen's Gunner
       // 5841 from Queen's Soldier
-      netRegex: NetRegexes.startsUsing({ source: ['Queen\'s Gunner', 'Queen\'s Soldier'], id: ['5854', '5841'], capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: ['Schütze Der Königin', 'Soldat Der Königin'], id: ['5854', '5841'], capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: ['Fusilier De La Reine', 'Soldat De La Reine'], id: ['5854', '5841'], capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: ['クイーンズ・ガンナー', 'クイーンズ・ソルジャー'], id: ['5854', '5841'], capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: ['女王枪手', '女王士兵'], id: ['5854', '5841'], capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: ['여왕의 총사', '여왕의 병사'], id: ['5854', '5841'], capture: false }),
+      netRegex: {
+        source: ['Queen\'s Gunner', 'Queen\'s Soldier'],
+        id: ['5854', '5841'],
+        capture: false,
+      },
       suppressSeconds: 1,
       response: Responses.aoe(),
     },
     {
       id: 'DelubrumSav Guard Optimal Offensive Sword',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Queen\'s Knight', id: '5819', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Ritter Der Königin', id: '5819', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Chevalier De La Reine', id: '5819', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'クイーンズ・ナイト', id: '5819', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '女王骑士', id: '5819', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '여왕의 기사', id: '5819', capture: false }),
+      netRegex: { source: 'Queen\'s Knight', id: '5819', capture: false },
       durationSeconds: 5,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -1102,12 +977,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Guard Optimal Offensive Shield',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Queen\'s Knight', id: '581A', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Ritter Der Königin', id: '581A', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Chevalier De La Reine', id: '581A', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'クイーンズ・ナイト', id: '581A', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '女王骑士', id: '581A', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '여왕의 기사', id: '581A', capture: false }),
+      netRegex: { source: 'Queen\'s Knight', id: '581A', capture: false },
       durationSeconds: 5,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -1124,12 +994,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Guard Optimal Play Sword',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Queen\'s Knight', id: '5816', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Ritter Der Königin', id: '5816', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Chevalier De La Reine', id: '5816', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'クイーンズ・ナイト', id: '5816', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '女王骑士', id: '5816', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '여왕의 기사', id: '5816', capture: false }),
+      netRegex: { source: 'Queen\'s Knight', id: '5816', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -1145,12 +1010,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Guard Optimal Play Shield',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Queen\'s Knight', id: '5817', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Ritter Der Königin', id: '5817', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Chevalier De La Reine', id: '5817', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'クイーンズ・ナイト', id: '5817', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '女王骑士', id: '5817', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '여왕의 기사', id: '5817', capture: false }),
+      netRegex: { source: 'Queen\'s Knight', id: '5817', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -1166,12 +1026,12 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Guard Yellow Tether',
       type: 'Tether',
-      netRegex: NetRegexes.tether({ source: 'Queen\'s Warrior', target: 'Queen\'s Knight', id: '0088', capture: false }),
-      netRegexDe: NetRegexes.tether({ source: 'Kriegerin Der Königin', target: 'Ritter Der Königin', id: '0088', capture: false }),
-      netRegexFr: NetRegexes.tether({ source: 'Guerrière De La Reine', target: 'Chevalier De La Reine', id: '0088', capture: false }),
-      netRegexJa: NetRegexes.tether({ source: 'クイーンズ・ウォリアー', target: 'クイーンズ・ナイト', id: '0088', capture: false }),
-      netRegexCn: NetRegexes.tether({ source: '女王战士', target: '女王骑士', id: '0088', capture: false }),
-      netRegexKo: NetRegexes.tether({ source: '여왕의 전사', target: '여왕의 기사', id: '0088', capture: false }),
+      netRegex: {
+        source: 'Queen\'s Warrior',
+        target: 'Queen\'s Knight',
+        id: '0088',
+        capture: false,
+      },
       // Yellow tether between Knight and Warrior gives them a Physical Vulnerability Down debuff.
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -1188,12 +1048,12 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Guard Purple Tether',
       type: 'Tether',
-      netRegex: NetRegexes.tether({ source: 'Queen\'s Warrior', target: 'Queen\'s Knight', id: '0089', capture: false }),
-      netRegexDe: NetRegexes.tether({ source: 'Kriegerin Der Königin', target: 'Ritter Der Königin', id: '0089', capture: false }),
-      netRegexFr: NetRegexes.tether({ source: 'Guerrière De La Reine', target: 'Chevalier De La Reine', id: '0089', capture: false }),
-      netRegexJa: NetRegexes.tether({ source: 'クイーンズ・ウォリアー', target: 'クイーンズ・ナイト', id: '0089', capture: false }),
-      netRegexCn: NetRegexes.tether({ source: '女王战士', target: '女王骑士', id: '0089', capture: false }),
-      netRegexKo: NetRegexes.tether({ source: '여왕의 전사', target: '여왕의 기사', id: '0089', capture: false }),
+      netRegex: {
+        source: 'Queen\'s Warrior',
+        target: 'Queen\'s Knight',
+        id: '0089',
+        capture: false,
+      },
       // Yellow tether between Knight and Warrior gives them a Physical Vulnerability Down debuff.
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -1210,12 +1070,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Guard Boost',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Queen\'s Warrior', id: '582D', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Kriegerin Der Königin', id: '582D', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Guerrière De La Reine', id: '582D', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'クイーンズ・ウォリアー', id: '582D', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '女王战士', id: '582D', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '여왕의 전사', id: '582D', capture: false }),
+      netRegex: { source: 'Queen\'s Warrior', id: '582D', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -1231,12 +1086,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Guard Higher Power',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Queen\'s Gunner', id: '5853', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Schütze Der Königin', id: '5853', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Fusilier De La Reine', id: '5853', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'クイーンズ・ガンナー', id: '5853', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '女王枪手', id: '5853', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '여왕의 총사', id: '5853', capture: false }),
+      netRegex: { source: 'Queen\'s Gunner', id: '5853', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -1253,35 +1103,20 @@ const triggerSet: TriggerSet<Data> = {
       id: 'DelubrumSav Guard/Queen Bombslinger',
       type: 'StartsUsing',
       // 5AFE = Bombslinger during Queen's Guard, 5B3F = Bombslinger during The Queen
-      netRegex: NetRegexes.startsUsing({ source: 'Queen\'s Warrior', id: ['5AFE', '5B3F'], capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Kriegerin Der Königin', id: ['5AFE', '5B3F'], capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Guerrière De La Reine', id: ['5AFE', '5B3F'], capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'クイーンズ・ウォリアー', id: ['5AFE', '5B3F'], capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '女王战士', id: ['5AFE', '5B3F'], capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '여왕의 전사', id: ['5AFE', '5B3F'], capture: false }),
+      netRegex: { source: 'Queen\'s Warrior', id: ['5AFE', '5B3F'], capture: false },
       run: (data) => data.tetherIsBombslinger = true,
     },
     {
       id: 'DelubrumSav Guard/Queen Bomb Reversal',
       type: 'Tether',
-      netRegex: NetRegexes.tether({ target: 'Queen\'s Warrior', id: '0010', capture: false }),
-      netRegexDe: NetRegexes.tether({ target: 'Kriegerin Der Königin', id: '0010', capture: false }),
-      netRegexFr: NetRegexes.tether({ target: 'Guerrière De La Reine', id: '0010', capture: false }),
-      netRegexJa: NetRegexes.tether({ target: 'クイーンズ・ウォリアー', id: '0010', capture: false }),
-      netRegexCn: NetRegexes.tether({ target: '女王战士', id: '0010', capture: false }),
-      netRegexKo: NetRegexes.tether({ target: '여왕의 전사', id: '0010', capture: false }),
+      netRegex: { target: 'Queen\'s Warrior', id: '0010', capture: false },
       suppressSeconds: 1,
       run: (data) => data.tetherOnBomb = true,
     },
     {
       id: 'DelubrumSav Guard/Queen Personal Reversal',
       type: 'Tether',
-      netRegex: NetRegexes.tether({ target: 'Queen\'s Warrior', id: '0087' }),
-      netRegexDe: NetRegexes.tether({ target: 'Kriegerin Der Königin', id: '0087' }),
-      netRegexFr: NetRegexes.tether({ target: 'Guerrière De La Reine', id: '0087' }),
-      netRegexJa: NetRegexes.tether({ target: 'クイーンズ・ウォリアー', id: '0087' }),
-      netRegexCn: NetRegexes.tether({ target: '女王战士', id: '0087' }),
-      netRegexKo: NetRegexes.tether({ target: '여왕의 전사', id: '0087' }),
+      netRegex: { target: 'Queen\'s Warrior', id: '0087' },
       condition: (data, matches) => matches.source === data.me,
       run: (data) => data.tetherOnSelf = true,
     },
@@ -1292,12 +1127,7 @@ const triggerSet: TriggerSet<Data> = {
       // This is used in two places, both for Bombslinger and the Winds of Weight.
       // 5829 = Reversal Of Forces during Queen's Guard, 5A0E = Reversal Of Forces during The Queen
       // TODO: should we differentiate big/small/wind/lightning with alert vs info?
-      netRegex: NetRegexes.startsUsing({ source: 'Queen\'s Warrior', id: ['5829', '5A0E'], capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Kriegerin Der Königin', id: ['5829', '5A0E'], capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Guerrière De La Reine', id: ['5829', '5A0E'], capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'クイーンズ・ウォリアー', id: ['5829', '5A0E'], capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '女王战士', id: ['5829', '5A0E'], capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '여왕의 전사', id: ['5829', '5A0E'], capture: false }),
+      netRegex: { source: 'Queen\'s Warrior', id: ['5829', '5A0E'], capture: false },
       durationSeconds: 11,
       alertText: (data, _matches, output) => {
         if (data.tetherIsBombslinger) {
@@ -1367,12 +1197,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Guard Fiery Portent',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Queen\'s Soldier', id: '583F' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Soldat Der Königin', id: '583F' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Soldat De La Reine', id: '583F' }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'クイーンズ・ソルジャー', id: '583F' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '女王士兵', id: '583F' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '여왕의 병사', id: '583F' }),
+      netRegex: { source: 'Queen\'s Soldier', id: '583F' },
       delaySeconds: (_data, matches) => parseFloat(matches.castTime) - 5,
       durationSeconds: 5.5,
       response: Responses.stopEverything(),
@@ -1381,12 +1206,7 @@ const triggerSet: TriggerSet<Data> = {
       id: 'DelubrumSav Guard Icy Portent',
       type: 'StartsUsing',
       // Assuming you need to move for 3 seconds (duration of Pyretic from Fiery Portent)
-      netRegex: NetRegexes.startsUsing({ source: 'Queen\'s Soldier', id: '5840' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Soldat Der Königin', id: '5840' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Soldat De La Reine', id: '5840' }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'クイーンズ・ソルジャー', id: '5840' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '女王士兵', id: '5840' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '여왕의 병사', id: '5840' }),
+      netRegex: { source: 'Queen\'s Soldier', id: '5840' },
       delaySeconds: (_data, matches) => parseFloat(matches.castTime) - 5,
       durationSeconds: 5.5,
       response: Responses.moveAround('alert'),
@@ -1395,24 +1215,14 @@ const triggerSet: TriggerSet<Data> = {
       id: 'DelubrumSav Guard Above Board Warning',
       type: 'StartsUsing',
       // 5826 in Guard fight, 5A0B in Queen fight.
-      netRegex: NetRegexes.startsUsing({ source: 'Queen\'s Warrior', id: ['5826', '5A0B'], capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Kriegerin Der Königin', id: ['5826', '5A0B'], capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Guerrière De La Reine', id: ['5826', '5A0B'], capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'クイーンズ・ウォリアー', id: ['5826', '5A0B'], capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '女王战士', id: ['5826', '5A0B'], capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '여왕의 전사', id: ['5826', '5A0B'], capture: false }),
+      netRegex: { source: 'Queen\'s Warrior', id: ['5826', '5A0B'], capture: false },
       delaySeconds: 9.5,
       response: Responses.moveAway(),
     },
     {
       id: 'DelubrumSav Guard Queen\'s Shot',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Queen\'s Gunner', id: '584C', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Schütze Der Königin', id: '584C', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Fusilier De La Reine', id: '584C', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'クイーンズ・ガンナー', id: '584C', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '女王枪手', id: '584C', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '여왕의 총사', id: '584C', capture: false }),
+      netRegex: { source: 'Queen\'s Gunner', id: '584C', capture: false },
       // This has a 7 second cast time.
       delaySeconds: 3.5,
       alertText: (_data, _matches, output) => output.text!(),
@@ -1431,12 +1241,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Queen Queen\'s Shot',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Queen\'s Gunner', id: '5A2D', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Schütze Der Königin', id: '5A2D', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Fusilier De La Reine', id: '5A2D', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'クイーンズ・ガンナー', id: '5A2D', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '女王枪手', id: '5A2D', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '여왕의 총사', id: '5A2D', capture: false }),
+      netRegex: { source: 'Queen\'s Gunner', id: '5A2D', capture: false },
       // This has a 7 second cast time.
       delaySeconds: 3.5,
       alertText: (_data, _matches, output) => output.text!(),
@@ -1455,12 +1260,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Guard Queen\'s Shot Followup',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Queen\'s Gunner', id: ['584C', '5A2D'], capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Schütze Der Königin', id: ['584C', '5A2D'], capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Fusilier De La Reine', id: ['584C', '5A2D'], capture: false }),
-      netRegexJa: NetRegexes.ability({ source: 'クイーンズ・ガンナー', id: ['584C', '5A2D'], capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '女王枪手', id: ['584C', '5A2D'], capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '여왕의 총사', id: ['584C', '5A2D'], capture: false }),
+      netRegex: { source: 'Queen\'s Gunner', id: ['584C', '5A2D'], capture: false },
       suppressSeconds: 1,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -1477,12 +1277,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Guard Coat of Arms',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Aetherial Ward', id: '5820' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Barriere', id: '5820' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Barrière Magique', id: '5820' }),
-      netRegexJa: NetRegexes.startsUsing({ source: '魔法障壁', id: '5820' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '魔法障壁', id: '5820' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '마법 장벽', id: '5820' }),
+      netRegex: { source: 'Aetherial Ward', id: '5820' },
       delaySeconds: (_data, matches) => parseFloat(matches.castTime) - 2.5,
       suppressSeconds: 1,
       alertText: (_data, _matches, output) => output.text!(),
@@ -1500,23 +1295,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Phantom Malediction Of Agony',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Bozjan Phantom', id: '57BD', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Bozja-Phantom', id: '57BD', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Fantôme Bozjien', id: '57BD', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ボズヤ・ファントム', id: '57BD', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '博兹雅幻灵', id: '57BD', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '보즈야 유령', id: '57BD', capture: false }),
+      netRegex: { source: 'Bozjan Phantom', id: '57BD', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'DelubrumSav Phantom Weave Miasma',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Bozjan Phantom', id: '57B2', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Bozja-Phantom', id: '57B2', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Fantôme Bozjien', id: '57B2', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ボズヤ・ファントム', id: '57B2', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '博兹雅幻灵', id: '57B2', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '보즈야 유령', id: '57B2', capture: false }),
+      netRegex: { source: 'Bozjan Phantom', id: '57B2', capture: false },
       infoText: (data, _matches, output) => {
         data.weaveCount = (data.weaveCount || 0) + 1;
         if (data.weaveCount === 1)
@@ -1528,7 +1313,7 @@ const triggerSet: TriggerSet<Data> = {
         firstWeave: {
           en: 'Go North (donut bottom/circle top)',
           de: 'Geh nach Norden (Donut unten/Kreise oben)',
-          fr: 'Allez au nord (donut bas/cercle haut)',
+          fr: 'Allez au nord (donut en bas/cercle en haut)',
           ja: '北へ (下にドーナツ/上に円)',
           cn: '去下环上圆列北侧',
           ko: '북쪽으로 (도넛이 아래, 원이 위인 곳)',
@@ -1536,7 +1321,7 @@ const triggerSet: TriggerSet<Data> = {
         secondWeave: {
           en: 'Stay South (square bottom/circle top)',
           de: 'Geh nach Süden (Viereck unten/Kreise oben)',
-          fr: 'Restez au sud (fond carré/cercle haut)',
+          fr: 'Restez au sud (carré en bas/cercle en haut)',
           ja: '南へ（下に四角/上に円）',
           cn: '待在下方上圆列南侧',
           ko: '남쪽으로 (사각형이 아래, 원이 위인 곳)',
@@ -1548,7 +1333,7 @@ const triggerSet: TriggerSet<Data> = {
       type: 'AddedCombatant',
       // Spawns after 57BA Summon, either North (-403.5) or South (-344.5)
       // Casts 57C2 Undying Hatred
-      netRegex: NetRegexes.addedCombatantFull({ npcNameId: '9756' }),
+      netRegex: { npcNameId: '9756' },
       durationSeconds: 5,
       suppressSeconds: 1,
       response: (_data, matches, output) => {
@@ -1557,7 +1342,7 @@ const triggerSet: TriggerSet<Data> = {
           goSouth: {
             en: 'Go South; Knockback to Glowing Donut',
             de: 'Geh nach Süden; Rückstoß zum leuchtenden Donut',
-            fr: 'Allez au sud; Poussée du donut brillant',
+            fr: 'Allez au sud; Poussée vers le donut embrasé',
             ja: '南へ、光ってるドーナツへノックバック',
             cn: '去发光环形列南侧',
             ko: '남쪽으로, 빛나는 도넛쪽으로 넉백',
@@ -1565,7 +1350,7 @@ const triggerSet: TriggerSet<Data> = {
           goNorth: {
             en: 'Go North; Knockback from Glowing Circle',
             de: 'Geh nach Norden; Rückstoß zum leuchtenden Kreis',
-            fr: 'Allez au nord; Poussée du cercle brillant',
+            fr: 'Allez au nord; Poussée depuis le cercle verdâtre',
             ja: '北へ、光ってる円からノックバック',
             cn: '去发光圆形列北侧',
             ko: '북쪽으로, 빛나는 원에서 넉백',
@@ -1581,12 +1366,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Phantom Vile Wave',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Bozjan Phantom', id: '57BF', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Bozja-Phantom', id: '57BF', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Fantôme Bozjien', id: '57BF', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ボズヤ・ファントム', id: '57BF', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '博兹雅幻灵', id: '57BF', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '보즈야 유령', id: '57BF', capture: false }),
+      netRegex: { source: 'Bozjan Phantom', id: '57BF', capture: false },
       response: Responses.getBehind(),
     },
     {
@@ -1594,12 +1374,7 @@ const triggerSet: TriggerSet<Data> = {
       type: 'StartsUsing',
       // Ice Spikes (effectId: '9E0') reflects damage, wait for Dispel
       // Buff expires about 16 seconds on first cast, ~8 seconds later casts)
-      netRegex: NetRegexes.startsUsing({ source: 'Bozjan Phantom', id: '57BC', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Bozja-Phantom', id: '57BC', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Fantôme Bozjien', id: '57BC', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ボズヤ・ファントム', id: '57BC', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '博兹雅幻灵', id: '57BC', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '보즈야 유령', id: '57BC', capture: false }),
+      netRegex: { source: 'Bozjan Phantom', id: '57BC', capture: false },
       delaySeconds: 3,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -1616,24 +1391,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Phantom Excruciation',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Bozjan Phantom', id: '57BE' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Bozja-Phantom', id: '57BE' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Fantôme Bozjien', id: '57BE' }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ボズヤ・ファントム', id: '57BE' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '博兹雅幻灵', id: '57BE' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '보즈야 유령', id: '57BE' }),
+      netRegex: { source: 'Bozjan Phantom', id: '57BE' },
       condition: tankBusterOnParty,
       response: Responses.tankBuster(),
     },
     {
       id: 'DelubrumSav Avowed Wrath Of Bozja',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Trinity Avowed', id: '594E', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Trinität Der Eingeschworenen', id: '594E', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Trinité Féale', id: '594E', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'トリニティ・アヴァウド', id: '594E', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '誓约之三位一体', id: '594E', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '맹세의 삼위일체', id: '594E', capture: false }),
+      netRegex: { source: 'Trinity Avowed', id: '594E', capture: false },
       response: (data, _matches, output) => {
         // cactbot-builtin-response
         output.responseOutputStrings = {
@@ -1657,12 +1422,7 @@ const triggerSet: TriggerSet<Data> = {
       id: 'DelubrumSav Avowed Fury Of Bozja',
       type: 'StartsUsing',
       // Allegiant Arsenal 5987 = staff (out), followed up with Fury of Bozja 594C
-      netRegex: NetRegexes.startsUsing({ source: 'Trinity Avowed', id: '5987', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Trinität Der Eingeschworenen', id: '5987', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Trinité Féale', id: '5987', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'トリニティ・アヴァウド', id: '5987', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '誓约之三位一体', id: '5987', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '맹세의 삼위일체', id: '5987', capture: false }),
+      netRegex: { source: 'Trinity Avowed', id: '5987', capture: false },
       response: Responses.getOut(),
       run: (data) => data.avowedPhase = 'staff',
     },
@@ -1670,12 +1430,7 @@ const triggerSet: TriggerSet<Data> = {
       id: 'DelubrumSav Avowed Flashvane',
       type: 'StartsUsing',
       // Allegiant Arsenal 5986 = bow (get behind), followed up by Flashvane 594B
-      netRegex: NetRegexes.startsUsing({ source: 'Trinity Avowed', id: '5986', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Trinität Der Eingeschworenen', id: '5986', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Trinité Féale', id: '5986', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'トリニティ・アヴァウド', id: '5986', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '誓约之三位一体', id: '5986', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '맹세의 삼위일체', id: '5986', capture: false }),
+      netRegex: { source: 'Trinity Avowed', id: '5986', capture: false },
       response: Responses.getBehind(),
       run: (data) => data.avowedPhase = 'bow',
     },
@@ -1683,19 +1438,14 @@ const triggerSet: TriggerSet<Data> = {
       id: 'DelubrumSav Avowed Infernal Slash',
       type: 'StartsUsing',
       // Allegiant Arsenal 5985 = sword (get front), followed up by Infernal Slash 594A
-      netRegex: NetRegexes.startsUsing({ source: 'Trinity Avowed', id: '5985', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Trinität Der Eingeschworenen', id: '5985', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Trinité Féale', id: '5985', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'トリニティ・アヴァウド', id: '5985', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '誓约之三位一体', id: '5985', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '맹세의 삼위일체', id: '5985', capture: false }),
+      netRegex: { source: 'Trinity Avowed', id: '5985', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       run: (data) => data.avowedPhase = 'sword',
       outputStrings: {
         text: {
           en: 'Get In Front',
           de: 'Geh vor den Boss',
-          fr: 'Soyez devant',
+          fr: 'Passez devant',
           ja: 'ボスの正面へ',
           cn: '去Boss正面',
           ko: '보스 정면에 서기',
@@ -1706,12 +1456,7 @@ const triggerSet: TriggerSet<Data> = {
       id: 'DelubrumSav Avowed Hot And Cold Cleanup',
       type: 'StartsUsing',
       // On Hot and Cold casts.  This will clean up any lingering forced march from bow phase 1.
-      netRegex: NetRegexes.startsUsing({ source: 'Trinity Avowed', id: ['5BB0', '5BAF', '597B'], capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Trinität Der Eingeschworenen', id: ['5BB0', '5BAF', '597B'], capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Trinité Féale', id: ['5BB0', '5BAF', '597B'], capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'トリニティ・アヴァウド', id: ['5BB0', '5BAF', '597B'], capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '誓约之三位一体', id: ['5BB0', '5BAF', '597B'], capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '맹세의 삼위일체', id: ['5BB0', '5BAF', '597B'], capture: false }),
+      netRegex: { source: 'Trinity Avowed', id: ['5BB0', '5BAF', '597B'], capture: false },
       run: (data) => {
         delete data.currentTemperature;
         delete data.currentBrand;
@@ -1728,7 +1473,7 @@ const triggerSet: TriggerSet<Data> = {
       // 8DC Running Cold: -1
       // 8E2 Running Cold: -2
       // 8A4 Running Hot: +2
-      netRegex: NetRegexes.gainsEffect({ effectId: ['89C', '89D', '8DC', '8E2', '8A4'] }),
+      netRegex: { effectId: ['89C', '89D', '8DC', '8E2', '8A4'] },
       condition: Conditions.targetIsYou(),
       run: (data, matches) => {
         const temperature: { [id: string]: number } = {
@@ -1749,7 +1494,7 @@ const triggerSet: TriggerSet<Data> = {
       // 8F3 Hot Brand: +2
       // 8F4 Cold Brand: +1
       // 8F8 Cold Brand: +2
-      netRegex: NetRegexes.gainsEffect({ effectId: ['8E5', '8F3', '8F4', '8F8'] }),
+      netRegex: { effectId: ['8E5', '8F3', '8F4', '8F8'] },
       condition: Conditions.targetIsYou(),
       run: (data, matches) => {
         const brand: { [id: string]: number } = {
@@ -1768,7 +1513,7 @@ const triggerSet: TriggerSet<Data> = {
       // 50E About Face
       // 50F Left Face
       // 510 Right Face
-      netRegex: NetRegexes.gainsEffect({ effectId: ['50D', '50E', '50F', '510'] }),
+      netRegex: { effectId: ['50D', '50E', '50F', '510'] },
       condition: Conditions.targetIsYou(),
       run: (data, matches) => data.forcedMarch = matches.effectId.toUpperCase(),
     },
@@ -1798,12 +1543,10 @@ const triggerSet: TriggerSet<Data> = {
       // 595B = left cleave cold (2) paired with 595D
       // 595C = left cleave heat (2) paired with 595A
       // 595D = left cleave cold (2) paired with 595B
-      netRegex: NetRegexes.startsUsing({ source: ['Trinity Avowed', 'Avowed Avatar'], id: ['5942', '5943', '5946', '5947', '5956', '5957', '595A', '595B'] }),
-      netRegexDe: NetRegexes.startsUsing({ source: ['Trinität Der Eingeschworenen', 'Spaltteil der Eingeschworenen'], id: ['5942', '5943', '5946', '5947', '5956', '5957', '595A', '595B'] }),
-      netRegexFr: NetRegexes.startsUsing({ source: ['Trinité Féale', 'Clone De La Trinité Féale'], id: ['5942', '5943', '5946', '5947', '5956', '5957', '595A', '595B'] }),
-      netRegexJa: NetRegexes.startsUsing({ source: ['トリニティ・アヴァウド', 'アヴァウドの分体'], id: ['5942', '5943', '5946', '5947', '5956', '5957', '595A', '595B'] }),
-      netRegexCn: NetRegexes.startsUsing({ source: ['誓约之三位一体', '誓约之分身'], id: ['5942', '5943', '5946', '5947', '5956', '5957', '595A', '595B'] }),
-      netRegexKo: NetRegexes.startsUsing({ source: ['맹세의 삼위일체', '맹세의 분열체'], id: ['5942', '5943', '5946', '5947', '5956', '5957', '595A', '595B'] }),
+      netRegex: {
+        source: ['Trinity Avowed', 'Avowed Avatar'],
+        id: ['5942', '5943', '5946', '5947', '5956', '5957', '595A', '595B'],
+      },
       run: (data, matches) => {
         data.blades ??= {};
         data.blades[parseInt(matches.sourceId, 16)] = matches.id.toUpperCase();
@@ -1812,12 +1555,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Avowed Hot And Cold Shimmering Shot',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Trinity Avowed', id: '597F', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Trinität Der Eingeschworenen', id: '597F', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Trinité Féale', id: '597F', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'トリニティ・アヴァウド', id: '597F', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '誓约之三位一体', id: '597F', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '맹세의 삼위일체', id: '597F', capture: false }),
+      netRegex: { source: 'Trinity Avowed', id: '597F', capture: false },
       durationSeconds: 5,
       alertText: (data, _matches, output) => {
         const currentBrand = data.currentBrand ?? 0;
@@ -1842,7 +1580,7 @@ const triggerSet: TriggerSet<Data> = {
           '510': output.right!(),
         };
 
-        if (data.forcedMarch) {
+        if (data.forcedMarch !== undefined) {
           const marchStr = marchStrMap[data.forcedMarch];
           return output.marchToArrow!({ arrow: arrowStr, dir: marchStr });
         }
@@ -1852,7 +1590,7 @@ const triggerSet: TriggerSet<Data> = {
         plusTwo: {
           en: '+2 Heat Arrow',
           de: '+2 Heiß-Pfeile',
-          fr: 'Flèche de chaleur +2',
+          fr: 'La flèche de chaleur +2',
           ja: '炎属性+2',
           cn: '火+2箭',
           ko: '+2 불 화살',
@@ -1860,7 +1598,7 @@ const triggerSet: TriggerSet<Data> = {
         plusOne: {
           en: '+1 Heat Arrow',
           de: '+1 Heiß-Pfeile',
-          fr: 'Flèche de chaleur +1',
+          fr: 'La flèche de chaleur +1',
           ja: '炎属性+1',
           cn: '火+1箭',
           ko: '+1 불 화살',
@@ -1868,7 +1606,7 @@ const triggerSet: TriggerSet<Data> = {
         emptySpot: {
           en: 'Empty Spot',
           de: 'Leeres Feld',
-          fr: 'Emplacement vide',
+          fr: 'L\'emplacement vide',
           ja: 'そのままにする',
           cn: '空白',
           ko: '빈 자리',
@@ -1876,7 +1614,7 @@ const triggerSet: TriggerSet<Data> = {
         minusOne: {
           en: '-1 Cold Arrow',
           de: '-1 Kalt-Pfeile',
-          fr: 'Flèche de froid -1',
+          fr: 'La flèche de froid -1',
           ja: '氷属性-1',
           cn: '冰-1箭',
           ko: '-1 얼음 화살',
@@ -1884,7 +1622,7 @@ const triggerSet: TriggerSet<Data> = {
         minusTwo: {
           en: '-2 Cold Arrow',
           de: '-2 Kalt-Pfeile',
-          fr: 'Flèche de froid -2',
+          fr: 'La flèche de froid -2',
           ja: '氷属性-2',
           cn: '冰-2箭',
           ko: '-2 얼음 화살',
@@ -1892,7 +1630,7 @@ const triggerSet: TriggerSet<Data> = {
         unknownTemperature: {
           en: 'Opposite Arrow',
           de: 'Entgegengesetze Pfeile',
-          fr: 'Flèche de l\'élément opposé',
+          fr: 'La flèche de l\'élément opposé',
           ja: '体温と逆のあみだ',
           cn: '相反温度的箭',
           ko: '반대속성 화살',
@@ -1900,7 +1638,7 @@ const triggerSet: TriggerSet<Data> = {
         forwards: {
           en: 'forwards',
           de: 'Vorwärts',
-          fr: 'Vers l\'avant',
+          fr: 'vers l\'avant',
           ja: '前',
           cn: '前',
           ko: '앞',
@@ -1908,7 +1646,7 @@ const triggerSet: TriggerSet<Data> = {
         backwards: {
           en: 'backwards',
           de: 'Rückwärts',
-          fr: 'Vers l\'arrière',
+          fr: 'vers l\'arrière',
           ja: '後ろ',
           cn: '后',
           ko: '뒤',
@@ -1916,7 +1654,7 @@ const triggerSet: TriggerSet<Data> = {
         left: {
           en: 'left',
           de: 'Links',
-          fr: 'À gauche',
+          fr: 'à gauche',
           ja: '左',
           cn: '左',
           ko: '왼쪽',
@@ -1924,7 +1662,7 @@ const triggerSet: TriggerSet<Data> = {
         right: {
           en: 'right',
           de: 'Rechts',
-          fr: 'À droite',
+          fr: 'à droite',
           ja: '右',
           cn: '右',
           ko: '오른쪽',
@@ -1940,7 +1678,7 @@ const triggerSet: TriggerSet<Data> = {
         marchToArrow: {
           en: 'March ${dir} to ${arrow}',
           de: 'Marchiere ${dir} zum ${arrow}',
-          fr: 'Marqueur ${dir} de ${arrow}',
+          fr: 'Marchez ${dir} de ${arrow}',
           ja: '強制移動: ${dir} > ${arrow}',
           cn: '强制移动：${dir} > ${arrow}',
           ko: '강제이동 ${dir} > ${arrow}',
@@ -1950,12 +1688,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Avowed Hot And Cold Freedom Of Bozja',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Trinity Avowed', id: '597C', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Trinität Der Eingeschworenen', id: '597C', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Trinité Féale', id: '597C', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'トリニティ・アヴァウド', id: '597C', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '誓约之三位一体', id: '597C', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '맹세의 삼위일체', id: '597C', capture: false }),
+      netRegex: { source: 'Trinity Avowed', id: '597C', capture: false },
       delaySeconds: 7,
       durationSeconds: 5,
       alertText: (data, _matches, output) => {
@@ -1980,7 +1713,7 @@ const triggerSet: TriggerSet<Data> = {
           '510': output.right!(),
         };
 
-        if (data.forcedMarch) {
+        if (data.forcedMarch !== undefined) {
           const marchStr = marchStrMap[data.forcedMarch];
           return output.marchToMeteor!({ meteor: meteorStr, dir: marchStr });
         }
@@ -2030,7 +1763,7 @@ const triggerSet: TriggerSet<Data> = {
         forwards: {
           en: 'forwards',
           de: 'Vorwärts',
-          fr: 'Vers l\'avant',
+          fr: 'vers l\'avant',
           ja: '前',
           cn: '前',
           ko: '앞',
@@ -2038,7 +1771,7 @@ const triggerSet: TriggerSet<Data> = {
         backwards: {
           en: 'backwards',
           de: 'Rückwärts',
-          fr: 'Vers l\'arrière',
+          fr: 'vers l\'arrière',
           ja: '後ろ',
           cn: '后',
           ko: '뒤',
@@ -2046,7 +1779,7 @@ const triggerSet: TriggerSet<Data> = {
         left: {
           en: 'left',
           de: 'Links',
-          fr: 'À gauche',
+          fr: 'à gauche',
           ja: '左',
           cn: '左',
           ko: '왼쪽',
@@ -2054,7 +1787,7 @@ const triggerSet: TriggerSet<Data> = {
         right: {
           en: 'right',
           de: 'Rechts',
-          fr: 'À droite',
+          fr: 'à droite',
           ja: '右',
           cn: '右',
           ko: '오른쪽',
@@ -2070,7 +1803,7 @@ const triggerSet: TriggerSet<Data> = {
         marchToMeteor: {
           en: 'March ${dir} to ${meteor}',
           de: 'Marchiere ${dir} zum ${meteor}',
-          fr: 'Marqueur ${dir} du ${meteor}',
+          fr: 'Marchez ${dir} du ${meteor}',
           ja: '強制移動: ${dir} > ${meteor}',
           cn: '强制移动：${dir} > ${meteor}',
           ko: '강제이동 ${dir} > ${meteor}',
@@ -2091,12 +1824,7 @@ const triggerSet: TriggerSet<Data> = {
       // Trigger delayed until after Blade Of Entropy happens about ~100ms after
       // to get left/right cleave info
       // Ignoring Trinity Avowed due to Environment 'randomly' refreshing its buff
-      netRegex: NetRegexes.gainsEffect({ target: 'Avowed Avatar', effectId: ['8F9', '8FA', '8FB', '8FC'], capture: false }),
-      netRegexDe: NetRegexes.gainsEffect({ target: 'Spaltteil der Eingeschworenen', effectId: ['8F9', '8FA', '8FB', '8FC'], capture: false }),
-      netRegexFr: NetRegexes.gainsEffect({ target: 'Clone De La Trinité Féale', effectId: ['8F9', '8FA', '8FB', '8FC'], capture: false }),
-      netRegexJa: NetRegexes.gainsEffect({ target: 'アヴァウドの分体', effectId: ['8F9', '8FA', '8FB', '8FC'], capture: false }),
-      netRegexCn: NetRegexes.gainsEffect({ target: '誓约之分身', effectId: ['8F9', '8FA', '8FB', '8FC'], capture: false }),
-      netRegexKo: NetRegexes.gainsEffect({ target: '맹세의 분열체', effectId: ['8F9', '8FA', '8FB', '8FC'], capture: false }),
+      netRegex: { target: 'Avowed Avatar', effectId: ['8F9', '8FA', '8FB', '8FC'], capture: false },
       delaySeconds: 0.5,
       durationSeconds: 9.5,
       suppressSeconds: 1,
@@ -2127,13 +1855,13 @@ const triggerSet: TriggerSet<Data> = {
 
         let combatantDataBoss = null;
         let combatantDataAvatars = null;
-        if (combatantNameBoss) {
+        if (combatantNameBoss !== undefined) {
           combatantDataBoss = await callOverlayHandler({
             call: 'getCombatants',
             names: [combatantNameBoss],
           });
         }
-        if (combatantNameAvatar) {
+        if (combatantNameAvatar !== undefined) {
           combatantDataAvatars = await callOverlayHandler({
             call: 'getCombatants',
             names: [combatantNameAvatar],
@@ -2147,23 +1875,15 @@ const triggerSet: TriggerSet<Data> = {
           delete data.safeZone;
           return;
         }
-        if (!combatantDataBoss.combatants) {
-          console.error(`Trinity Avowed: null combatants`);
-          delete data.safeZone;
-          return;
-        }
         if (combatantDataAvatars === null) {
           console.error(`Avowed Avatar: null data`);
           delete data.safeZone;
           return;
         }
-        if (!combatantDataAvatars.combatants) {
-          console.error(`Avowed Avatar: null combatants`);
-          delete data.safeZone;
-          return;
-        }
         if (combatantDataAvatars.combatants.length < 3) {
-          console.error(`Avowed Avatar: expected at least 3 combatants got ${combatantDataAvatars.combatants.length}`);
+          console.error(
+            `Avowed Avatar: expected at least 3 combatants got ${combatantDataAvatars.combatants.length}`,
+          );
           delete data.safeZone;
           return;
         }
@@ -2190,12 +1910,15 @@ const triggerSet: TriggerSet<Data> = {
         // we need to filter for the Trinity Avowed with the lowest ID
         // that one is always cleaving on one of the cardinals
         // Trinity Avowed is always East (-267, -87)
-        const sortCombatants = (a: PluginCombatantState, b: PluginCombatantState) => (a.ID ?? 0) - (b.ID ?? 0);
+        const sortCombatants = (a: PluginCombatantState, b: PluginCombatantState) =>
+          (a.ID ?? 0) - (b.ID ?? 0);
         const eastCombatant = combatantDataBoss.combatants.sort(sortCombatants).shift();
 
         // we need to filter for the three Avowed Avatars with the lowest IDs
         // as they cast cleave at the different cardinals
-        const [avatarOne, avatarTwo, avatarThree] = combatantDataAvatars.combatants.sort(sortCombatants);
+        const [avatarOne, avatarTwo, avatarThree] = combatantDataAvatars.combatants.sort(
+          sortCombatants,
+        );
         if (!avatarOne || !avatarTwo || !avatarThree)
           throw new UnreachableCode();
 
@@ -2272,8 +1995,8 @@ const triggerSet: TriggerSet<Data> = {
         let safeZone = null;
         let adjacentZones: { [dir: number]: number } = {};
         if (
-          (northCombatantFacing === dirNum.north && bladeSides[northCombatantBlade]) ||
-          (northCombatantFacing === dirNum.south && !bladeSides[northCombatantBlade])
+          northCombatantFacing === dirNum.north && bladeSides[northCombatantBlade] ||
+          northCombatantFacing === dirNum.south && !bladeSides[northCombatantBlade]
         ) {
           // North clone cleaving inside east (and therefore east clone cleaving north).
           safeZone = output.southwest!();
@@ -2284,8 +2007,8 @@ const triggerSet: TriggerSet<Data> = {
             [dirNum.west]: westCombatantBladeValue,
           };
         } else if (
-          (northCombatantFacing === dirNum.north && !bladeSides[northCombatantBlade]) ||
-          (northCombatantFacing === dirNum.south && bladeSides[northCombatantBlade])
+          northCombatantFacing === dirNum.north && !bladeSides[northCombatantBlade] ||
+          northCombatantFacing === dirNum.south && bladeSides[northCombatantBlade]
         ) {
           // North clone cleaving inside west (and therefore west clone cleaving north).
           safeZone = output.southeast!();
@@ -2296,8 +2019,8 @@ const triggerSet: TriggerSet<Data> = {
             [dirNum.west]: northCombatantBladeValue,
           };
         } else if (
-          (southCombatantFacing === dirNum.south && bladeSides[southCombatantBlade]) ||
-          (southCombatantFacing === dirNum.north && !bladeSides[southCombatantBlade])
+          southCombatantFacing === dirNum.south && bladeSides[southCombatantBlade] ||
+          southCombatantFacing === dirNum.north && !bladeSides[southCombatantBlade]
         ) {
           // South clone cleaving inside west (and therefore west clone cleaving south).
           safeZone = output.northeast!();
@@ -2308,8 +2031,8 @@ const triggerSet: TriggerSet<Data> = {
             [dirNum.west]: southCombatantBladeValue,
           };
         } else if (
-          (southCombatantFacing === dirNum.north && bladeSides[southCombatantBlade]) ||
-          (southCombatantFacing === dirNum.south && !bladeSides[southCombatantBlade])
+          southCombatantFacing === dirNum.north && bladeSides[southCombatantBlade] ||
+          southCombatantFacing === dirNum.south && !bladeSides[southCombatantBlade]
         ) {
           // South clone cleaving inside east (and therefore east clone cleaving south).
           safeZone = output.northwest!();
@@ -2336,10 +2059,12 @@ const triggerSet: TriggerSet<Data> = {
         const effectiveTemperature = currentTemperature + currentBrand;
 
         // Calculate which adjacent zone to go to, if needed
-        let adjacentZone = null;
-        if (effectiveTemperature && adjacentZones) {
+        let adjacentZone: string | null | undefined = null;
+        if (effectiveTemperature !== 0) {
           // Find the adjacent zone that gets closest to 0
-          const calculatedZones = Object.values(adjacentZones).map((i: number) => Math.abs(effectiveTemperature + i));
+          const calculatedZones = Object.values(adjacentZones).map((i: number) =>
+            Math.abs(effectiveTemperature + i)
+          );
 
           // Use zone closest to zero as output
           const dirs = {
@@ -2358,7 +2083,7 @@ const triggerSet: TriggerSet<Data> = {
 
         // Callout safe spot and get cleaved spot if both are known
         // Callout safe spot only if no need to be cleaved
-        if (adjacentZone) {
+        if (adjacentZone !== null) {
           data.safeZone = output.getCleaved!({ dir1: safeZone, dir2: adjacentZone });
         } else if (safeZone) {
           data.safeZone = output.safeSpot!({ dir: safeZone });
@@ -2367,12 +2092,12 @@ const triggerSet: TriggerSet<Data> = {
           data.safeZone = output.unknown!();
         }
       },
-      alertText: (data, _matches, output) => !data.safeZone ? output.unknown!() : data.safeZone,
+      alertText: (data, _matches, output) => data.safeZone ?? output.unknown!(),
       outputStrings: {
         getCleaved: {
           en: '${dir1} Safe Spot => ${dir2} for cleave',
           de: 'Sichere Stelle ${dir1} => ${dir2} für Cleave',
-          fr: '${dir1} Zone sûre => ${dir2} pour le cleave',
+          fr: '${dir1} Zone safe => ${dir2} pour le cleave',
           ja: '${dir1}に安置 => ${dir2}範囲攻撃に',
           cn: '去${dir1}方安全点 => 去${dir2}吃顺劈',
           ko: '${dir1} 안전 지대 => ${dir2} 광역 맞기',
@@ -2380,7 +2105,7 @@ const triggerSet: TriggerSet<Data> = {
         safeSpot: {
           en: '${dir} Safe Spot',
           de: 'Sichere Stelle ${dir}',
-          fr: '${dir} Zone sûre',
+          fr: '${dir} Zone safe',
           ja: '${dir}に安置',
           cn: '去${dir}方安全点',
           ko: '${dir} 안전 지대',
@@ -2399,12 +2124,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Avowed Gleaming Arrow Collect',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Avowed Avatar', id: '594D' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Spaltteil Der Eingeschworenen', id: '594D' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Clone De La Trinité Féale', id: '594D' }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'アヴァウドの分体', id: '594D' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '誓约之分身', id: '594D' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '맹세의 분열체', id: '594D' }),
+      netRegex: { source: 'Avowed Avatar', id: '594D' },
       run: (data, matches) => {
         data.unseenIds ??= [];
         data.unseenIds.push(parseInt(matches.sourceId, 16));
@@ -2413,12 +2133,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Avowed Gleaming Arrow',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Avowed Avatar', id: '594D', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Spaltteil Der Eingeschworenen', id: '594D', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Clone De La Trinité Féale', id: '594D', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'アヴァウドの分体', id: '594D', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '誓约之分身', id: '594D', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '맹세의 분열체', id: '594D', capture: false }),
+      netRegex: { source: 'Avowed Avatar', id: '594D', capture: false },
       delaySeconds: 0.5,
       suppressSeconds: 10,
       promise: async (data) => {
@@ -2434,12 +2149,10 @@ const triggerSet: TriggerSet<Data> = {
           console.error(`Gleaming Arrow: null data`);
           return;
         }
-        if (!unseenData.combatants) {
-          console.error(`Gleaming Arrow: null combatants`);
-          return;
-        }
         if (unseenData.combatants.length !== unseenIds.length) {
-          console.error(`Gleaming Arrow: expected ${unseenIds.length}, got ${unseenData.combatants.length}`);
+          console.error(
+            `Gleaming Arrow: expected ${unseenIds.length}, got ${unseenData.combatants.length}`,
+          );
           return;
         }
 
@@ -2552,12 +2265,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Lord Foe Splitter',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Stygimoloch Lord', id: '57D7' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Anführer-Stygimoloch', id: '57D7' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Seigneur Stygimoloch', id: '57D7' }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'スティギモロク・ロード', id: '57D7' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '冥河之王', id: '57D7' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '스티키몰로크 군주', id: '57D7' }),
+      netRegex: { source: 'Stygimoloch Lord', id: '57D7' },
       // THANKFULLY this starts using comes out immediately before the headmarker line.
       preRun: (data) => data.firstUnknownHeadmarker = headmarker.foeSplitter,
       response: (data, matches, output) => {
@@ -2578,14 +2286,14 @@ const triggerSet: TriggerSet<Data> = {
         if (matches.target === data.me)
           return { alarmText: output.cleaveOnYou!() };
         if (tankBusterOnParty(data, matches))
-          return { alertText: output.cleaveOn!({ player: data.ShortName(matches.target) }) };
+          return { alertText: output.cleaveOn!({ player: data.party.member(matches.target) }) };
         return { infoText: output.avoidCleave!() };
       },
     },
     {
       id: 'DelubrumSav Lord Rapid Bolts',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker(),
+      netRegex: {},
       condition: (data, matches) => {
         if (data.me !== matches.target)
           return false;
@@ -2608,7 +2316,7 @@ const triggerSet: TriggerSet<Data> = {
       type: 'GainsEffect',
       // 97E: Wanderer's Fate, Pushes outward on Fateful Word cast
       // 97F: Sacrifice's Fate, Pulls to middle on Fateful Word cast
-      netRegex: NetRegexes.gainsEffect({ effectId: '97[EF]' }),
+      netRegex: { effectId: '97[EF]' },
       condition: Conditions.targetIsYou(),
       preRun: (data, matches) => {
         data.labyrinthineFate = matches.effectId.toUpperCase();
@@ -2649,12 +2357,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Lord Fateful Words',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Stygimoloch Lord', id: '57C9', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Anführer-Stygimoloch', id: '57C9', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Seigneur Stygimoloch', id: '57C9', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'スティギモロク・ロード', id: '57C9', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '冥河之王', id: '57C9', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '스티키몰로크 군주', id: '57C9', capture: false }),
+      netRegex: { source: 'Stygimoloch Lord', id: '57C9', capture: false },
       // 97E: Wanderer's Fate, Pushes outward on Fateful Word cast
       // 97F: Sacrifice's Fate, Pulls to middle on Fateful Word cast
       // Labyrinthine Fate is cast and 1 second later debuffs are applied
@@ -2676,12 +2379,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Lord Devastating Bolt',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Stygimoloch Lord', id: '57C5', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Anführer-Stygimoloch', id: '57C5', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Seigneur Stygimoloch', id: '57C5', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'スティギモロク・ロード', id: '57C5', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '冥河之王', id: '57C5', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '스티키몰로크 군주', id: '57C5', capture: false }),
+      netRegex: { source: 'Stygimoloch Lord', id: '57C5', capture: false },
       durationSeconds: 4,
       suppressSeconds: 1,
       alertText: (_data, _matches, output) => output.text!(),
@@ -2699,12 +2397,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Lord 1111-Tonze Swing',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Stygimoloch Lord', id: '57D8', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Anführer-Stygimoloch', id: '57D8', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Seigneur Stygimoloch', id: '57D8', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'スティギモロク・ロード', id: '57D8', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '冥河之王', id: '57D8', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '스티키몰로크 군주', id: '57D8', capture: false }),
+      netRegex: { source: 'Stygimoloch Lord', id: '57D8', capture: false },
       response: Responses.getOut(),
     },
     {
@@ -2714,12 +2407,7 @@ const triggerSet: TriggerSet<Data> = {
       // Tank swap will be required between the two hits if not using a tank invulnerability
       // Tank swap required after second hit if not using PLD or GNB tank invulnerabilities
       // To avoid bad swaps between 11 other tanks, only mention swap to targetted tank
-      netRegex: NetRegexes.startsUsing({ source: 'The Queen', id: '59F5' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Kriegsgöttin', id: '59F5' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Garde-La-Reine', id: '59F5' }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'セイブ・ザ・クイーン', id: '59F5' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '天佑女王', id: '59F5' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '세이브 더 퀸', id: '59F5' }),
+      netRegex: { source: 'The Queen', id: '59F5' },
       response: (data, matches, output) => {
         // cactbot-builtin-response
         output.responseOutputStrings = {
@@ -2759,14 +2447,10 @@ const triggerSet: TriggerSet<Data> = {
       id: 'DelubrumSav Queen Cleansing Slash Doom',
       type: 'GainsEffect',
       // Each Cleansing Slash applies a cleansable Doom (38E), if damage is taken
-      netRegex: NetRegexes.gainsEffect({ source: 'The Queen', effectId: '38E' }),
-      netRegexDe: NetRegexes.gainsEffect({ source: 'Kriegsgöttin', effectId: '38E' }),
-      netRegexFr: NetRegexes.gainsEffect({ source: 'Garde-La-Reine', effectId: '38E' }),
-      netRegexJa: NetRegexes.gainsEffect({ source: 'セイブ・ザ・クイーン', effectId: '38E' }),
-      netRegexCn: NetRegexes.gainsEffect({ source: '天佑女王', effectId: '38E' }),
-      netRegexKo: NetRegexes.gainsEffect({ source: '세이브 더 퀸', effectId: '38E' }),
+      netRegex: { source: 'The Queen', effectId: '38E' },
       condition: (data) => data.CanCleanse(),
-      infoText: (data, matches, output) => output.text!({ player: data.ShortName(matches.target) }),
+      infoText: (data, matches, output) =>
+        output.text!({ player: data.party.member(matches.target) }),
       outputStrings: {
         text: {
           en: 'Esuna ${player}',
@@ -2774,7 +2458,7 @@ const triggerSet: TriggerSet<Data> = {
           fr: 'Guérison sur ${player}',
           ja: '${player} にエスナ',
           cn: '驱散: ${player}',
-          ko: '"${player}" 에스나',
+          ko: '${player} 에스나',
         },
       },
     },
@@ -2783,12 +2467,7 @@ const triggerSet: TriggerSet<Data> = {
       type: 'GainsEffect',
       // Players with Dispel should Dispel all the buffs on The Queen.
       // Critical Strikes = 705 is the first one.
-      netRegex: NetRegexes.gainsEffect({ target: 'The Queen', effectId: '705', capture: false }),
-      netRegexDe: NetRegexes.gainsEffect({ target: 'Kriegsgöttin', effectId: '705', capture: false }),
-      netRegexFr: NetRegexes.gainsEffect({ target: 'Garde-La-Reine', effectId: '705', capture: false }),
-      netRegexJa: NetRegexes.gainsEffect({ target: 'セイブ・ザ・クイーン', effectId: '705', capture: false }),
-      netRegexCn: NetRegexes.gainsEffect({ target: '天佑女王', effectId: '705', capture: false }),
-      netRegexKo: NetRegexes.gainsEffect({ target: '세이브 더 퀸', effectId: '705', capture: false }),
+      netRegex: { target: 'The Queen', effectId: '705', capture: false },
       condition: (data) => {
         data.queenDispelCount = (data.queenDispelCount || 0) + 1;
         // The third time she gains this effect is the enrage, and there's no need to dispel.
@@ -2810,7 +2489,7 @@ const triggerSet: TriggerSet<Data> = {
       id: 'DelubrumSav Queen Ball Lightning',
       type: 'AddedCombatant',
       // Players with Reflect should destroy one for party to stand in the shield left behind
-      netRegex: NetRegexes.addedCombatantFull({ npcNameId: '7974', capture: false }),
+      netRegex: { npcNameId: '7974', capture: false },
       suppressSeconds: 1,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -2827,12 +2506,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Queen Ball Lightning Bubble',
       type: 'WasDefeated',
-      netRegex: NetRegexes.wasDefeated({ target: 'Ball Lightning', capture: false }),
-      netRegexDe: NetRegexes.wasDefeated({ target: 'Elektrosphäre', capture: false }),
-      netRegexFr: NetRegexes.wasDefeated({ target: 'Orbe De Foudre', capture: false }),
-      netRegexJa: NetRegexes.wasDefeated({ target: '雷球', capture: false }),
-      netRegexCn: NetRegexes.wasDefeated({ target: '雷球', capture: false }),
-      netRegexKo: NetRegexes.wasDefeated({ target: '뇌구', capture: false }),
+      netRegex: { target: 'Ball Lightning', capture: false },
       suppressSeconds: 20,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -2849,12 +2523,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Queen Fiery Portent',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Queen\'s Soldier', id: '5A21' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Soldat Der Königin', id: '5A21' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Soldat De La Reine', id: '5A21' }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'クイーンズ・ソルジャー', id: '5A21' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '女王士兵', id: '5A21' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '여왕의 병사', id: '5A21' }),
+      netRegex: { source: 'Queen\'s Soldier', id: '5A21' },
       delaySeconds: (_data, matches) => parseFloat(matches.castTime) - 5,
       durationSeconds: 5.5,
       response: Responses.stopEverything(),
@@ -2863,12 +2532,7 @@ const triggerSet: TriggerSet<Data> = {
       id: 'DelubrumSav Queen Icy Portent',
       type: 'StartsUsing',
       // Assuming you need to move for 3 seconds (duration of Pyretic from Fiery Portent)
-      netRegex: NetRegexes.startsUsing({ source: 'Queen\'s Soldier', id: '5A22' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Soldat Der Königin', id: '5A22' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Soldat De La Reine', id: '5A22' }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'クイーンズ・ソルジャー', id: '5A22' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '女王士兵', id: '5A22' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '여왕의 병사', id: '5A22' }),
+      netRegex: { source: 'Queen\'s Soldier', id: '5A22' },
       delaySeconds: (_data, matches) => parseFloat(matches.castTime) - 5,
       durationSeconds: 5.5,
       response: Responses.moveAround('alert'),
@@ -2876,12 +2540,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Queen Judgment Blade Right',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'The Queen', id: '59F2', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Kriegsgöttin', id: '59F2', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Garde-La-Reine', id: '59F2', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'セイブ・ザ・クイーン', id: '59F2', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '天佑女王', id: '59F2', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '세이브 더 퀸', id: '59F2', capture: false }),
+      netRegex: { source: 'The Queen', id: '59F2', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -2897,12 +2556,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'DelubrumSav Queen Judgment Blade Left',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'The Queen', id: '59F1', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Kriegsgöttin', id: '59F1', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Garde-La-Reine', id: '59F1', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'セイブ・ザ・クイーン', id: '59F1', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '天佑女王', id: '59F1', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '세이브 더 퀸', id: '59F1', capture: false }),
+      netRegex: { source: 'The Queen', id: '59F1', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -2926,12 +2580,11 @@ const triggerSet: TriggerSet<Data> = {
       // Set 1 Double AoE, 3 seconds later Double AoE
       // Set 2 5 seconds later, Double AoE, 3 seconds later Double AoE, 3 seconds later AoE + Bleed
       // Set 3 1.3 seconds later, Single AoEs every 3 seconds all while bleed from set 2 persists
-      netRegex: NetRegexes.startsUsing({ source: ['Queen\'s Warrior', 'Queen\'s Knight', 'Queen\'s Gunner', 'Queen\'s Soldier'], id: ['5A16', '5A08', '5A35', '5A23'], capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: ['Kriegerin Der Königin', 'Ritter Der Königin', 'Schütze Der Königin', 'Soldat Der Königin'], id: ['5A16', '5A08', '5A35', '5A23'], capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: ['Guerrière De La Reine', 'Chevalier De La Reine', 'Fusilier De La Reine', 'Soldat De La Reine'], id: ['5A16', '5A08', '5A35', '5A23'], capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: ['クイーンズ・ウォリアー', 'クイーンズ・ナイト', 'クイーンズ・ガンナー', 'クイーンズ・ソルジャー'], id: ['5A16', '5A08', '5A35', '5A23'], capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: ['女王战士', '女王骑士', '女王枪手', '女王士兵'], id: ['5A16', '5A08', '5A35', '5A23'], capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: ['여왕의 전사', '여왕의 기사', '여왕의 총사', '여왕의 병사'], id: ['5A16', '5A08', '5A35', '5A23'], capture: false }),
+      netRegex: {
+        source: ['Queen\'s Warrior', 'Queen\'s Knight', 'Queen\'s Gunner', 'Queen\'s Soldier'],
+        id: ['5A16', '5A08', '5A35', '5A23'],
+        capture: false,
+      },
       // Only call out the beginning of a set of two casts
       suppressSeconds: 5,
       alertText: (_data, _matches, output) => output.text!(),

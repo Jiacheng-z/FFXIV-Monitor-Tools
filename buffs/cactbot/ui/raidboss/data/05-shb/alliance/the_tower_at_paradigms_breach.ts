@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import Outputs from '../../../../../resources/outputs';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
@@ -24,7 +23,6 @@ export interface Data extends RaidbossData {
 
 // TODO:
 //   Update Knave knockback directions to instead use cardinals
-//   Hansel and Gretel Bloody Sweep
 //   Hansel and Gretel Stronger Together Tethered
 //   Hansel & Gretel Passing Lance
 //   Hansel & Gretel Breakthrough
@@ -36,41 +34,27 @@ export interface Data extends RaidbossData {
 //   Her Inflorescence Pillar Impact
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'TheTowerAtParadigmsBreach',
   zoneId: ZoneId.TheTowerAtParadigmsBreach,
   timelineFile: 'the_tower_at_paradigms_breach.txt',
   triggers: [
     {
       id: 'Paradigm Knave Roar',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5EB5', source: 'Knave Of Hearts', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5EB5', source: 'Herzbube', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5EB5', source: 'Jack', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5EB5', source: 'ジャック', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5EB5', source: '杰克', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5EB5', source: '잭', capture: false }),
+      netRegex: { id: '5EB5', source: 'Knave Of Hearts', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Paradigm Knave Colossal Impact Sides',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5EA4', source: 'Knave Of Hearts', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5EA4', source: 'Herzbube', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5EA4', source: 'Jack', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5EA4', source: 'ジャック', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5EA4', source: '杰克', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5EA4', source: '잭', capture: false }),
+      netRegex: { id: '5EA4', source: 'Knave Of Hearts', capture: false },
       durationSeconds: 5,
       response: Responses.goMiddle(),
     },
     {
       id: 'Paradigm Copied Knave Colossal Impact Sides',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5EA4', source: 'Copied Knave', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5EA4', source: 'Kopiert(?:e|er|es|en) Herzbube', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5EA4', source: 'Réplique De Jack', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5EA4', source: '複製サレタジャック', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5EA4', source: '复制的杰克', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5EA4', source: '복제된 잭', capture: false }),
+      netRegex: { id: '5EA4', source: 'Copied Knave', capture: false },
       // Cast time of 8 seconds, clones start casting 6 seconds into the cast.
       delaySeconds: 2.1,
       durationSeconds: 5,
@@ -79,12 +63,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paradigm Knave Colossal Impact Middle',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5EA7', source: 'Knave Of Hearts', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5EA7', source: 'Herzbube', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5EA7', source: 'Jack', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5EA7', source: 'ジャック', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5EA7', source: '杰克', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5EA7', source: '잭', capture: false }),
+      netRegex: { id: '5EA7', source: 'Knave Of Hearts', capture: false },
       durationSeconds: 5,
       alertText: (_data, _matches, output) => output.text!(),
       tts: (_data, _matches, output) => output.ttsText!(),
@@ -110,12 +89,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paradigm Copied Knave Colossal Impact Middle',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5EA7', source: 'Copied Knave', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5EA7', source: 'Kopiert(?:e|er|es|en) Herzbube', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5EA7', source: 'Réplique De Jack', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5EA7', source: '複製サレタジャック', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5EA7', source: '复制的杰克', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5EA7', source: '복제된 잭', capture: false }),
+      netRegex: { id: '5EA7', source: 'Copied Knave', capture: false },
       delaySeconds: 2.1,
       durationSeconds: 5,
       alertText: (_data, _matches, output) => output.text!(),
@@ -143,14 +117,14 @@ const triggerSet: TriggerSet<Data> = {
       // Also applies for Red Girl Manipulate Energy
       id: 'Paradigm Knave Magic Artillery Beta You',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '00DA' }),
+      netRegex: { id: '00DA' },
       condition: Conditions.targetIsYou(),
       response: Responses.tankBuster(),
     },
     {
       id: 'Paradigm Knave Magic Artillery Beta Collect',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '00DA' }),
+      netRegex: { id: '00DA' },
       run: (data, matches) => {
         data.busterTargets ??= [];
         data.busterTargets.push(matches.target);
@@ -159,7 +133,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paradigm Knave Magic Artillery Beta',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '00DA', capture: false }),
+      netRegex: { id: '00DA', capture: false },
       delaySeconds: 0.5,
       suppressSeconds: 5,
       infoText: (data, _matches, output) => {
@@ -189,19 +163,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paradigm Knave Magic Artillery Alpha Spread',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '00A9' }),
+      netRegex: { id: '00A9' },
       condition: Conditions.targetIsYou(),
       response: Responses.spread(),
     },
     {
       id: 'Paradigm Knave Lunge',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5EB1', source: 'Knave of Hearts' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5EB1', source: 'Herzbube' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5EB1', source: 'Jack' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5EB1', source: 'ジャック' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5EB1', source: '杰克' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5EB1', source: '잭' }),
+      netRegex: { id: '5EB1', source: 'Knave of Hearts' },
       delaySeconds: (_data, matches) => parseFloat(matches.castTime) - 6,
       durationSeconds: 5,
       infoText: (_data, _matches, output) => output.text!(),
@@ -219,12 +188,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paradigm Copied Knave Lunge',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5EB1', source: 'Copied Knave' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5EB1', source: 'Kopiert(?:e|er|es|en) Herzbube' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5EB1', source: 'Réplique De Jack' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5EB1', source: '複製サレタジャック' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5EB1', source: '复制的杰克' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5EB1', source: '복제된 잭' }),
+      netRegex: { id: '5EB1', source: 'Copied Knave' },
       condition: (data) => !data.cloneLunge,
       delaySeconds: (_data, matches) => parseFloat(matches.castTime) - 6,
       durationSeconds: 5,
@@ -244,12 +208,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paradigm Copied Knave Lunge Get Middle',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '60C7', source: 'Knave of Hearts' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '60C7', source: 'Herzbube' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '60C7', source: 'Jack' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '60C7', source: 'ジャック' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '60C7', source: '杰克' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '60C7', source: '잭' }),
+      netRegex: { id: '60C7', source: 'Knave of Hearts' },
       // Half a second longer cast time than the Lunge itself
       delaySeconds: (_data, matches) => parseFloat(matches.castTime) - 6.5,
       durationSeconds: 5,
@@ -268,12 +227,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paradigm Copied Knave Lunge Out of Middle',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '60C8', source: 'Knave of Hearts' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '60C8', source: 'Herzbube' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '60C8', source: 'Jack' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '60C8', source: 'ジャック' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '60C8', source: '杰克' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '60C8', source: '잭' }),
+      netRegex: { id: '60C8', source: 'Knave of Hearts' },
       delaySeconds: (_data, matches) => parseFloat(matches.castTime) - 6.5,
       durationSeconds: 5,
       alertText: (_data, _matches, output) => output.text!(),
@@ -281,7 +235,7 @@ const triggerSet: TriggerSet<Data> = {
         text: {
           en: 'Knockback -> Out of Middle',
           de: 'Rückstoß -> Raus aus der Mitte',
-          fr: 'Poussée -> Éloignez-vous du milieu',
+          fr: 'Poussée -> Sortez du milieu',
           ja: 'ノックバック -> 外へ',
           cn: '击退 -> 去外面',
           ko: '넉백 -> 가운데 피하기',
@@ -291,12 +245,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paradigm Gretel Upgraded Shield',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5C69', source: 'Gretel', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5C69', source: 'Gretel', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5C69', source: 'Gretel', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5C69', source: 'グレーテル', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5C69', source: '格雷特', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5C69', source: '그레텔', capture: false }),
+      netRegex: { id: '5C69', source: 'Gretel', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -312,12 +261,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paradigm Hansel Upgraded Shield',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5C6B', source: 'Hansel', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5C6B', source: 'Hänsel', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5C6B', source: 'Hansel', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5C6B', source: 'ヘンゼル', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5C6B', source: '韩塞尔', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5C6B', source: '헨젤', capture: false }),
+      netRegex: { id: '5C6B', source: 'Hansel', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -333,30 +277,20 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paradigm Hansel/Gretel Wail',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5C7[67]', source: ['Hansel', 'Gretel'], capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5C7[67]', source: ['Hänsel', 'Gretel'], capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5C7[67]', source: ['Hansel', 'Gretel'], capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5C7[67]', source: ['ヘンゼル', 'グレーテル'], capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5C7[67]', source: ['韩塞尔', '格雷特'], capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5C7[67]', source: ['헨젤', '그레텔'], capture: false }),
+      netRegex: { id: '5C7[67]', source: ['Hansel', 'Gretel'], capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Paradigm Hansel/Gretel Crippling Blow',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5C7[89]', source: ['Hansel', 'Gretel'] }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5C7[89]', source: ['Hänsel', 'Gretel'] }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5C7[89]', source: ['Hansel', 'Gretel'] }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5C7[89]', source: ['ヘンゼル', 'グレーテル'] }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5C7[89]', source: ['韩塞尔', '格雷特'] }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5C7[89]', source: ['헨젤', '그레텔'] }),
+      netRegex: { id: '5C7[89]', source: ['Hansel', 'Gretel'] },
       condition: Conditions.targetIsYou(),
       response: Responses.tankBuster(),
     },
     {
       id: 'Paradigm Hansel/Gretel Seed Of Magic Alpha',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0060' }),
+      netRegex: { id: '0060' },
       preRun: (data, matches) => {
         data.seedTargets ??= [];
         data.seedTargets.push(matches.target);
@@ -372,7 +306,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paradigm Hansel/Gretel Riot Of Magic',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '003E' }),
+      netRegex: { id: '003E' },
       delaySeconds: 0.5,
       infoText: (data, matches, output) => {
         if (!data.seedTargets)
@@ -383,7 +317,7 @@ const triggerSet: TriggerSet<Data> = {
         if (matches.target === data.me)
           return output.stackOnYou!();
 
-        return output.stackOn!({ player: data.ShortName(matches.target) });
+        return output.stackOn!({ player: data.party.member(matches.target) });
       },
       run: (data) => delete data.seedTargets,
       outputStrings: {
@@ -394,34 +328,74 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paradigm Hansel/Gretel Lamentation',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5C7[34]', source: ['Hansel', 'Gretel'], capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5C7[34]', source: ['Hänsel', 'Gretel'], capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5C7[34]', source: ['Hansel', 'Gretel'], capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5C7[34]', source: ['ヘンゼル', 'グレーテル'], capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5C7[34]', source: ['韩塞尔', '格雷特'], capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5C7[34]', source: ['헨젤', '그레텔'], capture: false }),
+      netRegex: { id: '5C7[34]', source: ['Hansel', 'Gretel'], capture: false },
       response: Responses.aoe(),
+    },
+    {
+      id: 'Paradigm Hansel/Gretel Bloody Sweep',
+      type: 'StartsUsing',
+      netRegex: { id: '5C5[4567]', source: ['Hansel', 'Gretel'] },
+      durationSeconds: 5,
+      suppressSeconds: 1,
+      alertText: (_data, matches, output) => {
+        // Hansel and Gretel each have unique abilities which indicate which
+        // side of the Bloody Sweep they're starting in. Hanssel is left
+        // handed, and Gretel is right handed. 5C54 and 5C55 indicate that
+        // Hansel is on the right and Gretel is on the left, relative to the
+        // two bosses. Using this, we can identify if the safe area is
+        // between the two, or on the opposite side of the arena.
+        //
+        // A further complication is that the pair might use Transference
+        // first, which causes them to swap places. We can detect this based
+        // on the cast time of the Bloody Sweep ability, since the cast time
+        // will be extended to account for the Transference. If the swap
+        // will take place, then the cast time will go from 7.7 seconds up
+        // to 12.7 seconds. We use an average of 10 seconds to detect the
+        // swap.
+        if (matches.id === '5C54' || matches.id === '5C55') {
+          // Hansel is on the right and Gretel is on the left.
+          if (parseFloat(matches.castTime) > 10) {
+            // Hansel and Gretel will switch places
+            return output.between!();
+          }
+          // Hansel and Gretel stay in same position
+          return output.opposite!();
+        }
+        // Gretel is on the right and Hansel is on the left.
+        if (parseFloat(matches.castTime) > 10) {
+          // Hansel and Gretel will switch places
+          return output.opposite!();
+        }
+        // Hansel and Gretel stay in same position
+        return output.between!();
+      },
+      outputStrings: {
+        between: {
+          en: 'Move between',
+          de: 'Laufe zwischen beide Bosse',
+          fr: 'Allez entre les boss',
+          cn: '移动到BOSS之间',
+          ko: '보스 사이로',
+        },
+        opposite: {
+          en: 'Move opposite',
+          de: 'Laufe entgegengesetzt beider Bosse',
+          fr: 'Allez à l\'opposé des boss',
+          cn: '移动到BOSS对面',
+          ko: '보스 반대쪽으로',
+        },
+      },
     },
     {
       id: 'Paradigm Red Girl Cruelty',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '601[23]', source: 'Red Girl', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '601[23]', source: 'Rot(?:e|er|es|en) Mädchen', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '601[23]', source: 'Fille En Rouge', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '601[23]', source: '赤い少女', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '601[23]', source: '红衣少女', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '601[23]', source: '붉은 소녀', capture: false }),
+      netRegex: { id: '601[23]', source: 'Red Girl', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Paradigm Red Sphere Wave: White',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '618D', source: 'Red Sphere', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '618D', source: 'Rot(?:e|er|es|en) Sphäre', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '618D', source: 'Noyau Orange', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '618D', source: '赤球', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '618D', source: '红球', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '618D', source: '붉은 공', capture: false }),
+      netRegex: { id: '618D', source: 'Red Sphere', capture: false },
       infoText: (data, _matches, output) => {
         // Skip the first callout, since you're still zoning in
         if (data.seenSphere)
@@ -442,12 +416,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paradigm Red Sphere Wave: Black',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '618E', source: 'Red Sphere', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '618E', source: 'Rot(?:e|er|es|en) Sphäre', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '618E', source: 'Noyau Orange', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '618E', source: '赤球', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '618E', source: '红球', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '618E', source: '붉은 공', capture: false }),
+      netRegex: { id: '618E', source: 'Red Sphere', capture: false },
       infoText: (data, _matches, output) => {
         if (data.seenSphere)
           return output.text!();
@@ -467,12 +436,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paradigm Meng-Zi/Xun-Zi Universal Assault',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5C06', source: ['Meng-Zi', 'Xun-Zi'], capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5C06', source: ['Meng-Zi', 'Xun-Zi'], capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5C06', source: ['Meng-Zi', 'Xun-Zi'], capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5C06', source: ['モウシ', 'ジュンシ'], capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5C06', source: ['孟子', '荀子'], capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5C06', source: ['맹자', '순자'], capture: false }),
+      netRegex: { id: '5C06', source: ['Meng-Zi', 'Xun-Zi'], capture: false },
       suppressSeconds: 5,
       response: Responses.aoe(),
     },
@@ -502,7 +466,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paradigm Meng-Zi/Xun-Zi Deploy Armaments Collect',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['5C00', '5C01', '5C03', '5C04'] }),
+      netRegex: { id: ['5C00', '5C01', '5C03', '5C04'] },
       run: (data, matches) => {
         data.deployArmaments ??= [];
 
@@ -521,7 +485,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paradigm Meng-Zi/Xun-Zi Deploy Armaments Trigger',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['5C00', '5C01', '5C03', '5C04'] }),
+      netRegex: { id: ['5C00', '5C01', '5C03', '5C04'] },
       delaySeconds: 0.25,
       durationSeconds: 5,
       suppressSeconds: 1,
@@ -580,7 +544,7 @@ const triggerSet: TriggerSet<Data> = {
         center: {
           en: 'Go to Center',
           de: 'Geh in die Mitte',
-          fr: 'Allez au milieu',
+          fr: 'Allez au centre',
           cn: '去中间',
           ko: '가운데로',
         },
@@ -622,7 +586,7 @@ const triggerSet: TriggerSet<Data> = {
         oops: {
           en: 'Avoid line AOEs',
           de: 'Weiche den Linien AoEs aus',
-          fr: 'Évitez l\'AOE en ligne',
+          fr: 'Évitez les AoEs en ligne',
           cn: '躲避直线AOE',
           ko: '레이저 피하기',
         },
@@ -631,42 +595,27 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paradigm False Idol Screaming Score',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5BDD', source: 'False Idol', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5BDD', source: 'Ihre Abgöttlichkeit', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5BDD', source: 'Déesse Factice', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5BDD', source: '偽造サレタ神', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5BDD', source: '伪造的神明', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5BDD', source: '위조된 신', capture: false }),
+      netRegex: { id: '5BDD', source: 'False Idol', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Paradigm False Idol Made Magic Left',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5BD6', source: 'False Idol', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5BD6', source: 'Ihre Abgöttlichkeit', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5BD6', source: 'Déesse Factice', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5BD6', source: '偽造サレタ神', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5BD6', source: '伪造的神明', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5BD6', source: '위조된 신', capture: false }),
+      netRegex: { id: '5BD6', source: 'False Idol', capture: false },
       durationSeconds: 5,
       response: Responses.goRight(),
     },
     {
       id: 'Paradigm False Idol Made Magic Right',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5BD7', source: 'False Idol', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5BD7', source: 'Ihre Abgöttlichkeit', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5BD7', source: 'Déesse Factice', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5BD7', source: '偽造サレタ神', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5BD7', source: '伪造的神明', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5BD7', source: '위조된 신', capture: false }),
+      netRegex: { id: '5BD7', source: 'False Idol', capture: false },
       durationSeconds: 5,
       response: Responses.goLeft(),
     },
     {
       id: 'Paradigm False Idol Lighter Note',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0001' }),
+      netRegex: { id: '0001' },
       condition: Conditions.targetIsYou(),
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -683,14 +632,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paradigm False Idol Darker Note You',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '008B' }),
+      netRegex: { id: '008B' },
       condition: Conditions.targetIsYou(),
       response: Responses.tankBuster(),
     },
     {
       id: 'Paradigm False Idol Darker Note Collect',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '008B' }),
+      netRegex: { id: '008B' },
       run: (data, matches) => {
         data.busterTargets ??= [];
         data.busterTargets.push(matches.target);
@@ -699,7 +648,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paradigm False Idol Darker Note',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '008B', capture: false }),
+      netRegex: { id: '008B', capture: false },
       delaySeconds: 0.5,
       suppressSeconds: 5,
       infoText: (data, _matches, output) => {
@@ -729,24 +678,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paradigm Her Inflorescence Screaming Score',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5BF5', source: 'Her Inflorescence', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5BF5', source: 'Ihre Infloreszenz', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5BF5', source: 'Déesse Éclose', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5BF5', source: '開花シタ神', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5BF5', source: '开花的神明', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5BF5', source: '꽃피운 신', capture: false }),
+      netRegex: { id: '5BF5', source: 'Her Inflorescence', capture: false },
       response: Responses.aoe(),
     },
     {
       // startsUsing callout is too early, instead callout when the cast has finished
       id: 'Paradigm Her Inflorescence Recreate Structure',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '5BE1', source: 'Her Inflorescence', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: '5BE1', source: 'Ihre Infloreszenz', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: '5BE1', source: 'Déesse Éclose', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: '5BE1', source: '開花シタ神', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: '5BE1', source: '开花的神明', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: '5BE1', source: '꽃피운 신', capture: false }),
+      netRegex: { id: '5BE1', source: 'Her Inflorescence', capture: false },
       durationSeconds: 5,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -763,23 +702,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paradigm Her Inflorescence Recreate Signal',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5BE3', source: 'Her Inflorescence', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5BE3', source: 'Ihre Infloreszenz', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5BE3', source: 'Déesse Éclose', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5BE3', source: '開花シタ神', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5BE3', source: '开花的神明', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5BE3', source: '꽃피운 신', capture: false }),
+      netRegex: { id: '5BE3', source: 'Her Inflorescence', capture: false },
       run: (data) => data.signalCount = 0,
     },
     {
       id: 'Paradigm Her Inflorescence Recreate Signal Collect',
       type: 'Tether',
-      netRegex: NetRegexes.tether({ id: '0036', target: 'Her Inflorescence', capture: false }),
-      netRegexDe: NetRegexes.tether({ id: '0036', target: 'Ihre Infloreszenz', capture: false }),
-      netRegexFr: NetRegexes.tether({ id: '0036', target: 'Déesse Éclose', capture: false }),
-      netRegexJa: NetRegexes.tether({ id: '0036', target: '開花シタ神', capture: false }),
-      netRegexCn: NetRegexes.tether({ id: '0036', target: '开花的神明', capture: false }),
-      netRegexKo: NetRegexes.tether({ id: '0036', target: '꽃피운 신', capture: false }),
+      netRegex: { id: '0036', target: 'Her Inflorescence', capture: false },
       preRun: (data) => data.signalCount = (data.signalCount ?? 0) + 1,
       durationSeconds: 5,
       alertText: (data, _matches, output) => {
@@ -800,23 +729,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Paradigm Her Inflorescence Heavy Arms Middle',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5BED', source: 'Her Inflorescence', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5BED', source: 'Ihre Infloreszenz', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5BED', source: 'Déesse Éclose', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5BED', source: '開花シタ神', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5BED', source: '开花的神明', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5BED', source: '꽃피운 신', capture: false }),
+      netRegex: { id: '5BED', source: 'Her Inflorescence', capture: false },
       response: Responses.goSides(),
     },
     {
       id: 'Paradigm Her Inflorescence Heavy Arms Sides',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '5BEF', source: 'Her Inflorescence', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '5BEF', source: 'Ihre Infloreszenz', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '5BEF', source: 'Déesse Éclose', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '5BEF', source: '開花シタ神', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '5BEF', source: '开花的神明', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '5BEF', source: '꽃피운 신', capture: false }),
+      netRegex: { id: '5BEF', source: 'Her Inflorescence', capture: false },
       suppressSeconds: 1,
       response: Responses.goFrontBack(),
     },
@@ -963,7 +882,6 @@ const triggerSet: TriggerSet<Data> = {
       },
       'replaceText': {
         '--targetable\\?--': '--ciblable ?--',
-        'Black Dissonance': 'Noir : rongement',
         '(?<!Tandem Assault: )Bloody Sweep': 'Balayage tranchant',
         '(?<!Tandem Assault: )Breakthrough': 'Grande ruée',
         'Child\'s Play': 'Marionnettiste',
@@ -1036,7 +954,7 @@ const triggerSet: TriggerSet<Data> = {
         'Wandering Trail': 'Disques magiques',
         'Wave: Black': 'Noir : onde',
         'Wave: White': 'Blanc : onde',
-        'White Dissonance': 'Blanc : rongement',
+        'White Dissonance / Black Dissonance': 'Blanc/Noir : rongement',
         'Wipe: Black': 'Noir : grosse Explosion',
         'Wipe: White': 'Blanc : grosse Explosion',
       },
@@ -1355,6 +1273,7 @@ const triggerSet: TriggerSet<Data> = {
         'Wail': '고함',
         'Wandering Trail': '마장륜',
         'Wave: Black': '파동: 흑',
+        'Wave: Black(?! )': '파동: 흑',
         'Wave: White': '파동: 백',
         'White Dissonance': '침식: 백',
         'Wipe: Black': '대폭발: 흑',

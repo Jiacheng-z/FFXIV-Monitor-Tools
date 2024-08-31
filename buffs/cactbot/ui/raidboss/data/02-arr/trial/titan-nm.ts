@@ -1,4 +1,3 @@
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -7,6 +6,7 @@ import { TriggerSet } from '../../../../../types/trigger';
 export type Data = RaidbossData;
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'TheNavel',
   zoneId: ZoneId.TheNavel,
   timelineFile: 'titan-nm.txt',
   timelineTriggers: [
@@ -22,12 +22,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'TitanNm Tumult',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '282', source: 'Titan', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: '282', source: 'Titan', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: '282', source: 'Titan', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: '282', source: 'タイタン', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: '282', source: '泰坦', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: '282', source: '타이탄', capture: false }),
+      netRegex: { id: '282', source: 'Titan', capture: false },
       suppressSeconds: 2,
       response: Responses.aoe(),
     },
@@ -35,10 +30,10 @@ const triggerSet: TriggerSet<Data> = {
       // Gaol callout for both yourself and others
       id: 'TitanNm Gaols',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '124' }),
+      netRegex: { effectId: '124' },
       alertText: (data, matches, output) => {
         if (matches.target !== data.me)
-          return output.breakGaolOn!({ player: data.ShortName(matches.target) });
+          return output.breakGaolOn!({ player: data.party.member(matches.target) });
 
         return output.gaolOnYou!();
       },
@@ -46,6 +41,7 @@ const triggerSet: TriggerSet<Data> = {
         breakGaolOn: {
           en: 'Break Gaol on ${player}',
           de: 'Zerstöre das Gefängnis von ${player}',
+          fr: 'Brisez la geôle sur ${player}',
           ja: '${player}にジェイル',
           cn: '石牢点${player}',
           ko: '${player} 돌감옥 해제',
@@ -53,6 +49,7 @@ const triggerSet: TriggerSet<Data> = {
         gaolOnYou: {
           en: 'Gaol on YOU',
           de: 'Gefängnis auf DIR',
+          fr: 'Geôle sur VOUS',
           ja: '自分にジェイル',
           cn: '石牢点名',
           ko: '돌감옥 대상자',

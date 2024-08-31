@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -14,6 +13,7 @@ export interface Data extends RaidbossData {
 // A8N
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'AlexanderTheBurdenOfTheSon',
   zoneId: ZoneId.AlexanderTheBurdenOfTheSon,
   timelineFile: 'a8n.txt',
   timelineTriggers: [
@@ -57,12 +57,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A8N Megabeam Onslaughter',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Onslaughter', id: '1732', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Schlachter', id: '1732', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Attaqueur', id: '1732', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'オンスローター', id: '1732', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '突击者', id: '1732', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '맹습자', id: '1732', capture: false }),
+      netRegex: { source: 'Onslaughter', id: '1732', capture: false },
       // Insert sound effect from Arthars here.
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -79,12 +74,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A8N Megabeam Brute Justice',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Brute Justice', id: '174F', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Brutalus', id: '174F', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Justicier', id: '174F', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ブルートジャスティス', id: '174F', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '残暴正义号', id: '174F', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '포악한 심판자', id: '174F', capture: false }),
+      netRegex: { source: 'Brute Justice', id: '174F', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -100,12 +90,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A8N Execution',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Onslaughter', id: '1632', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Schlachter', id: '1632', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Attaqueur', id: '1632', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: 'オンスローター', id: '1632', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '突击者', id: '1632', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '맹습자', id: '1632', capture: false }),
+      netRegex: { source: 'Onslaughter', id: '1632', capture: false },
       condition: (data) => data.role === 'dps' || data.job === 'BLU',
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -122,19 +107,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A8N Perpetual Ray',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Onslaughter', id: '1730' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Schlachter', id: '1730' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Attaqueur', id: '1730' }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'オンスローター', id: '1730' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '突击者', id: '1730' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '맹습자', id: '1730' }),
+      netRegex: { source: 'Onslaughter', id: '1730' },
       response: Responses.tankBuster(),
     },
     {
       id: 'A8N Low Arithmeticks',
       type: 'GainsEffect',
       // Note: both high and low use '0025' headmarker
-      netRegex: NetRegexes.gainsEffect({ effectId: '3FD' }),
+      netRegex: { effectId: '3FD' },
       condition: Conditions.targetIsYou(),
       durationSeconds: 10,
       suppressSeconds: 10,
@@ -153,7 +133,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A8N High Arithmeticks',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '3FE' }),
+      netRegex: { effectId: '3FE' },
       condition: Conditions.targetIsYou(),
       durationSeconds: 10,
       suppressSeconds: 10,
@@ -172,22 +152,17 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A8N Super Cyclone',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Vortexer', id: '1747', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Wirbler', id: '1747', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Tourbillonneur', id: '1747', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ボルテッカー', id: '1747', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '环旋者', id: '1747', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '교반자', id: '1747', capture: false }),
+      netRegex: { source: 'Vortexer', id: '1747', capture: false },
       response: Responses.knockback(),
     },
     {
       id: 'A8N Enumeration',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: ['0040', '0041', '0042'] }),
+      netRegex: { id: ['0040', '0041', '0042'] },
       infoText: (data, matches, output) => {
         // 0040 = 2, 0041 = 3, 0042 = 4
         const count = 2 + parseInt(matches.id, 16) - parseInt('0040', 16);
-        return output.text!({ player: data.ShortName(matches.target), count: count });
+        return output.text!({ player: data.party.member(matches.target), count: count });
       },
       outputStrings: {
         text: {
@@ -203,12 +178,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A8N Double Rocket Punch',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Brute Justice', id: '174E' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Brutalus', id: '174E' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Justicier', id: '174E' }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ブルートジャスティス', id: '174E' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '残暴正义号', id: '174E' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '포악한 심판자', id: '174E' }),
+      netRegex: { source: 'Brute Justice', id: '174E' },
       response: Responses.tankBuster(),
     },
     {
@@ -217,12 +187,7 @@ const triggerSet: TriggerSet<Data> = {
       // in order to warn them not to stack.
       id: 'A8N Brute Active Tank',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Brute Justice', id: '174C' }),
-      netRegexDe: NetRegexes.ability({ source: 'Brutalus', id: '174C' }),
-      netRegexFr: NetRegexes.ability({ source: 'Justicier', id: '174C' }),
-      netRegexJa: NetRegexes.ability({ source: 'ブルートジャスティス', id: '174C' }),
-      netRegexCn: NetRegexes.ability({ source: '残暴正义号', id: '174C' }),
-      netRegexKo: NetRegexes.ability({ source: '포악한 심판자', id: '174C' }),
+      netRegex: { source: 'Brute Justice', id: '174C' },
       run: (data, matches) => data.bruteTank = matches.target,
     },
     {
@@ -235,26 +200,21 @@ const triggerSet: TriggerSet<Data> = {
       // 1750 is Super Jump, 1756 is J-Kick.
       id: 'A8N Long Needle Toggle',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Brute Justice', id: ['1750', '1756'] }),
-      netRegexDe: NetRegexes.ability({ source: 'Brutalus', id: ['1750', '1756'] }),
-      netRegexFr: NetRegexes.ability({ source: 'Justicier', id: ['1750', '1756'] }),
-      netRegexJa: NetRegexes.ability({ source: 'ブルートジャスティス', id: ['1750', '1756'] }),
-      netRegexCn: NetRegexes.ability({ source: '残暴正义号', id: ['1750', '1756'] }),
-      netRegexKo: NetRegexes.ability({ source: '포악한 심판자', id: ['1750', '1756'] }),
+      netRegex: { source: 'Brute Justice', id: ['1750', '1756'] },
       suppressSeconds: 5,
       run: (data, matches) => data.bruteTankOut = matches.id === '1756',
     },
     {
       id: 'A8N Long Needle Party',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '003E' }),
+      netRegex: { id: '003E' },
       condition: (data) => !(data.me === data.bruteTank && data.bruteTankOut),
       response: Responses.stackMarkerOn(),
     },
     {
       id: 'A8N Long Needle Active Tank',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '003E', capture: false }),
+      netRegex: { id: '003E', capture: false },
       condition: (data) => data.me === data.bruteTank && data.bruteTankOut,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -271,23 +231,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A8N Apocalyptic Ray',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Brute Justice', id: '1751', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Brutalus', id: '1751', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Justicier', id: '1751', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ブルートジャスティス', id: '1751', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '残暴正义号', id: '1751', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '포악한 심판자', id: '1751', capture: false }),
+      netRegex: { source: 'Brute Justice', id: '1751', capture: false },
       response: Responses.awayFromFront(),
     },
     {
       id: 'A8N Super Jump',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Brute Justice', id: '1750' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Brutalus', id: '1750' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Justicier', id: '1750' }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ブルートジャスティス', id: '1750' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '残暴正义号', id: '1750' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '포악한 심판자', id: '1750' }),
+      netRegex: { source: 'Brute Justice', id: '1750' },
       alertText: (data, matches, output) => {
         if (data.me !== matches.target)
           return;
@@ -296,7 +246,7 @@ const triggerSet: TriggerSet<Data> = {
       infoText: (data, matches, output) => {
         if (data.me === matches.target)
           return;
-        return output.superJumpOn!({ player: data.ShortName(matches.target) });
+        return output.superJumpOn!({ player: data.party.member(matches.target) });
       },
       outputStrings: {
         superJumpOn: {
@@ -320,7 +270,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A8N Mirage Marker',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0008' }),
+      netRegex: { id: '0008' },
       condition: Conditions.targetIsYou(),
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -337,7 +287,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A8N Ice Missile Marker',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0043' }),
+      netRegex: { id: '0043' },
       condition: Conditions.targetIsYou(),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -354,12 +304,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A8N Mirage Supercharge',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Blaster Mirage', id: '1749', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Blaster-Replikant', id: '1749', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Réplique Du Fracasseur', id: '1749', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ブラスター・ミラージュ', id: '1749', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '爆破者幻象', id: '1749', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '폭파자의 환영', id: '1749', capture: false }),
+      netRegex: { source: 'Blaster Mirage', id: '1749', capture: false },
       suppressSeconds: 5,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {

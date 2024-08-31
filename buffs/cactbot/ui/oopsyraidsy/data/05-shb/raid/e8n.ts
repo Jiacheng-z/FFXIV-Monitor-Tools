@@ -28,13 +28,18 @@ const triggerSet: OopsyTriggerSet<Data> = {
       type: 'GainsEffect',
       netRegex: NetRegexes.gainsEffect({ effectId: '95' }),
       mistake: (_data, matches) => {
-        return { type: 'warn', blame: matches.target, reportId: matches.targetId, text: matches.effect };
+        return {
+          type: 'warn',
+          blame: matches.target,
+          reportId: matches.targetId,
+          text: matches.effect,
+        };
       },
     },
     {
       id: 'E8N Heavenly Strike',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '4DD8', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '4DD8', ...playerDamageFields }),
       deathReason: (_data, matches) => {
         return {
           id: matches.targetId,
@@ -42,7 +47,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
           text: {
             en: 'Pushed off!',
             de: 'Runter gestoßen!',
-            fr: 'A été poussé(e) !',
+            fr: 'Repoussé(e) !',
             ja: 'ノックバック',
             cn: '击退坠落',
             ko: '넉백됨!',

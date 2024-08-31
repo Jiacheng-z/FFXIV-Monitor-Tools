@@ -113,7 +113,7 @@
   display: none;
 }
 
-.resizeHandle .resize-helper {
+.resize-handle .resize-helper {
   display: inline-block;
 }
 
@@ -124,7 +124,7 @@
 
 #timeline-resize-helper .resize-helper-bar {
   border: 1px solid black;
-  padding: 0 0.2em 0 0.2em;
+  padding: 0 0.2em;
   vertical-align: middle;
   height: 18px;
   margin-bottom: 2;
@@ -147,26 +147,26 @@
   margin-bottom: 2;
 }
 
-.timeline-grid .timer-bar {
-  transition: all var(--transition-time);
-}
-
 :lang(ko) .timer-bar {
   height: 23px;
 }
 
 .timeline-bar-color {
-  background-color: #88f;
+  background: #88f;
 }
 
 .timeline-bar-color.soon {
-  background-color: #f88;
+  background: #f88;
 }
 
 #timeline-debug {
   position: absolute;
-  top: 0;
   left: calc(100%);
+}
+
+.reversed {
+  position: absolute;
+  bottom: 0;
 }
 
 .autoplay-helper-button {

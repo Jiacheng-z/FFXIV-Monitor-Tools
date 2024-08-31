@@ -24,7 +24,11 @@ const triggerSet: OopsyTriggerSet<Data> = {
       // Instant death has a special flag value, differentiating
       // from the explosion damage you take when somebody else
       // pops one.
-      netRegex: NetRegexes.abilityFull({ id: '26AB', ...playerDamageFields, flags: kFlagInstantDeath }),
+      netRegex: NetRegexes.ability({
+        id: '26AB',
+        ...playerDamageFields,
+        flags: kFlagInstantDeath,
+      }),
       mistake: (_data, matches) => {
         return {
           type: 'fail',
@@ -44,7 +48,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
     {
       id: 'UCU Thermionic Burst',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '26B9', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '26B9', ...playerDamageFields }),
       mistake: (_data, matches) => {
         return {
           type: 'fail',
@@ -64,7 +68,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
     {
       id: 'UCU Chain Lightning',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '26C8', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '26C8', ...playerDamageFields }),
       mistake: (_data, matches) => {
         // It's hard to assign blame for lightning.  The debuffs
         // go out and then explode in order, but the attacker is
@@ -140,11 +144,11 @@ const triggerSet: OopsyTriggerSet<Data> = {
         let text;
         const duration = parseFloat(matches.duration);
         if (duration < 9)
-          text = matches.effect + ' #1';
+          text = `${matches.effect} #1`;
         else if (duration < 14)
-          text = matches.effect + ' #2';
+          text = `${matches.effect} #2`;
         else
-          text = matches.effect + ' #3';
+          text = `${matches.effect} #3`;
         return {
           id: matches.targetId,
           name: matches.target,

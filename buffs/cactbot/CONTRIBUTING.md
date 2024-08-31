@@ -5,13 +5,15 @@
 * [Code of Conduct](#code-of-conduct)
 * [Issues and Bug Reports](#issues-and-bug-reports)
 * [Pull Requests](#pull-requests)
+  * [Development Workflow](#development-workflow)
+  * [Code Review Culture](#code-review-culture)
 * [Coding Style](#coding-style)
 * [Desired Features](#desired-features)
 * [Trigger Guidelines](#trigger-guidelines)
-  * [Trigger Severity](#trigger-severity)
-  * [Trigger Text](#trigger-text)
 * [Timeline Guidelines](#timeline-guidelines)
-* [Roadmap](#roadmap)
+* [Oopsy Guidelines](#oopsy-guidelines)
+* [Markdown Guidelines](#markdown-guidelines)
+* [How to Release](#how-to-release)
 
 ## Code of Conduct
 
@@ -22,7 +24,7 @@ The code of conduct for cactbot can be found here:
 
 Please file all issues with cactbot on github,
 via this url:
-<https://github.com/quisquous/cactbot/issues/new/choose>
+<https://github.com/OverlayPlugin/cactbot/issues/new/choose>
 
 ## Pull Requests
 
@@ -76,6 +78,19 @@ and on the server-side (GitHub).
 You will need to [install](README.md#npm-and-webpack) `nodejs` and run `npm install`
 in order to install local versions of husky, lint-staged, and eslint.
 
+It is recommended that you also install typescript globally, e.g.
+
+```shell
+npm install -g typescript
+```
+
+Most commands have npm versions of them, e.g. `npm test` or `npm lint`
+You must pass a `--loader` parameter to make these scripts run.
+
+```shell
+node --loader=ts-node/esm util/sync_files.ts
+```
+
 If the pre-commit validations are causing you significant problems,
 feel free to bypass the checks with `--no-verify` flag,
 such as `git commit --no-verify`,
@@ -91,20 +106,25 @@ and we definitely don't expect anyone to know everything right away.
 Cactbot uses [Webpack](https://webpack.js.org/) to bundle assets.
 Over time, it has become necessary to bundle various things,
 such as helper JavaScript files, assets, triggers, and timelines
-into the modules themselves
+into the overlays themselves
 instead of loading files directly off the user's computer.
-These assets are bundled by cactbot module (raidboss, oopsyraidsy, etc.)
+These assets are bundled by cactbot overlay (raidboss, oopsyraidsy, etc.)
 and can be found within the `dist/` folder
 after running either `npm start` or `npm run build`
-as `<module>.bundle.js`.
+as `<overlay>.bundle.js`.
 
 `npm start` will open a local server at <http://localhost:8080>,
-allowing you to access cactbot modules at <http://localhost:8080/ui/raidboss/raidboss.html>
-(or similar) for the various modules.
+allowing you to access cactbot overlays at <http://localhost:8080/ui/raidboss/raidboss.html>
+(or similar) for the various overlays.
 The advantage of this approach is that any changes made locally
 will immediately update the overlay,
-prompting a refresh within the module itself.
+prompting a refresh within the overlay itself.
 This is the recommended approach of validating local code changes.
+
+For convenience, webpack has access to the `/user/webpack/` directory
+inside your local git root.
+You can use this directory to store assets for your persoonal user confiiguration (if any).
+The `/user/` directory is also suppressed for change tracking by `/.gitignore`.
 
 Alternatively, `npm run build` will locally create a production distribution
 of cactbot. This shouldn't be necessary for developing
@@ -122,11 +142,11 @@ Please consider using `npm start` instead.
 Cactbot has the ability to reference remote GitHub URLs
 in place of referencing the HTML file on your computer.
 In order to use the main cactbot repository as your cactbot's source URL,
-simply enter the cactbot module's full HTML filepath
+simply enter the cactbot overlay's full HTML filepath
 instead of the HTML file included in the cactbot download.
 
-For example, <https://quisquous.github.io/cactbot/ui/raidboss/raidboss.html>
-will use the latest changes for the `raidboss` module pushed to GitHub.
+For example, <https://overlayplugin.github.io/cactbot/ui/raidboss/raidboss.html>
+will use the latest changes for the `raidboss` overlay pushed to GitHub.
 
 When making changes, it may be helpful to reference your personal fork
 via the same methods listed above.
@@ -137,7 +157,7 @@ and configure the source to point to either your `master` or `gh-pages` branch.
 From there, any change you'd like to test
 can be added to the branch you've selected
 and tested in real time by pointing cactbot to use
-`<username>.github.io/cactbot/ui/<module>/<module>.html`
+`<username>.github.io/cactbot/ui/<overlay>/<overlay>.html`
 as its source.
 
 #### VSCode extension for cactbot
@@ -150,18 +170,13 @@ feel free to leave an issue/pull request in the repository.
 
 ### Code Review Culture
 
-Ideally, all changes should get code review.
-Currently, since there's a shortage of people reviewing code.
-@quisquous just commits smaller changes directly,
-but this is not an ideal situation,
-especially since they make a lot of mistakes (sorry).
-Please feel free to leave comments about any of these commits
-or ask for more things to become pull requests.
-
+All changes to the main branch require approval from a committer to the project.
 Any contributor to cactbot should feel welcome to chime in on any pull request,
 if you have ideas about how to make the code better
-(even if it's not part of the code you feel like you are an expert in).
+(even if it's not part of the code you feel like you are an expert in
+and even if you do not have commit access yourself).
 Pull requests are a collaborative effort!
+
 There's a lack of good code reviewers at the moment,
 so feel encouraged to chip in as you have time and opinions.
 
@@ -174,8 +189,8 @@ See these links:
 
 ## Coding Style
 
-The ideal end state is that all C#, Python, and Javascript code is linted and autoformatted.
-The current state is that Javascript and Python are fairly well linted
+The ideal end state is that all C# and Javascript code is linted and autoformatted.
+The current state is that Javascript is fairly well linted
 (although variable naming conventions are all over the place)
 and C# is not very consistent.
 Over time, it would be nice to move towards that ideal state.
@@ -214,9 +229,9 @@ If there are errors in the build, such as lint failings,
 the complete list of commands being run in CI are found within
 [.github/workflows](.github/workflows/README.md)
 and can be run locally without needing to commit changes just to test them.
-If it is not obvious _which_ command is failing,
+If it is not obvious *which* command is failing,
 you can click the workflow in the
-[GitHub Actions](https://github.com/quisquous/cactbot/actions)
+[GitHub Actions](https://github.com/OverlayPlugin/cactbot/actions)
 page and click `Workflow file` to see the exact list of commands being run.
 The majority of this file is setting up the workflow runner, and the command
 that is failing is most likely going to be found at the bottom,
@@ -233,80 +248,24 @@ If you are wondering how to contribute to cactbot,
 here's a set of features that will almost always be needed:
 
 * fixing bugs
-* [issues marked "help wanted"](https://github.com/quisquous/cactbot/issues?utf8=%E2%9C%93&q=label%3A%22help+wanted%22)
+* [issues marked "help wanted"](https://github.com/OverlayPlugin/cactbot/issues?utf8=%E2%9C%93&q=label%3A%22help+wanted%22)
 * [adding missing timelines](https://github.com/quisquous/cactbot/issues/414)
 * missing translations
-* job ui for missing jobs (that you play and have opinions on)
+* [trigger future work](docs/RaidbossGuide.md#future-work)
+* [timeline future work](docs/TimelineGuide.md#future-work)
+* [oopsy future work](docs/OopsyraidsyGuide.md#future-oopsy-work)
 
 ## Trigger Guidelines
 
-As a rule, cactbot defaults to text alarms with a small number of default sounds over custom sounds and tts.
-This is because there is a clearer mental separation between visual text for triggers and audio of voice comms.
-This separation is easier to process than mixing the audio of voice comms and tts together.
-This design choice isn't for everybody, especially those used to tts (which is an option).
-However, text triggers will always be the default.
-Give it a try.
-
-As it's easier to disable triggers than to write triggers,
-cactbot also tends to be slightly noisier than most people prefer.
-
-### Trigger Severity
-
-Here's the general guidelines for how cactbot has triggers.
-You can use these when adding new triggers for raids.
-As always, try to be consistent with the surrounding code.
-
-* alarm (red text)
-  * you will wipe the raid if you mess this up
-  * ideally used on random mechanics (one person gets X)
-  * ideally used only once or twice in a raid
-
-* alert (yellow text)
-  * you will get killed if you mess this up (or kill others)
-  * used for important mechanics
-  * should be about ~1/3 of the triggers
-
-* info (green text)
-  * you should probably do something about this, but it might not kill you
-  * also used for information like nael dragon dives or grand octet markers
-  * should be about ~2/3 of the triggers
-
-Another consideration for trigger severity is to make them contextually useful.
-For example, if you may get selected for one of two mechanics,
-it's preferable to have one mechanic be info and the other alert
-(or one alert and the other alarm)
-so that it is obvious from the noise which mechanic you have.
-
-A final consideration is to not overload the player
-with too many of the same types of message.
-If every trigger is an alert,
-it's probably better to change some of them to be info.
-Having different sounds helps create a "rhythm" for the fight.
-This is especially true for simultaneous alerts.
-
-### Trigger Text
-
-Here's some general guidelines for the text in triggers.
-The goal for trigger text is to mimic what a human raidcaller would say.
-It should minimize the amount of that the player has to think to do a mechanic.
-
-* Be concise.  Text should be as short as possible, like lalafells.
-* Tell the player what to do rather than the mechanic name, i.e. prefer `Get Out` vs `Iron Chariot`
-* Have the text be positive, i.e. prefer `Left` vs `Don't Go Right`
-* Don't prescribe a particular strategy, if multiple strategies exist, i.e. Titania Ex tethers or Hello World
-* If multiple strategies exist, tell the player the mechanic (`Jail on YOU`) instead of dictating a strategy.
-* Don't write triggers for obvious ground aoes.
-* As always, be consistent with other triggers.
+See: [Raidboss Guide](docs/RaidbossGuide.md#trigger-guidelines)
 
 ## Timeline Guidelines
 
-* Use the existing scripts in the `util/` directory to make timelines.
-* Prefer using `sync` with the default time for all abilities.
-* Prefer to use actual ability names for the timeline text.
-* If ability names are confusing or long, consider abbreviating.
-* When using `jump`, prefer to jump to a time that has a timeline entry on it.
-* When adding a loop, add at least 30 seconds of fake abilities, and make sure these abilities line up with where the loop jumps to.
-* As always, be consistent with other timelines.
+See: [Timeline Guide](docs/TimelineGuide.md#cactbot-style-guide)
+
+## Oopsy Guidelines
+
+See: [Oopsy Guide](docs/OopsyraidsyGuide.md#overview)
 
 ## Markdown Guidelines
 
@@ -314,7 +273,17 @@ It should minimize the amount of that the player has to think to do a mechanic.
 * Use [semantic line breaks](https://sembr.org/).
 * As always, be consistent!
 
-## Roadmap
+## How to Release
 
-If you're curious what is coming in the future,
-here is a [rough roadmap](https://gist.github.com/quisquous/85b85338b7a87ca6bad98e793d159fdf).
+1. Run `npm run release`. You will need to provide a release type (patch or minor) and a short
+summary (ideally <100 characters) that will be appended to the release title, and you will
+need to indicate whether the release should be in draft, which allows manual edits to the release notes
+prior to publishing. You can provide this info either through the interactive prompts or
+via command line arguments (use `npm run release -- -h` for a list).  The script will automatically
+update the release attributes in `package.json`, and will then run `npm version`, which will add
+a local commit containing a version bump and the new release attributes.
+
+2. Upload this PR, and a release will happen automatically once the PR is merged.
+
+3. If you set the release to draft (`-d`), make whatever changes are needed to the release notes
+on the `Releases` page, and publish the release.

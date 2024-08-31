@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -8,6 +7,7 @@ import { TriggerSet } from '../../../../../types/trigger';
 export type Data = RaidbossData;
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'AlexanderTheBurdenOfTheFatherSavage',
   zoneId: ZoneId.AlexanderTheBurdenOfTheFatherSavage,
   timelineFile: 'a4s.txt',
   timelineTriggers: [
@@ -23,14 +23,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A4S Discord Marker',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '00AE' }),
+      netRegex: { id: '00AE' },
       alertText: (data, matches, output) => {
         if (data.me === matches.target)
           return output.orbsOnYou!();
       },
       infoText: (data, matches, output) => {
         if (data.me === matches.target)
-          return output.orbsOn!({ player: data.ShortName(matches.target) });
+          return output.orbsOn!({ player: data.party.member(matches.target) });
       },
       outputStrings: {
         orbsOn: {
@@ -55,7 +55,7 @@ const triggerSet: TriggerSet<Data> = {
       // Stun Resistance.
       id: 'A4S Stun Leg',
       type: 'LosesEffect',
-      netRegex: NetRegexes.losesEffect({ effectId: '27' }),
+      netRegex: { effectId: '27' },
       condition: (data) => data.CanStun(),
       alertText: (_data, matches, output) => output.text!({ name: matches.target }),
       outputStrings: {
@@ -72,12 +72,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A4S Mortal Revolution',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'The Manipulator', id: '13E7', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Manipulator', id: '13E7', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Manipulateur', id: '13E7', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'マニピュレーター', id: '13E7', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '操纵者', id: '13E7', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '조종자', id: '13E7', capture: false }),
+      netRegex: { source: 'The Manipulator', id: '13E7', capture: false },
       response: Responses.aoe('alert'),
     },
     {
@@ -85,12 +80,7 @@ const triggerSet: TriggerSet<Data> = {
       // as a set of tethers come out from bits and some may be pre-intercepted.
       id: 'A4S Carnage',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'The Manipulator', id: 'F5E', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Manipulator', id: 'F5E', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Manipulateur', id: 'F5E', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'マニピュレーター', id: 'F5E', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '操纵者', id: 'F5E', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '조종자', id: 'F5E', capture: false }),
+      netRegex: { source: 'The Manipulator', id: 'F5E', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -106,12 +96,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A4S Judgment Nisi A',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'The Manipulator', id: 'F64' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Manipulator', id: 'F64' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Manipulateur', id: 'F64' }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'マニピュレーター', id: 'F64' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '操纵者', id: 'F64' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '조종자', id: 'F64' }),
+      netRegex: { source: 'The Manipulator', id: 'F64' },
       condition: Conditions.targetIsYou(),
       alarmText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -128,12 +113,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A4S Judgment Nisi B',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'The Manipulator', id: 'F65' }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Manipulator', id: 'F65' }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Manipulateur', id: 'F65' }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'マニピュレーター', id: 'F65' }),
-      netRegexCn: NetRegexes.startsUsing({ source: '操纵者', id: 'F65' }),
-      netRegexKo: NetRegexes.startsUsing({ source: '조종자', id: 'F65' }),
+      netRegex: { source: 'The Manipulator', id: 'F65' },
       condition: Conditions.targetIsYou(),
       alarmText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -150,12 +130,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A4S Carnage Zero',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'The Manipulator', id: 'F5E', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Manipulator', id: 'F5E', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Manipulateur', id: 'F5E', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'マニピュレーター', id: 'F5E', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '操纵者', id: 'F5E', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '조종자', id: 'F5E', capture: false }),
+      netRegex: { source: 'The Manipulator', id: 'F5E', capture: false },
       response: Responses.spread('alert'),
     },
   ],

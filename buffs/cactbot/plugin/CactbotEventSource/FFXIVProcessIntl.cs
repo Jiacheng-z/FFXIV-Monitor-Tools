@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json.Linq;
 using CactbotEventSource.loc;
+using RainbowMage.OverlayPlugin;
 
 namespace Cactbot {
   public class FFXIVProcessIntl : FFXIVProcess {
-    // Last updated for FFXIV 6.0
+    // Last updated for FFXIV 7.0
 
     [StructLayout(LayoutKind.Explicit)]
     public unsafe struct EntityMemory {
@@ -28,22 +29,22 @@ namespace Cactbot {
       [FieldOffset(0x92)]
       public ushort distance;
 
-      [FieldOffset(0xA0)]
+      [FieldOffset(0xB0)]
       public Single pos_x;
 
-      [FieldOffset(0xA4)]
+      [FieldOffset(0xB4)]
       public Single pos_z;
 
-      [FieldOffset(0xA8)]
+      [FieldOffset(0xB8)]
       public Single pos_y;
 
-      [FieldOffset(0xB0)]
+      [FieldOffset(0xC0)]
       public Single rotation;
 
-      [FieldOffset(0x1C4)]
+      [FieldOffset(0x1BC)]
       public CharacterDetails charDetails;
 
-      [FieldOffset(0x1997)]
+      [FieldOffset(0x1E6)]
       public byte shieldPercentage;
     }
 
@@ -71,10 +72,10 @@ namespace Cactbot {
       [FieldOffset(0x16)]
       public short max_cp;
 
-      [FieldOffset(0x1C)]
+      [FieldOffset(0x1E)]
       public EntityJob job;
 
-      [FieldOffset(0x1D)]
+      [FieldOffset(0x1F)]
       public byte level;
     }
     public FFXIVProcessIntl(ILogger logger) : base(logger) { }
@@ -83,8 +84,8 @@ namespace Cactbot {
     // instead of just being loose variables everywhere.
 
     // A piece of code that reads the pointer to the list of all entities, that we
-    // refer to as the charmap. The pointer is the 4 byte ?????????.
-    private static String kCharmapSignature = "48c1ea0381faa7010000????8bc2488d0d";
+    // refer to as the charmap.
+    private static String kCharmapSignature = "488b5720b8000000e0483Bd00f84????????488d0d";
     private static int kCharmapSignatureOffset = 0;
     // The signature finds a pointer in the executable code which uses RIP addressing.
     private static bool kCharmapSignatureRIP = true;
@@ -97,25 +98,18 @@ namespace Cactbot {
     private static int kCharmapStructOffsetPlayer = 0;
 
     // In combat boolean.
-    // Variable is set at 83FA587D70534883EC204863C2410FB6D8381C08744E (offset=0)
-    // via a mov [rax+rcx],bl line.
-    // This sig below finds the calling function that sets rax(offset) and rcx(base address).
-    private static String kInCombatSignature = "84C07425450FB6C7488D0D";
-    private static int kInCombatBaseOffset = 0;
-    private static bool kInCombatBaseRIP = true;
-    private static int kInCombatOffsetOffset = 5;
-    private static bool kInCombatOffsetRIP = false;
-
-    // Bait integer.
-    // Variable is accessed via a cmp eax,[...] line at offset=0.
-    private static String kBaitSignature = "4883C4305BC3498BC8E8????????3B05";
-    private static int kBaitBaseOffset = 0;
-    private static bool kBaitBaseRIP = true;
+    // This address is written to by "mov [rax+rcx],bl" and has three readers.
+    // This reader is "cmp byte ptr [ffxiv_dx11.exe+????????],00 { (0),0 }"
+    private static String kInCombatSignature = "803D??????????74??488B03488BCBFF50";
+    private static int kInCombatSignatureOffset = -15;
+    private static bool kInCombatSignatureRIP = true;
+    // Because this line is a cmp byte line, the signature is not at the end of the line.
+    private static int kInCombatRipOffset = 1;
 
     // A piece of code that reads the job data.
     // The pointer of interest is the first ???????? in the signature.
-    private static String kJobDataSignature = "488B0D????????4885C90F84????????488B05????????3C03";
-    private static int kJobDataSignatureOffset = -22;
+    private static String kJobDataSignature = "488B3D????????33ED";
+    private static int kJobDataSignatureOffset = -6;
     // The signature finds a pointer in the executable code which uses RIP addressing.
     private static bool kJobDataSignatureRIP = true;
 
@@ -127,7 +121,7 @@ namespace Cactbot {
       // They both point to the same spot, so verify these have the same value.
       p = SigScan(kCharmapSignature, kCharmapSignatureOffset, kCharmapSignatureRIP);
       if (p.Count == 0) {
-        logger_.LogError(Strings.CharmapSignatureFoundMultipleMatchesErrorMessage, p.Count);
+        logger_.Log(LogLevel.Error, Strings.CharmapSignatureFoundMultipleMatchesErrorMessage, p.Count);
       } else {
         IntPtr player_ptr_value = IntPtr.Zero;
         foreach (IntPtr ptr in p) {
@@ -137,39 +131,23 @@ namespace Cactbot {
             player_ptr_value = value;
             player_ptr_addr_ = addr;
           } else {
-            logger_.LogError(Strings.CharmapSignatureConflictingMatchErrorMessage);
+            logger_.Log(LogLevel.Error, Strings.CharmapSignatureConflictingMatchErrorMessage);
           }
         }
       }
 
       p = SigScan(kJobDataSignature, kJobDataSignatureOffset, kJobDataSignatureRIP);
       if (p.Count != 1) {
-        logger_.LogError(Strings.JobSignatureFoundMultipleMatchesErrorMessage, p.Count);
+        logger_.Log(LogLevel.Error, Strings.JobSignatureFoundMultipleMatchesErrorMessage, p.Count);
       } else {
         job_data_outer_addr_ = IntPtr.Add(p[0], kJobDataOuterStructOffset);
       }
 
-      p = SigScan(kInCombatSignature, kInCombatBaseOffset, kInCombatBaseRIP);
+      p = SigScan(kInCombatSignature, kInCombatSignatureOffset, kInCombatSignatureRIP, kInCombatRipOffset);
       if (p.Count != 1) {
-        logger_.LogError(Strings.InCombatSignatureFoundMultipleMatchesErrorMessage, p.Count);
+        logger_.Log(LogLevel.Error, Strings.InCombatSignatureFoundMultipleMatchesErrorMessage, p.Count);
       } else {
-        var baseAddress = p[0];
-        p = SigScan(kInCombatSignature, kInCombatOffsetOffset, kInCombatOffsetRIP);
-        if (p.Count != 1) {
-          logger_.LogError(Strings.InCombatOffsetSignatureFoundMultipleMatchesErrorMessage, p.Count);
-        } else {
-          // Abuse sigscan here to return 64-bit "pointer" which we will mask into the 32-bit immediate integer we need.
-          // TODO: maybe sigscan should be able to return different types?
-          int offset = (int)(((UInt64)p[0]) & 0xFFFFFFFF);
-          in_combat_addr_ = IntPtr.Add(baseAddress, offset);
-        }
-      }
-
-      p = SigScan(kBaitSignature, kBaitBaseOffset, kBaitBaseRIP);
-      if (p.Count != 1) {
-        logger_.LogError(Strings.BaitSignatureFoundMultipleMatchesErrorMessage, p.Count);
-      } else {
-        bait_addr_ = p[0];
+        in_combat_addr_ = p[0];
       }
     }
 
@@ -179,10 +157,9 @@ namespace Cactbot {
 
         // dump '\0' string terminators
         var memoryName = System.Text.Encoding.UTF8.GetString(mem.Name, EntityMemory.nameBytes).Split(new[] { '\0' }, 2)[0];
-        var capitalizedName = System.Globalization.CultureInfo.InvariantCulture.TextInfo.ToTitleCase(memoryName);
 
         EntityData entity = new EntityData() {
-          name = capitalizedName,
+          name = memoryName,
           id = mem.id,
           type = mem.type,
           distance = mem.distance,
@@ -239,10 +216,7 @@ namespace Cactbot {
       IntPtr entity_ptr = ReadIntPtr(player_ptr_addr_);
       if (entity_ptr == IntPtr.Zero)
         return null;
-      var data = GetEntityData(entity_ptr);
-      if (data.job == EntityJob.FSH)
-        data.bait = GetBait();
-      return data;
+      return GetEntityData(entity_ptr);
     }
 
     public unsafe override JObject GetJobSpecificData(EntityJob job) {
@@ -301,6 +275,12 @@ namespace Cactbot {
                 return JObject.FromObject(*(SamuraiJobMemory*)&p[0]);
             case EntityJob.SGE:
                 return JObject.FromObject(*(SageJobMemory*)&p[0]);
+            case EntityJob.RPR:
+                return JObject.FromObject(*(ReaperJobMemory*)&p[0]);
+            case EntityJob.VPR:
+                return JObject.FromObject(*(ViperJobMemory*)&p[0]);
+            case EntityJob.PCT:
+                return JObject.FromObject(*(PictomancerJobMemory*)&p[0]);
           }
           return null;
         }
@@ -381,7 +361,11 @@ namespace Cactbot {
       }
 
       [FieldOffset(0x00)]
-      public ushort songMilliseconds;
+      public ushort songMilliseconds; // 00~01
+
+      // 02~03 is related to song and songProcs, but not sure what it is.
+      // 02 changes upon songProcs/soulGauge/Coda changes.
+      // 03 set on 0b when song active, changes upon songProcs/soulGauge cost, but reset to 0b at next songProcs/soulGauge gain.
 
       [FieldOffset(0x04)]
       public byte songProcs;
@@ -389,8 +373,11 @@ namespace Cactbot {
       [FieldOffset(0x05)]
       public byte soulGauge;
 
-      [NonSerialized]
       [FieldOffset(0x06)]
+      public byte LastCodaCost;
+
+      [NonSerialized]
+      [FieldOffset(0x07)]
       private SongFlags songFlags;
 
       public String songName {
@@ -501,19 +488,19 @@ namespace Cactbot {
             return 0;
         }
       }
+
+      [FieldOffset(0x04)]
+      public byte firstmindsFocus;
     };
 
     [Serializable]
     [StructLayout(LayoutKind.Explicit)]
     public struct NinjaJobMemory {
       [FieldOffset(0x00)]
-      public uint hutonMilliseconds;
-
-      [FieldOffset(0x04)]
       public byte ninkiAmount;
 
-      [FieldOffset(0x05)]
-      private byte hutonCount; // Why though?
+      [FieldOffset(0x02)]
+      public byte kazematoi;
     };
 
     [StructLayout(LayoutKind.Explicit)]
@@ -563,6 +550,12 @@ namespace Cactbot {
           return enochian_state.HasFlag(EnochianFlags.Paradox);
         }
       }
+
+      public int astralSoulStacks {
+        get {
+          return ((int)enochian_state >> 2) & 0x7; // = 0b111, to get the last 3 bits.
+        }
+      }
     };
 
     [StructLayout(LayoutKind.Explicit)]
@@ -585,82 +578,200 @@ namespace Cactbot {
 
     [StructLayout(LayoutKind.Explicit)]
     public struct SummonerJobMemory {
+      public enum ActiveArcanum : byte {
+        None = 0,
+        Ifrit = 1,
+        Titan = 2,
+        Garuda = 3,
+      }
+
+      [Flags]
+      public enum Stance : byte {
+        None = 0,
+        // 0-1 bits: AetherFlows
+        AetherFlow1 = 1 << 0,
+        AetherFlow2 = 1 << 1,
+        AetherFlow3 = AetherFlow1 | AetherFlow2,
+        // 2 bit: Phoenix Ready
+        Phoenix = 1 << 2,
+        // 3 bit: Solar Bahamut Ready
+        // FIXME: guessed, not tested
+        SolarBahamut = 1 << 3,
+        // 4 bit: Unknown
+        // 5-7 bits: Usable Arcanum
+        Ruby = 1 << 5, // Fire/Ifrit
+        Topaz = 1 << 6, // Earth/Titan
+        Emerald = 1 << 7, // Wind/Garuda
+      }
+
       [FieldOffset(0x00)]
       public ushort tranceMilliseconds;
 
       [FieldOffset(0x02)]
       public ushort attunementMilliseconds;
 
+      /// <summary>
+      /// 0x04: 0x17 = Summoned other than Carbuncle, 0x00 = Other Condition
+      /// </summary>
+      [NonSerialized]
+      [FieldOffset(0x04)]
+      private byte _summonStatus;
+
+      /// <summary>
+      /// (From right to left)
+      /// 1-2 bits: Active Primal
+      /// 3-5 bits: Counts of Attunement Stacks
+      [NonSerialized]
       [FieldOffset(0x06)]
-      public byte attunement;
+      private byte _attunement;
 
       [NonSerialized]
       [FieldOffset(0x07)]
-      private byte stance;
+      private Stance stance;
 
-      public string[] usableArcanum {
+      public bool summonStatus {
         get {
-          var arcanums = new List<string>();
-          if ((stance & 0x20) != 0)
-            arcanums.Add("Ruby"); // Fire/Ifrit
-          if ((stance & 0x40) != 0)
-            arcanums.Add("Topaz"); // Earth/Titan
-          if ((stance & 0x80) != 0)
-            arcanums.Add("Emerald"); // Wind/Garuda
+          return _summonStatus != 0;
+        }
+      }
 
-          return arcanums.ToArray();
+      public int attunement {
+        get {
+          return (_attunement >> 2) & 0x7; // = 0b111, to get the last 3 bits.
         }
       }
 
       public string activePrimal {
         get {
-          if ((stance & 0xC) == 0x4)
-            return "Ifrit";
-          else if ((stance & 0xC) == 0x8)
-            return "Titan";
-          else if ((stance & 0xC) == 0xC)
-            return "Garuda";
-          else
-            return null;
+          return ((ActiveArcanum)(_attunement & 0x3)).ToString();
         }
       }
 
-      public String nextSummoned {
+      public string[] usableArcanum {
         get {
-          if ((stance & 0x10) == 0)
-            return "Bahamut";
-          else
-            return "Phoenix";
+          var arcanums = new List<string>();
+          foreach (var flag in new List<Stance> { Stance.Ruby, Stance.Topaz, Stance.Emerald }) {
+            if (stance.HasFlag(flag))
+              arcanums.Add(flag.ToString());
+          }
+
+          return arcanums.ToArray();
+        }
+      }
+
+      public string nextSummoned {
+        get {
+          foreach (var flag in new List<Stance> { Stance.SolarBahamut, Stance.Phoenix }) {
+            if (stance.HasFlag(flag))
+              return flag.ToString();
+          }
+          return "Bahamut";
         }
       }
 
       public int aetherflowStacks {
         get {
-          return stance & 0x3;
+          return stance.HasFlag(Stance.AetherFlow3) ? 3 :
+                 stance.HasFlag(Stance.AetherFlow2) ? 2 :
+                 stance.HasFlag(Stance.AetherFlow1) ? 1 :
+                 0;
         }
       }
     };
 
     [StructLayout(LayoutKind.Explicit)]
     public struct ScholarJobMemory {
-      [FieldOffset(0x02)]
+      [FieldOffset(0x00)]
       public byte aetherflowStacks;
 
-      [FieldOffset(0x03)]
+      [FieldOffset(0x01)]
       public byte fairyGauge;
 
-      [FieldOffset(0x04)]
+      [FieldOffset(0x02)]
       public ushort fairyMilliseconds; // Seraph time left ms.
 
-      [FieldOffset(0x06)]
-      public byte fairyStatus; // Varies depending on which fairy was summoned, during Seraph/Dissipation: 6 - Eos, 7 - Selene, else 0.
+      [FieldOffset(0x04)]
+      public byte fairyStatus; // Seraph: 6, else 0.
     };
 
 
     [StructLayout(LayoutKind.Explicit)]
     public struct MonkJobMemory {
+      public enum Beast : byte {
+        None = 0,
+        Opo = 1,
+        Raptor = 2,
+        Coeurl = 3,
+      }
+
       [FieldOffset(0x00)]
       public byte chakraStacks;
+
+      [NonSerialized]
+      [FieldOffset(0x01)]
+      private Beast beastChakra1;
+
+      [NonSerialized]
+      [FieldOffset(0x02)]
+      private Beast beastChakra2;
+
+      [NonSerialized]
+      [FieldOffset(0x03)]
+      private Beast beastChakra3;
+
+      [NonSerialized]
+      [FieldOffset(0x04)]
+      private byte Fury;
+
+      [NonSerialized]
+      [FieldOffset(0x05)]
+      private byte Nadi;
+
+      [FieldOffset(0x06)]
+      public ushort MasterfulReadyMilisecond;
+
+      public string[] beastChakra {
+        get {
+          Beast[] _beasts = { beastChakra1, beastChakra2, beastChakra3 };
+          return _beasts.Select(a => a.ToString()).Where(a => a != "None").ToArray();
+        }
+      }
+
+      public bool solarNadi {
+        get {
+          if ((Nadi & 0x2) == 0x2)
+            return true;
+          else
+            return false;
+        }
+      }
+
+      public bool lunarNadi {
+        get {
+          if ((Nadi & 0x1) == 0x1)
+            return true;
+          else
+            return false;
+        }
+      }
+
+      public int opoopoFury {
+        get {
+          return Fury & 0x3;
+        }
+      }
+
+      public int raptorFury {
+        get {
+          return (Fury >> 2) & 0x3;
+        }
+      }
+
+      public int coeurlFury {
+        get {
+          return (Fury >> 4) & 0x3;
+        }
+      }
     };
 
     [StructLayout(LayoutKind.Explicit)]
@@ -707,40 +818,52 @@ namespace Cactbot {
         Spear = 4,
         Ewer = 5,
         Spire = 6,
+        Lord = 7,
+        Lady = 8,
       }
 
-      public enum Arcanum : byte {
-        None = 0,
-        Solar = 1,
-        Lunar = 2,
-        Celestial = 3,
-      }
-
-      [FieldOffset(0x04)]
-      private Card _heldCard;
+      [NonSerialized]
+      [FieldOffset(0x00)]
+      private ushort _card;
 
       [NonSerialized]
-      [FieldOffset(0x05)]
-      private Arcanum arcanum_1;
+      [FieldOffset(0x02)]
+      private byte _nextdraw;
 
-      [NonSerialized]
-      [FieldOffset(0x06)]
-      private Arcanum arcanum_2;
-
-      [NonSerialized]
-      [FieldOffset(0x07)]
-      private Arcanum arcanum_3;
-
-      public string heldCard {
+      public string card1 {
         get {
-          return _heldCard.ToString();
+          return ((Card)(_card & 0xF)).ToString();
         }
       }
 
-      public string[] arcanums {
+      public string card2 {
         get {
-          Arcanum[] _arcanums = { arcanum_1, arcanum_2, arcanum_3 };
-          return _arcanums.Select(a => a.ToString()).Where(a => a != "None").ToArray();
+          return ((Card)((_card >> 4) & 0xF)).ToString();
+        }
+      }
+
+        public string card3 {
+        get {
+          return ((Card)((_card >> 8) & 0xF)).ToString();
+        }
+      }
+
+      public string card4 {
+        get {
+          return ((Card)((_card >> 12) & 0xF)).ToString();
+        }
+      }
+
+      public string nextdraw {
+        get {
+          if (_nextdraw == 0)
+          {
+            return "Astral";
+          } else
+          {
+            return "Umbral";
+          }
+
         }
       }
     };
@@ -789,6 +912,133 @@ namespace Cactbot {
 
       [FieldOffset(0x04)]
       public byte eukrasia;
+    }
+
+    [StructLayout(LayoutKind.Explicit)]
+    public struct ReaperJobMemory {
+      [FieldOffset(0x00)]
+      public byte soul;
+
+      [FieldOffset(0x01)]
+      public byte shroud;
+
+      [FieldOffset(0x02)]
+      public ushort enshroudMilliseconds;
+
+      [FieldOffset(0x04)]
+      public byte lemureShroud;
+
+      [FieldOffset(0x05)]
+      public byte voidShroud;
+    }
+
+    [StructLayout(LayoutKind.Explicit)]
+    public struct ViperJobMemory {
+      public enum AdvancedCombo : byte {
+        Vicewinder = 1,
+        HuntersCoil = 2,
+        SwiftskinsCoil = 3,
+        Vicepit = 4,
+        HuntersDen = 5,
+        SwiftskinsDen = 6,
+        Reawaken = 7,
+        FirstGeneration = 8,
+        SecondGeneration = 9,
+        ThirdGeneration = 10,
+        FourthGeneration = 11,
+      }
+
+      [FieldOffset(0x00)]
+      public byte rattlingCoilStacks;
+
+      [FieldOffset(0x01)]
+      public byte anguineTribute;
+
+      [FieldOffset(0x02)]
+      public byte serpentOffering;
+
+      [NonSerialized]
+      [FieldOffset(0x03)]
+      private AdvancedCombo _advancedCombo;
+
+      public string advancedCombo {
+        get {
+          return _advancedCombo.ToString();
+        }
+      }
+
+      [FieldOffset(0x06)]
+      public ushort reawakenedTimer;
+    }
+
+
+
+    [StructLayout(LayoutKind.Explicit)]
+    public struct PictomancerJobMemory {
+      [Flags]
+      private enum CanvasFlags : byte {
+          Pom = 1,
+          Wing = 1 << 1,
+          Claw = 1 << 2,
+          Maw = 1 << 3,
+          Weapon = 1 << 4,
+          Landscape = 1 << 5,
+      }
+
+      [Flags]
+      private enum CreatureFlags : byte {
+          Pom = 1,
+          Wing = 1 << 1,
+          Claw = 1 << 2,
+          // Maw = 1 << 3, // Once you paint the Maw motif, it becomes a Madeen portrait.
+          MooglePortrait = 1 << 4,
+          MadeenPortrait = 1 << 5,
+      }
+
+      [FieldOffset(0x00)]
+      public byte paletteGauge;
+      [FieldOffset(0x02)]
+      public byte paint;
+
+      [NonSerialized]
+      [FieldOffset(0x03)]
+      private CanvasFlags canvasFlags;
+
+      public string creatureMotif {
+        get {
+          if (canvasFlags.HasFlag(CanvasFlags.Pom))
+            return "Pom";
+          if (canvasFlags.HasFlag(CanvasFlags.Wing))
+            return "Wing";
+          if (canvasFlags.HasFlag(CanvasFlags.Claw))
+            return "Claw";
+          if (canvasFlags.HasFlag(CanvasFlags.Maw))
+            return "Maw";
+          return "None";
+        }
+      }
+      public bool weaponMotif => canvasFlags.HasFlag(CanvasFlags.Weapon);
+      public bool landscapeMotif => canvasFlags.HasFlag(CanvasFlags.Landscape);
+
+      [NonSerialized]
+      [FieldOffset(0x04)]
+      private CreatureFlags creatureFlags;
+
+      public string[] depictions {
+        get {
+          var motifs = new List<string>();
+          if (creatureFlags.HasFlag(CreatureFlags.Pom))
+            motifs.Add("Pom");
+          if (creatureFlags.HasFlag(CreatureFlags.Wing))
+            motifs.Add("Wing");
+          if (creatureFlags.HasFlag(CreatureFlags.Claw))
+            motifs.Add("Claw");
+          return motifs.ToArray();
+        }
+      }
+
+      public bool mooglePortrait => creatureFlags.HasFlag(CreatureFlags.MooglePortrait);
+      public bool madeenPortrait => creatureFlags.HasFlag(CreatureFlags.MadeenPortrait);
     }
   }
 }

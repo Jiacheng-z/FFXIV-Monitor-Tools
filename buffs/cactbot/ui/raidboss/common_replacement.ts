@@ -2,14 +2,28 @@
 
 import { Lang, NonEnLang } from '../../resources/languages';
 
+// The seal key is kind of a hack because we use it in a lot of different
+// contexts and need to correctly grab the name of the zone that is sealed.
+// These are some various lookbehinds for those different contexts:
+
+// Regexes for a parsed ACT log line
+const parsedLB = '00:0839::';
+// Regexes for a network log line
+const networkLB = '00\\|[^|]*\\|0839\\|\\|';
+// Regex for a regex for a network log line.  <_<
+const netRegexLB = '\\\\\\|0839\\\\\\|\\[\\^\\|\\]\\*\\\\\\|';
+// A bare parameter (e.g. `X will be sealed off` via `netRegex: { line: 'X will be sealed off' },`)
+const paramLB = '^';
+
 // It's awkward to refer to these string keys, so name them as replaceSync[keys.sealKey].
 export const syncKeys = {
-  // Match Regexes, NetRegexes, and timeline constructions of seal log lines.
-  // FIXME: This seal regex includes an optional second colon, as "0839::?"".
-  // Once we have completely converted things for 6.0,
-  // we should come back here and make the doubled colon non-optional.
+  // Seal is trying to match these types of lines, and is more complicated because it's
+  // trying to also capture the area name:
+  //   parsed log lines: 00:0839::Something will be sealed off
+  //   network log lines: 00|timestamp|0839||Something will be sealed off
+  //   NetRegexes: ^^00\|[^|]*\|0839\|[^|]*\|Something will be sealed off.*?\|
   seal:
-    '(?<=00:0839::?|00\\|[^|]*\\|0839\\|\\|)(.*) will be sealed off(?: in (?:[0-9]+ seconds)?)?',
+    `(?<=${parsedLB}|${networkLB}|${netRegexLB}|${paramLB})([^|:]*) will be sealed off(?: in (?:[0-9]+ seconds)?)?`,
   unseal: 'is no longer sealed',
   engage: 'Engage!',
 };
@@ -56,10 +70,10 @@ export const commonReplacement: CommonReplacement = {
       en: '$1 will be sealed off',
       de:
         'Noch 15 Sekunden, bis sich (?:(?:der|die|das) )?(?:Zugang zu(?:[rm]| den)? )?$1 schließt',
-      fr: 'Fermeture d(?:e|u|es) $1 dans',
+      fr: 'Fermeture d(?:e|u|es) (?:l\'|la |les? )?$1 dans',
       ja: '$1の封鎖まであと',
       cn: '距$1被封锁还有',
-      ko: '15초 후에 $1(?:이|가) 봉쇄됩니다',
+      ko: '15초 후에 $1[이가] 봉쇄됩니다',
     },
     [syncKeys.unseal]: {
       en: 'is no longer sealed',
@@ -435,8 +449,9 @@ export const commonReplacement: CommonReplacement = {
 // Keys into commonReplacement objects that represent "partial" translations,
 // in the sense that even if it applies, there still needs to be another
 // translation for it to be complete.  These keys should be exactly the same
-// as the keys from the commonReplacement block above.
-export const partialCommonReplacementKeys = [
+// as the keys from the commonReplacement block above.  These are used for
+// timeline regexes only.
+export const partialCommonTimelineReplacementKeys = [
   // Because the zone name needs to be translated here, this is partial.
   syncKeys.seal,
   // Directions
@@ -452,4 +467,10 @@ export const partialCommonReplacementKeys = [
   textKeys.Tank,
   textKeys.Healer,
   textKeys.DPS,
+];
+
+// Same as the timeline version above, but only for trigger regexes.
+export const partialCommonTriggerReplacementKeys = [
+  // Because the zone name needs to be translated here, this is partial.
+  syncKeys.seal,
 ];

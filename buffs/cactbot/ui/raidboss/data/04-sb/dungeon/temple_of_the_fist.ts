@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -8,6 +7,7 @@ import { TriggerSet } from '../../../../../types/trigger';
 export type Data = RaidbossData;
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'TheTempleOfTheFist',
   zoneId: ZoneId.TheTempleOfTheFist,
   timelineFile: 'temple_of_the_fist.txt',
   timelineTriggers: [
@@ -28,40 +28,25 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Temple Electric Burst Sruti',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1FD6', source: 'Coeurl Sruti', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1FD6', source: 'Coeurl Sruti', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1FD6', source: 'Coeurl Sruti', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1FD6', source: 'クァール・シュルティ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1FD6', source: '凶豹所闻', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1FD6', source: '커얼 슈루티', capture: false }),
+      netRegex: { id: '1FD6', source: 'Coeurl Sruti', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Temple Electric Burst Smriti',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1FD6', source: 'Coeurl Smriti', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1FD6', source: 'Coeurl Smriti', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1FD6', source: 'Coeurl Smriti', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1FD6', source: 'クァール・スムリティ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1FD6', source: '凶豹所忆', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1FD6', source: '커얼 스므리티', capture: false }),
+      netRegex: { id: '1FD6', source: 'Coeurl Smriti', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Temple Fourfold Shear',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1FD9', source: 'Arbuda' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1FD9', source: 'Arbuda' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1FD9', source: 'Arbuda' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1FD9', source: 'アブダ' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1FD9', source: '额部陀' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1FD9', source: '아부다' }),
+      netRegex: { id: '1FD9', source: 'Arbuda' },
       response: Responses.tankBuster(),
     },
     {
       id: 'Temple Moonseal',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0059' }),
+      netRegex: { id: '0059' },
       condition: Conditions.targetIsYou(),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -78,7 +63,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Temple Sunseal',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0058' }),
+      netRegex: { id: '0058' },
       condition: Conditions.targetIsYou(),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -95,40 +80,25 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Temple Port And Star',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1FDC', source: 'Arbuda', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1FDC', source: 'Arbuda', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1FDC', source: 'Arbuda', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1FDC', source: 'アブダ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1FDC', source: '额部陀', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1FDC', source: '아부다', capture: false }),
+      netRegex: { id: '1FDC', source: 'Arbuda', capture: false },
       response: Responses.goFrontBack(),
     },
     {
       id: 'Temple Fore And Aft',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1FDB', source: 'Arbuda', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1FDB', source: 'Arbuda', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1FDB', source: 'Arbuda', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1FDB', source: 'アブダ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1FDB', source: '额部陀', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1FDB', source: '아부다', capture: false }),
+      netRegex: { id: '1FDB', source: 'Arbuda', capture: false },
       response: Responses.goSides(),
     },
     {
       id: 'Temple Killer Instinct',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1FDE', source: 'Arbuda', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1FDE', source: 'Arbuda', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1FDE', source: 'Arbuda', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1FDE', source: 'アブダ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1FDE', source: '额部陀', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1FDE', source: '아부다', capture: false }),
+      netRegex: { id: '1FDE', source: 'Arbuda', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'watch for safe',
           de: 'nach sicherer Position schauen',
-          fr: 'Trouvez une zone sûre',
+          fr: 'Trouvez une zone safe',
           ja: '安置へ',
           cn: '前往安全区',
           ko: '안전지대 찾기',
@@ -138,25 +108,16 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Temple Spirit Wave',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1FE7', source: 'Ivon Coeurlfist', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1FE7', source: 'Ivon Coeurlfaust', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1FE7', source: 'Ivon Le Coeurl', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1FE7', source: '双豹のイヴォン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1FE7', source: '双豹伊沃恩', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1FE7', source: '쌍표범 이본', capture: false }),
+      netRegex: { id: '1FE7', source: 'Ivon Coeurlfist', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Temple Touch Of Slaughter',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1FE6', source: 'Ivon Coeurlfist' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1FE6', source: 'Ivon Coeurlfaust' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1FE6', source: 'Ivon Le Coeurl' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1FE6', source: '双豹のイヴォン' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1FE6', source: '双豹伊沃恩' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1FE6', source: '쌍표범 이본' }),
-      condition: (data) => data.role === 'healer',
-      infoText: (data, matches, output) => output.text!({ player: data.ShortName(matches.target) }),
+      netRegex: { id: '1FE6', source: 'Ivon Coeurlfist' },
+      condition: (data) => data.role === 'healer' || data.job === 'BLU',
+      infoText: (data, matches, output) =>
+        output.text!({ player: data.party.member(matches.target) }),
       outputStrings: {
         text: {
           en: 'Heal ${player} soon',
@@ -171,12 +132,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Temple Coeurl Heads',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '1FE9', source: 'Ivon Coeurlfist', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: '1FE9', source: 'Ivon Coeurlfaust', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: '1FE9', source: 'Ivon Le Coeurl', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: '1FE9', source: '双豹のイヴォン', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: '1FE9', source: '双豹伊沃恩', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: '1FE9', source: '쌍표범 이본', capture: false }),
+      netRegex: { id: '1FE9', source: 'Ivon Coeurlfist', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -192,12 +148,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Temple Rhalgr\'s Piece',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1FED', source: 'Ivon Coeurlfist', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1FED', source: 'Ivon Coeurlfaust', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1FED', source: 'Ivon Le Coeurl', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1FED', source: '双豹のイヴォン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1FED', source: '双豹伊沃恩', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1FED', source: '쌍표범 이본', capture: false }),
+      netRegex: { id: '1FED', source: 'Ivon Coeurlfist', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -213,12 +164,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Temple Rose Of Destruction',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1FEE', source: 'Ivon Coeurlfist' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1FEE', source: 'Ivon Coeurlfaust' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1FEE', source: 'Ivon Le Coeurl' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1FEE', source: '双豹のイヴォン' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1FEE', source: '双豹伊沃恩' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1FEE', source: '쌍표범 이본' }),
+      netRegex: { id: '1FEE', source: 'Ivon Coeurlfist' },
       response: Responses.stackMarkerOn(),
     },
   ],

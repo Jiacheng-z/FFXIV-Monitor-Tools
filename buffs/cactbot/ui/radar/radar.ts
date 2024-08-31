@@ -8,6 +8,7 @@ import { BaseOptions } from '../../types/data';
 import { EventMap } from '../../types/event';
 import { NetMatches } from '../../types/net_matches';
 import { CactbotBaseRegExp } from '../../types/net_trigger';
+import { LocaleText } from '../../types/trigger';
 
 import arrowImage from './arrow.png';
 
@@ -28,7 +29,9 @@ const defaultRadarConfigOptions = {
   DetectionRange: 0,
   TTS: false,
   PopSoundAlert: true,
-  PopVolume: 0,
+  PopVolume: 0.5,
+  PullSoundAlert: true,
+  PullVolume: 1,
   Puller: true,
   Position: true,
 } as const;
@@ -37,6 +40,7 @@ type RadarConfigOptions = typeof defaultRadarConfigOptions;
 // Additional options that can be configured via the user file.
 interface RadarOptions extends BaseOptions, RadarConfigOptions {
   PopSound: string;
+  PullSound: string;
   RankOptions: {
     [rank in Rank]?: {
       Type?: RadarType;
@@ -60,14 +64,15 @@ type Monster = {
   addTime: number;
   dom: HTMLElement;
   puller?: string;
-  // already pulled before being detected
-  skipPuller: boolean;
+  // already pulled, possibly before being detected
+  alreadyPulled: boolean;
 };
 
 const defaultOptions: RadarOptions = {
   ...UserConfig.getDefaultBaseOptions(),
   ...defaultRadarConfigOptions,
   PopSound: '../../resources/sounds/freesound/sonar.webm',
+  PullSound: '../../resources/sounds/BigWigs/Alarm.webm',
   RankOptions: {
     'S': {
       Type: 'mob',
@@ -120,7 +125,7 @@ class Point2D {
 
   // Calculates vector length (magnitude)
   length() {
-    return Math.sqrt((this.x) * (this.x) + (this.y) * (this.y));
+    return Math.sqrt(this.x * this.x + this.y * this.y);
   }
 
   // Calculate delta vector
@@ -149,7 +154,7 @@ const posToMap = (h: number) => {
   return h * pitch + offset;
 };
 
-const PlaySound = (monster: Monster, options: RadarOptions) => {
+const PlayPopSound = (monster: Monster, options: RadarOptions) => {
   if (options.TTS) {
     void callOverlayHandler({
       call: 'cactbotSay',
@@ -162,6 +167,31 @@ const PlaySound = (monster: Monster, options: RadarOptions) => {
   }
 };
 
+const PlayPullSound = (monster: Monster, options: RadarOptions) => {
+  // Only play sounds for S ranks and above.
+  if (monster.rank !== 'S' && monster.rank !== 'SS+' && monster.rank !== 'SS-')
+    return;
+
+  if (options.TTS) {
+    const pullText: LocaleText = {
+      en: `${monster.name} pulled`,
+      de: `${monster.name} gepullt`,
+      fr: `${monster.name} a été attaqué`,
+      ja: `${monster.name} 開始`,
+      cn: `${monster.name} 已开怪`,
+      ko: `${monster.name} 풀링됨`,
+    };
+    void callOverlayHandler({
+      call: 'cactbotSay',
+      text: pullText[options.DisplayLanguage] ?? pullText['en'],
+    });
+  } else if (options.PullSoundAlert && options.PullSound && options.PullVolume) {
+    const audio = new Audio(options.PullSound);
+    audio.volume = options.PullVolume;
+    void audio.play();
+  }
+};
+
 class Radar {
   private targetMonsters: { [mobKey: string]: Monster };
   private playerPos: Point2DWithZ | null;
@@ -170,8 +200,8 @@ class Radar {
   private lang: Lang;
   private nameToHuntEntry: HuntMap;
   private regexes: {
-    abilityFull: CactbotBaseRegExp<'Ability'>;
-    addedCombatantFull: CactbotBaseRegExp<'AddedCombatant'>;
+    ability: CactbotBaseRegExp<'Ability'>;
+    addedCombatant: CactbotBaseRegExp<'AddedCombatant'>;
     instanceChanged: CactbotBaseRegExp<'GameLog'>;
     wasDefeated: CactbotBaseRegExp<'WasDefeated'>;
   };
@@ -184,10 +214,9 @@ class Radar {
     this.lang = this.options.ParserLanguage ?? 'en';
     this.nameToHuntEntry = {};
     this.regexes = {
-      abilityFull: NetRegexes.abilityFull(),
-      addedCombatantFull: NetRegexes.addedCombatantFull(),
-      instanceChanged: instanceChangedRegexes[this.options.ParserLanguage] ||
-        instanceChangedRegexes['en'],
+      ability: NetRegexes.ability(),
+      addedCombatant: NetRegexes.addedCombatant(),
+      instanceChanged: instanceChangedRegexes[this.options.ParserLanguage],
       wasDefeated: NetRegexes.wasDefeated(),
     };
 
@@ -207,8 +236,6 @@ class Radar {
 
   AddMonster(log: string, hunt: HuntEntry, matches: NetMatches['AddedCombatant']) {
     if (!this.playerPos)
-      return;
-    if (!matches)
       return;
     if (
       matches.id === undefined ||
@@ -271,7 +298,7 @@ class Radar {
 
         // Play sound only if its far enough
         if (oldPos.distance(newPos) >= kMinDistanceBeforeSound)
-          PlaySound(targetMob, options);
+          PlayPopSound(targetMob, options);
       }
     } else {
       // Add DOM
@@ -305,7 +332,7 @@ class Radar {
         'addTime': Date.now().valueOf(),
         'dom': tr,
         'puller': undefined,
-        'skipPuller': matches.hp !== matches.currentHp, // already pulled before being detected
+        'alreadyPulled': matches.hp !== matches.currentHp, // already pulled before being detected
       };
       this.targetMonsters[mobKey] = m;
       this.UpdateMonsterDom(m);
@@ -314,15 +341,21 @@ class Radar {
       const mapY = posToMap(m.pos.y).toFixed(1);
       console.log(`Found: ${m.name} (${mapX}, ${mapY})`);
 
-      PlaySound(m, options);
+      PlayPopSound(m, options);
     }
   }
 
   UpdateMonsterPuller(monster: Monster, puller: string) {
+    if (monster.puller !== undefined || monster.alreadyPulled)
+      return;
+
+    PlayPullSound(monster, this.options);
+
+    monster.alreadyPulled = true;
+
     if (!this.options.Puller)
       return;
-    if (monster.puller || monster.skipPuller)
-      return;
+
     monster.puller = puller;
     this.UpdateMonsterDom(monster);
     console.log(`Pulled: ${puller} => ${monster.name}`);
@@ -344,26 +377,25 @@ class Radar {
       targetVector.x - playerVector.x,
       targetVector.y - playerVector.y,
     );
-    if (tr) {
-      const node = tr.childNodes[1];
-      if (node && node instanceof HTMLElement) {
-        node.innerHTML = `${monster.rank ?? ''}&nbsp;&nbsp;&nbsp;&nbsp;${monster.name}`;
-        if (Math.abs(this.playerPos.z - monster.posZ) > 5)
-          node.innerHTML += '&nbsp;&nbsp;' + (this.playerPos.z < monster.posZ ? '↑' : '↓');
-        node.innerHTML += '<br>' + deltaVector.length().toFixed(2) + 'm';
-        if (Date.now().valueOf() / 1000 <= monster.battleTime + 60) {
-          node.innerHTML += ' ' + (monster.currentHp * 100 /
-            monster.hp).toFixed(2) +
-            '%';
-        }
-        if (monster.puller)
-          node.innerHTML += '&nbsp;&nbsp;' + monster.puller;
-        // Z position is relative to the map so it's omitted.
-        if (options.Position) {
-          node.innerHTML += '<br>X: ' +
-            posToMap(monster.pos.x).toFixed(1) + '&nbsp;&nbsp;Y:' +
-            posToMap(monster.pos.y).toFixed(1);
-        }
+    const node = tr.childNodes[1];
+    if (node && node instanceof HTMLElement) {
+      node.innerHTML = `${monster.rank ?? ''}&nbsp;&nbsp;&nbsp;&nbsp;${monster.name}`;
+      if (Math.abs(this.playerPos.z - monster.posZ) > 5)
+        node.innerHTML += `&nbsp;&nbsp;${this.playerPos.z < monster.posZ ? '↑' : '↓'}`;
+      node.innerHTML += `<br>${deltaVector.length().toFixed(2)}m`;
+      if (Date.now().valueOf() / 1000 <= monster.battleTime + 60) {
+        node.innerHTML += ` ${
+          (monster.currentHp * 100 /
+            monster.hp).toFixed(2)
+        }%`;
+      }
+      if (monster.puller !== undefined)
+        node.innerHTML += `&nbsp;&nbsp;${monster.puller}`;
+      // Z position is relative to the map so it's omitted.
+      if (options.Position) {
+        node.innerHTML += `<br>X: ${posToMap(monster.pos.x).toFixed(1)}&nbsp;&nbsp;Y:${
+          posToMap(monster.pos.y).toFixed(1)
+        }`;
       }
     }
     if (options.DetectionRange > 0 && deltaVector.length() > options.DetectionRange)
@@ -395,7 +427,7 @@ class Radar {
 
     // added new combatant
     if (type === '03') {
-      const m = this.regexes.addedCombatantFull.exec(log);
+      const m = this.regexes.addedCombatant.exec(log);
       const matches = m?.groups;
       if (!matches)
         return;
@@ -410,7 +442,7 @@ class Radar {
 
     // network ability
     if (type === '21' || type === '22') {
-      const m = this.regexes.abilityFull.exec(log);
+      const m = this.regexes.ability.exec(log);
       const matches = m?.groups;
       if (!matches)
         return;

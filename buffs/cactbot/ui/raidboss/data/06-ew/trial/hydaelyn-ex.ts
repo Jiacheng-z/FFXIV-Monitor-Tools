@@ -1,4 +1,3 @@
-import NetRegexes from '../../../../../resources/netregexes';
 import Outputs from '../../../../../resources/outputs';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
@@ -6,7 +5,6 @@ import { RaidbossData } from '../../../../../types/data';
 import { TriggerSet } from '../../../../../types/trigger';
 
 // TODO: how to call out crystal LOS???
-// TODO: call out directions where party/tanks should go in add phase?
 // TODO: call Chakram stack locations / direction to run
 // TODO: call out intercard to run to in the final phase
 // TODO: Lightwave has different ids, do these mean anything?
@@ -22,17 +20,17 @@ const storedMechanicsOutputStrings = {
   groups: {
     en: 'Healer Groups',
     de: 'Heiler-Gruppen',
-    fr: 'Healers en groupes',
+    fr: 'Groupes sur les heals',
     ja: 'ヒラに頭割り',
-    cn: '治疗分摊组',
+    cn: '治疗分组分摊',
     ko: '힐러 그룹 쉐어',
   },
   stack: {
     en: 'Party Stack',
     de: 'Mit der Party sammeln',
-    fr: 'Package en groupe',
+    fr: 'Package en équipe',
     ja: '全員集合',
-    cn: '8人分摊',
+    cn: '全体分摊',
     ko: '파티 전체 쉐어',
   },
 };
@@ -44,6 +42,8 @@ const crystallizeOutputStrings = {
     de: 'Kristalisieren: ${name}',
     fr: 'Cristallisation : ${name}',
     ja: 'クリスタライズ: ${name}',
+    cn: '水晶化: ${name}',
+    ko: '크리스탈화: ${name}',
   },
 };
 
@@ -52,6 +52,7 @@ const comboOutputStrings = {
   combo: {
     en: '${first} => ${second}',
     de: '${first} => ${second}',
+    fr: '${first} => ${second}',
     ja: '${first} => ${second}',
     cn: '${first} => ${second}',
     ko: '${first} => ${second}',
@@ -59,6 +60,7 @@ const comboOutputStrings = {
 };
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'TheMinstrelsBalladHydaelynsCall',
   zoneId: ZoneId.TheMinstrelsBalladHydaelynsCall,
   timelineFile: 'hydaelyn-ex.txt',
   timelineTriggers: [
@@ -66,11 +68,14 @@ const triggerSet: TriggerSet<Data> = {
       id: 'HydaelynEx Marker Equinox',
       // There is no 8E1 effect here (maybe because it is deterministic?) so use a timeline trigger.
       regex: /Equinox/,
-      beforeSeconds: 4,
-      durationSeconds: (data) => data.crystallize ? 6 : 3,
+      beforeSeconds: 3.5,
+      durationSeconds: (data) => data.crystallize ? 6.5 : 3.5,
       alertText: (data, _matches, output) => {
         if (data.crystallize)
-          return output.combo!({ first: output.intercards!(), second: output[data.crystallize]!() });
+          return output.combo!({
+            first: output.intercards!(),
+            second: output[data.crystallize]!(),
+          });
         return output.intercards!();
       },
       run: (data) => delete data.crystallize,
@@ -91,23 +96,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'HydaelynEx Heros\'s Radiance',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '65C1', source: 'Hydaelyn', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '65C1', source: 'Hydaelyn', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '65C1', source: 'Hydaelyn', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '65C1', source: 'ハイデリン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '65C1', source: '海德林', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '65C1', source: '하이델린', capture: false }),
+      netRegex: { id: '65C1', source: 'Hydaelyn', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'HydaelynEx Shining Saber',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '68C8', source: 'Hydaelyn', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '68C8', source: 'Hydaelyn', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '68C8', source: 'Hydaelyn', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '68C8', source: 'ハイデリン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '68C8', source: '海德林', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '68C8', source: '하이델린', capture: false }),
+      netRegex: { id: '68C8', source: 'Hydaelyn', capture: false },
       // In the final phase, there's a Shining Saber -> Crystalline Water III section.
       durationSeconds: (data) => data.crystallize ? 7 : 4,
       alertText: (data, _matches, output) => {
@@ -121,23 +116,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'HydaelynEx Magos\'s Raidance',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '65C2', source: 'Hydaelyn', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '65C2', source: 'Hydaelyn', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '65C2', source: 'Hydaelyn', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '65C2', source: 'ハイデリン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '65C2', source: '海德林', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '65C2', source: '하이델린', capture: false }),
+      netRegex: { id: '65C2', source: 'Hydaelyn', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'HydaelynEx Parhelion Tracker',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '65B0', source: 'Hydaelyn', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '65B0', source: 'Hydaelyn', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '65B0', source: 'Hydaelyn', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '65B0', source: 'ハイデリン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '65B0', source: '海德林', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '65B0', source: '하이델린', capture: false }),
+      netRegex: { id: '65B0', source: 'Hydaelyn', capture: false },
       run: (data) => data.parhelion = true,
     },
     {
@@ -145,12 +130,7 @@ const triggerSet: TriggerSet<Data> = {
       type: 'Ability',
       // We could call this out on startsUsing, but no action needs to be taken for ~17 seconds,
       // and so just call this out on the action.
-      netRegex: NetRegexes.ability({ id: ['659A', '6ED5'], source: 'Hydaelyn', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: ['659A', '6ED5'], source: 'Hydaelyn', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: ['659A', '6ED5'], source: 'Hydaelyn', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: ['659A', '6ED5'], source: 'ハイデリン', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: ['659A', '6ED5'], source: '海德林', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: ['659A', '6ED5'], source: '하이델린', capture: false }),
+      netRegex: { id: ['659A', '6ED5'], source: 'Hydaelyn', capture: false },
       infoText: (_data, _matches, output) => output.crystallize!({ name: output.groups!() }),
       run: (data) => data.crystallize = 'groups',
       outputStrings: crystallizeOutputStrings,
@@ -159,12 +139,7 @@ const triggerSet: TriggerSet<Data> = {
       // During Parhelion, there's a Crystallize Water with no mechanic in between.
       id: 'HydaelynEx Crystallize Water Parhelion',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: ['659A', '6ED5'], source: 'Hydaelyn', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: ['659A', '6ED5'], source: 'Hydaelyn', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: ['659A', '6ED5'], source: 'Hydaelyn', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: ['659A', '6ED5'], source: 'ハイデリン', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: ['659A', '6ED5'], source: '海德林', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: ['659A', '6ED5'], source: '하이델린', capture: false }),
+      netRegex: { id: ['659A', '6ED5'], source: 'Hydaelyn', capture: false },
       condition: (data) => data.parhelion,
       // There's 10 seconds between Crystallize Water ability and action in this one case.
       // Subparhelion occurs ~2s before, but that's too soon.
@@ -181,12 +156,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'HydaelynEx Crystallize Ice',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: ['659C', '659D'], source: 'Hydaelyn', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: ['659C', '659D'], source: 'Hydaelyn', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: ['659C', '659D'], source: 'Hydaelyn', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: ['659C', '659D'], source: 'ハイデリン', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: ['659C', '659D'], source: '海德林', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: ['659C', '659D'], source: '하이델린', capture: false }),
+      netRegex: { id: ['659C', '659D'], source: 'Hydaelyn', capture: false },
       infoText: (_data, _matches, output) => output.crystallize!({ name: output.spread!() }),
       run: (data) => data.crystallize = 'spread',
       outputStrings: crystallizeOutputStrings,
@@ -194,12 +164,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'HydaelynEx Crystallize Stone',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: ['659B', '659E'], source: 'Hydaelyn', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: ['659B', '659E'], source: 'Hydaelyn', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: ['659B', '659E'], source: 'Hydaelyn', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: ['659B', '659E'], source: 'ハイデリン', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: ['659B', '659E'], source: '海德林', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: ['659B', '659E'], source: '하이델린', capture: false }),
+      netRegex: { id: ['659B', '659E'], source: 'Hydaelyn', capture: false },
       infoText: (_data, _matches, output) => output.crystallize!({ name: output.stack!() }),
       run: (data) => data.crystallize = 'stack',
       outputStrings: crystallizeOutputStrings,
@@ -207,28 +172,23 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'HydaelynEx Marker Anthelion',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '8E1', source: 'Hydaelyn', count: '1B5', capture: false }),
-      netRegexDe: NetRegexes.gainsEffect({ effectId: '8E1', source: 'Hydaelyn', count: '1B5', capture: false }),
-      netRegexFr: NetRegexes.gainsEffect({ effectId: '8E1', source: 'Hydaelyn', count: '1B5', capture: false }),
-      netRegexJa: NetRegexes.gainsEffect({ effectId: '8E1', source: 'ハイデリン', count: '1B5', capture: false }),
-      netRegexCn: NetRegexes.gainsEffect({ effectId: '8E1', source: '海德林', count: '1B5', capture: false }),
-      netRegexKo: NetRegexes.gainsEffect({ effectId: '8E1', source: '하이델린', count: '1B5', capture: false }),
+      netRegex: { effectId: '8E1', source: 'Hydaelyn', count: '1B5', capture: false },
       // Example timeline:
       //     t=0 StartsCasting Crystallize
       //     t=4 ActionEffect Crystalize
       //     t=7 StatusAdd 81E (this regex)
-      //     t=10 marker appears
+      //     t=9.5 marker appears
       //     t=13 ActionEffect Anthelion
       //     t=17 ActionEffect Crystalline Blizzard
       //
       // We could call this out immediately, but then it's very close to the Crystallize call.
       // Additionally, if we call this out immediately then players have to remember something
-      // for 10 seconds.  A delay of 3 feels more natural in terms of time to react and
+      // for 10 seconds.  A delay of 2.5 feels more natural in terms of time to react and
       // handle this, rather than calling it out extremely early.  Also, add a duration so that
       // this stays on screen until closer to the Crystalline action.  This also puts this call
       // closer to when the marker appears on screen, and so feels a little bit more natural.
-      delaySeconds: 3,
-      durationSeconds: (data) => data.crystallize ? 6 : 3,
+      delaySeconds: 2.5,
+      durationSeconds: (data) => data.crystallize ? 6.5 : 3.5,
       alertText: (data, _matches, output) => {
         if (data.crystallize)
           return output.combo!({ first: output.in!(), second: output[data.crystallize]!() });
@@ -243,14 +203,9 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'HydaelynEx Marker Highest Holy',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '8E1', source: 'Hydaelyn', count: '1B4', capture: false }),
-      netRegexDe: NetRegexes.gainsEffect({ effectId: '8E1', source: 'Hydaelyn', count: '1B4', capture: false }),
-      netRegexFr: NetRegexes.gainsEffect({ effectId: '8E1', source: 'Hydaelyn', count: '1B4', capture: false }),
-      netRegexJa: NetRegexes.gainsEffect({ effectId: '8E1', source: 'ハイデリン', count: '1B4', capture: false }),
-      netRegexCn: NetRegexes.gainsEffect({ effectId: '8E1', source: '海德林', count: '1B4', capture: false }),
-      netRegexKo: NetRegexes.gainsEffect({ effectId: '8E1', source: '하이델린', count: '1B4', capture: false }),
-      delaySeconds: 3,
-      durationSeconds: (data) => data.crystallize ? 6 : 3,
+      netRegex: { effectId: '8E1', source: 'Hydaelyn', count: '1B4', capture: false },
+      delaySeconds: 2.5,
+      durationSeconds: (data) => data.crystallize ? 6.5 : 3.5,
       alertText: (data, _matches, output) => {
         if (data.crystallize)
           return output.combo!({ first: output.out!(), second: output[data.crystallize]!() });
@@ -265,12 +220,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'HydaelynEx Aureole',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['6C91', '6F11'], source: 'Hydaelyn', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: ['6C91', '6F11'], source: 'Hydaelyn', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: ['6C91', '6F11'], source: 'Hydaelyn', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: ['6C91', '6F11'], source: 'ハイデリン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: ['6C91', '6F11'], source: '海德林', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: ['6C91', '6F11'], source: '하이델린', capture: false }),
+      netRegex: { id: ['6C91', '6F11'], source: 'Hydaelyn', capture: false },
       // Late in the fight there is a Crystallize -> Aureole combo.
       alertText: (data, _matches, output) => {
         if (data.crystallize)
@@ -286,12 +236,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'HydaelynEx Lateral Aureole',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['65C5', '6F13'], source: 'Hydaelyn', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: ['65C5', '6F13'], source: 'Hydaelyn', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: ['65C5', '6F13'], source: 'Hydaelyn', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: ['65C5', '6F13'], source: 'ハイデリン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: ['65C5', '6F13'], source: '海德林', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: ['65C5', '6F13'], source: '하이델린', capture: false }),
+      netRegex: { id: ['65C5', '6F13'], source: 'Hydaelyn', capture: false },
       alertText: (data, _matches, output) => {
         if (data.crystallize)
           return output.combo!({ first: output.frontBack!(), second: output[data.crystallize]!() });
@@ -306,23 +251,48 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'HydaelynEx Mousa\'s Scorn',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '65C0', source: 'Hydaelyn' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '65C0', source: 'Hydaelyn' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '65C0', source: 'Hydaelyn' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '65C0', source: 'ハイデリン' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '65C0', source: '海德林' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '65C0', source: '하이델린' }),
+      netRegex: { id: '65C0', source: 'Hydaelyn' },
       response: Responses.sharedTankBuster(),
+    },
+    {
+      id: 'HydaelynEx Crystal of Light',
+      type: 'Ability',
+      netRegex: { id: '65BE', source: 'Crystal of Light', capture: true },
+      // Each of the three adds fires every 1.1s or so until about Exodus or their death
+      suppressSeconds: 60,
+      infoText: (data, matches, output) => {
+        // North Crystals: (87.87, 93.00),  (100.00, 86.00), (112.12, 93)
+        // South Crystals: (87.87, 107.00), (100.00, 114.00), (112.12, 107.00)
+        const isSouthFirst = parseFloat(matches.y) > 100;
+        if (data.role === 'tank')
+          return output.dirEchoes!({ dir: isSouthFirst ? output.north!() : output.south!() });
+        return output.dirCrystals!({ dir: isSouthFirst ? output.south!() : output.north!() });
+      },
+      outputStrings: {
+        dirCrystals: {
+          en: '${dir} Crystals first',
+          de: 'Kristall im ${dir} zuerst',
+          fr: 'Premiers cristaux au ${dir} ',
+          ja: '${dir}のクリスタルから',
+          cn: '先攻击 ${dir} 水晶',
+          ko: '${dir} 크리스탈 먼저',
+        },
+        dirEchoes: {
+          en: 'Move Echoes ${dir} first',
+          de: 'Bewege Echoes zuerst nach ${dir}',
+          fr: 'Déplacez les échos au ${dir} en premier',
+          ja: '${dir}に誘導',
+          cn: '先拉回声到 ${dir} ',
+          ko: '쫄 ${dir}으로 먼저 데려가기',
+        },
+        north: Outputs.north,
+        south: Outputs.south,
+      },
     },
     {
       id: 'HydaelynEx Exodus',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '6B55', source: 'Hydaelyn', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: '6B55', source: 'Hydaelyn', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: '6B55', source: 'Hydaelyn', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: '6B55', source: 'ハイデリン', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: '6B55', source: '海德林', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: '6B55', source: '하이델린', capture: false }),
+      netRegex: { id: '6B55', source: 'Hydaelyn', capture: false },
       // 14.8 seconds from this ability (no cast) to 662B raidwide.
       delaySeconds: 5,
       response: Responses.aoe(),
@@ -330,45 +300,25 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'HydaelynEx Halo',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '65A5', source: 'Hydaelyn', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '65A5', source: 'Hydaelyn', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '65A5', source: 'Hydaelyn', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '65A5', source: 'ハイデリン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '65A5', source: '海德林', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '65A5', source: '하이델린', capture: false }),
+      netRegex: { id: '65A5', source: 'Hydaelyn', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'HydaelynEx Radiant Halo',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '6B54', source: 'Hydaelyn', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '6B54', source: 'Hydaelyn', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '6B54', source: 'Hydaelyn', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '6B54', source: 'ハイデリン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '6B54', source: '海德林', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '6B54', source: '하이델린', capture: false }),
+      netRegex: { id: '6B54', source: 'Hydaelyn', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'HydaelynEx Heros\'s Sundering',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '65BF', source: 'Hydaelyn' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '65BF', source: 'Hydaelyn' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '65BF', source: 'Hydaelyn' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '65BF', source: 'ハイデリン' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '65BF', source: '海德林' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '65BF', source: '하이델린' }),
+      netRegex: { id: '65BF', source: 'Hydaelyn' },
       response: Responses.tankCleave('alert'),
     },
     {
       id: 'HydaelynEx Infralateral Arc',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '6669', source: 'Hydaelyn', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '6669', source: 'Hydaelyn', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '6669', source: 'Hydaelyn', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '6669', source: 'ハイデリン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '6669', source: '海德林', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '6669', source: '하이델린', capture: false }),
+      netRegex: { id: '6669', source: 'Hydaelyn', capture: false },
       durationSeconds: 4,
       infoText: (_data, _matches, output) => output.rolePositions!(),
       outputStrings: {
@@ -385,25 +335,15 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'HydaelynEx Heros\'s Glory',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '65A8', source: 'Hydaelyn', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '65A8', source: 'Hydaelyn', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '65A8', source: 'Hydaelyn', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '65A8', source: 'ハイデリン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '65A8', source: '海德林', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '65A8', source: '하이델린', capture: false }),
+      netRegex: { id: '65A8', source: 'Hydaelyn', capture: false },
       response: Responses.getBehind(),
     },
     {
       id: 'HydaelynEx Parhelic Circle',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '65AC', source: 'Hydaelyn', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '65AC', source: 'Hydaelyn', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '65AC', source: 'Hydaelyn', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '65AC', source: 'ハイデリン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '65AC', source: '海德林', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '65AC', source: '하이델린', capture: false }),
+      netRegex: { id: '65AC', source: 'Hydaelyn', capture: false },
       durationSeconds: 9,
-      alertText: (data, _matches, output) => {
+      alertText: (_data, _matches, output) => {
         // This is always crystallize === 'spread'.
         return output.combo!({ first: output.avoid!(), second: output.spread!() });
       },
@@ -423,12 +363,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'HydaelynEx Echoes',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '65B5', source: 'Hydaelyn', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '65B5', source: 'Hydaelyn', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '65B5', source: 'Hydaelyn', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '65B5', source: 'ハイデリン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '65B5', source: '海德林', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '65B5', source: '하이델린', capture: false }),
+      netRegex: { id: '65B5', source: 'Hydaelyn', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -444,12 +379,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'HydaelynEx Bright Spectrum',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '65B9', source: 'Hydaelyn' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '65B9', source: 'Hydaelyn' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '65B9', source: 'Hydaelyn' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '65B9', source: 'ハイデリン' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '65B9', source: '海德林' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '65B9', source: '하이델린' }),
+      netRegex: { id: '65B9', source: 'Hydaelyn' },
       preRun: (data, matches) => (data.brightSpectrumStack ??= []).push(matches.target),
       infoText: (data, matches, output) => {
         if (data.me === matches.target)
@@ -463,12 +393,7 @@ const triggerSet: TriggerSet<Data> = {
       // In practice, this cast begins after the Bright Spectrum casts.
       id: 'HydaelynEx Dichroic Spectrum',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '65B8', source: 'Hydaelyn' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '65B8', source: 'Hydaelyn' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '65B8', source: 'Hydaelyn' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '65B8', source: 'ハイデリン' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '65B8', source: '海德林' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '65B8', source: '하이델린' }),
+      netRegex: { id: '65B8', source: 'Hydaelyn' },
       infoText: (data, matches, output) => {
         if (data.brightSpectrumStack?.includes(data.me))
           return;
@@ -485,6 +410,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       'locale': 'de',
       'replaceSync': {
+        'Crystal of Light': 'Lichtkristall',
         'Hydaelyn': 'Hydaelyn',
         'Mystic Refulgence': 'Truglicht',
         'Parhelion': 'Parhelion',
@@ -529,6 +455,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       'locale': 'fr',
       'replaceSync': {
+        'Crystal of Light': 'Cristal De Lumière',
         'Hydaelyn': 'Hydaelyn',
         'Mystic Refulgence': 'illusion de Lumière',
         'Parhelion': 'Parhélie',
@@ -538,7 +465,7 @@ const triggerSet: TriggerSet<Data> = {
         '--top-middle': '--En haut au milieu',
         '--middle': '--Milieu',
         'Anthelion': 'Anthélie',
-        'Aureole': 'Auréole',
+        'Aureole/Lateral Aureole': 'Auréole/Auréole latérale',
         'Beacon': 'Rayon de Lumière',
         'Bright Spectrum': 'Spectre lumineux',
         'Crystalline Blizzard III': 'Méga Glace cristallisée',
@@ -557,7 +484,6 @@ const triggerSet: TriggerSet<Data> = {
         'Highest Holy': 'Miracle suprême',
         'Incandescence': 'Incandescence',
         'Infralateral Arc': 'Arc infralatéral',
-        'Lateral Aureole': 'Auréole latérale',
         'Light of the Crystal': 'Lumière du cristal',
         'Lightwave': 'Vague de Lumière',
         'Magos\'s Radiance': 'Radiance du mage',
@@ -573,6 +499,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       'locale': 'ja',
       'replaceSync': {
+        'Crystal of Light': '光のクリスタル',
         'Hydaelyn': 'ハイデリン',
         'Mystic Refulgence': '幻想光',
         'Parhelion': 'パルヘリオン',
@@ -610,6 +537,94 @@ const triggerSet: TriggerSet<Data> = {
         'Radiant Halo': 'レディアントヘイロー',
         'Shining Saber': 'シャイニングセイバー',
         'Subparhelion': 'サブパルヘリオン',
+      },
+    },
+    {
+      'locale': 'cn',
+      'replaceSync': {
+        'Crystal of Light': '光之水晶',
+        'Hydaelyn': '海德林',
+        'Mystic Refulgence': '幻想光',
+        'Parhelion': '幻日',
+      },
+      'replaceText': {
+        '--top-middle': '--前方中间',
+        '--middle': '--中间',
+        'Anthelion': '反假日',
+        'Aureole': '晕光',
+        'Beacon': '光芒',
+        'Bright Spectrum': '明亮光谱',
+        'Crystalline Blizzard III': '水晶冰封',
+        'Crystalline Stone III': '水晶垒石',
+        'Crystalline Water III': '水晶狂水',
+        'Crystalline Water/Stone III': '水晶狂水/垒石',
+        'Crystallize': '结晶',
+        'Dichroic Spectrum': '二色光谱',
+        'Echoes': '回声',
+        'Equinox': '昼夜二分',
+        'Exodus': '众生离绝',
+        '(?<!Radiant )Halo': '光环',
+        'Heros\'s Glory': '守护者的荣耀',
+        'Heros\'s Radiance': '守护者的光辉',
+        'Heros\'s Sundering': '守护者的斩断',
+        'Highest Holy': '至高神圣',
+        'Incandescence': '幻闪光',
+        'Infralateral Arc': '外侧晕弧',
+        'Lateral Aureole': '侧晕光',
+        'Light of the Crystal': '水晶之光',
+        'Lightwave': '光波',
+        'Magos\'s Radiance': '魔法师的光辉',
+        'Mousa\'s Scorn': '演艺家的蔑视',
+        'Parhelic Circle': '幻日环',
+        '(?<!Sub)Parhelion': '幻日',
+        'Pure Crystal': '纯净水晶',
+        'Radiant Halo': '明辉光环',
+        'Shining Saber': '光芒刃',
+        'Subparhelion': '映幻日',
+      },
+    },
+    {
+      'locale': 'ko',
+      'replaceSync': {
+        'Crystal of Light': '빛의 크리스탈',
+        'Hydaelyn': '하이델린',
+        'Mystic Refulgence': '환상빛',
+        'Parhelion': '무리해',
+      },
+      'replaceText': {
+        '--top-middle': '--위쪽 중앙',
+        '--middle': '--중앙',
+        'Anthelion': '맞무리해',
+        'Aureole': '후광',
+        'Beacon': '광망',
+        'Bright Spectrum': '환한 분광',
+        'Crystalline Blizzard III': '크리스탈 블리자가',
+        'Crystalline Stone III': '크리스탈 스톤가',
+        'Crystalline Water III': '크리스탈 워터가',
+        'Crystalline Water/Stone III': '크리스탈 워터가/스톤가',
+        'Crystallize': '크리스탈화',
+        'Dichroic Spectrum': '이분광',
+        'Echoes': '되울림',
+        'Equinox': '이분점',
+        'Exodus': '엑소더스',
+        'Heros\'s Glory': '헤로이스의 영광',
+        'Heros\'s Radiance': '헤로이스의 광휘',
+        'Heros\'s Sundering': '헤로이스의 절단',
+        'Highest Holy': '지고의 홀리',
+        'Incandescence': '환섬광',
+        'Infralateral Arc': '접선호',
+        'Lateral Aureole': '측면 후광',
+        'Light of the Crystal': '크리스탈의 빛',
+        'Lightwave': '빛의 파도',
+        'Magos\'s Radiance': '마고스의 광휘',
+        'Mousa\'s Scorn': '무사의 경멸',
+        'Parhelic Circle': '무리해고리',
+        'Pure Crystal': '순수 크리스탈',
+        'Radiant Halo': '눈부신 빛무리',
+        'Shining Saber': '찬란한 검',
+        'Subparhelion': '무리햇빛',
+        '(?<!Radiant )Halo': '빛무리',
+        '(?<!Sub)Parhelion': '무리해',
       },
     },
   ],

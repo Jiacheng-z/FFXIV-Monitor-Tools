@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -8,6 +7,7 @@ import { TriggerSet } from '../../../../../types/trigger';
 export type Data = RaidbossData;
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'AlexanderTheCuffOfTheSon',
   zoneId: ZoneId.AlexanderTheCuffOfTheSon,
   timelineFile: 'a6n.txt',
   timelineTriggers: [
@@ -22,14 +22,14 @@ const triggerSet: TriggerSet<Data> = {
       id: 'A6N Brute Force',
       regex: /Brute Force/,
       beforeSeconds: 4,
-      condition: (data) => data.role === 'tank' || data.role === 'healer',
+      condition: (data) => data.role === 'tank' || data.role === 'healer' || data.job === 'BLU',
       response: Responses.miniBuster(),
     },
     {
       id: 'A6N Magicked Mark',
       regex: /Magicked Mark/,
       beforeSeconds: 4,
-      condition: (data) => data.role === 'tank' || data.role === 'healer',
+      condition: (data) => data.role === 'tank' || data.role === 'healer' || data.job === 'BLU',
       response: Responses.miniBuster(),
     },
   ],
@@ -37,12 +37,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A6N Minefield',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Blaster', id: '170D', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Blaster', id: '170D', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Fracasseur', id: '170D', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ブラスター', id: '170D', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '爆破者', id: '170D', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '폭파자', id: '170D', capture: false }),
+      netRegex: { source: 'Blaster', id: '170D', capture: false },
       suppressSeconds: 5,
       infoText: (_data, _matches, output) => output.avoidMines!(),
       outputStrings: {
@@ -59,12 +54,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A6N Supercharge',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Blaster Mirage', id: '1713', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Blaster-Replikant', id: '1713', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Réplique Du Fracasseur', id: '1713', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ブラスター・ミラージュ', id: '1713', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '爆破者幻象', id: '1713', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '폭파자의 환영', id: '1713', capture: false }),
+      netRegex: { source: 'Blaster Mirage', id: '1713', capture: false },
       suppressSeconds: 1,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -81,7 +71,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A6N Low Arithmeticks',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '3FD' }),
+      netRegex: { effectId: '3FD' },
       condition: Conditions.targetIsYou(),
       suppressSeconds: 10,
       alertText: (_data, _matches, output) => output.text!(),
@@ -99,7 +89,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A6N High Arithmeticks',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '3FE' }),
+      netRegex: { effectId: '3FE' },
       condition: Conditions.targetIsYou(),
       suppressSeconds: 10,
       alertText: (_data, _matches, output) => output.text!(),
@@ -117,22 +107,17 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A6N Bio-arithmeticks',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Swindler', id: '171F', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Schwindler', id: '171F', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Arnaqueur', id: '171F', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'スウィンドラー', id: '171F', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '欺诈者', id: '171F', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '조작자', id: '171F', capture: false }),
+      netRegex: { source: 'Swindler', id: '171F', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'A6N Enumeration',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: ['0040', '0041', '0042'] }),
+      netRegex: { id: ['0040', '0041', '0042'] },
       infoText: (data, matches, output) => {
         // 0040 = 2, 0041 = 3, 0042 = 4
         const count = 2 + parseInt(matches.id, 16) - parseInt('0040', 16);
-        return output.text!({ player: data.ShortName(matches.target), count: count });
+        return output.text!({ player: data.party.member(matches.target), count: count });
       },
       outputStrings: {
         text: {
@@ -148,23 +133,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A6N Super Cyclone',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Vortexer', id: '1728', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Wirbler', id: '1728', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Tourbillonneur', id: '1728', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ボルテッカー', id: '1728', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '环旋者', id: '1728', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '교반자', id: '1728', capture: false }),
+      netRegex: { source: 'Vortexer', id: '1728', capture: false },
       response: Responses.knockback(),
     },
     {
       id: 'A6N Ultra Flash',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ source: 'Vortexer', id: '1722', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ source: 'Wirbler', id: '1722', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ source: 'Tourbillonneur', id: '1722', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ source: 'ボルテッカー', id: '1722', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ source: '环旋者', id: '1722', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ source: '교반자', id: '1722', capture: false }),
+      netRegex: { source: 'Vortexer', id: '1722', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -180,7 +155,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A6N Ice Marker',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0043' }),
+      netRegex: { id: '0043' },
       condition: Conditions.targetIsYou(),
       alarmText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -197,7 +172,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A6N Compressed Water Initial',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '3FF' }),
+      netRegex: { effectId: '3FF' },
       condition: Conditions.targetIsYou(),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -214,7 +189,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'A6N Compressed Water Explode',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '3FF' }),
+      netRegex: { effectId: '3FF' },
       condition: Conditions.targetIsYou(),
       delaySeconds: (_data, matches) => parseFloat(matches.duration) - 5,
       alertText: (_data, _matches, output) => {
@@ -278,7 +253,6 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       'locale': 'fr',
-      'missingTranslations': true,
       'replaceSync': {
         'Blaster(?! Mirage)': 'Fracasseur',
         'Blaster Mirage': 'réplique du Fracasseur',
@@ -309,14 +283,11 @@ const triggerSet: TriggerSet<Data> = {
         'Ultra Flash': 'Ultraflash',
         'Minefield': 'Champ de mines',
         'Supercharge': 'Super charge',
-        'Single Buster': 'Pulsoréacteur',
-        'Double Buster': 'Double pulsoréacteur',
-        'Rocket Drill': 'Roquette-foreuse',
+        'Single Buster/Double Buster/Rocket Drill': 'Réacteur/Foreuse',
       },
     },
     {
       'locale': 'ja',
-      'missingTranslations': true,
       'replaceSync': {
         'Blaster(?! Mirage)': 'ブラスター',
         'Blaster Mirage': 'ブラスター・ミラージュ',

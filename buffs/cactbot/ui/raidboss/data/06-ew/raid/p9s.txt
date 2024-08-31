@@ -1,0 +1,293 @@
+### P9S: Anabaseios: The Ninth Circle (Savage)
+
+# -p 814C:12.2
+# -ii 814B 814D 8150 815D 816E 815E 8165 8166 820B 820C 8222 8223 817F 8171 8173 817A 8176 8188 8189 8143 8187 818B
+# -it "Kokytos"
+
+hideall "--Reset--"
+hideall "--sync--"
+
+0.0 "--Reset--" ActorControl { command: "4000000F" } window 0,100000 jump 0
+
+0.0 "--sync--" InCombat { inGameCombat: "1" } window 0,1
+7.2 "--sync--" StartsUsing { id: "814C", source: "Kokytos" } window 10,10
+12.2 "Gluttony's Augur" Ability { id: "814C", source: "Kokytos" }
+19.6 "--middle--" Ability { id: "8144", source: "Kokytos" }
+
+# Mage 1
+25.3 "Ravening (Mage #1)" Ability { id: "8118", source: "Kokytos" }
+32.0 "Soul Surge" Ability { id: "811B", source: "Kokytos" }
+47.0 "Duality of Death" Ability { id: "8151", source: "Kokytos" }
+47.9 "Aero IV/Fire IV #1" #Ability { id: ["8152", "8153"], source: "Kokytos" }
+50.2 "Aero IV/Fire IV #2" #Ability { id: ["8152", "8153"], source: "Kokytos" }
+
+60.4 "Dualspell (Fire/Ice)" Ability { id: "8154", source: "Kokytos" }
+63.7 "--sync--" Ability { id: ["8122", "8123"], source: "Kokytos" }
+68.1 "Blizzard III" Ability { id: ["8157", "8159"], source: "Kokytos" }
+68.1 "Pile Pyre" Ability { id: ["8156", "8158"], source: "Kokytos" }
+
+73.4 "Dualspell (Thunder/Ice)" Ability { id: "8155", source: "Kokytos" }
+76.7 "--sync--" Ability { id: ["8123", "815C"], source: "Kokytos" }
+81.1 "Blizzard III" Ability { id: ["8157", "8159"], source: "Kokytos" }
+81.1 "Thunder III" Ability { id: ["815A", "815B"], source: "Kokytos" }
+
+86.4 "Dualspell (Fire/Ice)" Ability { id: "8154", source: "Kokytos" }
+89.7 "--sync--" Ability { id: ["8122", "8123"], source: "Kokytos" }
+94.1 "Blizzard III" Ability { id: ["8157", "8159"], source: "Kokytos" }
+94.1 "Pile Pyre" Ability { id: ["8156", "8158"], source: "Kokytos" }
+
+101.8 "Disgorge" Ability { id: "8124", source: "Kokytos" }
+
+# Fighter
+114.2 "Ravening (Fighter)" Ability { id: "8119", source: "Kokytos" } window 40,40
+120.9 "Soul Surge" Ability { id: "811B", source: "Kokytos" }
+134.0 "Ascendant Fist" Ability { id: "816F", source: "Kokytos" }
+
+146.4 "Archaic Rockbreaker (cast)" Ability { id: "815F", source: "Kokytos" }
+148.0 "Shockwave" Ability { id: "8160", source: "Kokytos" }
+149.3 "Archaic Rockbreaker (stacks)" Ability { id: "8162", source: "Kokytos" }
+155.5 "Front Combination/Rear Combination" Ability { id: ["8167", "8168", "8169", "816A"], source: "Kokytos" }
+155.8 "Archaic Rockbreaker #1" Ability { id: "8161", source: "Kokytos" }
+156.3 "Inside Roundhouse/Outside Roundhouse" Ability { id: ["8238", "8239"], source: "Kokytos" }
+158.7 "Swinging Kick" Ability { id: ["816B", "816C"], source: "Kokytos" }
+161.7 "Archaic Rockbreaker #2" Ability { id: "8161", source: "Kokytos" }
+162.4 "Outside Roundhouse/Inside Roundhouse" Ability { id: ["8239", "8238"], source: "Kokytos" }
+168.7 "Archaic Demolish" Ability { id: "816D", source: "Kokytos" }
+
+175.8 "Gluttony's Augur" Ability { id: "814C", source: "Kokytos" }
+187.1 "Ascendant Fist" Ability { id: "816F", source: "Kokytos" }
+
+194.5 "Disgorge" Ability { id: "8125", source: "Kokytos" }
+
+# Chimera 1
+202.9 "--middle--" Ability { id: "8144", source: "Kokytos" }
+208.2 "Ravening (Chimera #1)" Ability { id: "817B", source: "Kokytos" }
+214.8 "Soul Surge" Ability { id: "811B", source: "Kokytos" }
+
+221.4 "Levinstrike Summoning" Ability { id: "817C", source: "Kokytos" }
+233.5 "Scrambled Succession" Ability { id: "817D", source: "Kokytos" }
+233.6 "--untargetable--"
+
+# Limit Cut 1
+233.7 "--sync--" Ability { id: "8144", source: "Kokytos" }
+235.3 "--sync--" Ability { id: "817E", source: "Kokytos" }
+238.4 "Firemeld #1" Ability { id: "8180", source: "Kokytos" }
+238.5 "Icemeld #1" Ability { id: "8183", source: "Kokytos's Echo" }
+239.4 "Shock #1" Ability { id: "8181", source: "Kokytos" }
+
+239.4 "--sync--" Ability { id: "8144", source: "Kokytos" }
+241.0 "--sync--" Ability { id: "817E", source: "Kokytos" }
+244.1 "Firemeld #2" Ability { id: "8180", source: "Kokytos" }
+244.3 "Icemeld #2" Ability { id: "8190", source: "Kokytos's Echo" }
+245.2 "Shock #2" Ability { id: "8181", source: "Kokytos" }
+
+245.2 "--sync--" Ability { id: "8144", source: "Kokytos" }
+246.6 "--sync--" Ability { id: "817E", source: "Kokytos" }
+249.7 "Firemeld #3" Ability { id: "8180", source: "Kokytos" }
+250.0 "Icemeld #3" Ability { id: "8191", source: "Kokytos's Echo" }
+250.7 "Shock #3" Ability { id: "8181", source: "Kokytos" }
+
+250.7 "--sync--" Ability { id: "8144", source: "Kokytos" }
+252.3 "--sync--" Ability { id: "817E", source: "Kokytos" }
+255.4 "Firemeld #4" Ability { id: "8180", source: "Kokytos" }
+255.8 "Icemeld #4" Ability { id: "8192", source: "Kokytos's Echo" }
+256.5 "Shock #4" Ability { id: "8181", source: "Kokytos" }
+256.5 "--middle--" Ability { id: "8144", source: "Kokytos" }
+
+258.1 "--targetable--"
+262.2 "--sync--" Ability { id: ["8122", "8123", "815C"], source: "Kokytos" }
+265.1 "Two Minds" Ability { id: ["8184", "8185"], source: "Kokytos" }
+266.2 "Blizzard III" Ability { id: ["8157", "8159"], source: "Kokytos" }
+266.2 "Pile Pyre/Thunder III" Ability { id: ["8156", "8158", "815A", "815B"], source: "Kokytos" }
+272.2 "Gluttony's Augur" Ability { id: "814C", source: "Kokytos" }
+
+276.3 "Disgorge" Ability { id: "8236", source: "Kokytos" }
+
+# Beast
+284.7 "--middle--" Ability { id: "8144", source: "Kokytos" }
+289.1 "Ravening (Beast)" Ability { id: "811A", source: "Kokytos" }
+297.0 "Soul Surge" Ability { id: "811B", source: "Kokytos" }
+302.6 "Charybdis" Ability { id: "8170", source: "Kokytos" }
+309.7 "Comet" Ability { id: "8172", source: "Kokytos" }
+
+318.7 "Beastly Bile (cast)" Ability { id: "8177", source: "Kokytos" }
+323.8 "Thunderbolt #1" Ability { id: "8179", source: "Kokytos" }
+325.7 "Beastly Bile #1" Ability { id: "8178", source: "Kokytos" }
+
+329.9 "Thunderbolt #2" Ability { id: "8179", source: "Kokytos" }
+331.7 "Beastly Bile #2" Ability { id: "8178", source: "Kokytos" }
+
+332.5 "Burst #1" Ability { id: "8174", source: "Comet" }
+338.5 "Burst #2" Ability { id: "8174", source: "Comet" }
+341.3 "Ecliptic Meteor" Ability { id: "8175", source: "Kokytos" }
+349.4 "Burst #3" Ability { id: "8174", source: "Comet" }
+355.0 "Beastly Fury" Ability { id: "8186", source: "Kokytos" }
+
+357.2 "Disgorge" Ability { id: "8126", source: "Kokytos" }
+
+# Chimera 2
+368.9 "--middle--" Ability { id: "8144", source: "Kokytos" }
+374.2 "Ravening (Chimera #2)" Ability { id: "817B", source: "Kokytos" }
+380.8 "Soul Surge" Ability { id: "811B", source: "Kokytos" }
+393.7 "Duality of Death" Ability { id: "8151", source: "Kokytos" }
+394.6 "Aero IV/Fire IV #1" #Ability { id: ["8152", "8153"], source: "Kokytos" }
+396.4 "Aero IV/Fire IV #2" #Ability { id: ["8152", "8153"], source: "Kokytos" }
+
+402.9 "Archaic Rockbreaker (cast)" Ability { id: "815F", source: "Kokytos" }
+404.5 "Shockwave" Ability { id: "8160", source: "Kokytos" }
+405.8 "Archaic Rockbreaker (stacks)" Ability { id: "8162", source: "Kokytos" }
+412.5 "Archaic Rockbreaker #1" Ability { id: "8161", source: "Kokytos" }
+413.2 "Dualspell" Ability { id: ["8154", "8155"], source: "Kokytos" }
+416.5 "--sync--" Ability { id: ["8122", "8123", "815C"], source: "Kokytos" }
+418.5 "Archaic Rockbreaker #2" Ability { id: "8161", source: "Kokytos" }
+
+420.9 "Blizzard III" Ability { id: ["8157", "8159"], source: "Kokytos" }
+420.9 "Pile Pyre/Thunder III" Ability { id: ["8156", "8158", "815A", "815B"], source: "Kokytos" }
+426.2 "Gluttony's Augur" Ability { id: "814C", source: "Kokytos" }
+
+# Limit Cut 2
+438.6 "Chimeric Succession" Ability { id: "81BB", source: "Kokytos" }
+449.5 "Icemeld #1" Ability { id: "8183", source: "Kokytos's Echo" }
+452.5 "Icemeld #2" Ability { id: "8190", source: "Kokytos's Echo" }
+454.2 "Front Firestrikes/Rear Firestrikes" Ability { id: ["878E", "878F"], source: "Kokytos" }
+
+454.4 "Pyremeld" Ability { id: ["8793", "8794"], source: "Kokytos" }
+455.8 "Icemeld #3" Ability { id: "8191", source: "Kokytos's Echo" }
+458.6 "Icemeld #4" Ability { id: "8192", source: "Kokytos's Echo" }
+459.7 "Swinging Kick" Ability { id: ["8795", "8796"], source: "Kokytos" }
+
+461.8 "--middle--" Ability { id: "8144", source: "Kokytos" }
+467.4 "--sync--" Ability { id: ["8122", "8123", "815C"], source: "Kokytos" }
+470.3 "Two Minds" Ability { id: ["8184", "8185"], source: "Kokytos" }
+471.4 "Blizzard III" Ability { id: ["8157", "8159"], source: "Kokytos" }
+471.4 "Pile Pyre/Thunder III" Ability { id: ["8156", "8158", "815A", "815B"], source: "Kokytos" }
+
+472.4 "Disgorge" Ability { id: "8236", source: "Kokytos" }
+
+# Mage 2
+480.8 "--middle--" Ability { id: "8144", source: "Kokytos" }
+486.1 "Ravening (Mage #2)" Ability { id: "8118", source: "Kokytos" }
+492.7 "Soul Surge" Ability { id: "811B", source: "Kokytos" }
+
+500.3 "Dualspell" Ability { id: ["8154", "8155"], source: "Kokytos" }
+503.6 "--sync--" Ability { id: ["8122", "8123", "815C"], source: "Kokytos" }
+508.2 "Blizzard III" Ability { id: ["8157", "8159"], source: "Kokytos" }
+508.2 "Pile Pyre/Thunder III" Ability { id: ["8156", "8158", "815A", "815B"], source: "Kokytos" }
+513.5 "Gluttony's Augur" Ability { id: "814C", source: "Kokytos" }
+
+520.6 "Dualspell" Ability { id: ["8154", "8155"], source: "Kokytos" }
+523.9 "--sync--" Ability { id: ["8122", "8123", "815C"], source: "Kokytos" }
+528.5 "Blizzard III" Ability { id: ["8157", "8159"], source: "Kokytos" }
+528.5 "Pile Pyre/Thunder III" Ability { id: ["8156", "8158", "815A", "815B"], source: "Kokytos" }
+
+534.8 "Duality of Death" Ability { id: "8151", source: "Kokytos" }
+535.7 "Aero IV/Fire IV #1" #Ability { id: ["8152", "8153"], source: "Kokytos" }
+538.0 "Aero IV/Fire IV #2" #Ability { id: ["8152", "8153"], source: "Kokytos" }
+
+544.0 "Dualspell" Ability { id: ["8154", "8155"], source: "Kokytos" }
+547.3 "--sync--" Ability { id: ["8122", "8123", "815C"], source: "Kokytos" }
+551.9 "Blizzard III" Ability { id: ["8157", "8159"], source: "Kokytos" }
+551.9 "Pile Pyre/Thunder III" Ability { id: ["8156", "8158", "815A", "815B"], source: "Kokytos" }
+557.1 "Gluttony's Augur" Ability { id: "814C", source: "Kokytos" }
+
+564.7 "Disgorge" Ability { id: "8124", source: "Kokytos" }
+
+# Final sequence
+573.1 "--middle--" Ability { id: "8144", source: "Kokytos" }
+578.5 "Ravening (Final)" Ability { id: "817B", source: "Kokytos" }
+585.1 "Soul Surge" Ability { id: "811B", source: "Kokytos" }
+
+597.7 "Disintegration (enrage)" Ability { id: "818A", source: "Kokytos" }
+
+
+# Abilities
+#
+# Ball of Levin:817F Shock, Levinstrike orb explosion
+# Comet:8143 Burst, self-targeted ability for targeted comet during Ecliptic Meteor
+# Comet:8173 Comet Impact, cast and proximity damage during Charybdis
+# Comet:8174 Burst, cast and damage for full meteor circle explosion
+# Kokytos:8118 Ravening, self-targeted cast for turning into Mage
+# Kokytos:8119 Ravening, self-targeted cast for turning into Fighter
+# Kokytos:811A Ravening, self-targeted cast for turning into Beast
+# Kokytos:811B Soul Surge, raidwide damage after all Ravening
+# Kokytos:8122 unknown_8122, self-targeted ability Fire symbol
+# Kokytos:8123 unknown_8123, self-targeted ability Ice symbol
+# Kokytos:8124 Disgorge, self-targeted ability after Mage phase
+# Kokytos:8125 Disgorge, self-targeted ability after Fighter phase
+# Kokytos:8126 Disgorge, self-targeted ability after Beast phase
+# Kokytos:8144 unknown_8144, repositioning middle self-targeted ability
+# Kokytos:814B unknown_814b, unaspected auto damage
+# Kokytos:814C Gluttony's Augur, self-targeted cast ability
+# Kokytos:814D Gluttony's Augur, raidwide damage
+# Kokytos:8150 unknown_8150, mage auto damage
+# Kokytos:8151 Duality of Death, self-targeted cast tankbuster
+# Kokytos:8152 Fire IV, damage on MT during Duality of Death
+# Kokytos:8153 Aero IV, damage on OT during Duality of Death
+# Kokytos:8154 Dualspell, self-targeted cast Fire and Ice spell
+# Kokytos:8155 Dualspell, self-targeted cast Thunder and Ice spell
+# Kokytos:8156 Pile Pyre, normal fire partner stack damage
+# Kokytos:8157 Blizzard III, normal ice donut damage
+# Kokytos:8158 Pile Pyre, empowered fire partner stack damage
+# Kokytos:8159 Blizzard III, empowered ice donut damage
+# Kokytos:815A Thunder III, empowered thunder protean damage
+# Kokytos:815B Thunder III, normal thunder protean damage
+# Kokytos:815C unknown_815c, self-targeted ability Thunder icon
+# Kokytos:815D unknown_815d, fighter auto damage
+# Kokytos:815E Uplift, ground aoe damage raising walls
+# Kokytos:815F Archaic Rockbreaker, purple knockback circle damage
+# Kokytos:8160 Shockwave, knockback damage into walls
+# Kokytos:8161 Archaic Rockbreaker, cast and damage for fuse explosions
+# Kokytos:8162 Archaic Rockbreaker, partner stack damage after Shockwave
+# Kokytos:8165 Inside Roundhouse, telegraph ability
+# Kokytos:8166 Outside Roundhouse, telegraph ability
+# Kokytos:8167 Front Combination, self-targeted cast for Front+Inside combo
+# Kokytos:8168 Front Combination, self-targeted cast for Front+Outside combo
+# Kokytos:8169 Rear Combination, self-targeted cast for Rear+Inside combo
+# Kokytos:816A Rear Combination, self-targeted cast for Rear+Outside combo
+# Kokytos:816B Swinging Kick, self-targeted ability paired with 8222
+# Kokytos:816C Swinging Kick, self-targeted ability paired with 8223
+# Kokytos:816D Archaic Demolish, self-targeted cast
+# Kokytos:816E Archaic Demolish, healer stack damage
+# Kokytos:816F Ascendant Fist, tank-targeted cast and tankbuster damage
+# Kokytos:8170 Charybdis, self-targeted cast ability
+# Kokytos:8171 Charybdis, cast and damage for initial tornado circles
+# Kokytos:8172 Comet, cast and self-targeted comet summoning before 8173
+# Kokytos:8175 Ecliptic Meteor, self-targeted cast of LOS meteor damage
+# Kokytos:8176 Ecliptic Meteor, self-targeted ability paired with 8188 (probably)
+# Kokytos:8177 Beastly Bile, self-targeted cast of poison stack damage
+# Kokytos:8178 Beastly Bile, shared damage with comet
+# Kokytos:8179 Thunderbolt, self-targeted cast of proteans during meteors
+# Kokytos:817A Thunderbolt, protean lightning damage from 8179
+# Kokytos:817B Ravening, self-targeted cast for turning into Chimera
+# Kokytos:817C Levinstrike Summoning, self-targeted cast for this mechanic
+# Kokytos:817D Scrambled Succession, self-targeted cast during which limit cut dots appear
+# Kokytos:817E unknown_817e, unknown ability during Levinstrike Summoning (repositioning?)
+# Kokytos:8180 Firemeld, spread damage in limit cut order
+# Kokytos:8181 Shock, tower damage
+# Kokytos:8182 Shock, raidwide damage if 8181 hits no target
+# Kokytos:8184 Two Minds, self-targeted cast Fire and Ice spell
+# Kokytos:8185 Two Minds, self-targeted cast Thunder and Ice spell
+# Kokytos:8186 Beastly Fury, self-targeted cast for 8187 raidwide
+# Kokytos:8187 Beastly Fury, raidwide damage
+# Kokytos:8188 Ecliptic Meteor, damage for not LOS-ing meteor (on other meteors, boss, players)
+# Kokytos:8189 unknown_8189, beast auto damage
+# Kokytos:818A Disintegration, self-targeted cast for enrage
+# Kokytos:818B Disintegration, raidwide enrage damage
+# Kokytos:81BB Chimeric Succession, self-targeted cast starting this mechanic
+# Kokytos:820B unknown_820b, unknown self-targeted cast mutually exclusive with 820C
+# Kokytos:820C unknown_820c, unknown self-targeted cast exclusive with 820B
+# Kokytos:8222 Swinging Kick, cast and damage from front combination dodge
+# Kokytos:8223 Swinging Kick, cast and damage from rear combination dodge
+# Kokytos:8236 Disgorge, self-targeted ability after Chimera phase
+# Kokytos:8238 Inside Roundhouse, cast and damage for "get out"
+# Kokytos:8239 Outside Roundhouse, cast and damage for "get in"
+# Kokytos:878E Front Firestrikes, self-targeted cast
+# Kokytos:878F Rear Firestrikes, self-targeted cast
+# Kokytos:8793 Pyremeld, Front Firestrikes charge damage
+# Kokytos:8794 Pyremeld, Rear Firestrikes charge damage
+# Kokytos:8795 Swinging Kick, cast and damage for Front Firestrikes Kick
+# Kokytos:8796 Swinging Kick, cast and damage for Rear Firestrikes Kick
+# Kokytos's Echo:8183 Icemeld, first defamation damage during Levinstrike/Succession
+# Kokytos's Echo:8190 Icemeld, second defamation damage during Levinstrike/Succession
+# Kokytos's Echo:8191 Icemeld, third defamation damage during Levinstrike/Succession
+# Kokytos's Echo:8192 Icemeld, fourth defamation damage during Levinstrike/Succession

@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import Outputs from '../../../../../resources/outputs';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
@@ -13,40 +12,31 @@ export interface Data extends RaidbossData {
 }
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'TheDyingGasp',
   zoneId: ZoneId.TheDyingGasp,
   timelineFile: 'hades.txt',
   triggers: [
     {
       id: 'Hades Phase Tracker',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '4180', source: 'Hades', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '4180', source: 'Hades', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '4180', source: 'Hadès', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '4180', source: 'ハーデス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '4180', source: '哈迪斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '4180', source: '하데스', capture: false }),
+      netRegex: { id: '4180', source: 'Hades', capture: false },
       run: (data) => data.neoHades = true,
     },
     {
       id: 'Hades Ravenous Assault',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '4158', source: 'Hades' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '4158', source: 'Hades' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '4158', source: 'Hadès' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '4158', source: 'ハーデス' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '4158', source: '哈迪斯' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '4158', source: '하데스' }),
+      netRegex: { id: '4158', source: 'Hades' },
       alertText: (data, matches, output) => {
         if (matches.target === data.me)
           return output.tankBusterOnYou!();
 
         if (data.role === 'healer')
-          return output.busterOn!({ player: data.ShortName(matches.target) });
+          return output.busterOn!({ player: data.party.member(matches.target) });
       },
       infoText: (data, matches, output) => {
         if (matches.target === data.me)
           return;
-        return output.awayFromPlayer!({ player: data.ShortName(matches.target) });
+        return output.awayFromPlayer!({ player: data.party.member(matches.target) });
       },
       outputStrings: {
         awayFromPlayer: {
@@ -64,40 +54,25 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Hades Bad Faith Left',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '4149', source: 'Hades', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '4149', source: 'Hades', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '4149', source: 'Hadès', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '4149', source: 'ハーデス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '4149', source: '哈迪斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '4149', source: '하데스', capture: false }),
+      netRegex: { id: '4149', source: 'Hades', capture: false },
       response: Responses.goLeft('info'),
     },
     {
       id: 'Hades Bad Faith Right',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '414A', source: 'Hades', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '414A', source: 'Hades', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '414A', source: 'Hadès', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '414A', source: 'ハーデス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '414A', source: '哈迪斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '414A', source: '하데스', capture: false }),
+      netRegex: { id: '414A', source: 'Hades', capture: false },
       response: Responses.goRight('info'),
     },
     {
       id: 'Hades Broken Faith',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '414D', source: 'Hades', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '414D', source: 'Hades', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '414D', source: 'Hadès', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '414D', source: 'ハーデス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '414D', source: '哈迪斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '414D', source: '하데스', capture: false }),
+      netRegex: { id: '414D', source: 'Hades', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'Dodge Giant Circles',
           de: 'Weiche dem großen Kreis aus',
-          fr: 'Évitez les cercles géants',
+          fr: 'Esquivez les cercles géants',
           ja: '降ったサークルを避ける',
           cn: '躲避大圈',
           ko: '대형장판피하기',
@@ -107,62 +82,37 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Hades Echo Right',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '4164', source: 'Hades', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '4164', source: 'Hades', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '4164', source: 'Hadès', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '4164', source: 'ハーデス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '4164', source: '哈迪斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '4164', source: '하데스', capture: false }),
+      netRegex: { id: '4164', source: 'Hades', capture: false },
       response: Responses.goRight('info'),
     },
     {
       id: 'Hades Echo Left',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '4163', source: 'Hades', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '4163', source: 'Hades', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '4163', source: 'Hadès', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '4163', source: 'ハーデス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '4163', source: '哈迪斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '4163', source: '하데스', capture: false }),
+      netRegex: { id: '4163', source: 'Hades', capture: false },
       response: Responses.goLeft('info'),
     },
     {
       id: 'Hades Titanomachy',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '4180', source: 'Hades', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '4180', source: 'Hades', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '4180', source: 'Hadès', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '4180', source: 'ハーデス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '4180', source: '哈迪斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '4180', source: '하데스', capture: false }),
+      netRegex: { id: '4180', source: 'Hades', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Hades Shadow Stream',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '415C', source: 'Hades', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '415C', source: 'Hades', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '415C', source: 'Hadès', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '415C', source: 'ハーデス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '415C', source: '哈迪斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '415C', source: '하데스', capture: false }),
+      netRegex: { id: '415C', source: 'Hades', capture: false },
       response: Responses.goSides(),
     },
     {
       id: 'Hades Purgation',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '4170', source: 'Hades', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '4170', source: 'Hades', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '4170', source: 'Hadès', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '4170', source: 'ハーデス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '4170', source: '哈迪斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '4170', source: '하데스', capture: false }),
+      netRegex: { id: '4170', source: 'Hades', capture: false },
       response: Responses.goMiddle(),
     },
     {
       id: 'Hades Doom',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: 'D2' }),
+      netRegex: { effectId: 'D2' },
       condition: Conditions.targetIsYou(),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -179,12 +129,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Hades Wail of the Lost Right',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '4166', source: 'Hades', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '4166', source: 'Hades', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '4166', source: 'Hadès', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '4166', source: 'ハーデス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '4166', source: '哈迪斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '4166', source: '하데스', capture: false }),
+      netRegex: { id: '4166', source: 'Hades', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -200,12 +145,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Hades Wail of the Lost Left',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '4165', source: 'Hades', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '4165', source: 'Hades', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '4165', source: 'Hadès', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '4165', source: 'ハーデス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '4165', source: '哈迪斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '4165', source: '하데스', capture: false }),
+      netRegex: { id: '4165', source: 'Hades', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -221,12 +161,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Hades Dual Strike Healer',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '4161', source: 'Hades', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '4161', source: 'Hades', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '4161', source: 'Hadès', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '4161', source: 'ハーデス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '4161', source: '哈迪斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '4161', source: '하데스', capture: false }),
+      netRegex: { id: '4161', source: 'Hades', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: Outputs.tankBusters,
@@ -235,7 +170,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Hades Dual Strike',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0060' }),
+      netRegex: { id: '0060' },
       condition: (data, matches) => data.neoHades && data.me === matches.target,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -252,7 +187,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Hades Hellborn Yawp',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0028' }),
+      netRegex: { id: '0028' },
       condition: Conditions.targetIsYou(),
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -269,7 +204,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Hades Fetters',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0078' }),
+      netRegex: { id: '0078' },
       condition: Conditions.targetIsYou(),
       alarmText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -286,23 +221,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Hades Life In Captivity',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '4175', source: 'Hades', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: '4175', source: 'Hades', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: '4175', source: 'Hadès', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: '4175', source: 'ハーデス', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: '4175', source: '哈迪斯', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: '4175', source: '하데스', capture: false }),
+      netRegex: { id: '4175', source: 'Hades', capture: false },
       run: (data) => data.seenLifeInCaptivity = true,
     },
     {
       id: 'Hades Gaol',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '417F', source: 'Hades', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: '417F', source: 'Hades', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: '417F', source: 'Hadès', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: '417F', source: 'ハーデス', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: '417F', source: '哈迪斯', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: '417F', source: '하데스', capture: false }),
+      netRegex: { id: '417F', source: 'Hades', capture: false },
       condition: (data) => {
         // There can be multiple gaols (if the phase loops), but ability also
         // gets used during the finall phase transition.  Ignore that one.
@@ -324,14 +249,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Hades Nether Blast / Dark Eruption',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '008B' }),
+      netRegex: { id: '008B' },
       condition: Conditions.targetIsYou(),
       response: Responses.spread('alert'),
     },
     {
       id: 'Hades Ancient Darkness',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0060' }),
+      netRegex: { id: '0060' },
       condition: (data, matches) => !data.neoHades && data.me === matches.target,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -348,14 +273,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Hades Ancient Water III',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '003E' }),
+      netRegex: { id: '003E' },
       condition: Conditions.targetIsYou(),
       response: Responses.stackMarkerOn(),
     },
     {
       id: 'Hades Ancient Collect',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: ['0060', '003E'] }),
+      netRegex: { id: ['0060', '003E'] },
       condition: (data) => !data.neoHades,
       run: (data, matches) => {
         data.ancient ??= {};
@@ -365,13 +290,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Hades Ancient No Marker',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '003E', capture: false }),
+      netRegex: { id: '003E', capture: false },
       delaySeconds: 0.5,
       infoText: (data, _matches, output) => {
-        if (!data.ancient || !data.ancient[data.me])
+        if (!data.ancient || data.ancient[data.me] === undefined)
           return;
         const name = Object.keys(data.ancient).find((key) => data.ancient?.[key] === '003E');
-        return output.text!({ player: data.ShortName(name) });
+        return output.text!({ player: data.party.member(name) });
       },
       outputStrings: {
         text: Outputs.stackOnPlayer,
@@ -380,7 +305,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Hades Ancient Cleanup',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '003E', capture: false }),
+      netRegex: { id: '003E', capture: false },
       delaySeconds: 10,
       run: (data) => delete data.ancient,
     },

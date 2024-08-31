@@ -25,9 +25,9 @@ const triggerSet: OopsyTriggerSet<Data> = {
   },
   triggers: [
     {
-      id: 'TitanEx Landslide',
+      id: 'TitanEx Landslide Pushed Off',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '5BB', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '5BB', ...playerDamageFields }),
       deathReason: (_data, matches) => {
         return {
           id: matches.targetId,
@@ -35,7 +35,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
           text: {
             en: 'Pushed off!',
             de: 'Runter geschubst!',
-            fr: 'A été poussé(e) !',
+            fr: 'Repoussé(e) !',
             ja: '落ちた',
             cn: '击退坠落',
             ko: '넉백됨',

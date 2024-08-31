@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -8,6 +7,7 @@ import { TriggerSet } from '../../../../../types/trigger';
 export type Data = RaidbossData;
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'TheDrownedCityOfSkalla',
   zoneId: ZoneId.TheDrownedCityOfSkalla,
   timelineFile: 'drowned_city_of_skalla.txt',
   timelineTriggers: [
@@ -39,63 +39,38 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Skalla Rising Seas',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2650', source: 'Kelpie', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2650', source: 'Kelpie', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2650', source: 'Kelpie', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2650', source: 'ケルピー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2650', source: '凯尔派', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2650', source: '켈피', capture: false }),
+      netRegex: { id: '2650', source: 'Kelpie', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Skalla Hydro Pull',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2651', source: 'Kelpie', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2651', source: 'Kelpie', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2651', source: 'Kelpie', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2651', source: 'ケルピー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2651', source: '凯尔派', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2651', source: '켈피', capture: false }),
+      netRegex: { id: '2651', source: 'Kelpie', capture: false },
       response: Responses.getOut(),
     },
     {
       id: 'Skalla Hydro Push',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2652', source: 'Kelpie', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2652', source: 'Kelpie', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2652', source: 'Kelpie', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2652', source: 'ケルピー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2652', source: '凯尔派', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2652', source: '켈피', capture: false }),
+      netRegex: { id: '2652', source: 'Kelpie', capture: false },
       response: Responses.knockback(),
     },
     {
       id: 'Skalla Bloody Puddle',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '002B' }),
+      netRegex: { id: '002B' },
       condition: Conditions.targetIsYou(),
       response: Responses.spread(),
     },
     {
       id: 'Skalla Rusting Claw',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2661', source: 'Hrodric Poisontongue' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2661', source: 'Hrodric Giftzunge' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2661', source: 'Hrodric Le Médisant' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2661', source: '直言のフロドリック' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2661', source: '直言不讳 赫罗德里克' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2661', source: '입바른 흐로드릭' }),
+      netRegex: { id: '2661', source: 'Hrodric Poisontongue' },
       response: Responses.tankCleave(),
     },
     {
       id: 'Skalla Tail Drive',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2663', source: 'Hrodric Poisontongue', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2663', source: 'Hrodric Giftzunge', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2663', source: 'Hrodric Le Médisant', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2663', source: '直言のフロドリック', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2663', source: '直言不讳 赫罗德里克', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2663', source: '입바른 흐로드릭', capture: false }),
+      netRegex: { id: '2663', source: 'Hrodric Poisontongue', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -111,18 +86,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Skalla The Spin',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2664', source: 'Hrodric Poisontongue', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2664', source: 'Hrodric Giftzunge', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2664', source: 'Hrodric Le Médisant', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2664', source: '直言のフロドリック', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2664', source: '直言不讳 赫罗德里克', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2664', source: '입바른 흐로드릭', capture: false }),
+      netRegex: { id: '2664', source: 'Hrodric Poisontongue', capture: false },
       response: Responses.getOut(),
     },
     {
       id: 'Skalla Ring Of Chaos',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0079' }),
+      netRegex: { id: '0079' },
       condition: Conditions.targetIsYou(),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -139,7 +109,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Skalla Cross Of Chaos',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '007A' }),
+      netRegex: { id: '007A' },
       condition: Conditions.targetIsYou(),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -156,41 +126,21 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Skalla Circle Of Chaos',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '001C' }),
+      netRegex: { id: '001C' },
       condition: Conditions.targetIsYou(),
       response: Responses.spread(),
     },
     {
       id: 'Skalla Eye Of The Fire',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2665', source: 'Hrodric Poisontongue', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2665', source: 'Hrodric Giftzunge', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2665', source: 'Hrodric Le Médisant', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2665', source: '直言のフロドリック', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2665', source: '直言不讳 赫罗德里克', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2665', source: '입바른 흐로드릭', capture: false }),
+      netRegex: { id: '2665', source: 'Hrodric Poisontongue', capture: false },
       response: Responses.lookAway(),
     },
     {
       id: 'Skalla Words Of Woe',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2662', source: 'Hrodric Poisontongue', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2662', source: 'Hrodric Giftzunge', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2662', source: 'Hrodric Le Médisant', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2662', source: '直言のフロドリック', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2662', source: '直言不讳 赫罗德里克', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2662', source: '입바른 흐로드릭', capture: false }),
-      infoText: (_data, _matches, output) => output.text!(),
-      outputStrings: {
-        text: {
-          en: 'avoid eye lasers',
-          de: 'Augenlaser ausweichen',
-          fr: 'Évitez les lasers',
-          ja: '前方レーザーを避ける',
-          cn: '避开眼部激光',
-          ko: '레이저 피하기',
-        },
-      },
+      netRegex: { id: '2662', source: 'Hrodric Poisontongue', capture: false },
+      response: Responses.awayFromFront(),
     },
   ],
   timelineReplace: [
@@ -250,10 +200,12 @@ const triggerSet: TriggerSet<Data> = {
         'The Old One': 'Ancien',
       },
       'replaceText': {
+        '\\?': ' ?',
+        '\\(cast\\)': '(lancement)',
         'Bloody Puddle': 'Mare ensanglantée',
         'Bubble Burst': 'Bulles explosives',
-        'Circle Of Chaos': 'Cercle du chaos',
-        'Cross Of Chaos': 'Croix du chaos',
+        '(?<!/)Cross Of Chaos(?!/)': 'Croix du chaos',
+        'Cross Of Chaos/Circle Of Chaos': 'Croix/Cercle du chaos',
         'Eye Of The Fire': 'Œil des flammes',
         'Gallop': 'Galop',
         'Hydro Pull': 'Hydrotraction',
@@ -261,7 +213,9 @@ const triggerSet: TriggerSet<Data> = {
         'Mystic Flame': 'Flammes mystiques',
         'Mystic Light': 'Lumière mystique',
         'Order To Detonate': 'Ordre de s\'auto-détruire',
-        'Ring Of Chaos': 'Anneau du chaos',
+        'Ring Of Chaos(?!/)': 'Anneau du chaos',
+        'Ring Of Chaos/Cross Of Chaos': 'Anneau/Croix du chaos',
+        'Ring Of Chaos/Circle Of Chaos': 'Anneau/Cercle du chaos',
         'Rising Seas': 'Montée des eaux',
         'Rusting Claw': 'Griffes de ruine',
         'Self-Detonate': 'Auto-atomisation',

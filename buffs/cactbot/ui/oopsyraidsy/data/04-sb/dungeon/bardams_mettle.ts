@@ -13,14 +13,19 @@ export type Data = OopsyData;
 // If the flag is present,a full trigger object is returned that drops in seamlessly.
 const abilityWarn = (args: { abilityId: string; id: string }): OopsyTrigger<Data> => {
   if (!args.abilityId)
-    console.error('Missing ability ' + JSON.stringify(args));
+    console.error(`Missing ability ${JSON.stringify(args)}`);
   const trigger: OopsyTrigger<Data> = {
     id: args.id,
     type: 'Ability',
-    netRegex: NetRegexes.abilityFull({ id: args.abilityId }),
-    condition: (_data, matches) => matches.flags.substr(-2) === '0E',
+    netRegex: NetRegexes.ability({ id: args.abilityId }),
+    condition: (_data, matches) => matches.flags.endsWith('0E'),
     mistake: (_data, matches) => {
-      return { type: 'warn', blame: matches.target, reportId: matches.targetId, text: matches.ability };
+      return {
+        type: 'warn',
+        blame: matches.target,
+        reportId: matches.targetId,
+        text: matches.ability,
+      };
     },
   };
   return trigger;
@@ -41,15 +46,6 @@ const triggerSet: OopsyTriggerSet<Data> = {
     'Bardam Double Smash': '26A', // Circle AoE, Mettling Dhara trash
     'Bardam Transonic Blast': '1262', // Circle AoE, Steppe Eagle trash
     'Bardam Wild Horn': '2208', // Frontal cleave, Khun Gurvel trash
-    'Bardam Heavy Strike 1': '2578', // 1 of 3 270-degree ring AoEs, Bardam, second boss
-    'Bardam Heavy Strike 2': '2579', // 2 of 3 270-degree ring AoEs, Bardam, second boss
-    'Bardam Heavy Strike 3': '257A', // 3 of 3 270-degree ring AoEs, Bardam, second boss
-    'Bardam Tremblor 1': '257B', // 1 of 2 concentric ring AoEs, Bardam, second boss
-    'Bardam Tremblor 2': '257C', // 2 of 2 concentric ring AoEs, Bardam, second boss
-    'Bardam Throwing Spear': '257F', // Checkerboard AoE, Throwing Spear, second boss
-    'Bardam Bardam\'s Ring': '2581', // Donut AoE headmarkers, Bardam, second boss
-    'Bardam Comet': '257D', // Targeted circle AoEs, Bardam, second boss
-    'Bardam Comet Impact': '2580', // Circle AoEs, Star Shard, second boss
     'Bardam Iron Sphere Attack': '16B6', // Contact damage, Iron Sphere trash, before third boss
     'Bardam Tornado': '247E', // Circle AoE, Khun Shavara trash
     'Bardam Pinion': '1F11', // Line AoE, Yol Feather, third boss
@@ -83,7 +79,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
     // Gaze attack, Warrior of Bardam, second boss
     abilityWarn({ id: 'Bardam Empty Gaze', abilityId: '1F04' }),
     // Donut AoE headmarkers, Bardam, second boss
-    abilityWarn({ id: 'Bardam\'s Ring', abilityId: '2581' }),
+    abilityWarn({ id: 'Bardam Bardam\'s Ring', abilityId: '2581' }),
     // Targeted circle AoEs, Bardam, second boss
     abilityWarn({ id: 'Bardam Comet', abilityId: '257D' }),
     // Circle AoEs, Star Shard, second boss

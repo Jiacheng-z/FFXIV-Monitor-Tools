@@ -1,4 +1,3 @@
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -8,56 +7,43 @@ export type Data = RaidbossData;
 
 // Tsukuyomi Normal
 const triggerSet: TriggerSet<Data> = {
+  id: 'CastrumFluminis',
   zoneId: ZoneId.CastrumFluminis,
   timelineFile: 'tsukuyomi.txt',
   triggers: [
     {
       id: 'Tsukuyomi Torment Unto Death',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2BE3', source: 'Tsukuyomi' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2BE3', source: 'Tsukuyomi' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2BE3', source: 'Tsukuyomi' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2BE3', source: 'ツクヨミ' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2BE3', source: '月读' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2BE3', source: '츠쿠요미' }),
+      netRegex: { id: '2BE3', source: 'Tsukuyomi' },
       response: Responses.tankCleave(),
     },
     {
       id: 'Tsukuyomi Reprimand',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2BE2', source: 'Tsukuyomi', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2BE2', source: 'Tsukuyomi', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2BE2', source: 'Tsukuyomi', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2BE2', source: 'ツクヨミ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2BE2', source: '月读', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2BE2', source: '츠쿠요미', capture: false }),
+      netRegex: { id: '2BE2', source: 'Tsukuyomi', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Tsukuyomi Midnight Haze',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatantFull({ npcNameId: '7230', capture: false }),
+      netRegex: { npcNameId: '7230', capture: false },
       response: Responses.killAdds(),
     },
     {
       id: 'Tsukuyomi Lead Of The Underworld',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2BE6', source: 'Tsukuyomi' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2BE6', source: 'Tsukuyomi' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2BE6', source: 'Tsukuyomi' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2BE6', source: 'ツクヨミ' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2BE6', source: '月读' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2BE6', source: '츠쿠요미' }),
+      netRegex: { id: '2BE6', source: 'Tsukuyomi' },
       alertText: (data, matches, output) => {
         if (data.me === matches.target)
           return output.lineStackOnYou!();
-        return output.lineStackOn!({ player: data.ShortName(matches.target) });
+        return output.lineStackOn!({ player: data.party.member(matches.target) });
       },
       outputStrings: {
         lineStackOnYou: {
           en: 'Line Stack on YOU',
           de: 'Linien Stack auf DIR',
           fr: 'Package en ligne sur VOUS',
+          ja: '直線頭割り',
           cn: '直线分摊点名',
           ko: '직선 쉐어 대상자',
         },
@@ -65,6 +51,7 @@ const triggerSet: TriggerSet<Data> = {
           en: 'Line Stack on ${player}',
           de: 'Linien Stack auf ${player}',
           fr: 'Package en ligne sur ${player}',
+          ja: '${player}に直線頭割り',
           cn: '直线分摊点${player}',
           ko: '${player} 직선 쉐어',
         },
@@ -73,24 +60,19 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Tsukuyomi Nightbloom',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '2CB0', source: 'Tsukuyomi', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '2CB0', source: 'Tsukuyomi', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '2CB0', source: 'Tsukuyomi', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '2CB0', source: 'ツクヨミ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '2CB0', source: '月读', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '2CB0', source: '츠쿠요미', capture: false }),
+      netRegex: { id: '2CB0', source: 'Tsukuyomi', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Tsukuyomi Lunacy',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '003E' }),
+      netRegex: { id: '003E' },
       response: Responses.stackMarkerOn(),
     },
     {
       id: 'Tsukuyomi Moonlit Debuff',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '602' }),
+      netRegex: { effectId: '602' },
       condition: (data, matches) => {
         if (matches.target !== data.me)
           return false;
@@ -101,7 +83,7 @@ const triggerSet: TriggerSet<Data> = {
         text: {
           en: 'Move to Black!',
           de: 'In\'s schwarze laufen!',
-          fr: 'Bougez en zone noire !',
+          fr: 'Allez en zone noire !',
           ja: '新月に！',
           cn: '踩黑色！',
           ko: '검정색으로 이동!',
@@ -111,7 +93,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Tsukuyomi Moonshadowed Debuff',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '603' }),
+      netRegex: { effectId: '603' },
       condition: (data, matches) => {
         if (matches.target !== data.me)
           return false;
@@ -122,7 +104,7 @@ const triggerSet: TriggerSet<Data> = {
         text: {
           en: 'Move to White!',
           de: 'In\'s weiße laufen!',
-          fr: 'Bougez en zone blanche !',
+          fr: 'Allez en zone blanche !',
           ja: '満月に！',
           cn: '踩白色！',
           ko: '흰색으로 이동!',
@@ -134,12 +116,7 @@ const triggerSet: TriggerSet<Data> = {
       // 2BFD is an unnamed ability that happens ~5 seconds before Dance Of The Dead.
       // Dance Of The Dead has no castbar.
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '2BFD', source: 'Tsukuyomi', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: '2BFD', source: 'Tsukuyomi', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: '2BFD', source: 'Tsukuyomi', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: '2BFD', source: 'ツクヨミ', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: '2BFD', source: '月读', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: '2BFD', source: '츠쿠요미', capture: false }),
+      netRegex: { id: '2BFD', source: 'Tsukuyomi', capture: false },
       response: Responses.aoe(),
     },
   ],
@@ -190,7 +167,6 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       'locale': 'fr',
-      'missingTranslations': true,
       'replaceSync': {
         'Dancing Fan': 'maiôgi',
         'Moonlight': 'Clair de lune',
@@ -201,6 +177,8 @@ const triggerSet: TriggerSet<Data> = {
         'Tsukuyomi': 'Tsukuyomi',
       },
       'replaceText': {
+        '--Empire/Homeland Adds': '--Adds Impériaux/Domiens--',
+        '--Patriarch/Matriarch Adds--': '--Adds Parâtres/Marâtres--',
         'Antitwilight': 'Belle-de-nuit',
         'Bright Blade/Dark Blade': 'Lame blafarde/ténébreuse',
         'Concentrativity': 'Kenki concentré',

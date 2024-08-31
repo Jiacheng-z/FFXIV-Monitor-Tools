@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -13,6 +12,7 @@ export interface Data extends RaidbossData {
 }
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'DunScaith',
   zoneId: ZoneId.DunScaith,
   timelineFile: 'dun_scaith.txt',
   timelineTriggers: [
@@ -28,19 +28,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Dun Scaith Generic Stack-up',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '003E' }),
+      netRegex: { id: '003E' },
       response: Responses.stackMarkerOn(),
     },
     // DEATHGAZE
     {
       id: 'Dun Scaith Void Death Circle',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['1C7F', '1C90'], source: 'Deathgaze Hollow', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: ['1C7F', '1C90'], source: 'Nihil-Thanatos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: ['1C7F', '1C90'], source: 'Mortalis Nihil', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: ['1C7F', '1C90'], source: 'デスゲイズ・ホロー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: ['1C7F', '1C90'], source: '虚空死亡凝视', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: ['1C7F', '1C90'], source: '공허의 저승파수꾼', capture: false }),
+      netRegex: { id: ['1C7F', '1C90'], source: 'Deathgaze Hollow', capture: false },
       suppressSeconds: 5,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -60,12 +55,7 @@ const triggerSet: TriggerSet<Data> = {
       // This would allow for notifying who needs cleansing directly, but might be spammy
       id: 'Dun Scaith Doom',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['1C84', '1C85'], source: 'Deathgaze Hollow', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: ['1C84', '1C85'], source: 'Nihil-Thanatos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: ['1C84', '1C85'], source: 'Mortalis Nihil', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: ['1C84', '1C85'], source: 'デスゲイズ・ホロー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: ['1C84', '1C85'], source: '虚空死亡凝视', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: ['1C84', '1C85'], source: '공허의 저승파수꾼', capture: false }),
+      netRegex: { id: ['1C84', '1C85'], source: 'Deathgaze Hollow', capture: false },
       condition: (data) => data.CanCleanse(),
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -84,19 +74,14 @@ const triggerSet: TriggerSet<Data> = {
       // The actual knockback cast is Void Aero IV, but it gives only 2-3s warning.
       id: 'Dun Scaith Blizzard Pillars',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1C8B', source: 'Deathgaze Hollow', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1C8B', source: 'Nihil-Thanatos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1C8B', source: 'Mortalis Nihil', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1C8B', source: 'デスゲイズ・ホロー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1C8B', source: '虚空死亡凝视', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1C8B', source: '공허의 저승파수꾼', capture: false }),
+      netRegex: { id: '1C8B', source: 'Deathgaze Hollow', capture: false },
       suppressSeconds: 5,
       response: Responses.knockback(),
     },
     {
       id: 'Dun Scaith Void Sprite',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatantFull({ npcNameId: '5508', capture: false }),
+      netRegex: { npcNameId: '5508', capture: false },
       suppressSeconds: 10,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -113,7 +98,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Dun Scaith Aero 2',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0046' }),
+      netRegex: { id: '0046' },
       condition: Conditions.targetIsYou(),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -133,12 +118,7 @@ const triggerSet: TriggerSet<Data> = {
       // Mechanically the handling is the same
       id: 'Dun Scaith Aero 3',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['1C7B', '1C8D'], source: 'Deathgaze Hollow', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: ['1C7B', '1C8D'], source: 'Nihil-Thanatos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: ['1C7B', '1C8D'], source: 'Mortalis Nihil', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: ['1C7B', '1C8D'], source: 'デスゲイズ・ホロー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: ['1C7B', '1C8D'], source: '虚空死亡凝视', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: ['1C7B', '1C8D'], source: '공허의 저승파수꾼', capture: false }),
+      netRegex: { id: ['1C7B', '1C8D'], source: 'Deathgaze Hollow', capture: false },
       suppressSeconds: 5,
       response: Responses.knockback(),
     },
@@ -148,12 +128,7 @@ const triggerSet: TriggerSet<Data> = {
       // and neither seems to target players directly.
       id: 'Dun Scaith Void Death Squares',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['1C82', '1C83'], source: 'Deathgaze Hollow', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: ['1C82', '1C83'], source: 'Nihil-Thanatos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: ['1C82', '1C83'], source: 'Mortalis Nihil', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: ['1C82', '1C83'], source: 'デスゲイズ・ホロー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: ['1C82', '1C83'], source: '虚空死亡凝视', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: ['1C82', '1C83'], source: '공허의 저승파수꾼', capture: false }),
+      netRegex: { id: ['1C82', '1C83'], source: 'Deathgaze Hollow', capture: false },
       suppressSeconds: 5,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -171,7 +146,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Dun Scaith Scythe Drop',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0017' }),
+      netRegex: { id: '0017' },
       condition: Conditions.targetIsYou(),
       suppressSeconds: 5,
       infoText: (_data, _matches, output) => output.text!(),
@@ -182,19 +157,14 @@ const triggerSet: TriggerSet<Data> = {
           fr: 'Déposez la faux à l\'extérieur',
           ja: 'ブラックウインド、外に置く',
           cn: '场地边缘放镰刀',
-          ko: '외곽으로',
+          ko: '낫 외곽으로 유도',
         },
       },
     },
     {
       id: 'Dun Scaith Jongleur\'s X',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1C98', source: 'Ferdiad Hollow' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1C98', source: 'Nihil-Ferdiad' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1C98', source: 'Ferdiad Nihil' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1C98', source: 'フェルディア・ホロー' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1C98', source: '虚空弗迪亚' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1C98', source: '공허의 페르디아' }),
+      netRegex: { id: '1C98', source: 'Ferdiad Hollow' },
       response: Responses.tankBuster(),
     },
     {
@@ -205,7 +175,7 @@ const triggerSet: TriggerSet<Data> = {
       // To avoid this, we store the IDs of Atomos for later comparison.
       id: 'Dun Scaith Atomos Setup',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatantFull({ npcNameId: ['5510', '5511'] }),
+      netRegex: { npcNameId: ['5510', '5511'] },
       run: (data, matches) => {
         data.cursing ??= [];
         data.wailing ??= [];
@@ -218,7 +188,7 @@ const triggerSet: TriggerSet<Data> = {
       // 1C9F:Aether is the circle AoE, 1CA0:Aetherial Chakram is the donut AoE
       id: 'Dun Scaith Atomos Compile',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['1C9F', '1CA0'] }),
+      netRegex: { id: ['1C9F', '1CA0'] },
       delaySeconds: .5,
       run: (data, matches) => {
         data.sphere ??= [];
@@ -233,7 +203,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Dun Scaith Atomos Response',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['1C9F', '1CA0'], capture: false }),
+      netRegex: { id: ['1C9F', '1CA0'], capture: false },
       delaySeconds: 1,
       suppressSeconds: 5,
       alertText: (data, _matches, output) => {
@@ -264,7 +234,7 @@ const triggerSet: TriggerSet<Data> = {
           fr: 'Allez sous une Gueule non liée',
           ja: '線のないアトモスに近づく',
           cn: '靠近无线小怪',
-          ko: '아트모스 근처로',
+          ko: '아무 아트모스 근처로',
         },
         avoidAllUntethered: {
           en: 'Avoid All Untethered',
@@ -311,7 +281,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Dun Scaith Atomos Cleanup',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: ['1CA1', '1CA2'], capture: false }),
+      netRegex: { id: ['1CA1', '1CA2'], capture: false },
       run: (data) => {
         delete data.cursing;
         delete data.wailing;
@@ -322,12 +292,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Dun Scaith Blackfire',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1CAA', source: 'Ferdiad Hollow', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1CAA', source: 'Nihil-Ferdiad', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1CAA', source: 'Ferdiad Nihil', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1CAA', source: 'フェルディア・ホロー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1CAA', source: '虚空弗迪亚', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1CAA', source: '공허의 페르디아', capture: false }),
+      netRegex: { id: '1CAA', source: 'Ferdiad Hollow', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -344,7 +309,7 @@ const triggerSet: TriggerSet<Data> = {
       // https://xivapi.com/Status/1137
       id: 'Dun Scaith Debilitator Fire',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '471', capture: false }),
+      netRegex: { effectId: '471', capture: false },
       suppressSeconds: 10,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -362,7 +327,7 @@ const triggerSet: TriggerSet<Data> = {
       // https://xivapi.com/Status/1157
       id: 'Dun Scaith Debilitator Water',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '485', capture: false }),
+      netRegex: { effectId: '485', capture: false },
       suppressSeconds: 10,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -381,18 +346,13 @@ const triggerSet: TriggerSet<Data> = {
       // Covers both 1E52 Aetherochemical Flare and 1D9D Supernova. Response to both is the same.
       id: 'Dun Scaith Proto-Ultima Raid Damage',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['1E52', '1D9D'], source: 'Proto Ultima', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: ['1E52', '1D9D'], source: 'Proto-Ultima', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: ['1E52', '1D9D'], source: 'Proto-Ultima', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: ['1E52', '1D9D'], source: 'プロトアルテマ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: ['1E52', '1D9D'], source: '究极神兵原型', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: ['1E52', '1D9D'], source: '프로토 알테마', capture: false }),
+      netRegex: { id: ['1E52', '1D9D'], source: 'Proto Ultima', capture: false },
       response: Responses.aoe(),
     },
     {
       id: 'Dun Scaith Prey Markers',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '232' }),
+      netRegex: { effectId: '232' },
       condition: Conditions.targetIsYou(),
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -402,7 +362,7 @@ const triggerSet: TriggerSet<Data> = {
           fr: 'Marquage - Évitez les autres et bougez',
           ja: 'マーキング - 外に移動し続ける',
           cn: '离开人群并保持移动',
-          ko: '파티에게서 떨어지고 움직이기',
+          ko: '파티에서 떨어지고 계속 움직이기',
         },
       },
     },
@@ -411,7 +371,7 @@ const triggerSet: TriggerSet<Data> = {
       // The cast time on Aetheromodulator is under 3 seconds
       id: 'Dun Scaith Bit Circles',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatantFull({ npcNameId: '3782', capture: false }),
+      netRegex: { npcNameId: '3782', capture: false },
       suppressSeconds: 5,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -428,7 +388,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Dun Scaith Aether Collectors',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatantFull({ npcNameId: '3781', capture: false }),
+      netRegex: { npcNameId: '3781', capture: false },
       suppressSeconds: 5,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -447,12 +407,7 @@ const triggerSet: TriggerSet<Data> = {
       // The actual attack is 1D20, but the castbar windup is 1D1F
       id: 'Dun Scaith Shadespin',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1D1[EF]', source: 'Scathach', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1D1[EF]', source: 'Scathach', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1D1[EF]', source: 'Scáthach', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1D1[EF]', source: 'スカアハ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1D1[EF]', source: '斯卡哈', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1D1[EF]', source: '스카하크', capture: false }),
+      netRegex: { id: '1D1[EF]', source: 'Scathach', capture: false },
       suppressSeconds: 5,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -469,24 +424,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Dun Scaith Thirty Thorns',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: ['1D1B', '1D2B'], source: 'Scathach', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: ['1D1B', '1D2B'], source: 'Scathach', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: ['1D1B', '1D2B'], source: 'Scáthach', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: ['1D1B', '1D2B'], source: 'スカアハ', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: ['1D1B', '1D2B'], source: '斯卡哈', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: ['1D1B', '1D2B'], source: '스카하크', capture: false }),
+      netRegex: { id: ['1D1B', '1D2B'], source: 'Scathach', capture: false },
       suppressSeconds: 5,
       response: Responses.outOfMelee(),
     },
     {
       id: 'Dun Scaith Thirty Arrows',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1D2F', source: 'Scathach', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1D2F', source: 'Scathach', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1D2F', source: 'Scáthach', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1D2F', source: 'スカアハ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1D2F', source: '斯卡哈', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1D2F', source: '스카하크', capture: false }),
+      netRegex: { id: '1D2F', source: 'Scathach', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -502,32 +447,25 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Dun Scaith Thirty Souls',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1D32', source: 'Scathach', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1D32', source: 'Scathach', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1D32', source: 'Scáthach', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1D32', source: 'スカアハ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1D32', source: '斯卡哈', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1D32', source: '스카하크', capture: false }),
+      netRegex: { id: '1D32', source: 'Scathach', capture: false },
       response: Responses.aoe(),
     },
     {
-      // Ordinarily we wouldn't use a game log line for this.
+      // Ordinarily we wouldn't use a log message for this.
       // However, the RP text seems to be the only indicator.
+      // (Not a MapEffect packet either.)
+      // https://xivapi.com/LogMessage/2747
+      // en: Shadows gather on the floor.
       id: 'Dun Scaith Shadow Links',
-      type: 'GameLog',
-      netRegex: NetRegexes.message({ line: 'Shadows gather on the floor.*?', capture: false }),
-      netRegexDe: NetRegexes.message({ line: 'Schatten sammeln sich auf dem Boden.*?', capture: false }),
-      netRegexFr: NetRegexes.message({ line: 'Le pouvoir des ombres se concentre sur le sol.*?', capture: false }),
-      netRegexJa: NetRegexes.message({ line: '床に影の力が集束していく.*?', capture: false }),
-      netRegexCn: NetRegexes.message({ line: '影之力正在向地面聚集.*?', capture: false }),
-      netRegexKo: NetRegexes.message({ line: '바닥에 그림자의 힘이 모여듭니다.*?', capture: false }),
+      type: 'SystemLogMessage',
+      netRegex: { id: 'ABB', capture: false },
       suppressSeconds: 5,
       response: Responses.stopMoving(),
     },
     {
       id: 'Dun Scaith Shadow Limb Spawn',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatantFull({ npcNameId: '5516', capture: false }),
+      netRegex: { npcNameId: '5516', capture: false },
       suppressSeconds: 5,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -544,12 +482,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Dun Scaith Connla Spawn',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1CD1', source: 'Connla', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1CD1', source: 'Connla', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1CD1', source: 'Connla', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1CD1', source: 'コンラ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1CD1', source: '康拉', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1CD1', source: '콘라', capture: false }),
+      netRegex: { id: '1CD1', source: 'Connla', capture: false },
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -566,7 +499,7 @@ const triggerSet: TriggerSet<Data> = {
       // This trigger is common to both Scathach and Diabolos, since handling is 100% identical.
       id: 'Dun Scaith Nox Orbs',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '005C' }),
+      netRegex: { id: '005C' },
       condition: Conditions.targetIsYou(),
       suppressSeconds: 5,
       alertText: (_data, _matches, output) => output.text!(),
@@ -577,7 +510,7 @@ const triggerSet: TriggerSet<Data> = {
           fr: 'Prenez l\'orbe à l\'extérieur',
           ja: '黒い球体を外に引く',
           cn: '把球带出人群，移动到球不再出现为止',
-          ko: '외곽으로 유도',
+          ko: '구슬 외곽으로 유도',
         },
       },
     },
@@ -585,46 +518,26 @@ const triggerSet: TriggerSet<Data> = {
       // This trigger is common to both Scathach and Diabolos, since handling is 100% identical.
       id: 'Dun Scaith Shadethrust',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['1D23', '1C1A'], source: ['Scathach', 'Diabolos Hollow'], capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: ['1D23', '1C1A'], source: ['Scathach', 'Nihil-Diabolos'], capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: ['1D23', '1C1A'], source: ['Scáthach', 'Diabolos Nihil'], capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: ['1D23', '1C1A'], source: ['スカアハ', 'ディアボロス・ホロー'], capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: ['1D23', '1C1A'], source: ['斯卡哈', '虚空迪亚波罗斯'], capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: ['1D23', '1C1A'], source: ['스카하크', '공허의 디아볼로스'], capture: false }),
+      netRegex: { id: ['1D23', '1C1A'], source: ['Scathach', 'Diabolos Hollow'], capture: false },
       response: Responses.awayFromFront(),
     },
     // DIABOLOS
     {
       id: 'Dun Scaith Ultimate Terror',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1C12', source: 'Diabolos', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1C12', source: 'Diabolos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1C12', source: 'Diabolos', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1C12', source: 'ディアボロス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1C12', source: '迪亚波罗斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1C12', source: '디아볼로스', capture: false }),
+      netRegex: { id: '1C12', source: 'Diabolos', capture: false },
       response: Responses.getIn(),
     },
     {
       id: 'Dun Scaith Nightmare',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['1C0E', '1C20'], capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: ['1C0E', '1C20'], capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: ['1C0E', '1C20'], capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: ['1C0E', '1C20'], capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: ['1C0E', '1C20'], capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: ['1C0E', '1C20'], capture: false }),
+      netRegex: { id: ['1C0E', '1C20'], capture: false },
       response: Responses.lookAway(),
     },
     {
       id: 'Dun Scaith Noctoshield',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ target: 'Diabolos', effectId: '1AA', capture: false }),
-      netRegexDe: NetRegexes.gainsEffect({ target: 'Diabolos', effectId: '1AA', capture: false }),
-      netRegexFr: NetRegexes.gainsEffect({ target: 'Diabolos', effectId: '1AA', capture: false }),
-      netRegexJa: NetRegexes.gainsEffect({ target: 'ディアボロス', effectId: '1AA', capture: false }),
-      netRegexCn: NetRegexes.gainsEffect({ target: '迪亚波罗斯', effectId: '1AA', capture: false }),
-      netRegexKo: NetRegexes.gainsEffect({ target: '디아볼로스', effectId: '1AA', capture: false }),
+      netRegex: { target: 'Diabolos', effectId: '1AA', capture: false },
       suppressSeconds: 5,
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -641,19 +554,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Dun Scaith Ruinous Omen',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['1C10', '1C11'], source: 'Diabolos', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: ['1C10', '1C11'], source: 'Diabolos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: ['1C10', '1C11'], source: 'Diabolos', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: ['1C10', '1C11'], source: 'ディアボロス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: ['1C10', '1C11'], source: '迪亚波罗斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: ['1C10', '1C11'], source: '디아볼로스', capture: false }),
+      netRegex: { id: ['1C10', '1C11'], source: 'Diabolos', capture: false },
       suppressSeconds: 5,
       response: Responses.aoe(),
     },
     {
       id: 'Dun Scaith Deathgates',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatantFull({ npcNameId: '5523', capture: false }),
+      netRegex: { npcNameId: '5523', capture: false },
       suppressSeconds: 5,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -670,23 +578,18 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Dun Scaith Camisado',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1C19', source: 'Diabolos Hollow' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1C19', source: 'Nihil-Diabolos' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1C19', source: 'Diabolos Nihil' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1C19', source: 'ディアボロス・ホロー' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1C19', source: '虚空迪亚波罗斯' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1C19', source: '공허의 디아볼로스' }),
+      netRegex: { id: '1C19', source: 'Diabolos Hollow' },
       response: Responses.tankBuster(),
     },
     {
       id: 'Dun Scaith Hollow Night',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '005B' }),
+      netRegex: { id: '005B' },
       alertText: (data, matches, output) => {
         if (matches.target === data.me)
           return output.gazeStackOnYou!();
 
-        return output.stackOnAndLookAway!({ player: data.ShortName(matches.target) });
+        return output.stackOnAndLookAway!({ player: data.party.member(matches.target) });
       },
       outputStrings: {
         gazeStackOnYou: {
@@ -710,12 +613,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Dun Scaith Hollow Omen',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['1C22', '1C23'], source: 'Diabolos Hollow', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: ['1C22', '1C23'], source: 'Nihil-Diabolos', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: ['1C22', '1C23'], source: 'Diabolos Nihil', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: ['1C22', '1C23'], source: 'ディアボロス・ホロー', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: ['1C22', '1C23'], source: '虚空迪亚波罗斯', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: ['1C22', '1C23'], source: '공허의 디아볼로스', capture: false }),
+      netRegex: { id: ['1C22', '1C23'], source: 'Diabolos Hollow', capture: false },
       suppressSeconds: 5,
       response: Responses.bigAoe(),
     },
@@ -723,13 +621,13 @@ const triggerSet: TriggerSet<Data> = {
       // This is the tank version of the stack marker. It has minimal circular bordering
       id: 'Dun Scaith Blindside',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '005D' }),
+      netRegex: { id: '005D' },
       response: Responses.stackMarkerOn(),
     },
     {
       id: 'Dun Scaith Earth Shaker',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0028' }),
+      netRegex: { id: '0028' },
       condition: Conditions.targetIsYou(),
       response: Responses.earthshaker(),
     },
@@ -738,7 +636,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       'locale': 'de',
       'replaceSync': {
-        'Aether': 'Äthersphäre',
+        'Aether(?!i)': 'Äthersphäre',
         'Aether Collector': 'Ätherakkumulator',
         'Aetherial Chakram': 'ätherisch(?:e|er|es|en) Chakram',
         'Connla': 'Connla',
@@ -754,7 +652,6 @@ const triggerSet: TriggerSet<Data> = {
         'Scathach': 'Scathach',
         'Shadow Limb': 'Schattenhand',
         'Shadowcourt Jester': 'Schattenhof-Narr',
-        'Shadows gather on the floor': 'Schatten sammeln sich auf dem Boden',
         'The Queen\'s Graces': 'Anmut der Königin',
         'The Queen\'s Pride': 'Stolz der Königin',
         'The Rostrum': 'Podium',
@@ -839,7 +736,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       'locale': 'fr',
       'replaceSync': {
-        'Aether': 'sphère éthérée',
+        'Aether(?!i)': 'sphère éthérée',
         'Aether Collector': 'accumulateur d\'éther',
         'Aetherial Chakram': 'chakram éthéré',
         'Connla': 'Connla',
@@ -855,7 +752,6 @@ const triggerSet: TriggerSet<Data> = {
         'Scathach': 'Scáthach',
         'Shadow Limb': 'Mains d\'ombre',
         'Shadowcourt Jester': 'bouffon de la Cour des ombres',
-        'Shadows gather on the floor': 'Le pouvoir des ombres se concentre sur le sol',
         'The Queen\'s Graces': 'Grâces de la Reine',
         'The Queen\'s Pride': 'Fierté de la Reine',
         'The Rostrum': 'Scène',
@@ -955,7 +851,6 @@ const triggerSet: TriggerSet<Data> = {
         'Scathach': 'スカアハ',
         'Shadow Limb': '影の手',
         'Shadowcourt Jester': 'クィーンズ・ジェスター',
-        'Shadows gather on the floor': '床に影の力が集束していく',
         'The Queen\'s Graces': '女王の間',
         'The Queen\'s Pride': '女王の観閲広場',
         'The Rostrum': '道化の舞台',
@@ -1056,7 +951,6 @@ const triggerSet: TriggerSet<Data> = {
         'Scathach': '斯卡哈',
         'Shadow Limb': '影之手',
         'Shadowcourt Jester': '女王小丑',
-        'Shadows gather on the floor': '影之力正在向地面聚集',
         'The Queen\'s Graces': '女王之间',
         'The Queen\'s Pride': '女王的阅兵广场',
         'The Rostrum': '小丑舞台',
@@ -1141,7 +1035,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       'locale': 'ko',
       'replaceSync': {
-        'Aether': '에테르 구체',
+        'Aether(?!i)': '에테르 구체',
         'Aether Collector': '에테르 집적기',
         'Aetherial Chakram': '에테르 차크람',
         'Connla': '콘라',
@@ -1157,7 +1051,6 @@ const triggerSet: TriggerSet<Data> = {
         'Scathach': '스카하크',
         'Shadow Limb': '그림자 손',
         'Shadowcourt Jester': '여왕의 어릿광대',
-        'Shadows gather on the floor': '바닥에 그림자의 힘이 모여듭니다',
         'The Queen\'s Graces': '여왕의 방',
         'The Queen\'s Pride': '여왕의 사열 광장',
         'The Rostrum': '광대의 무대',

@@ -1,4 +1,3 @@
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -9,6 +8,7 @@ export interface Data extends RaidbossData {
 }
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'BrayfloxsLongstop',
   zoneId: ZoneId.BrayfloxsLongstop,
   initData: () => {
     return {
@@ -19,38 +19,29 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'Brayflox Normal Numbing Breath',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1FA', source: 'Great Yellow Pelican' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1FA', source: 'Groß(?:e|er|es|en) Gelbpelikan' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1FA', source: 'Grand Pélican Jaune' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1FA', source: 'グレート・イエローペリカン' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1FA', source: '大黄鹈鹕' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1FA', source: '노란 왕사다새' }),
+      netRegex: { id: '1FA', source: 'Great Yellow Pelican' },
       condition: (data) => data.CanStun(),
       response: Responses.stun('info'),
     },
     {
       id: 'Brayflox Normal Pelican Poison Collect',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '12' }),
+      netRegex: { effectId: '12' },
       condition: (data) => data.CanCleanse(),
       run: (data, matches) => data.pelicanPoisons.push(matches.target),
     },
     {
       id: 'Brayflox Normal Pelican Poison Healer',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '12', capture: false }),
+      netRegex: { effectId: '12', capture: false },
       condition: (data) => data.CanCleanse(),
       delaySeconds: 1,
       suppressSeconds: 2,
       alertText: (data, _matches, output) => {
-        if (!data.pelicanPoisons)
-          return;
-
         const names = data.pelicanPoisons.sort();
         if (names.length === 1 && names[0] === data.me)
           return output.esunaYourPoison!();
-
-        return output.esunaPoisonOn!({ players: names.map((x) => data.ShortName(x)).join(', ') });
+        return output.esunaPoisonOn!({ players: names.map((x) => data.party.member(x)) });
       },
       run: (data) => data.pelicanPoisons = [],
       outputStrings: {
@@ -79,19 +70,14 @@ const triggerSet: TriggerSet<Data> = {
       // from activating early when you pick up the Headgate Key and the boss and adds spawn.
       id: 'Brayflox Normal Pelican Adds',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatantFull({ npcNameId: '1283', capture: false }),
+      netRegex: { npcNameId: '1283', capture: false },
       suppressSeconds: 2,
       response: Responses.killAdds(),
     },
     {
       id: 'Brayflox Normal Ashdrake Burning Cyclone',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '205', source: 'Ashdrake' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '205', source: 'Asch-Drakon' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '205', source: 'Draconide Des Cendres' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '205', source: 'アッシュドレイク' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '205', source: '白烬火蛟' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '205', source: '잿빛도마뱀' }),
+      netRegex: { id: '205', source: 'Ashdrake' },
       condition: (data) => data.CanStun(),
       response: Responses.stun('info'),
     },
@@ -99,18 +85,13 @@ const triggerSet: TriggerSet<Data> = {
       // Tempest Biast Spawn
       id: 'Brayflox Normal Tempest Biast',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatantFull({ npcNameId: '1285', capture: false }),
+      netRegex: { npcNameId: '1285', capture: false },
       response: Responses.killAdds(),
     },
     {
       id: 'Brayflox Normal Inferno Drake Burning Cyclone',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '3D8', source: 'Inferno Drake' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '3D8', source: 'Sonnen-Drakon' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '3D8', source: 'Draconide Des Brasiers' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '3D8', source: 'インフェルノドレイク' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '3D8', source: '狱炎火蛟' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '3D8', source: '지옥불 도마뱀' }),
+      netRegex: { id: '3D8', source: 'Inferno Drake' },
       condition: (data) => data.CanStun(),
       response: Responses.stun('info'),
     },
@@ -118,15 +99,10 @@ const triggerSet: TriggerSet<Data> = {
       // Hellbender Bubble
       id: 'Brayflox Normal Hellbender Effluvium',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '3D3', source: 'Hellbender' }),
-      netRegexDe: NetRegexes.ability({ id: '3D3', source: 'Höllenkrümmer' }),
-      netRegexFr: NetRegexes.ability({ id: '3D3', source: 'Ménopome' }),
-      netRegexJa: NetRegexes.ability({ id: '3D3', source: 'ヘルベンダー' }),
-      netRegexCn: NetRegexes.ability({ id: '3D3', source: '水栖蝾螈' }),
-      netRegexKo: NetRegexes.ability({ id: '3D3', source: '장수도롱뇽' }),
+      netRegex: { id: '3D3', source: 'Hellbender' },
       infoText: (data, matches, output) => {
         if (matches.target !== data.me)
-          return output.breakBubbleOn!({ player: data.ShortName(matches.target) });
+          return output.breakBubbleOn!({ player: data.party.member(matches.target) });
 
         if (matches.target === data.me)
           return output.breakYourBubble!();
@@ -154,12 +130,7 @@ const triggerSet: TriggerSet<Data> = {
       // Stunnable Line Attack
       id: 'Brayflox Normal Aiatar Dragon Breath',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '22F', source: 'Aiatar' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '22F', source: 'Aiatar' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '22F', source: 'Aiatar' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '22F', source: 'アイアタル' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '22F', source: '阿杰特' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '22F', source: '아이아타르' }),
+      netRegex: { id: '22F', source: 'Aiatar' },
       condition: (data) => data.CanStun(),
       response: Responses.stun('info'),
     },
@@ -167,7 +138,7 @@ const triggerSet: TriggerSet<Data> = {
       // Move Aiatar out of Puddles
       id: 'Brayflox Normal Aiatar Toxic Vomit Tank',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '117', capture: false }),
+      netRegex: { effectId: '117', capture: false },
       condition: (data) => data.role === 'tank',
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -186,11 +157,11 @@ const triggerSet: TriggerSet<Data> = {
       // This triggers on both Salivous Snap and Puddle Poison Application
       id: 'Brayflox Normal Aiatar Poison Healer',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '113' }),
+      netRegex: { effectId: '113' },
       condition: (data) => data.CanCleanse(),
       alertText: (data, matches, output) => {
         if (matches.target !== data.me)
-          return output.esunaPoisonOn!({ player: data.ShortName(matches.target) });
+          return output.esunaPoisonOn!({ player: data.party.member(matches.target) });
 
         return output.esunaYourPoison!();
       },
@@ -213,6 +184,12 @@ const triggerSet: TriggerSet<Data> = {
         },
       },
     },
+    {
+      id: 'Brayflox Normal Aiatar Salivous Snap',
+      type: 'StartsUsing',
+      netRegex: { id: '6FF3', source: 'Aiatar' },
+      response: Responses.tankBuster(),
+    },
   ],
   timelineReplace: [
     {
@@ -220,7 +197,7 @@ const triggerSet: TriggerSet<Data> = {
       'replaceSync': {
         'Aiatar': 'Aiatar',
         'Ashdrake': 'Asch-Drakon',
-        'Great Yellow Pelican': 'groß(?:e|er|es|en) Gelbpelikan',
+        'Great Yellow Pelican': 'Großer Gelbpelikan',
         'Hellbender': 'Höllenkrümmer',
         'Inferno Drake': 'Sonnen-Drakon',
       },

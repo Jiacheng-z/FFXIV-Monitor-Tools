@@ -1,13 +1,19 @@
 import fs from 'fs';
 import path from 'path';
 
-import { Lang } from '../resources/languages';
+import { Namespace, SubParser } from 'argparse';
+import inquirer from 'inquirer';
+
+import { isLang, Lang, languages } from '../resources/languages';
+import { UnreachableCode } from '../resources/not_reached';
 import { LooseTriggerSet } from '../types/trigger';
 import Options from '../ui/raidboss/raidboss_options';
-import { Event, Sync, TimelineParser } from '../ui/raidboss/timeline_parser';
+import { TimelineParser } from '../ui/raidboss/timeline_parser';
 
 import { walkDirSync } from './file_utils';
 import { findMissing } from './find_missing_timeline_translations';
+
+import { ActionChoiceType } from '.';
 
 const rootDir = 'ui/raidboss/data';
 
@@ -23,9 +29,9 @@ const findTriggersFile = (shortName: string): string | undefined => {
   return found;
 };
 
-export default async (timelinePath: string, locale: Lang): Promise<void> => {
+const translateTimeline = async (timelinePath: string, locale: Lang): Promise<void> => {
   const triggersFile = findTriggersFile(timelinePath);
-  if (!triggersFile) {
+  if (triggersFile === undefined) {
     console.error(`Couldn\'t find '${timelinePath}', aborting.`);
     process.exit(-2);
   }
@@ -39,7 +45,7 @@ export default async (timelinePath: string, locale: Lang): Promise<void> => {
   // Use findMissing to figure out which lines have errors on them.
   const syncErrors: { [lineNumber: number]: boolean } = {};
   const textErrors: { [lineNumber: number]: boolean } = {};
-  await findMissing(triggersFile, locale, (filename: string, lineNumber: number, label: string) => {
+  await findMissing(triggersFile, locale, (filename, lineNumber, label, _message) => {
     if (!filename.endsWith('.txt') || !lineNumber)
       return;
     if (label === 'text')
@@ -49,7 +55,7 @@ export default async (timelinePath: string, locale: Lang): Promise<void> => {
   });
 
   // TODO: this block is very duplicated with a number of other scripts.
-  const importPath = '../' + path.relative(process.cwd(), triggersFile).replace('.ts', '.js');
+  const importPath = `../${path.relative(process.cwd(), triggersFile).replace('.ts', '.js')}`;
   // TODO: Fix dynamic imports in TypeScript
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   const triggerSet = (await import(importPath))?.default as LooseTriggerSet;
@@ -59,33 +65,76 @@ export default async (timelinePath: string, locale: Lang): Promise<void> => {
   // Use Timeline to figure out what the replacements will look like in game.
   const options = { ...Options, ParserLanguage: locale, TimelineLanguage: locale };
   const timeline = new TimelineParser(timelineText, replacements, [], [], options);
-  const lineToText: { [lineNumber: number]: Event } = {};
-  const lineToSync: { [lineNumber: number]: Sync } = {};
-  for (const event of timeline.events) {
-    if (!event.lineNumber)
-      continue;
-    lineToText[event.lineNumber] = event;
-  }
-  for (const event of timeline.syncStarts)
-    lineToSync[event.lineNumber] = event;
 
-  // Combine replaced lines with errors.
-  const timelineLines = timelineText.split(/\n/);
-  timelineLines.forEach((timelineLine, idx) => {
-    const lineNumber = idx + 1;
-    let line = timelineLine.trim();
-
-    const lineText = lineToText[lineNumber];
-    if (lineText)
-      line = line.replace(` "${lineText.name}"`, ` "${lineText.text}"`);
-    const lineSync = lineToSync[lineNumber];
-    if (lineSync)
-      line = line.replace(`sync /${lineSync.origRegexStr}/`, `sync /${lineSync.regex.source}/`);
-
-    if (syncErrors[lineNumber])
-      line += ' #MISSINGSYNC';
-    if (textErrors[lineNumber])
-      line += ' #MISSINGTEXT';
+  const translated = TimelineParser.Translate(timeline, timelineText, syncErrors, textErrors);
+  for (const line of translated)
     console.log(line);
+};
+
+type TranslateTimelineNamespaceInterface = {
+  'timeline': string | null;
+  'locale': string | null;
+};
+
+class TranslateTimelineNamespace extends Namespace implements TranslateTimelineNamespaceInterface {
+  'timeline': string | null;
+  'locale': string | null;
+}
+
+type TranslateTimelineInquirerType = {
+  [name in keyof TranslateTimelineNamespaceInterface]: TranslateTimelineNamespaceInterface[name];
+};
+
+const translateTimelineFunc = (args: Namespace): Promise<void> => {
+  if (!(args instanceof TranslateTimelineNamespace))
+    throw new UnreachableCode();
+  const questions = [
+    {
+      type: 'fuzzypath',
+      excludeFilter: (path: string) => !path.endsWith('.txt'),
+      name: 'timeline',
+      message: 'Input a valid timeline filename: ',
+      rootPath: 'ui/raidboss/data',
+      default: args.timeline ?? '',
+      when: () => typeof args.timeline !== 'string',
+    },
+    {
+      type: 'list',
+      name: 'locale',
+      message: 'Select a locale: ',
+      choices: languages,
+      default: args.locale,
+      when: () => typeof args.locale !== 'string',
+    },
+  ] as const;
+  return inquirer.prompt<TranslateTimelineInquirerType>(questions)
+    .then((answers) => {
+      const timeline = answers.timeline ?? args.timeline;
+      const locale = answers.locale ?? args.locale;
+      if (typeof timeline === 'string' && typeof locale === 'string' && isLang(locale))
+        return translateTimeline(timeline, locale);
+    });
+};
+
+export const registerTranslateTimeline = (
+  actionChoices: ActionChoiceType,
+  subparsers: SubParser,
+): void => {
+  actionChoices.translateTimeline = {
+    name: 'Translate Raidboss timeline',
+    callback: translateTimelineFunc,
+    namespace: TranslateTimelineNamespace,
+  };
+  const translateParser = subparsers.addParser('translateTimeline', {
+    description: actionChoices.translateTimeline.name,
+  });
+
+  translateParser.addArgument(['-l', '--locale'], {
+    type: 'string',
+    help: 'The locale to translate the timeline for, e.g. de',
+  });
+  translateParser.addArgument(['-t', '--timeline'], {
+    type: 'string',
+    help: 'The timeline file to match, e.g. "a12s"',
   });
 };

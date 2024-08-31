@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
@@ -8,6 +7,7 @@ import { TriggerSet } from '../../../../../types/trigger';
 export type Data = RaidbossData;
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'SohmAlHard',
   zoneId: ZoneId.SohmAlHard,
   timelineFile: 'sohm_al_hard.txt',
   timelineTriggers: [
@@ -24,12 +24,7 @@ const triggerSet: TriggerSet<Data> = {
       // occurs between 1C30 and 1C31.
       id: 'Sohm Al Hard Inflammable Fumes',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: '1C30', source: 'The Leightonward', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: '1C30', source: 'Hortigolem', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: '1C30', source: 'Chortocyon', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: '1C30', source: 'レイトンワード', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: '1C30', source: '莱顿瓦德', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: '1C30', source: '레이튼워드', capture: false }),
+      netRegex: { id: '1C30', source: 'The Leightonward', capture: false },
       response: Responses.aoe(),
     },
     {
@@ -37,12 +32,7 @@ const triggerSet: TriggerSet<Data> = {
       // However, it's not the same ability.
       id: 'Sohm Al Hard Glorious Blaze',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1C32', source: 'Spore Sac', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1C32', source: 'Sporensack', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1C32', source: 'Sac de spores', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1C32', source: 'スポアサック', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1C32', source: '孢囊', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1C32', source: '포자 주머니', capture: false }),
+      netRegex: { id: '1C32', source: 'Spore Sac', capture: false },
       suppressSeconds: 5,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -60,9 +50,11 @@ const triggerSet: TriggerSet<Data> = {
       // The actual effect being checked here is Heavy.
       id: 'Sohm Al Hard Excretion',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '0E' }),
+      netRegex: { effectId: '0E' },
       condition: (data) => data.CanCleanse(),
-      infoText: (data, matches, output) => output.text!({ player: data.ShortName(matches.target) }),
+      infoText: (data, matches, output) => {
+        return output.text!({ player: data.party.member(matches.target) });
+      },
       outputStrings: {
         text: {
           en: 'Cleanse ${player}',
@@ -70,7 +62,7 @@ const triggerSet: TriggerSet<Data> = {
           fr: 'Guérison sur ${player}',
           ja: 'エスナ：${player}',
           cn: '康复${player}',
-          ko: '"${player}" 에스나',
+          ko: '${player} 에스나',
         },
       },
     },
@@ -80,12 +72,7 @@ const triggerSet: TriggerSet<Data> = {
       // leaves a tornado at the target location on completion.
       id: 'Sohm Al Hard Ripper Claw',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1C37', source: 'Gowrow', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1C37', source: 'Gowrow', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1C37', source: 'Gowrow', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1C37', source: 'ガウロウ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1C37', source: '高牢怪龙', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1C37', source: '가우로우', capture: false }),
+      netRegex: { id: '1C37', source: 'Gowrow', capture: false },
       response: Responses.awayFromFront(),
     },
     {
@@ -94,12 +81,7 @@ const triggerSet: TriggerSet<Data> = {
       // AND if Gowrow is not empowered.
       id: 'Sohm Al Hard Tail Smash',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1C35', source: 'Gowrow', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1C35', source: 'Gowrow', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1C35', source: 'Gowrow', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1C35', source: 'ガウロウ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1C35', source: '高牢怪龙', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1C35', source: '가우로우', capture: false }),
+      netRegex: { id: '1C35', source: 'Gowrow', capture: false },
       response: Responses.goFrontOrSides(),
     },
     {
@@ -107,60 +89,35 @@ const triggerSet: TriggerSet<Data> = {
       // Used only if Gowrow is empowered.
       id: 'Sohm Al Hard Tail Swing',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1C36', source: 'Gowrow', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1C36', source: 'Gowrow', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1C36', source: 'Gowrow', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1C36', source: 'ガウロウ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1C36', source: '高牢怪龙', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1C36', source: '가우로우', capture: false }),
+      netRegex: { id: '1C36', source: 'Gowrow', capture: false },
       response: Responses.getOut(),
     },
     {
       // Used only if Gowrow is not empowered.
       id: 'Sohm Al Hard Wild Charge',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1C39', source: 'Gowrow', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1C39', source: 'Gowrow', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1C39', source: 'Gowrow', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1C39', source: 'ガウロウ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1C39', source: '高牢怪龙', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1C39', source: '가우로우', capture: false }),
+      netRegex: { id: '1C39', source: 'Gowrow', capture: false },
       response: Responses.awayFromFront(),
     },
     {
       // Used only if Gowrow is empowered.
       id: 'Sohm Al Hard Hot Charge',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1C3A', source: 'Gowrow', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1C3A', source: 'Gowrow', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1C3A', source: 'Gowrow', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1C3A', source: 'ガウロウ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1C3A', source: '高牢怪龙', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1C3A', source: '가우로우', capture: false }),
+      netRegex: { id: '1C3A', source: 'Gowrow', capture: false },
       response: Responses.awayFromFront(),
     },
     {
       // Used only if Gowrow is not empowered.
       id: 'Sohm Al Hard Fireball',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1C3B', source: 'Gowrow', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1C3B', source: 'Gowrow', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1C3B', source: 'Gowrow', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1C3B', source: 'ガウロウ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1C3B', source: '高牢怪龙', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1C3B', source: '가우로우', capture: false }),
+      netRegex: { id: '1C3B', source: 'Gowrow', capture: false },
       response: Responses.awayFromFront(),
     },
     {
       // Used only if Gowrow is empowered.
       id: 'Sohm Al Hard Lava Flow',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1C3C', source: 'Gowrow', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1C3C', source: 'Gowrow', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1C3C', source: 'Gowrow', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1C3C', source: 'ガウロウ', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1C3C', source: '高牢怪龙', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1C3C', source: '가우로우', capture: false }),
+      netRegex: { id: '1C3C', source: 'Gowrow', capture: false },
       response: Responses.awayFromFront(),
     },
     {
@@ -168,12 +125,7 @@ const triggerSet: TriggerSet<Data> = {
       // We use the cast line for this trigger because the timing is the same.
       id: 'Sohm Al Hard Flying Press',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1C3E', source: 'Lava Scorpion' }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1C3E', source: 'Lavaskorpion' }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1C3E', source: 'scorpion de lave' }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1C3E', source: 'ラーヴァ・スコーピオン' }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1C3E', source: '熔岩蝎' }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1C3E', source: '용암 전갈' }),
+      netRegex: { id: '1C3E', source: 'Lava Scorpion' },
       condition: Conditions.targetIsYou(),
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -183,30 +135,20 @@ const triggerSet: TriggerSet<Data> = {
           fr: 'Déposez la zone au sol à l\'extérieur',
           ja: '外周に置く',
           cn: '人群外放圈圈',
-          ko: '용암지대 생성 대상자',
+          ko: '바깥쪽으로 장판 유도하기',
         },
       },
     },
     {
       id: 'Sohm Al Hard Deadly Thrust',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['1C40', '1C48'], source: ['Lava Scorpion', 'The Scorpion\'s Tail'] }),
-      netRegexDe: NetRegexes.startsUsing({ id: ['1C40', '1C48'], source: ['Lavaskorpion', 'Schwanzskorpion'] }),
-      netRegexFr: NetRegexes.startsUsing({ id: ['1C40', '1C48'], source: ['scorpion de lave', 'queue du scorpion'] }),
-      netRegexJa: NetRegexes.startsUsing({ id: ['1C40', '1C48'], source: ['ラーヴァ・スコーピオン', 'テイル・スコーピオン'] }),
-      netRegexCn: NetRegexes.startsUsing({ id: ['1C40', '1C48'], source: ['熔岩蝎', '尖尾蝎'] }),
-      netRegexKo: NetRegexes.startsUsing({ id: ['1C40', '1C48'], source: ['용암 전갈', '꼬리 전갈'] }),
+      netRegex: { id: ['1C40', '1C48'], source: ['Lava Scorpion', 'The Scorpion\'s Tail'] },
       response: Responses.tankBuster(),
     },
     {
       id: 'Sohm Al Hard Hiss',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: '1C45', source: 'Lava Scorpion', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: '1C45', source: 'Lavaskorpion', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: '1C45', source: 'scorpion de lave', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: '1C45', source: 'ラーヴァ・スコーピオン', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: '1C45', source: '熔岩蝎', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: '1C45', source: '용암 전갈', capture: false }),
+      netRegex: { id: '1C45', source: 'Lava Scorpion', capture: false },
       response: Responses.killAdds(),
     },
   ],
@@ -221,6 +163,7 @@ const triggerSet: TriggerSet<Data> = {
         'Small Spore Sac': 'klein(?:e|er|es|en) Sporensack',
         '(?<!Small )Spore Sac': 'Sporensack',
         'Lava Scorpion': 'Lavaskorpion',
+        'Gowrow': 'Gowrow',
       },
       'replaceText': {
         '\\(Back\\)': '(Hinten)',
@@ -249,6 +192,7 @@ const triggerSet: TriggerSet<Data> = {
         'Lava Scorpion': 'scorpion de lave',
         'The Scorpion\'s Tail': 'queue du scorpion',
         '(?<!Small )Spore Sac': 'Sac de spores',
+        'Gowrow': 'Gowrow',
       },
       'replaceText': {
         '\\(Back\\)': '(Derrière)',
@@ -277,6 +221,7 @@ const triggerSet: TriggerSet<Data> = {
         'Lava Scorpion': 'ラーヴァ・スコーピオン',
         'The Scorpion\'s Tail': 'テイル・スコーピオン',
         '(?<!Small )Spore Sac': 'スポアサック',
+        'Gowrow': 'ガウロウ',
       },
       'replaceText': {
         '\\(Adds x2\\)': '(2つ 雑魚)',
@@ -350,7 +295,7 @@ const triggerSet: TriggerSet<Data> = {
         'Glorious Blaze': '불붙이기',
         'Flying Press': '도약 내리찍기',
         'Excretion': '점액',
-        'Deadly Thrust': '치명적 일격',
+        'Deadly Thrust': '죽음의 꼬리',
       },
     },
   ],

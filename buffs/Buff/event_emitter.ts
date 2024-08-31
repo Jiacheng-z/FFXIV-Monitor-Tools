@@ -2,9 +2,11 @@ import EventEmitter from 'eventemitter3';
 
 import logDefinitions from '../cactbot/resources/netlog_defs';
 import { addOverlayListener } from '../cactbot/resources/overlay_plugin_api';
+import ZoneInfo from '../cactbot/resources/zone_info';
 import { EventResponses as OverlayEventResponses, Party } from '../cactbot/types/event';
 import { NetFields } from '../cactbot/types/net_fields';
 import { ToMatches } from '../cactbot/types/net_matches';
+
 import { normalizeLogLine } from './utils';
 
 export type PartialFieldMatches<Field extends keyof NetFields> = Partial<
@@ -16,7 +18,7 @@ export interface EventMap {
   // party changed
   'party': (party: Party[]) => void;
   // zone changing
-  'zone/change': (id: number, name: string) => void;
+  'zone/change': (id: number, name: string, info?: typeof ZoneInfo[number]) => void;
   // battle events
   'battle/in-combat': (info: { game: boolean; act: boolean }) => void;
   'battle/wipe': () => void;
@@ -46,23 +48,23 @@ export class JobsEventEmitter extends EventEmitter<EventMap> {
       this.emit('player', ev);
     });
 
-    // addOverlayListener('EnmityTargetData', (ev) => {
-    //   this.processEnmityTargetData(ev);
-    // });
-
-    addOverlayListener('onPartyWipe', () => {
-      this.emit('battle/wipe');
+    addOverlayListener('EnmityTargetData', (ev) => {
+      // this.processEnmityTargetData(ev);
     });
 
-    // addOverlayListener('onInCombatChangedEvent', (ev) => {
-    //   this.emit('battle/in-combat', {
-    //     game: ev.detail.inGameCombat,
-    //     act: ev.detail.inACTCombat,
-    //   });
+    // addOverlayListener('onPartyWipe', () => {
+    //   this.emit('battle/wipe');
     // });
 
+    addOverlayListener('onInCombatChangedEvent', (ev) => {
+      // this.emit('battle/in-combat', {
+      //   game: ev.detail.inGameCombat,
+      //   act: ev.detail.inACTCombat,
+      // });
+    });
+
     addOverlayListener('ChangeZone', (ev) => {
-      this.emit('zone/change', ev.zoneID, ev.zoneName);
+      this.emit('zone/change', ev.zoneID, ev.zoneName, ZoneInfo[ev.zoneID]);
     });
 
     addOverlayListener('LogLine', (ev) => {
@@ -74,7 +76,7 @@ export class JobsEventEmitter extends EventEmitter<EventMap> {
     });
   }
 
-  processLogLine(ev: OverlayEventResponses['LogLine']): void {
+  public processLogLine(ev: OverlayEventResponses['LogLine']): void {
     const type = ev.line[logDefinitions.None.fields.type];
 
     this.emit('log', ev.line, ev.rawLine);
@@ -90,17 +92,16 @@ export class JobsEventEmitter extends EventEmitter<EventMap> {
         break;
       case logDefinitions.GainsEffect.type: {
         const matches = normalizeLogLine(ev.line, logDefinitions.GainsEffect.fields);
-        if (matches.effectId)
+        if (matches.effectId !== undefined)
           this.emit('effect/gain', matches.effectId, matches);
         break;
       }
       case logDefinitions.LosesEffect.type: {
         const matches = normalizeLogLine(ev.line, logDefinitions.LosesEffect.fields);
-        if (matches.effectId)
+        if (matches.effectId !== undefined)
           this.emit('effect/lose', matches.effectId, matches);
         break;
       }
-
       case logDefinitions.NetworkDoT.type: {
         const matches = normalizeLogLine(ev.line, logDefinitions.NetworkDoT.fields);
         const damage = parseInt(matches.damage ?? '0', 16); // damage is in hex
@@ -110,6 +111,12 @@ export class JobsEventEmitter extends EventEmitter<EventMap> {
           this.emit('tick/hot', damage, matches);
         break;
       }
+      case logDefinitions.ActorControl.type: {
+        const matches = normalizeLogLine(ev.line, logDefinitions.ActorControl.fields);
+        if (matches.command === '40000010' || matches.command === '4000000F')
+          this.emit('battle/wipe');
+        break;
+      }
 
       default:
         break;
@@ -117,11 +124,11 @@ export class JobsEventEmitter extends EventEmitter<EventMap> {
   }
 
   processEnmityTargetData({ Target: target }: OverlayEventResponses['EnmityTargetData']): void {
-    if (target) {
+    if (target !== null) {
       this.emit('battle/target', {
         name: target.Name,
-        distance: target.Distance,
-        effectiveDistance: target.EffectiveDistance,
+        distance: parseFloat(target.Distance),
+        effectiveDistance: parseFloat(target.EffectiveDistance),
       });
     } else {
       this.emit('battle/target');

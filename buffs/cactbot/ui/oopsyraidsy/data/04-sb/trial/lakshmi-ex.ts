@@ -39,7 +39,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
     {
       id: 'LakshmiEx Divine Denial Knocked Off',
       type: 'Ability',
-      netRegex: NetRegexes.abilityFull({ id: '2149', ...playerDamageFields }),
+      netRegex: NetRegexes.ability({ id: '2149', ...playerDamageFields }),
       deathReason: (_data, matches) => {
         return {
           id: matches.targetId,
@@ -47,7 +47,7 @@ const triggerSet: OopsyTriggerSet<Data> = {
           text: {
             en: 'Knocked off',
             de: 'Runtergefallen',
-            fr: 'A été assommé(e)',
+            fr: 'Renversé(e)',
             ja: 'ノックバック',
             cn: '击退坠落',
             ko: '넉백',

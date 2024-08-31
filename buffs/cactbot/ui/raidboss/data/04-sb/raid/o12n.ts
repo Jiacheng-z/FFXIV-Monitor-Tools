@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import Outputs from '../../../../../resources/outputs';
 import { Responses } from '../../../../../resources/responses';
 import ZoneId from '../../../../../resources/zone_id';
@@ -12,6 +11,7 @@ export interface Data extends RaidbossData {
 
 // O12N - Alphascape 4.0
 const triggerSet: TriggerSet<Data> = {
+  id: 'AlphascapeV40',
   zoneId: ZoneId.AlphascapeV40,
   timelineFile: 'o12n.txt',
   timelineTriggers: [
@@ -26,48 +26,28 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O12N Solar Ray',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['330F', '3310'], source: ['Omega', 'Omega-M'] }),
-      netRegexDe: NetRegexes.startsUsing({ id: ['330F', '3310'], source: ['Omega', 'Omega-M'] }),
-      netRegexFr: NetRegexes.startsUsing({ id: ['330F', '3310'], source: ['Oméga', 'Oméga-M'] }),
-      netRegexJa: NetRegexes.startsUsing({ id: ['330F', '3310'], source: ['オメガ', 'オメガM'] }),
-      netRegexCn: NetRegexes.startsUsing({ id: ['330F', '3310'], source: ['欧米茄', '欧米茄M'] }),
-      netRegexKo: NetRegexes.startsUsing({ id: ['330F', '3310'], source: ['오메가', '오메가 M'] }),
+      netRegex: { id: ['330F', '3310'], source: ['Omega', 'Omega-M'] },
       suppressSeconds: 1,
       response: Responses.tankCleave('alert'),
     },
     {
       id: 'O12N Optimized Blade Dance',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['3321', '3322'], source: ['Omega', 'Omega-M'] }),
-      netRegexDe: NetRegexes.startsUsing({ id: ['3321', '3322'], source: ['Omega', 'Omega-M'] }),
-      netRegexFr: NetRegexes.startsUsing({ id: ['3321', '3322'], source: ['Oméga', 'Oméga-M'] }),
-      netRegexJa: NetRegexes.startsUsing({ id: ['3321', '3322'], source: ['オメガ', 'オメガM'] }),
-      netRegexCn: NetRegexes.startsUsing({ id: ['3321', '3322'], source: ['欧米茄', '欧米茄M'] }),
-      netRegexKo: NetRegexes.startsUsing({ id: ['3321', '3322'], source: ['오메가', '오메가 M'] }),
+      netRegex: { id: ['3321', '3322'], source: ['Omega', 'Omega-M'] },
       suppressSeconds: 1,
       response: Responses.tankBuster(),
     },
     {
       id: 'O12N Laser Shower',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['3311', '3312'], source: ['Omega', 'Omega-M'], capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: ['3311', '3312'], source: ['Omega', 'Omega-M'], capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: ['3311', '3312'], source: ['Oméga', 'Oméga-M'], capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: ['3311', '3312'], source: ['オメガ', 'オメガM'], capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: ['3311', '3312'], source: ['欧米茄', '欧米茄M'], capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: ['3311', '3312'], source: ['오메가', '오메가 M'], capture: false }),
+      netRegex: { id: ['3311', '3312'], source: ['Omega', 'Omega-M'], capture: false },
       suppressSeconds: 1,
       response: Responses.aoe(),
     },
     {
       id: 'O12N Cosmo Memory',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: ['331C', '331D'], source: ['Omega', 'Omega-M'], capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: ['331C', '331D'], source: ['Omega', 'Omega-M'], capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: ['331C', '331D'], source: ['Oméga', 'Oméga-M'], capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: ['331C', '331D'], source: ['オメガ', 'オメガM'], capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: ['331C', '331D'], source: ['欧米茄', '欧米茄M'], capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: ['331C', '331D'], source: ['오메가', '오메가 M'], capture: false }),
+      netRegex: { id: ['331C', '331D'], source: ['Omega', 'Omega-M'], capture: false },
       suppressSeconds: 1,
       response: Responses.bigAoe(),
     },
@@ -75,31 +55,21 @@ const triggerSet: TriggerSet<Data> = {
       id: 'O12N Efficient Bladework',
       type: 'Ability',
       // 12.1 seconds after Subject Simulation M is an untelegraphed Efficient Bladework.
-      netRegex: NetRegexes.ability({ id: '32F4', source: 'Omega-M', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: '32F4', source: 'Omega-M', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: '32F4', source: 'Oméga-M', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: '32F4', source: 'オメガM', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: '32F4', source: '欧米茄M', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: '32F4', source: '오메가 M', capture: false }),
+      netRegex: { id: '32F4', source: 'Omega-M', capture: false },
       delaySeconds: 8,
       response: Responses.getOut(),
     },
     {
       id: 'O12N Local Resonance',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ target: 'Omega', effectId: '67E', capture: false }),
-      netRegexDe: NetRegexes.gainsEffect({ target: 'Omega', effectId: '67E', capture: false }),
-      netRegexFr: NetRegexes.gainsEffect({ target: 'Oméga', effectId: '67E', capture: false }),
-      netRegexJa: NetRegexes.gainsEffect({ target: 'オメガ', effectId: '67E', capture: false }),
-      netRegexCn: NetRegexes.gainsEffect({ target: '欧米茄', effectId: '67E', capture: false }),
-      netRegexKo: NetRegexes.gainsEffect({ target: '오메가', effectId: '67E', capture: false }),
-      condition: (data) => data.role === 'tank',
+      netRegex: { target: 'Omega', effectId: '67E', capture: false },
+      condition: (data) => data.role === 'tank' || data.job === 'BLU',
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'Move bosses apart',
           de: 'Bosse auseinander ziehen',
-          fr: 'Écartez les boss',
+          fr: 'Déplacez les boss séparément',
           ja: 'ボスを引き離す',
           cn: '拉开boss',
           ko: '보스 서로 떨어뜨리기',
@@ -109,14 +79,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O12N Optimized Meteor',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0057' }),
+      netRegex: { id: '0057' },
       condition: Conditions.targetIsYou(),
       response: Responses.meteorOnYou(),
     },
     {
       id: 'O12N Ground Zero',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '008B' }),
+      netRegex: { id: '008B' },
       condition: Conditions.targetIsYou(),
       alertText: (_data, _matches, output) => output.getOut!(),
       run: (data, matches) => data.groundZero = matches.target,
@@ -134,7 +104,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O12N Goo Instructions',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '008B', capture: false }),
+      netRegex: { id: '008B', capture: false },
       delaySeconds: 8,
       infoText: (_data, _matches, output) => output.text!(),
       run: (data) => delete data.groundZero,
@@ -142,6 +112,7 @@ const triggerSet: TriggerSet<Data> = {
         text: {
           en: 'Knockback from F; Away from M',
           de: 'Rückstoß von F; Weg von M',
+          fr: 'Poussée depuis F; Éloignez-vous de M',
           cn: '被女性击退; 远离男性',
           ko: 'F 넉백, M 광역기',
         },
@@ -150,7 +121,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O12N Stack Marker',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '003E' }),
+      netRegex: { id: '003E' },
       delaySeconds: 0.3,
       infoText: (data, matches, output) => {
         if (data.me === data.groundZero)
@@ -159,7 +130,7 @@ const triggerSet: TriggerSet<Data> = {
         // since it's stack, but also get away from Ground Zero purple marker.
         if (data.me === matches.target)
           return output.stackOnYou!();
-        return output.stackOnPlayer!({ player: data.ShortName(matches.target) });
+        return output.stackOnPlayer!({ player: data.party.member(matches.target) });
       },
       outputStrings: {
         stackOnYou: Outputs.stackOnYou,
@@ -169,14 +140,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O12N Optimized Fire III',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0060' }),
+      netRegex: { id: '0060' },
       condition: Conditions.targetIsYou(),
       response: Responses.spread(),
     },
     {
       id: 'O12N Packet Filter F',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '67D' }),
+      netRegex: { effectId: '67D' },
       condition: Conditions.targetIsYou(),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -193,7 +164,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'O12N Packet Filter M',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '67C' }),
+      netRegex: { effectId: '67C' },
       condition: Conditions.targetIsYou(),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -212,12 +183,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       'locale': 'de',
       'replaceSync': {
-        'Calculations indicate increased probability of defeat': 'Warnung. Erhöhte Wahrscheinlichkeit einer Niederlage',
+        'Calculations indicate increased probability of defeat':
+          'Warnung. Erhöhte Wahrscheinlichkeit einer Niederlage',
         'Omega(?!-)': 'Omega',
         'Omega-M': 'Omega-M',
         'Optical Unit': 'Optikmodul',
         'Progress to party combat': 'Initiiere Gruppenkampf',
-        '\\\\<blip\\\\> Warning\\\\\. Calculations indicate': '<biep> Warnung. Erhöhte Wahrscheinlichkeit',
+        '<blip> Limits of single combatant': '<biep> Leistungsgrenze als Einzelkämpfer',
+        '<blip> Warning\\. Calculations indicate': '<biep> Warnung. Erhöhte Wahrscheinlichkeit',
       },
       'replaceText': {
         'Beyond Strength': 'Schildkombo G',
@@ -250,12 +223,15 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       'locale': 'fr',
-      'missingTranslations': true,
       'replaceSync': {
+        'Calculations indicate increased probability of defeat':
+          'Forte augmentation des probabilités de défaite',
         'Omega(?!-)': 'Oméga',
         'Omega-M': 'Oméga-M',
         'Optical Unit': 'unité optique',
         'Progress to party combat': 'Limites du combat en solitaire atteintes',
+        '<blip> Limits of single combatant': 'Bip... Bip... Limites du combat en solitaire',
+        '<blip> Warning\\. Calculations indicate': 'Alerte... Alerte... Forte augmentation',
       },
       'replaceText': {
         'Beyond Strength': 'Combo bouclier G',
@@ -288,13 +264,13 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       'locale': 'ja',
-      'missingTranslations': true,
       'replaceSync': {
-        'Calculations indicate increased probability of defeat': '警告……警告……敗北の危険性が上昇……',
         'Omega(?!-)': 'オメガ',
         'Omega-M': 'オメガM',
         'Optical Unit': 'オプチカルユニット',
         'Progress to party combat': '単独戦闘による限界を確認',
+        '<blip> Limits of single combatant': '分析……単独戦闘による',
+        '<blip> Warning\\. Calculations indicate': '警告……警告……敗北の危険性が上昇……',
       },
       'replaceText': {
         'Beyond Strength': 'シールドコンボG',
@@ -327,13 +303,14 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       'locale': 'cn',
-      'missingTranslations': true,
       'replaceSync': {
         'Calculations indicate increased probability of defeat': '警告……警告……失败的危险性上升……',
         'Omega(?!-)': '欧米茄',
         'Omega-M': '欧米茄M',
         'Optical Unit': '视觉组',
         'Progress to party combat': '确认到单独战斗的极限',
+        '<blip> Limits of single combatant': '分析……确认到单',
+        '<blip> Warning\\. Calculations indicate': '警告……警告……失败的危险性上升……',
       },
       'replaceText': {
         'Beyond Strength': '盾连击G',
@@ -366,13 +343,14 @@ const triggerSet: TriggerSet<Data> = {
     },
     {
       'locale': 'ko',
-      'missingTranslations': true,
       'replaceSync': {
         'Omega(?!-)': '오메가',
         'Omega-M': '오메가 M',
         'Optical Unit': '광학 유닛',
         'Progress to party combat': '단독 전투 한계 확인',
         'Calculations indicate increased probability of defeat': '패배 위험성 상승',
+        '<blip> Limits of single combatant': '분석…… 단독 전투 한계',
+        '<blip> Warning\\. Calculations indicate': '패배 위험성 상승',
       },
       'replaceText': {
         'Beyond Strength': '방패 연격 G',

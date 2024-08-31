@@ -1,4 +1,3 @@
-import NetRegexes from '../../../../../resources/netregexes';
 import Outputs from '../../../../../resources/outputs';
 import { callOverlayHandler } from '../../../../../resources/overlay_plugin_api';
 import Util from '../../../../../resources/util';
@@ -25,18 +24,14 @@ export interface Data extends RaidbossData {
 // them apart.
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'TheWhorleaterUnreal',
   zoneId: ZoneId.TheWhorleaterUnreal,
   timelineFile: 'levi-un.txt',
   triggers: [
     {
       id: 'LeviUn Dive Counter Tidal Wave Reset',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Leviathan', id: '5CDE', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Leviathan', id: '5CDE', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Léviathan', id: '5CDE', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: 'リヴァイアサン', id: '5CDE', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '利维亚桑', id: '5CDE', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '리바이어선', id: '5CDE', capture: false }),
+      netRegex: { source: 'Leviathan', id: '5CDE', capture: false },
       run: (data) => {
         // There's always a slam after Tidal Wave.
         data.diveCounter = 1;
@@ -48,24 +43,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'LeviUn Dive Counter Body Slam Reset',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Leviathan', id: '5CD2', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Leviathan', id: '5CD2', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Léviathan', id: '5CD2', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: 'リヴァイアサン', id: '5CD2', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '利维亚桑', id: '5CD2', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '리바이어선', id: '5CD2', capture: false }),
+      netRegex: { source: 'Leviathan', id: '5CD2', capture: false },
       // Redundant, but this will keep things on track if anything goes awry.
       run: (data) => data.diveCounter = 1,
     },
     {
       id: 'LeviUn Dive Counter Wave Spume Adjust',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatant({ name: 'Wave Spume', capture: false }),
-      netRegexDe: NetRegexes.addedCombatant({ name: 'Gischtwelle', capture: false }),
-      netRegexFr: NetRegexes.addedCombatant({ name: 'Écume Ondulante', capture: false }),
-      netRegexJa: NetRegexes.addedCombatant({ name: 'ウェイブ・スピューム', capture: false }),
-      netRegexCn: NetRegexes.addedCombatant({ name: '巨浪泡沫', capture: false }),
-      netRegexKo: NetRegexes.addedCombatant({ name: '파도치는 물거품', capture: false }),
+      netRegex: { name: 'Wave Spume', capture: false },
       suppressSeconds: 5,
       // Usually the pattern is slam / dive / dive / slam, but after wave spumes appear,
       // there is a single dive then a slam.  Adjust for this one-off case here.
@@ -74,12 +59,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'LeviUn Slam Location',
       type: 'NameToggle',
-      netRegex: NetRegexes.nameToggle({ name: 'Leviathan', toggle: '00', capture: false }),
-      netRegexDe: NetRegexes.nameToggle({ name: 'Leviathan', toggle: '00', capture: false }),
-      netRegexFr: NetRegexes.nameToggle({ name: 'Léviathan', toggle: '00', capture: false }),
-      netRegexJa: NetRegexes.nameToggle({ name: 'リヴァイアサン', toggle: '00', capture: false }),
-      netRegexCn: NetRegexes.nameToggle({ name: '利维亚桑', toggle: '00', capture: false }),
-      netRegexKo: NetRegexes.nameToggle({ name: '리바이어선', toggle: '00', capture: false }),
+      netRegex: { name: 'Leviathan', toggle: '00', capture: false },
       condition: (data) => {
         data.diveCounter = (data.diveCounter || 0) + 1;
         return data.diveCounter % 3 === 1;
@@ -90,7 +70,7 @@ const triggerSet: TriggerSet<Data> = {
         const callData = await callOverlayHandler({
           call: 'getCombatants',
         });
-        if (!callData || !callData.combatants || !callData.combatants.length) {
+        if (!callData.combatants.length) {
           console.error('Dive: failed to get combatants: ${JSON.stringify(callData)}');
           return;
         }
@@ -120,12 +100,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'LeviUn Veil of the Whorl',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Leviathan', id: '5CE5', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Leviathan', id: '5CE5', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Léviathan', id: '5CE5', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: 'リヴァイアサン', id: '5CE5', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '利维亚桑', id: '5CE5', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '리바이어선', id: '5CE5', capture: false }),
+      netRegex: { source: 'Leviathan', id: '5CE5', capture: false },
       condition: (data) => Util.isCasterDpsJob(data.job) || Util.isHealerJob(data.job),
       suppressSeconds: 9999,
       infoText: (_data, _matches, output) => output.text!(),
@@ -143,12 +118,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'LeviUn Mantle of the Whorl',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ source: 'Leviathan\'s Tail', id: '5CE4', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Leviathans Schwanz', id: '5CE4', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Queue De Léviathan', id: '5CE4', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: 'リヴァイアサン・テール', id: '5CE4', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '利维亚桑的尾巴', id: '5CE4', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '리바이어선 꼬리', id: '5CE4', capture: false }),
+      netRegex: { source: 'Leviathan\'s Tail', id: '5CE4', capture: false },
       condition: (data) => Util.isRangedDpsJob(data.job),
       suppressSeconds: 9999,
       infoText: (_data, _matches, output) => output.text!(),
@@ -166,12 +136,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'LeviUn Wavespine Sahagin Add',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatant({ name: 'Wavespine Sahagin', capture: false }),
-      netRegexDe: NetRegexes.addedCombatant({ name: 'Wellendorn-Sahagin', capture: false }),
-      netRegexFr: NetRegexes.addedCombatant({ name: 'Sahuagin Épine-Du-Ressac', capture: false }),
-      netRegexJa: NetRegexes.addedCombatant({ name: 'ウェイブスパイン・サハギン', capture: false }),
-      netRegexCn: NetRegexes.addedCombatant({ name: '波棘鱼人', capture: false }),
-      netRegexKo: NetRegexes.addedCombatant({ name: '물결등뼈 사하긴', capture: false }),
+      netRegex: { name: 'Wavespine Sahagin', capture: false },
       suppressSeconds: 5,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -181,12 +146,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'LeviUn Wavetooth Sahagin Add',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatant({ name: 'Wavetooth Sahagin', capture: false }),
-      netRegexDe: NetRegexes.addedCombatant({ name: 'Wellenzahn-Sahagin', capture: false }),
-      netRegexFr: NetRegexes.addedCombatant({ name: 'Sahuagin Dent-Du-Ressac', capture: false }),
-      netRegexJa: NetRegexes.addedCombatant({ name: 'ウェイブトゥース・サハギン', capture: false }),
-      netRegexCn: NetRegexes.addedCombatant({ name: '波齿鱼人', capture: false }),
-      netRegexKo: NetRegexes.addedCombatant({ name: '물결이빨 사하긴', capture: false }),
+      netRegex: { name: 'Wavetooth Sahagin', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -202,12 +162,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'LeviUn Wavetooth Sahagin Stun',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatant({ name: 'Wavetooth Sahagin' }),
-      netRegexDe: NetRegexes.addedCombatant({ name: 'Wellenzahn-Sahagin' }),
-      netRegexFr: NetRegexes.addedCombatant({ name: 'Sahuagin Dent-Du-Ressac' }),
-      netRegexJa: NetRegexes.addedCombatant({ name: 'ウェイブトゥース・サハギン' }),
-      netRegexCn: NetRegexes.addedCombatant({ name: '波齿鱼人' }),
-      netRegexKo: NetRegexes.addedCombatant({ name: '물결이빨 사하긴' }),
+      netRegex: { name: 'Wavetooth Sahagin' },
       condition: (data) => data.CanStun(),
       delaySeconds: 5,
       alertText: (_data, matches, output) => output.text!({ name: matches.name }),
@@ -218,12 +173,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'LeviUn Gyre Spume',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatant({ name: 'Gyre Spume', capture: false }),
-      netRegexDe: NetRegexes.addedCombatant({ name: 'Gischtblase', capture: false }),
-      netRegexFr: NetRegexes.addedCombatant({ name: 'Écume Concentrique', capture: false }),
-      netRegexJa: NetRegexes.addedCombatant({ name: 'ジャイヤ・スピューム', capture: false }),
-      netRegexCn: NetRegexes.addedCombatant({ name: '游涡泡沫', capture: false }),
-      netRegexKo: NetRegexes.addedCombatant({ name: '소용돌이치는 물거품', capture: false }),
+      netRegex: { name: 'Gyre Spume', capture: false },
       suppressSeconds: 5,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -240,19 +190,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'LeviUn Wave Spume',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatant({ name: 'Wave Spume', capture: false }),
-      netRegexDe: NetRegexes.addedCombatant({ name: 'Gischtwelle', capture: false }),
-      netRegexFr: NetRegexes.addedCombatant({ name: 'Écume Ondulante', capture: false }),
-      netRegexJa: NetRegexes.addedCombatant({ name: 'ウェイブ・スピューム', capture: false }),
-      netRegexCn: NetRegexes.addedCombatant({ name: '巨浪泡沫', capture: false }),
-      netRegexKo: NetRegexes.addedCombatant({ name: '파도치는 물거품', capture: false }),
+      netRegex: { name: 'Wave Spume', capture: false },
       suppressSeconds: 5,
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'Wave Spume Adds',
           de: 'Gischtwelle Adds',
-          fr: 'Tuez les écumes ondulantes',
+          fr: 'Adds Écumes ondulantes',
           ja: 'ウェイブ・スピューム出現',
           cn: '蓝泡泡出现',
           ko: '파랑 물거품 출현',
@@ -262,12 +207,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'LeviUn Wave Spume Explosion',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatant({ name: 'Wave Spume', capture: false }),
-      netRegexDe: NetRegexes.addedCombatant({ name: 'Gischtwelle', capture: false }),
-      netRegexFr: NetRegexes.addedCombatant({ name: 'Écume Ondulante', capture: false }),
-      netRegexJa: NetRegexes.addedCombatant({ name: 'ウェイブ・スピューム', capture: false }),
-      netRegexCn: NetRegexes.addedCombatant({ name: '巨浪泡沫', capture: false }),
-      netRegexKo: NetRegexes.addedCombatant({ name: '파도치는 물거품', capture: false }),
+      netRegex: { name: 'Wave Spume', capture: false },
       // ~35.2 seconds from added combatant until :Aqua Burst:888: explosion.
       // Tell everybody because not much else going on in this fight,
       // and other people need to get away.
@@ -288,23 +228,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'LeviUn Elemental Converter',
       type: 'NameToggle',
-      netRegex: NetRegexes.nameToggle({ name: 'Elemental Converter' }),
-      netRegexDe: NetRegexes.nameToggle({ name: 'Elementarumwandler' }),
-      netRegexFr: NetRegexes.nameToggle({ name: 'Activateur De La Barrière' }),
-      netRegexJa: NetRegexes.nameToggle({ name: '魔法障壁発動器' }),
-      netRegexCn: NetRegexes.nameToggle({ name: '魔法障壁发动器' }),
-      netRegexKo: NetRegexes.nameToggle({ name: '마법 장벽 발동기' }),
+      netRegex: { name: 'Elemental Converter' },
       run: (data, matches) => data.converter = !!parseInt(matches.toggle),
     },
     {
       id: 'LeviUn Hit The Button',
       type: 'NameToggle',
-      netRegex: NetRegexes.nameToggle({ name: 'Leviathan', toggle: '00', capture: false }),
-      netRegexDe: NetRegexes.nameToggle({ name: 'Leviathan', toggle: '00', capture: false }),
-      netRegexFr: NetRegexes.nameToggle({ name: 'Léviathan', toggle: '00', capture: false }),
-      netRegexJa: NetRegexes.nameToggle({ name: 'リヴァイアサン', toggle: '00', capture: false }),
-      netRegexCn: NetRegexes.nameToggle({ name: '利维亚桑', toggle: '00', capture: false }),
-      netRegexKo: NetRegexes.nameToggle({ name: '리바이어선', toggle: '00', capture: false }),
+      netRegex: { name: 'Leviathan', toggle: '00', capture: false },
       // The best way to know if it's time to hit the button is if the converter is ready.
       // I think this is not true for hard mode, but is true (fingers crossed) for extreme.
       condition: (data) => data.converter,

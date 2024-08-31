@@ -1,5 +1,4 @@
 import Conditions from '../../../../../resources/conditions';
-import NetRegexes from '../../../../../resources/netregexes';
 import ZoneId from '../../../../../resources/zone_id';
 import { RaidbossData } from '../../../../../types/data';
 import { TriggerSet } from '../../../../../types/trigger';
@@ -9,6 +8,7 @@ export interface Data extends RaidbossData {
 }
 
 const triggerSet: TriggerSet<Data> = {
+  id: 'TheFinalCoilOfBahamutTurn3',
   zoneId: ZoneId.TheFinalCoilOfBahamutTurn3,
   timelineFile: 't12.txt',
   initData: () => {
@@ -20,24 +20,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'T12 Phase 3',
       type: 'Ability',
-      netRegex: NetRegexes.ability({ id: 'B96', source: 'Phoenix', capture: false }),
-      netRegexDe: NetRegexes.ability({ id: 'B96', source: 'Phönix', capture: false }),
-      netRegexFr: NetRegexes.ability({ id: 'B96', source: 'Phénix', capture: false }),
-      netRegexJa: NetRegexes.ability({ id: 'B96', source: 'フェニックス', capture: false }),
-      netRegexCn: NetRegexes.ability({ id: 'B96', source: '不死鸟', capture: false }),
-      netRegexKo: NetRegexes.ability({ id: 'B96', source: '피닉스', capture: false }),
+      netRegex: { id: 'B96', source: 'Phoenix', capture: false },
       sound: 'Long',
       run: (data) => data.phase = 3,
     },
     {
       id: 'T12 Bennu',
       type: 'AddedCombatant',
-      netRegex: NetRegexes.addedCombatant({ name: 'Bennu', capture: false }),
-      netRegexDe: NetRegexes.addedCombatant({ name: 'Bennu', capture: false }),
-      netRegexFr: NetRegexes.addedCombatant({ name: 'Bénou', capture: false }),
-      netRegexJa: NetRegexes.addedCombatant({ name: 'ベンヌ', capture: false }),
-      netRegexCn: NetRegexes.addedCombatant({ name: '贝努鸟', capture: false }),
-      netRegexKo: NetRegexes.addedCombatant({ name: '벤누', capture: false }),
+      netRegex: { name: 'Bennu', capture: false },
       condition: (data) => data.phase <= 2,
       delaySeconds: 55,
       durationSeconds: 4.5,
@@ -56,19 +46,14 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'T12 Revelation',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: 'B87', source: 'Phoenix' }),
-      netRegexDe: NetRegexes.startsUsing({ id: 'B87', source: 'Phönix' }),
-      netRegexFr: NetRegexes.startsUsing({ id: 'B87', source: 'Phénix' }),
-      netRegexJa: NetRegexes.startsUsing({ id: 'B87', source: 'フェニックス' }),
-      netRegexCn: NetRegexes.startsUsing({ id: 'B87', source: '不死鸟' }),
-      netRegexKo: NetRegexes.startsUsing({ id: 'B87', source: '피닉스' }),
+      netRegex: { id: 'B87', source: 'Phoenix' },
       alertText: (data, matches, output) => {
         if (matches.target === data.me)
           return output.revelationOnYou!();
       },
       infoText: (data, matches, output) => {
         if (matches.target !== data.me)
-          return output.awayFromPlayer!({ player: data.ShortName(matches.target) });
+          return output.awayFromPlayer!({ player: data.party.member(matches.target) });
       },
       outputStrings: {
         awayFromPlayer: {
@@ -92,12 +77,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'T12 Blackfire',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({ id: 'B8C', source: 'Phoenix', capture: false }),
-      netRegexDe: NetRegexes.startsUsing({ id: 'B8C', source: 'Phönix', capture: false }),
-      netRegexFr: NetRegexes.startsUsing({ id: 'B8C', source: 'Phénix', capture: false }),
-      netRegexJa: NetRegexes.startsUsing({ id: 'B8C', source: 'フェニックス', capture: false }),
-      netRegexCn: NetRegexes.startsUsing({ id: 'B8C', source: '不死鸟', capture: false }),
-      netRegexKo: NetRegexes.startsUsing({ id: 'B8C', source: '피닉스', capture: false }),
+      netRegex: { id: 'B8C', source: 'Phoenix', capture: false },
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -113,7 +93,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'T12 Whitefire',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0020' }),
+      netRegex: { id: '0020' },
       condition: Conditions.targetIsYou(),
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -130,7 +110,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'T12 Bluefire',
       type: 'HeadMarker',
-      netRegex: NetRegexes.headMarker({ id: '0021' }),
+      netRegex: { id: '0021' },
       condition: Conditions.targetIsYou(),
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -148,14 +128,14 @@ const triggerSet: TriggerSet<Data> = {
       // Chain Of Purgatory
       id: 'T12 Chain',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({ effectId: '24D' }),
+      netRegex: { effectId: '24D' },
       alertText: (data, matches, output) => {
         if (matches.target === data.me)
           return output.chainOnYou!();
       },
       infoText: (data, matches, output) => {
         if (matches.target !== data.me)
-          return output.chainOn!({ player: data.ShortName(matches.target) });
+          return output.chainOn!({ player: data.party.member(matches.target) });
       },
       outputStrings: {
         chainOn: {
