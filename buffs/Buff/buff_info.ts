@@ -12,13 +12,13 @@ const noMercyImage = "../resources/images/003402.png"; // 无情
 const chainStratagemImage = "../resources/images/002815.png"; // 连环计
 // 占星
 const divinationImage = "../resources/images/003553.png"; // 占卜
-const astrodyneImage = "../resources/images/003558.png"; // 宏图
-const theArrowImage = "../resources/images/003113.png"; // 放浪神
+// const astrodyneImage = "../resources/images/003558.png"; // 宏图
+// const theArrowImage = "../resources/images/003113.png"; // 放浪神
 const theBalanceImage = "../resources/images/003110.png"; // 太阳神
-const theBoleImage = "../resources/images/003112.png"; // 世界树
-const theEwerImage = "../resources/images/003114.png"; // 河流神
+// const theBoleImage = "../resources/images/003112.png"; // 世界树
+// const theEwerImage = "../resources/images/003114.png"; // 河流神
 const theSpearImage = "../resources/images/003111.png"; // 战争神
-const theSpireImage = "../resources/images/003115.png"; // 建筑神
+// const theSpireImage = "../resources/images/003115.png"; // 建筑神
 // const ladyOfCrownsImage = "../resources/images/003146.png"; // 富贵
 // const lordOfCrownsImage = "../resources/images/003147.png"; // 领主
 // 武僧
@@ -27,10 +27,12 @@ const brotherhoodImage = "../resources/images/002542.png"; // 义结金兰
 // 龙骑
 const lanceChargeImage = "../resources/images/000309.png"; // 猛枪
 const battleLitanyImage = "../resources/images/002585.png"; // 战斗连祷
-const leftEyeImage = "../resources/images/002587.png"; // 左眼
+// const leftEyeImage = "../resources/images/002587.png"; // 左眼
 //忍者
 // const trickAttackImage = "../resources/images/000618.png"; // 背刺
 const mugImage = "../resources/images/000613.png"; // 夺取
+const dokumoriImage = "../resources/images/dokumori.png"; // 夺取
+
 // 钐镰客
 const arcaneCircleImage = "../resources/images/003633.png"; // 秘环
 // 诗人
@@ -45,6 +47,7 @@ const technicalFinishImage = "../resources/images/003474.png"; // 技巧舞步
 const searingLightImage = "../resources/images/002752.png"; // 灼热之光
 // 赤魔
 const emboldenImage = "../resources/images/003218.png"; // 鼓励
+const starryMuseImage = "../resources/images/starry_muse.png"; // 星空构想
 
 export interface BuffInfo {
     name: string;
@@ -148,30 +151,30 @@ export class BuffInfoList {
             magicUp: 6,
             tts: '占卜',
         },
-        astrodyne: { // 宏图
-            gainEffect: [EffectId.HarmonyOfMind],
-            loseEffect: [EffectId.HarmonyOfMind],
-            useEffectDuration: true,
-            icon: astrodyneImage,
-            borderColor: '#413952',
-            sortKey: 0,
-            cooldown: 120,
-            target: 'you',
-            physicalUp: 5, // 物理增伤
-            magicUp: 5, // 魔法增伤
-        },
-        arrow: { // 放浪神之箭
-            gainEffect: [EffectId.TheArrow_75C],
-            loseEffect: [EffectId.TheArrow_75C],
-            useEffectDuration: true,
-            icon: theArrowImage,
-            borderColor: '#37ccee',
-            sortKey: 0,
-            target: 'you',
-            meleeUp: 6,
-            rangedUp: 3,
-            tts: '近卡',
-        },
+        // astrodyne: { // 宏图
+        //     gainEffect: [EffectId.HarmonyOfMind],
+        //     loseEffect: [EffectId.HarmonyOfMind],
+        //     useEffectDuration: true,
+        //     icon: astrodyneImage,
+        //     borderColor: '#413952',
+        //     sortKey: 0,
+        //     cooldown: 120,
+        //     target: 'you',
+        //     physicalUp: 5, // 物理增伤
+        //     magicUp: 5, // 魔法增伤
+        // },
+        // arrow: { // 放浪神之箭
+        //     gainEffect: [EffectId.TheArrow_75C],
+        //     loseEffect: [EffectId.TheArrow_75C],
+        //     useEffectDuration: true,
+        //     icon: theArrowImage,
+        //     borderColor: '#37ccee',
+        //     sortKey: 0,
+        //     target: 'you',
+        //     meleeUp: 6,
+        //     rangedUp: 3,
+        //     tts: '近卡',
+        // },
         balance: { // 太阳神之衡
             gainEffect: [EffectId.TheBalance_75A],
             loseEffect: [EffectId.TheBalance_75A],
@@ -184,30 +187,30 @@ export class BuffInfoList {
             rangedUp: 3,
             tts: '近卡',
         },
-        bole: { // 世界树之干
-            gainEffect: [EffectId.TheBole_75B],
-            loseEffect: [EffectId.TheBole_75B],
-            useEffectDuration: true,
-            icon: theBoleImage,
-            borderColor: '#22dd77',
-            sortKey: 0,
-            target: 'you',
-            meleeUp: 3,
-            rangedUp: 6,
-            tts: '远卡',
-        },
-        ewer: { // 河流神之瓶
-            gainEffect: [EffectId.TheEwer_75E],
-            loseEffect: [EffectId.TheEwer_75E],
-            useEffectDuration: true,
-            icon: theEwerImage,
-            borderColor: '#66ccdd',
-            sortKey: 0,
-            target: 'you',
-            meleeUp: 3,
-            rangedUp: 6,
-            tts: '远卡',
-        },
+        // bole: { // 世界树之干
+        //     gainEffect: [EffectId.TheBole_75B],
+        //     loseEffect: [EffectId.TheBole_75B],
+        //     useEffectDuration: true,
+        //     icon: theBoleImage,
+        //     borderColor: '#22dd77',
+        //     sortKey: 0,
+        //     target: 'you',
+        //     meleeUp: 3,
+        //     rangedUp: 6,
+        //     tts: '远卡',
+        // },
+        // ewer: { // 河流神之瓶
+        //     gainEffect: [EffectId.TheEwer_75E],
+        //     loseEffect: [EffectId.TheEwer_75E],
+        //     useEffectDuration: true,
+        //     icon: theEwerImage,
+        //     borderColor: '#66ccdd',
+        //     sortKey: 0,
+        //     target: 'you',
+        //     meleeUp: 3,
+        //     rangedUp: 6,
+        //     tts: '远卡',
+        // },
         spear: { // 战争神之枪
             gainEffect: [EffectId.TheSpear_75D],
             loseEffect: [EffectId.TheSpear_75D],
@@ -220,18 +223,18 @@ export class BuffInfoList {
             rangedUp: 3,
             tts: '近卡',
         },
-        spire: { // 建筑神之塔
-            gainEffect: [EffectId.TheSpire_75F],
-            loseEffect: [EffectId.TheSpire_75F],
-            useEffectDuration: true,
-            icon: theSpireImage,
-            borderColor: '#ddd044',
-            sortKey: 0,
-            target: 'you',
-            meleeUp: 3,
-            rangedUp: 6,
-            tts: '远卡',
-        },
+        // spire: { // 建筑神之塔
+        //     gainEffect: [EffectId.TheSpire_75F],
+        //     loseEffect: [EffectId.TheSpire_75F],
+        //     useEffectDuration: true,
+        //     icon: theSpireImage,
+        //     borderColor: '#ddd044',
+        //     sortKey: 0,
+        //     target: 'you',
+        //     meleeUp: 3,
+        //     rangedUp: 6,
+        //     tts: '远卡',
+        // },
         // 武僧
         riddleOfFire: { // 红莲
             gainEffect: [EffectId.RiddleOfFire_49D],
@@ -284,31 +287,31 @@ export class BuffInfoList {
             magicUp: 5,
             tts: '连祷',
         },
-        lefteye: { // 巨龙左眼
-            gainEffect: [EffectId.LeftEye_5AE],
-            loseEffect: [EffectId.LeftEye_5AE],
-            useEffectDuration: true,
-            icon: leftEyeImage,
-            borderColor: '#f85d48',
-            sortKey: 0,
-            cooldown: 120,
-            target: 'you',
-            physicalUp: 5,
-            magicUp: 5,
-            tts: '左眼',
-        },
-        righteye: { // 巨龙右眼 单人+双人
-            gainEffect: [EffectId.RightEye_776, EffectId.RightEye_5AD],
-            loseEffect: [EffectId.RightEye_776, EffectId.RightEye_5AD],
-            useEffectDuration: true,
-            icon: leftEyeImage,
-            borderColor: '#fa5437',
-            sortKey: 0,
-            cooldown: 120,
-            target: 'you',
-            physicalUp: 10,
-            magicUp: 10,
-        },
+        // lefteye: { // 巨龙左眼
+        //     gainEffect: [EffectId.LeftEye_5AE],
+        //     loseEffect: [EffectId.LeftEye_5AE],
+        //     useEffectDuration: true,
+        //     icon: leftEyeImage,
+        //     borderColor: '#f85d48',
+        //     sortKey: 0,
+        //     cooldown: 120,
+        //     target: 'you',
+        //     physicalUp: 5,
+        //     magicUp: 5,
+        //     tts: '左眼',
+        // },
+        // righteye: { // 巨龙右眼 单人+双人
+        //     gainEffect: [EffectId.RightEye_776, EffectId.RightEye_5AD],
+        //     loseEffect: [EffectId.RightEye_776, EffectId.RightEye_5AD],
+        //     useEffectDuration: true,
+        //     icon: leftEyeImage,
+        //     borderColor: '#fa5437',
+        //     sortKey: 0,
+        //     cooldown: 120,
+        //     target: 'you',
+        //     physicalUp: 10,
+        //     magicUp: 10,
+        // },
         // 忍者
         // trick: { // 背刺
         //     activeAbility: [kAbility.TrickAttack],
@@ -328,6 +331,19 @@ export class BuffInfoList {
             durationSeconds: 20,
             icon: mugImage,
             borderColor: '#e2b640',
+            sortKey: 0,
+            cooldown: 120,
+            target: 'boss',
+            physicalUp: 5,
+            magicUp: 5,
+            tts: '夺取',
+        },
+        dokumori: { // 介毒之术
+            activeAbility: [kAbility.Dokumori],
+            partyOnly: true,
+            durationSeconds: 20,
+            icon: dokumoriImage,
+            borderColor: '#ab5ed9',
             sortKey: 0,
             cooldown: 120,
             target: 'boss',
@@ -425,8 +441,8 @@ export class BuffInfoList {
             sortKey: 0,
             cooldown: 120,
             target: 'you',
-            physicalUp: 3,
-            magicUp: 3,
+            physicalUp: 5,
+            magicUp: 5,
             tts: '灼热',
         },
         emboldenIsMe: { // 鼓励(自己给自己) 4d7
@@ -454,6 +470,19 @@ export class BuffInfoList {
             physicalUp: 5,
             magicUp: 5,
             tts: '鼓励',
+        },
+        starryMuse: {
+            gainEffect: [EffectId.StarryMuse],
+            loseEffect: [EffectId.StarryMuse],
+            useEffectDuration: true,
+            icon: starryMuseImage,
+            borderColor: '#cc86ef',
+            sortKey: 0,
+            cooldown: 120,
+            target: 'you',
+            physicalUp: 5,
+            magicUp: 5,
+            tts: '星空',
         },
     }
 

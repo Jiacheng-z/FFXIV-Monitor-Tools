@@ -26,7 +26,7 @@ UserConfig.getUserConfigLocation('buff', defaultOptions, () => {
         'de': 701,
         'fr': 701,
         'ja': 701,
-        'cn': 650,
+        'cn': 701,
         'ko': 650,
     };
     const ffxivVersion = ffxivlanguageToVersion[options.ParserLanguage];

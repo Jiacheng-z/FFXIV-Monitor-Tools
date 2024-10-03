@@ -12,7 +12,7 @@ const combustIIIImage = '../resources/images/003554.png'; // 焚灼
 // 贤者
 const eukrasianDosisIiiImage = '../resources/images/003682.png'; // 焚灼
 // 武僧
-const demolishIiiImage = '../resources/images/000204.png'; // 破碎拳
+// const demolishIiiImage = '../resources/images/000204.png'; // 破碎拳
 // 龙骑
 const chaosThrustIiiImage = '../resources/images/000308.png'; // 樱花怒放
 const chaoticSpringImage = '../resources/images/chaotic_spring.png'; // 樱花2
@@ -25,6 +25,7 @@ const stormbiteImage = '../resources/images/002614.png';
 const causticBiteImage = '../resources/images/002613.png';
 // 黑魔
 const thunderIiiImage = '../resources/images/000459.png';
+const thunderIvImage = '../resources/images/thunder_iv.png';
 // 召唤
 // const bioIIIImage = '../resources/images/002689.png';
 // const miasmaIIIImage = '../resources/images/002690.png';
@@ -105,15 +106,15 @@ export class DotInfoList {
             tts: true,
         },
         // 武僧
-        demolish: {
-            gainEffect: [Effect_id.Demolish_F6],
-            loseEffect: [Effect_id.Demolish_F6],
-            icon: demolishIiiImage,
-            borderColor: '#f5cc19',
-            sortKey: 0,
-            attackType: 'physical',
-            tts: false,
-        },
+        // demolish: {
+        //     gainEffect: [Effect_id.Demolish_F6],
+        //     loseEffect: [Effect_id.Demolish_F6],
+        //     icon: demolishIiiImage,
+        //     borderColor: '#f5cc19',
+        //     sortKey: 0,
+        //     attackType: 'physical',
+        //     tts: false,
+        // },
         // 龙骑
         chaosThrust: {
             gainEffect: [Effect_id.ChaosThrust_76],
@@ -178,6 +179,15 @@ export class DotInfoList {
             loseEffect: [Effect_id.ThunderIii],
             icon: thunderIiiImage,
             borderColor: '#93d5fd',
+            sortKey: 0,
+            attackType: 'magic',
+            tts: true,
+        },
+        thunderIv: {
+            gainEffect: [Effect_id.ThunderIv],
+            loseEffect: [Effect_id.ThunderIv],
+            icon: thunderIvImage,
+            borderColor: '#b850e8',
             sortKey: 0,
             attackType: 'magic',
             tts: true,

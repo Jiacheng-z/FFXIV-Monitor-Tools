@@ -11,7 +11,7 @@ export interface UserConfigOptions {
   DotNoticeTTSOn: boolean;
   DotNoticeTTS: string;
 
-  TTSGoringBlade: boolean; // 骑士-沥血剑
+  TTSGoringBlade: boolean; // 骑士-沥血剑 取消
   TTSSurgingTempest: boolean; // 战士-红斩
   TTSDia: boolean; // 白魔-天辉
   TTSBiolysis: boolean; // 学者-蛊毒法
@@ -22,7 +22,7 @@ export interface UserConfigOptions {
   TTSHiganbana: boolean; // 武士-彼岸花
   TTSDeathsDesign: boolean; // 镰刀-死亡之影
   TTSStormbite: boolean; // 诗人-狂风蚀箭
-  TTSThunderIii: boolean; // 黑魔-暴雷
+  TTSThunderIii: boolean; // 黑魔-暴雷+高闪雷
 }
 
 export const defaultUserConfig: UserConfigOptions = {

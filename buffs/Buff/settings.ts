@@ -86,13 +86,15 @@ function save() {
         options.DotNoticeTTS = dlt
     }
 
-    options.TTSGoringBlade = (document.getElementById("TTSGoringBlade") as HTMLInputElement).checked;
+    // options.TTSGoringBlade = (document.getElementById("TTSGoringBlade") as HTMLInputElement).checked;
+    options.TTSGoringBlade = false;
     options.TTSSurgingTempest = (document.getElementById("TTSSurgingTempest") as HTMLInputElement).checked;
     options.TTSDia = (document.getElementById("TTSDia") as HTMLInputElement).checked;
     options.TTSBiolysis = (document.getElementById("TTSBiolysis") as HTMLInputElement).checked;
     options.TTSCombustIII = (document.getElementById("TTSCombustIII") as HTMLInputElement).checked;
     options.TTSEukrasianDosisIii = (document.getElementById("TTSEukrasianDosisIii") as HTMLInputElement).checked;
-    options.TTSDemolish = (document.getElementById("TTSDemolish") as HTMLInputElement).checked;
+    // options.TTSDemolish = (document.getElementById("TTSDemolish") as HTMLInputElement).checked;
+    options.TTSDemolish = false;
     options.TTSChaoticSpring = (document.getElementById("TTSChaoticSpring") as HTMLInputElement).checked;
     options.TTSHiganbana = (document.getElementById("TTSHiganbana") as HTMLInputElement).checked;
     options.TTSDeathsDesign = (document.getElementById("TTSDeathsDesign") as HTMLInputElement).checked;
