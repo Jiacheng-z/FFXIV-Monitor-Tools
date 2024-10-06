@@ -25,7 +25,7 @@ const stormbiteImage = '../resources/images/002614.png';
 const causticBiteImage = '../resources/images/002613.png';
 // 黑魔
 const thunderIiiImage = '../resources/images/000459.png';
-const thunderIvImage = '../resources/images/thunder_iv.png';
+const highThunderImage = '../resources/images/high_thunder.png';
 // 召唤
 // const bioIIIImage = '../resources/images/002689.png';
 // const miasmaIIIImage = '../resources/images/002690.png';
@@ -183,10 +183,10 @@ export class DotInfoList {
             attackType: 'magic',
             tts: true,
         },
-        thunderOfTheRroneek: {
-            gainEffect: [Effect_id.ThunderOfTheRroneek],
-            loseEffect: [Effect_id.ThunderOfTheRroneek],
-            icon: thunderIvImage,
+        highThunder: {
+            gainEffect: [Effect_id.HighThunder_F1F],
+            loseEffect: [Effect_id.HighThunder_F1F],
+            icon: highThunderImage,
             borderColor: '#b850e8',
             sortKey: 0,
             attackType: 'magic',
