@@ -42337,8 +42337,8 @@ class BuffInfoList {
     // },
     balance: {
       // 太阳神之衡
-      gainEffect: [effect_id.TheBalance_75A],
-      loseEffect: [effect_id.TheBalance_75A],
+      gainEffect: [effect_id.TheBalance_F2F],
+      loseEffect: [effect_id.TheBalance_F2F],
       useEffectDuration: true,
       icon: theBalanceImage,
       borderColor: '#ff5900',
@@ -42374,16 +42374,16 @@ class BuffInfoList {
     // },
     spear: {
       // 战争神之枪
-      gainEffect: [effect_id.TheSpear_75D],
-      loseEffect: [effect_id.TheSpear_75D],
+      gainEffect: [effect_id.TheSpear_F31],
+      loseEffect: [effect_id.TheSpear_F31],
       useEffectDuration: true,
       icon: theSpearImage,
       borderColor: '#4477dd',
       sortKey: 0,
       target: 'you',
-      meleeUp: 6,
-      rangedUp: 3,
-      tts: '近卡'
+      meleeUp: 3,
+      rangedUp: 6,
+      tts: '远卡'
     },
     // spire: { // 建筑神之塔
     //     gainEffect: [EffectId.TheSpire_75F],
