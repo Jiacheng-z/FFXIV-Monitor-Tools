@@ -183,9 +183,9 @@ export class DotInfoList {
             attackType: 'magic',
             tts: true,
         },
-        thunderIv: {
-            gainEffect: [Effect_id.ThunderIv],
-            loseEffect: [Effect_id.ThunderIv],
+        thunderOfTheRroneek: {
+            gainEffect: [Effect_id.ThunderOfTheRroneek],
+            loseEffect: [Effect_id.ThunderOfTheRroneek],
             icon: thunderIvImage,
             borderColor: '#b850e8',
             sortKey: 0,
