@@ -127,7 +127,7 @@ export class BuffInfoList {
         chain: { // 连环计
             activeAbility: [kAbility.ChainStratagem],
             partyOnly: true,
-            durationSeconds: 15,
+            durationSeconds: 20,
             icon: chainStratagemImage,
             borderColor: '#849dfd',
             sortKey: 0,
